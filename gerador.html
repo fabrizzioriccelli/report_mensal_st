@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Gerador do report · Creative Strategy PF</title>
+<!--
+  GERADOR DO REPORT (uso interno do time, não é enviado a ninguém)
+  1. Abra este arquivo no Edge ou Chrome.
+  2. Clique em "Abrir pasta do report" e escolha a pasta do projeto
+     (a que contém conteudo/, assets/ e template/).
+  3. Edite o JSON à esquerda; a prévia atualiza sozinha.
+  4. Exporte: pacote de envio (Graph), HTML do e-mail ou versão web.
+-->
+<style>
+  :root{--red:#9E1218;--ink:#1A1A1A;--gray:#5C5C5C;--rule:#E2DEDA;--bg:#F5F3F1}
+  *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:grid;grid-template-rows:auto 1fr}
+  header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 18px;background:#fff;border-bottom:4px solid var(--red)}
+  header h1{font-size:16px;margin:0 12px 0 0;color:var(--red)}
+  button,.file{font:inherit;font-size:13px;font-weight:600;border:1px solid #CFC9C4;background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;position:relative}
+  button.pri{background:var(--red);border-color:var(--red);color:#fff}button:disabled{opacity:.45;cursor:not-allowed}
+  .file input{position:absolute;inset:0;opacity:0;cursor:pointer}.file:focus-within,button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  main{display:grid;grid-template-columns:minmax(320px,30%) 1fr;min-height:0}
+  .left{display:grid;grid-template-rows:1fr auto;min-height:0;border-right:1px solid var(--rule);background:#fff}
+  textarea{width:100%;height:100%;border:0;resize:none;padding:14px;font:12.5px/1.5 Consolas,"Cascadia Mono",monospace;color:#222;outline:none}
+  .info{border-top:1px solid var(--rule);padding:12px 14px;font-size:12.5px;max-height:38vh;overflow:auto}
+  .info h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px;color:var(--gray)}.info h2:first-child{margin-top:0}
+  .info ul{margin:0;padding-left:18px}.info li{margin:3px 0}.ok{color:#1F7A3A;font-weight:600}.err{color:var(--red);font-weight:600}
+  .right{display:grid;grid-template-rows:auto 1fr;min-height:0}
+  .tabs{display:flex;gap:6px;padding:10px 14px;align-items:center}.tabs button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabs span{margin-left:auto;font-size:12px;color:var(--gray)}
+  .stage{overflow:auto;display:flex;justify-content:center;padding:0 14px 14px}
+  iframe{border:0;background:#fff;box-shadow:0 6px 30px rgba(0,0,0,.12);height:100%;min-height:600px}
+  @media (max-width:900px){main{grid-template-columns:1fr}.left{height:50vh}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Gerador do report</h1>
+  <label class="file">Abrir pasta do report<input type="file" id="dir" webkitdirectory multiple></label>
+  <label class="file">Abrir JSON<input type="file" id="json" accept=".json,application/json"></label>
+  <button type="button" class="pri" id="bSend" title="Corpo pronto para POST /me/sendMail do Microsoft Graph, com imagens inline">Gerar pacote de envio</button>
+  <button type="button" id="bEmail">Copiar HTML do e-mail</button>
+  <button type="button" id="bWeb">Baixar versão web</button>
+  <button type="button" id="bJson">Baixar JSON editado</button>
+</header>
+<main>
+  <section class="left" aria-label="Conteúdo do mês">
+    <label for="ed" style="position:absolute;left:-9999px">Conteúdo do mês em JSON</label>
+    <textarea id="ed" spellcheck="false"></textarea>
+    <div class="info" id="info" aria-live="polite"></div>
+  </section>
+  <section class="right" aria-label="Prévia">
+    <div class="tabs" role="group" aria-label="Tipo de prévia">
+      <button type="button" data-view="email" aria-pressed="true">E-mail · desktop</button>
+      <button type="button" data-view="mobile" aria-pressed="false">E-mail · celular</button>
+      <button type="button" data-view="web" aria-pressed="false">Versão web</button>
+      <span id="size"></span>
+    </div>
+    <div class="stage"><iframe id="pv" title="Prévia do report"></iframe></div>
+  </section>
+</main>
+<script src="template/render.js"></script>
+<script>
+(function () {
+  "use strict";
+  var T = window.ReportTemplate, $ = function (s) { return document.querySelector(s); };
+  var ed = $("#ed"), pv = $("#pv"), info = $("#info"), view = "email", content = null, slug = "report";
+  var FILES = {}; /* caminho relativo → File (quando a pasta é aberta) */
+  var DEFAULT = "conteudo/2026-09.json";
+
+  function srcOf(p) { if (!p || /^(https?:|data:|blob:|cid:)/i.test(p)) return p; return FILES[p] ? (FILES[p].url || (FILES[p].url = URL.createObjectURL(FILES[p]))) : p; }
+  function li(t, cls) { var l = document.createElement("li"); l.textContent = t; if (cls) l.className = cls; return l; }
+
+  function render() {
+    try { content = JSON.parse(ed.value); } catch (e) { info.replaceChildren(h2("JSON inválido"), ul([li(e.message, "err")])); return; }
+    var html;
+    if (view === "web") html = T.renderWeb(content, { src: srcOf });
+    else html = T.renderEmail(content, { src: srcOf });
+    pv.style.width = view === "mobile" ? "390px" : view === "web" ? "100%" : "880px";
+    pv.srcdoc = html;
+    var lint = T.lintEmail(T.renderEmail(content, { src: function (p) { return "cid:" + p.split("/").pop(); } }));
+    var pend = T.validate(content);
+    $("#size").textContent = "E-mail: " + lint.kb + " KB de HTML";
+    info.replaceChildren(
+      h2("Compatibilidade com Outlook"), ul(lint.issues.length ? lint.issues.map(function (x) { return li(x, "err"); }) : [li("Sem problemas encontrados", "ok")]),
+      h2("Pendências (" + pend.length + ")"), ul(pend.length ? pend.map(function (p) { return li(p.campo + ": " + p.valor); }) : [li("Nenhuma: pronto para enviar", "ok")]),
+      h2("Imagens"), ul([li(Object.keys(FILES).length ? "Pasta carregada: " + Object.keys(FILES).length + " arquivos" : "Abra a pasta do report para gerar o pacote de envio (as imagens precisam ser lidas)")]));
+  }
+  function h2(t) { var e = document.createElement("h2"); e.textContent = t; return e; }
+  function ul(items) { var u = document.createElement("ul"); items.forEach(function (i) { u.append(i); }); return u; }
+  var timer = 0; ed.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(render, 350); });
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () { view = b.dataset.view; document.querySelectorAll("[data-view]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); render(); });
+  });
+  function load(text, name) { ed.value = text; slug = (name || "report").replace(/\.json$/, ""); render(); }
+
+  /* Pasta do projeto: mapeia arquivos e carrega o JSON mais recente de conteudo/ */
+  $("#dir").addEventListener("change", function (e) {
+    FILES = {}; var jsons = [];
+    Array.prototype.forEach.call(e.target.files, function (f) {
+      var rel = f.webkitRelativePath.split("/").slice(1).join("/"); FILES[rel] = f;
+      if (/^conteudo\/[^/]+\.json$/.test(rel)) jsons.push(rel);
+    });
+    jsons.sort(); var last = jsons[jsons.length - 1];
+    if (last) FILES[last].text().then(function (t) { load(t, last.split("/").pop()); }); else render();
+  });
+  $("#json").addEventListener("change", function (e) { var f = e.target.files[0]; if (f) f.text().then(function (t) { load(t, f.name); }); });
+
+  /* Lê a imagem (arquivo da pasta ou URL quando servido por HTTP), otimiza e, se for vídeo, grava o play */
+  function prepImage(path, isVideo) {
+    return new Promise(function (res, rej) {
+      var im = new Image(); im.onload = function () {
+        var maxW = 600, k = Math.min(1, maxW / im.naturalWidth), w = Math.round(im.naturalWidth * k), hh = Math.round(im.naturalHeight * k);
+        var c = document.createElement("canvas"); c.width = w; c.height = hh; var x = c.getContext("2d");
+        x.fillStyle = "#fff"; x.fillRect(0, 0, w, hh); x.drawImage(im, 0, 0, w, hh);
+        if (isVideo) { var r = Math.max(18, Math.round(hh * .15)), cx = 18 + r, cy = hh - 16 - r;
+          x.fillStyle = "rgba(0,0,0,.25)"; x.beginPath(); x.arc(cx, cy + 2, r, 0, 7); x.fill(); x.fillStyle = "#fff"; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill();
+          x.fillStyle = "#9E1218"; x.beginPath(); x.moveTo(cx - r * .3, cy - r * .42); x.lineTo(cx - r * .3, cy + r * .42); x.lineTo(cx + r * .45, cy); x.closePath(); x.fill(); }
+        try { res(c.toDataURL("image/jpeg", .82).split(",")[1]); } catch (e) { rej(new Error("Navegador bloqueou a leitura de " + path + ". Abra a pasta do report pelo botão.")); }
+      };
+      im.onerror = function () { rej(new Error("Imagem não encontrada: " + path)); };
+      if (FILES[path]) im.src = srcOf(path); else { im.crossOrigin = "anonymous"; im.src = path; }
+    });
+  }
+  function download(name, text, type) { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: type })); a.download = name; a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000); }
+
+  $("#bSend").addEventListener("click", function () {
+    if (!content) return; var btn = this; btn.disabled = true; btn.textContent = "Gerando…";
+    var imgs = T.collectImages(content), cid = {};
+    imgs.forEach(function (i) { var base = i.src.split("/").pop(); cid[i.src] = i.kind === "video" ? base.replace(/(\.\w+)$/, "-play.jpg") : base.replace(/\.\w+$/, ".jpg"); });
+    Promise.all(imgs.map(function (i) { return prepImage(i.src, i.kind === "video").then(function (b64) {
+      return { "@odata.type": "#microsoft.graph.fileAttachment", name: cid[i.src], contentType: "image/jpeg", contentId: cid[i.src], isInline: true, contentBytes: b64 }; }); }))
+    .then(function (att) {
+      var html = T.renderEmail(content, { src: function (p) { return cid[p] ? "cid:" + cid[p] : p; }, emailThumb: function (p) { return p; } });
+      var payload = { message: { subject: content.meta.assuntoEmail, body: { contentType: "HTML", content: html }, toRecipients: [{ emailAddress: { address: "[DESTINATARIO@EMPRESA]" } }], attachments: att }, saveToSentItems: true };
+      var str = JSON.stringify(payload, null, 1); download("sendmail-" + slug + ".json", str, "application/json");
+      alert("Pacote gerado: " + Math.round(str.length / 1024) + " KB.\nTroque [DESTINATARIO@EMPRESA] e envie com POST /me/sendMail (Power Automate, Graph Explorer ou PowerShell). Veja docs/ENVIO.md.");
+    }).catch(function (e) { alert(e.message); }).then(function () { btn.disabled = false; btn.textContent = "Gerar pacote de envio"; });
+  });
+  $("#bEmail").addEventListener("click", function () {
+    if (!content) return; var html = T.renderEmail(content, {});
+    (navigator.clipboard ? navigator.clipboard.writeText(html) : Promise.reject()).then(function () { alert("HTML do e-mail copiado (imagens com caminho relativo assets/...)."); }, function () { download("email-" + slug + ".html", html, "text/html"); });
+  });
+  $("#bWeb").addEventListener("click", function () { if (content) download("report-" + slug + ".html", T.renderWeb(content, {}), "text/html"); });
+  $("#bJson").addEventListener("click", function () { if (content) download(slug + ".json", ed.value, "application/json"); });
+
+  /* Servido por HTTP (SharePoint/servidor local): carrega o conteúdo padrão direto */
+  var q = new URLSearchParams(location.search).get("conteudo") || DEFAULT;
+  if (location.protocol.indexOf("http") === 0) fetch(q).then(function (r) { return r.text(); }).then(function (t) { load(t, q.split("/").pop()); }).catch(render);
+  else { ed.value = "{\n  \"_dica\": \"Clique em 'Abrir pasta do report' e escolha a pasta do projeto.\"\n}"; info.textContent = "Clique em “Abrir pasta do report” e escolha a pasta do projeto (com conteudo/, assets/ e template/)."; }
+})();
+</script>
+</body>
+</html>
