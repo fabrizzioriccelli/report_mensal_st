@@ -6,7 +6,8 @@ Template do report mensal, fiel ao layout original, com **e-mail como canal prin
 
 | Arquivo | O que é |
 |---|---|
-| `dist/2026-09/email.html` | Prévia do e-mail de setembro (o que chega no Outlook). |
+| `dist/2026-09/report-2026-09.eml` | **E-mail pronto para o Outlook**: dois cliques, preencha os destinatários e envie. |
+| `dist/2026-09/email-previa-2026-09.html` | Prévia do e-mail em arquivo único, para ver no navegador. |
 | `dist/2026-09/report.html` | Versão web interativa, com vídeo em modal e ampliação de imagens. |
 | `gerador.html` | Área de atualização: edite o JSON, veja a prévia e exporte o pacote de envio. |
 

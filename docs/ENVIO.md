@@ -2,6 +2,14 @@
 
 O e-mail precisa levar as imagens **anexadas inline** (`cid:`). Assim elas aparecem no Outlook sem o leitor clicar em "Baixar imagens" e sem depender de login no SharePoint.
 
+## Caminho mais rápido: arquivo .eml
+
+1. No `gerador.html`, clique em "Baixar e-mail para o Outlook (.eml)" (ou use `dist/AAAA-MM/report-AAAA-MM.eml`).
+2. Dê dois cliques no arquivo. O Outlook abre uma mensagem nova, já com o layout e as imagens embutidas.
+3. Preencha os destinatários e envie.
+
+Funciona no Outlook clássico para Windows. No novo Outlook, o arquivo .eml pode abrir só para leitura, dependendo da versão; nesse caso use o caminho pelo Graph abaixo.
+
 ## 1. Gerar
 
 - **Sem instalar nada:** abra `gerador.html` no Edge ou Chrome, clique em "Abrir pasta do report", confira a prévia e as pendências e clique em "Gerar pacote de envio".

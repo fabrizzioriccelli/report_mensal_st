@@ -62,6 +62,28 @@ const payload = {
 const payloadStr = JSON.stringify(payload);
 fs.writeFileSync(path.join(out, "sendmail.json"), payloadStr);
 
+/* 2b) Arquivo .eml: abre no Outlook como rascunho pronto (X-Unsent), imagens embutidas via cid */
+const b64lines = s => s.replace(/.{1,76}/g, "$&\r\n");
+const boundary = "----=_report_" + Date.now().toString(36);
+const subject = "=?UTF-8?B?" + Buffer.from(content.meta.assuntoEmail || "Report").toString("base64") + "?=";
+const eml = [
+  "X-Unsent: 1", "Subject: " + subject, "MIME-Version: 1.0",
+  `Content-Type: multipart/related; boundary="${boundary}"; type="text/html"`, "",
+  "--" + boundary, 'Content-Type: text/html; charset="utf-8"', "Content-Transfer-Encoding: base64", "",
+  b64lines(Buffer.from(emailCid, "utf8").toString("base64")),
+  ...attachments.flatMap(a => ["--" + boundary, `Content-Type: ${a.contentType}; name="${a.name}"`, "Content-Transfer-Encoding: base64",
+    `Content-ID: <${a.contentId}>`, `Content-Disposition: inline; filename="${a.name}"`, "", b64lines(a.contentBytes)]),
+  "--" + boundary + "--", ""
+].join("\r\n");
+const emlName = `report-${slug}.eml`;
+fs.writeFileSync(path.join(out, emlName), eml);
+
+/* 2c) Prévia em arquivo único (imagens em base64): só para ver no navegador; o Outlook bloqueia base64 */
+const dataUri = {};
+attachments.forEach(a => { dataUri[a.name] = `data:${a.contentType};base64,${a.contentBytes}`; });
+const preview = T.renderEmail(content, { src: p => dataUri[path.basename(p)] || rel(p), emailThumb });
+fs.writeFileSync(path.join(out, `email-previa-${slug}.html`), preview);
+
 /* 3) Versão web */
 fs.writeFileSync(path.join(out, "report.html"), T.renderWeb(content, { src: rel }));
 
@@ -71,6 +93,8 @@ const pend = T.validate(content);
 console.log(`\nReport ${content.meta.mes} ${content.meta.ano} → dist/${slug}/`);
 console.log(`  email.html      ${Math.round(Buffer.byteLength(emailPreview) / 1024)} KB`);
 console.log(`  sendmail.json   ${Math.round(payloadStr.length / 1024)} KB (HTML ${lint.kb} KB + ${attachments.length} imagens inline, ${Math.round(total / 1024)} KB)`);
+console.log(`  ${emlName}  ${Math.round(eml.length / 1024)} KB  ← abrir no Outlook`);
+console.log(`  email-previa-${slug}.html  ${Math.round(preview.length / 1024)} KB  ← prévia no navegador`);
 console.log(`  report.html     ${Math.round(fs.statSync(path.join(out, "report.html")).size / 1024)} KB`);
 if (payloadStr.length > 3 * 1024 * 1024) warn.push("Pacote acima de ~3 MB: o Graph exige sessão de upload para anexos maiores. Reduza as imagens.");
 console.log(`\nCompatibilidade com Outlook: ${lint.issues.length ? "\n  - " + lint.issues.join("\n  - ") : "ok"}`);

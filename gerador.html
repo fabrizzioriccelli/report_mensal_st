@@ -40,7 +40,8 @@
   <h1>Gerador do report</h1>
   <label class="file">Abrir pasta do report<input type="file" id="dir" webkitdirectory multiple></label>
   <label class="file">Abrir JSON<input type="file" id="json" accept=".json,application/json"></label>
-  <button type="button" class="pri" id="bSend" title="Corpo pronto para POST /me/sendMail do Microsoft Graph, com imagens inline">Gerar pacote de envio</button>
+  <button type="button" class="pri" id="bEml" title="Abre no Outlook como rascunho pronto, com as imagens embutidas">Baixar e-mail para o Outlook (.eml)</button>
+  <button type="button" id="bSend" title="Corpo pronto para POST /me/sendMail do Microsoft Graph, com imagens inline">Gerar pacote de envio</button>
   <button type="button" id="bEmail">Copiar HTML do e-mail</button>
   <button type="button" id="bWeb">Baixar versão web</button>
   <button type="button" id="bJson">Baixar JSON editado</button>
@@ -125,6 +126,25 @@
     });
   }
   function download(name, text, type) { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: type })); a.download = name; a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000); }
+
+  /* Monta anexos inline (imagens otimizadas, play gravado nos vídeos) e o HTML com cid: */
+  function buildPackage() {
+    var imgs = T.collectImages(content), cid = {};
+    imgs.forEach(function (i) { var base = i.src.split("/").pop(); cid[i.src] = i.kind === "video" ? base.replace(/(\.\w+)$/, "-play.jpg") : base.replace(/\.\w+$/, ".jpg"); });
+    return Promise.all(imgs.map(function (i) { return prepImage(i.src, i.kind === "video").then(function (b64) { return { name: cid[i.src], b64: b64 }; }); }))
+      .then(function (att) { return { att: att, html: T.renderEmail(content, { src: function (p) { return cid[p] ? "cid:" + cid[p] : p; }, emailThumb: function (p) { return p; } }) }; });
+  }
+  function b64utf8(str) { var bytes = new TextEncoder().encode(str), bin = ""; for (var i = 0; i < bytes.length; i += 32768) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 32768)); return btoa(bin); }
+  function wrap76(s) { return s.replace(/.{1,76}/g, "$&\r\n"); }
+  $("#bEml").addEventListener("click", function () {
+    if (!content) return; var btn = this; btn.disabled = true;
+    buildPackage().then(function (pk) {
+      var bd = "----=_report_" + Date.now().toString(36), L = ["X-Unsent: 1", "Subject: =?UTF-8?B?" + b64utf8(content.meta.assuntoEmail || "Report") + "?=", "MIME-Version: 1.0",
+        'Content-Type: multipart/related; boundary="' + bd + '"; type="text/html"', "", "--" + bd, 'Content-Type: text/html; charset="utf-8"', "Content-Transfer-Encoding: base64", "", wrap76(b64utf8(pk.html))];
+      pk.att.forEach(function (a) { L.push("--" + bd, 'Content-Type: image/jpeg; name="' + a.name + '"', "Content-Transfer-Encoding: base64", "Content-ID: <" + a.name + ">", 'Content-Disposition: inline; filename="' + a.name + '"', "", wrap76(a.b64)); });
+      L.push("--" + bd + "--", ""); download("report-" + slug + ".eml", L.join("\r\n"), "message/rfc822");
+    }).catch(function (e) { alert(e.message); }).then(function () { btn.disabled = false; });
+  });
 
   $("#bSend").addEventListener("click", function () {
     if (!content) return; var btn = this; btn.disabled = true; btn.textContent = "Gerando…";

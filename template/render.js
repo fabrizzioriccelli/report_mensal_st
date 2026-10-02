@@ -89,6 +89,7 @@
     (r.cases || []).forEach(function (cs) { if (cs.midia && cs.midia.src) add(cs.midia.src); });
     if (r.excelencia) { add(r.excelencia.logo && r.excelencia.logo.src); add(r.excelencia.imagem && r.excelencia.imagem.src); }
     var vm = videoMap(c);
+    if (c.abertura && c.abertura.mostrar !== false && vm[c.abertura.video]) add(vm[c.abertura.video].thumb, "video");
     ((c.temas && c.temas.itens) || []).forEach(function (t) {
       var m = t.midia || {};
       if (m.tipo === "imagem") add(m.src);
@@ -169,6 +170,22 @@
       "</tr>") + "</td></tr>");
     out.push(rule(2, INK, "16px " + PAD + "px 0"));
 
+    /* --- Abertura editorial + vídeo-resumo do mês (herdado da versão 1) --- */
+    var A = c.abertura;
+    if (A && A.mostrar !== false) {
+      var av = vm[A.video];
+      var manchete = (A.manchete || []).map(function (l, i, arr) {
+        return p(esc(l), f(40, 700, i === arr.length - 1 ? RED : INK, 42, "letter-spacing:-1.5px;"));
+      }).join("");
+      var chamada = '<span style="' + f(12, 700, RED, 16) + '">&#9654;</span>&nbsp;&nbsp;' + esc(A.chamada || "Assistir");
+      var vidCell = av ? '<td valign="top" class="col" width="340" style="width:340px;">' + videoThumb(av, 340, Math.round(340 / 1.7787), "Assistir: " + av.titulo) +
+        gap(9, isUrl(av.link) ? '<a href="' + esc(av.link) + '" target="_blank" style="' + f(12, 700, INK, 16, "text-decoration:none;") + '">' + chamada + " &#8250;</a>" : p(chamada, f(12, 700, INK, 16))) +
+        p(esc(av.duracao) + " · resumo em vídeo no Stream", "padding-top:2px;" + f(10.5, 400, MUTED, 14)) + "</td>" : "";
+      out.push('<tr><td class="px" style="padding:24px ' + PAD + 'px 4px;">' + table('<tr><td valign="middle" class="col" style="padding-right:28px;">' + manchete +
+        p(rich(A.resumo), "padding-top:14px;" + f(13.5, 400, TEXT, 20)) + "</td>" + vidCell + "</tr>") + "</td></tr>");
+      out.push(rule(1, RULE, "20px " + PAD + "px 0"));
+    }
+
     /* --- 01 Principais resultados --- */
     var R = c.resultados || {};
     out.push(sectionHead("01", R.titulo || "Principais resultados"));
@@ -244,20 +261,28 @@
     }).join("");
     out.push('<tr><td class="px" style="padding:0 ' + PAD + 'px;">' + table("<tr>" + temaCells + "</tr>") + "</td></tr>");
 
-    /* --- Top vídeos do mês (opcional) --- */
+    /* --- Top vídeos do mês (opcional; estilo "cinema" herdado da versão 1) --- */
     var tv = topVideos(c);
     if (tv.length) {
-      out.push(rule(1, RULE, "22px " + PAD + "px 0"));
-      out.push('<tr><td class="px" style="padding:12px ' + PAD + 'px 12px;"><span style="' + f(13, 700, RED, 22) + '">&#9654;</span>&nbsp;&nbsp;<span style="' + f(11, 700, INK, 22, "letter-spacing:1px;") + '">' + esc(upper(c.topVideos.titulo || "Top vídeos do mês")) + "</span></td></tr>");
-      var vw = Math.floor((CW - 2 * 16) / 3);
+      var cine = c.topVideos.estilo === "cinema";
+      var K = cine ? { bg: "#120D0C", title: "#FFFFFF", rank: "#FF4D42", txt: "#F7F1EC", meta: "#C9BFB9", cta: "#FF8A80" } : { bg: "#FFFFFF", title: INK, rank: RED, txt: INK, meta: GRAY, cta: RED };
+      var inner = cine ? CW - 40 : CW, vw = Math.floor((inner - 2 * 16) / 3);
       var vCells = tv.slice(0, 3).map(function (v, i) {
-        var cta = isUrl(v.link) ? '<a href="' + esc(v.link) + '" target="_blank" style="' + f(11, 700, RED, 15, "text-decoration:none;") + '">Assistir no Stream &#8250;</a>' : p("[link do Stream pendente]", f(10, 400, MUTED, 15));
+        var cta = isUrl(v.link) ? '<a href="' + esc(v.link) + '" target="_blank" style="' + f(11, 700, K.cta, 15, "text-decoration:none;") + '">Assistir no Stream &#8250;</a>' : p("[link do Stream pendente]", f(10, 400, K.meta, 15));
         return '<td valign="top" class="col" width="' + vw + '" style="width:' + vw + "px;" + (i < 2 ? "padding-right:16px;" : "") + '">' +
-          table('<tr><td valign="top" width="30" style="width:30px;">' + p(String(i + 1).padStart(2, "0"), f(16, 700, RED, 20)) + '</td><td valign="top">' +
-            p(esc(v.titulo), f(12, 700, INK, 16)) + p(fmtAcessos(v.acessos) + " · " + esc(v.duracao), "padding-top:2px;" + f(10.5, 400, GRAY, 14)) + "</td></tr>") +
-          gap(8, videoThumb(v, vw, Math.round(vw / 2.54))) + gap(6, cta) + "</td>";
+          table('<tr><td valign="top" width="34" style="width:34px;">' + p(String(i + 1).padStart(2, "0"), f(20, 700, K.rank, 22)) + '</td><td valign="top">' +
+            p(esc(v.titulo), f(12, 700, K.txt, 16)) + p(fmtAcessos(v.acessos) + " · " + esc(v.duracao), "padding-top:2px;" + f(10.5, 400, K.meta, 14)) + "</td></tr>") +
+          gap(10, videoThumb(v, vw, Math.round(vw / 2.54))) + gap(7, cta) + "</td>";
       }).join("");
-      out.push('<tr><td class="px" style="padding:0 ' + PAD + 'px;">' + table("<tr>" + vCells + "</tr>") + "</td></tr>");
+      var head = '<span style="' + f(13, 700, K.rank, 22) + '">&#9654;</span>&nbsp;&nbsp;<span style="' + f(11, 700, K.title, 22, "letter-spacing:1px;") + '">' + esc(upper(c.topVideos.titulo || "Top vídeos do mês")) + "</span>";
+      if (cine) {
+        out.push('<tr><td class="px" style="padding:26px ' + PAD + 'px 0;">' + table('<tr><td class="pad" style="padding:18px 20px 4px;">' + head + "</td></tr>" +
+          '<tr><td class="pad" style="padding:10px 20px 20px;">' + table("<tr>" + vCells + "</tr>") + "</td></tr>", 'width="100%" bgcolor="' + K.bg + '" style="background:' + K.bg + ';"') + "</td></tr>");
+      } else {
+        out.push(rule(1, RULE, "22px " + PAD + "px 0"));
+        out.push('<tr><td class="px" style="padding:12px ' + PAD + 'px 12px;">' + head + "</td></tr>");
+        out.push('<tr><td class="px" style="padding:0 ' + PAD + 'px;">' + table("<tr>" + vCells + "</tr>") + "</td></tr>");
+      }
     }
 
     /* --- 03 Vem aí: linha do tempo --- */
@@ -288,11 +313,22 @@
         '<!--[if !mso]><!--><a href="' + esc(li) + '" target="_blank" style="display:inline-block;background:' + RED + ";border-radius:20px;padding:11px 24px;" + f(13, 700, "#FFFFFF", 18, "text-decoration:none;") + '">Abrir a versão interativa &#8250;</a><!--<![endif]-->' + "</td></tr>");
     }
 
-    /* --- Rodapé --- */
-    var rd = c.rodape || {};
-    out.push(rule(1, RULE, "34px " + PAD + "px 0"));
-    out.push('<tr><td class="px" style="padding:10px ' + PAD + 'px 22px;">' + table("<tr>" +
-      "<td>" + p(esc(rd.esquerda), f(10, 700, GRAY, 14)) + '</td><td align="right">' + p(esc(rd.direita), f(10, 700, GRAY, 14)) + "</td></tr>") + "</td></tr>");
+    /* --- Rodapé (com encerramento escuro herdado da versão 1, se ativo) --- */
+    var rd = c.rodape || {}, En = c.encerramento;
+    if (En && En.mostrar !== false) {
+      out.push('<tr><td style="padding-top:34px;"></td></tr>');
+      out.push('<tr><td class="px" bgcolor="#1B1716" style="background:#1B1716;padding:30px ' + PAD + 'px 0;">' + table("<tr>" +
+        '<td valign="bottom" class="col">' + p(esc(En.texto) + '<span style="color:#FF4D42;">.</span>', f(38, 700, "#FFFFFF", 42, "letter-spacing:-1px;")) +
+        (En.nota ? p(esc(En.nota), "padding-top:8px;" + f(12, 400, "#B9AEA8", 17)) : "") + "</td>" +
+        (ant ? '<td valign="bottom" align="right" width="92" class="hide-m" style="width:92px;">' + table('<tr><td bgcolor="#FFFFFF" style="background:#FFFFFF;padding:4px;">' + img(ant.src, 72, 92, ant.alt) + "</td></tr>", 'align="right"') + "</td>" : "") +
+        "</tr>") + "</td></tr>");
+      out.push('<tr><td class="px" bgcolor="#1B1716" style="background:#1B1716;padding:22px ' + PAD + 'px 24px;">' + table('<tr><td style="border-top:1px solid #3A3533;padding-top:12px;">' +
+        p(esc(rd.esquerda), f(10, 700, "#B9AEA8", 14)) + '</td><td align="right" style="border-top:1px solid #3A3533;padding-top:12px;">' + p(esc(rd.direita), f(10, 700, "#B9AEA8", 14)) + "</td></tr>") + "</td></tr>");
+    } else {
+      out.push(rule(1, RULE, "34px " + PAD + "px 0"));
+      out.push('<tr><td class="px" style="padding:10px ' + PAD + 'px 22px;">' + table("<tr>" +
+        "<td>" + p(esc(rd.esquerda), f(10, 700, GRAY, 14)) + '</td><td align="right">' + p(esc(rd.direita), f(10, 700, GRAY, 14)) + "</td></tr>") + "</td></tr>");
+    }
     out.push('</table><!--[if mso]></td></tr></table><![endif]--></td></tr></table>\n</body>\n</html>\n');
     return out.join("\n");
   }
