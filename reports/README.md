@@ -4,7 +4,7 @@ Um arquivo HTML por mês, no formato `AAAA-MM.html`. Cada arquivo é o e-mail co
 
 | Arquivo | Mês | Situação |
 |---|---|---|
-| [2026-09.html](2026-09.html) | Setembro 2026 | Números do esboço; imagens, vídeos e aprendizados como placeholder |
+| [2026-09.html](2026-09.html) | Setembro 2026 | Números, textos e imagens do esboço (recortes em baixa resolução); aprendizados, links e acessos dos vídeos como placeholder |
 
 ## Novo mês
 

@@ -34,7 +34,7 @@ O report é distribuído por Outlook. O ponto crítico é o **Outlook clássico 
 | △ GIF animado | Versões antigas do Outlook para Windows mostram só o 1º quadro | Não usado. Se usar, o 1º quadro precisa funcionar sozinho |
 | △ Modo escuro | Cada Outlook escurece cores de um jeito (alguns invertem fundos claros e textos escuros) | Texto branco sobre vermelho e texto escuro sobre claro continuam legíveis. Imagens JPG não são invertidas: a formiguinha fica numa moldura clara. **Conferir em cada envio** |
 | △ Imagem hospedada (link `https://`) | Bloqueada até "Baixar imagens" | Imagens vão anexadas (CID) |
-| △ Tamanho do e-mail | Mensagens grandes demoram e podem ser barradas | HTML ~56 KB; imagens até ~200 KB cada, ~3 MB no total |
+| △ Tamanho do e-mail | Mensagens grandes demoram e podem ser barradas | HTML ~55 KB; imagens até ~200 KB cada, ~3 MB no total |
 | △ Botão | Botão com `<a>` estilizado perde o fundo no Word | Botão feito com célula de tabela colorida e link dentro |
 
 ## Não depender

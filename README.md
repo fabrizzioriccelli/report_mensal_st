@@ -21,7 +21,7 @@ O report da área era montado em formato de slide. O desafio foi transformá-lo 
 - ser atualizada todo mês por uma pessoa com conhecimento básico de HTML;
 - reservar espaços para peças, imagens e vídeos do mês.
 
-Os números de setembro vêm do esboço original da área. Informações que ainda não existem (score anterior do Creative X, aprendizados, links e acessos dos vídeos, peças) aparecem como placeholders identificados.
+Os números, textos e imagens de setembro vêm do esboço original da área; as imagens são recortes do esboço, em baixa resolução, e devem ser trocadas pelos arquivos originais. Informações que ainda não existem (score anterior do Creative X, aprendizados, links e acessos dos vídeos, o segundo vídeo e a peça em destaque) aparecem como placeholders identificados.
 
 ## Base técnica
 

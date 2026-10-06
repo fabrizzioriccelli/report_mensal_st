@@ -67,12 +67,12 @@ Quem lê só a visão geral já sabe como foi o mês. Quem lê até 02 sabe os n
 
 ## 6. Conteúdo de setembro
 
-O report de setembro usa **somente** os números, títulos e textos que estão no esboço. Ficaram como placeholder, por não existirem no esboço:
+O report de setembro usa **somente** os números, títulos, textos e imagens que estão no esboço. As imagens são recortes do esboço, em baixa resolução; o visual central da visão geral é uma composição das duas peças dos cases. Ficaram como placeholder, por não existirem no esboço:
 
 - score CreativeX do período anterior e a variação;
 - aprendizados e foco do próximo mês;
 - acessos, duração e links dos vídeos;
-- todas as imagens de peças (o esboço só tem recortes em baixa resolução);
+- o segundo vídeo e a peça em destaque da seção 04;
 - datas marcadas como `[dd/mm]` e trechos cortados (`[COMPLETAR]`).
 
 A manchete ("Escala e eficiência no mesmo mês.") e a síntese da visão geral resumem textos do próprio esboço ("ampliação de volume e valor", "ganhos de eficiência"). Valide com a área antes do envio.
