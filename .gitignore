@@ -1,0 +1,15 @@
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+*.swp
+
+# .eml gerados no dia a dia (o exemplo versionado fica em examples/)
+*.eml
+!examples/*.eml
+
+# Arquivos temporários do Office
+~$*
