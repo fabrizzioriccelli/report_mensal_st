@@ -1,190 +1,130 @@
 # Report Mensal · Creative Strategy PF
 
-Report mensal da área em **uma única página HTML**, feita para ser enviada **por Outlook, como arquivo .eml**.
+Template do report mensal da Creative Strategy PF (Marketing PF), construído como um e-mail HTML de uma única página e distribuído pelo Outlook em formato `.eml`.
 
-<img src="docs/preview-2026-09.jpg" width="320" alt="Prévia do report de setembro 2026">
+## Prévia do report
 
----
+<img src="docs/preview-2026-09.jpg" width="320" alt="Prévia do report de setembro de 2026">
 
-## O que é
+- **[Report de setembro 2026](reports/2026-09.html)**: arquivo editável do mês.
+- **[Exemplo de .eml](examples/report-2026-09.eml)**: mensagem pronta para abrir no Outlook, gerada pela ferramenta do projeto.
 
-Um template de e-mail HTML que substitui o report em slide. Ele tem uma visão geral no topo, os principais resultados, o Creative X, os destaques do mês, as peças e vídeos, os aprendizados e o que vem a seguir. A identidade da área (vermelho, tipografia forte, numeração das seções e a formiguinha) foi mantida.
+O report apresenta a visão geral do mês, os principais resultados, o Creative X, os destaques, as peças e vídeos, os aprendizados e os próximos passos, mantendo a identidade da área: vermelho, seções numeradas e a formiguinha.
 
-## Por que existe
+## Por que este projeto existe
 
-O report precisava:
+O report da área era montado em formato de slide. O desafio foi transformá-lo em uma experiência única, vertical e legível no canal em que ele é realmente lido: o Outlook. A solução precisava:
 
-- caber em **uma página vertical**, sem abas, menus ou várias telas;
-- abrir **igual no Outlook** (o canal real de distribuição), sem depender de JavaScript;
-- ser **atualizado todo mês por uma pessoa só**, com conhecimento básico de HTML;
-- ter **espaços prontos** para peças, imagens e vídeos.
+- caber em uma página contínua, sem abas, menus ou várias telas;
+- abrir da mesma forma no Outlook para Windows, no novo Outlook, no Outlook na Web e no celular;
+- funcionar sem JavaScript, já que nenhum cliente de e-mail executa scripts;
+- ser atualizada todo mês por uma pessoa com conhecimento básico de HTML;
+- reservar espaços para peças, imagens e vídeos do mês.
 
-## Como funciona
+Os números de setembro vêm do esboço original da área. Informações que ainda não existem (score anterior do Creative X, aprendizados, links e acessos dos vídeos, peças) aparecem como placeholders identificados.
 
+## Base técnica
+
+### HTML para e-mail
+
+O report está em `reports/AAAA-MM.html`, um arquivo por mês. O layout usa tabelas e estilos inline, porque o Outlook para Windows desenha e-mails com o motor do Word e ignora CSS moderno como flexbox, grid e `position`.
+
+Todo o conteúdo fica escrito diretamente no HTML. Comentários `EDITAR AQUI` marcam cada ponto que muda no mês, numerados de 01 a 10:
+
+```text
+01 MÊS · 02 TÍTULO · 03 RESUMO · 04 MÉTRICAS · 05 CREATIVE X
+06 SCORES · 07 IMAGENS · 08 VÍDEOS · 09 APRENDIZADOS · 10 LINKS
 ```
-reports/AAAA-MM.html  ──(tools/gerar-eml.html)──►  AAAA-MM.eml  ──(Outlook)──►  área
-   você edita aqui          confere e embute            abre como          envio
-                            as imagens                  mensagem nova
-```
 
-1. **Todo o conteúdo fica direto no HTML.** Não existe banco de dados, JSON nem etapa de build. O que você vê no arquivo é o que vai no e-mail.
-2. **Comentários `EDITAR AQUI`** marcam cada texto, número, imagem e link que muda no mês.
-3. **A ferramenta `tools/gerar-eml.html`** (abre no Edge ou Chrome, sem instalar nada) confere as pendências, embute as imagens no e-mail e gera o `.eml`.
-4. **O Outlook abre o `.eml` como mensagem nova.** Você preenche os destinatários e envia.
+Blocos que se repetem (case, destaque, vídeo, aprendizado, item da agenda) são delimitados por `INÍCIO BLOCO` e `FIM BLOCO` e podem ser duplicados ou removidos inteiros.
 
-## Estrutura
+### Ferramenta de .eml
 
-```
-/
-├── README.md                    ← este arquivo
-├── reports/
-│   └── 2026-09.html             ← report de setembro (um arquivo por mês)
+O arquivo `tools/gerar-eml.html` abre no Edge ou no Chrome, sem instalação. Ele:
+
+1. lê o report e as imagens da pasta do projeto;
+2. lista pendências de conteúdo e problemas de compatibilidade com o Outlook;
+3. embute as imagens na mensagem (anexos inline `cid:`);
+4. gera um `.eml` que o Outlook abre como mensagem nova, pronta para envio.
+
+As imagens vão dentro do e-mail porque imagens hospedadas no SharePoint não aparecem no Outlook, e imagens com link externo ficam bloqueadas até o leitor clicar em "Baixar imagens".
+
+### Vídeos
+
+Nenhuma versão do Outlook reproduz vídeo dentro do e-mail. O report usa miniatura, título, acessos, duração e um botão **ASSISTIR**, que abre o vídeo no Microsoft Stream.
+
+## Estrutura do repositório
+
+```text
+report_mensal_st/
+├── reports/                      # um report por mês (arquivo editado)
+│   └── 2026-09.html              # report de setembro de 2026
 ├── template/
-│   └── report-template.html     ← modelo em branco, só com placeholders
-├── assets/
-│   ├── mascote/formiga.jpg      ← a formiguinha (fixa)
-│   ├── marca/creativex.jpg      ← logo CreativeX (fixo)
-│   ├── icones/                  ← ícones reutilizáveis
-│   └── 2026-09/                 ← imagens do mês (peças, miniaturas)
+│   └── report-template.html      # modelo em branco, só com placeholders
+├── assets/                       # imagens usadas pelos reports
+│   ├── mascote/formiga.jpg       # a formiguinha (fixa)
+│   ├── marca/creativex.jpg       # logo CreativeX (fixo)
+│   ├── icones/                   # ícones reutilizáveis
+│   └── 2026-09/                  # peças e miniaturas do mês
 ├── tools/
-│   └── gerar-eml.html           ← confere e gera o .eml (abre no navegador)
+│   └── gerar-eml.html            # conferência e geração do .eml
 ├── examples/
-│   └── report-2026-09.eml       ← exemplo real gerado pela ferramenta
-└── docs/
-    ├── HOW_TO_EDIT.md           ← atualizando o report em 10 minutos
-    ├── HOW_TO_EXPORT_EML.md     ← o que é o .eml, como gerar, abrir e enviar
-    ├── OUTLOOK_COMPATIBILITY.md ← o que funciona e o que evitar no Outlook
-    ├── TEST_CHECKLIST.md        ← checklist antes de cada envio
-    ├── ANALISE_E_DECISOES.md    ← análise do esboço e decisões de UX/UI
-    └── preview-2026-09.jpg      ← imagem de prévia usada neste README
+│   └── report-2026-09.eml        # exemplo gerado pela ferramenta
+└── docs/                         # documentação complementar
+    ├── HOW_TO_EDIT.md            # atualização mensal em 10 passos
+    ├── HOW_TO_EXPORT_EML.md      # o que é o .eml, como gerar e enviar
+    ├── OUTLOOK_COMPATIBILITY.md  # o que funciona e o que evitar
+    ├── TEST_CHECKLIST.md         # checklist antes de cada envio
+    ├── ANALISE_E_DECISOES.md     # análise do esboço e decisões de UX/UI
+    └── preview-2026-09.jpg       # prévia usada neste README
 ```
 
-Não há vídeos no repositório: eles ficam no Microsoft Stream, e o report leva só a miniatura e o link.
+Vídeos não ficam no repositório: eles são publicados no Stream, e o report leva apenas a miniatura e o link.
 
-## Como editar o report mensal
+## Como usar
 
-Resumo abaixo; o passo a passo completo está em [docs/HOW_TO_EDIT.md](docs/HOW_TO_EDIT.md).
+### Ver o report
 
-1. Copie o report do mês anterior: `reports/2026-09.html` → `reports/2026-10.html`.
-2. Abra o arquivo no **VS Code** ou no **Bloco de Notas**.
-3. Pesquise (Ctrl+F) por **`EDITAR AQUI`** e atualize cada ponto. Os marcadores são numerados:
+Abra `reports/2026-09.html` no navegador. A página mostra o e-mail como ele será recebido. Para conferir a versão de celular, pressione F12 e depois Ctrl+Shift+M.
 
-| Marcador | O que muda |
-|---|---|
-| `01 MÊS` | assunto, cabeçalho, visão geral, "Foco de…", "Até…" e rodapé |
-| `02 TÍTULO` | manchete da visão geral |
-| `03 RESUMO` | síntese do mês e texto de pré-visualização da caixa de entrada |
-| `04 MÉTRICAS` | os 4 números da visão geral, a faixa vermelha e as métricas das peças |
-| `05 CREATIVE X` | escopo, referências e principal ganho |
-| `06 SCORES` | score anterior, atual, variação e as barras |
-| `07 IMAGENS` | visual central, peças dos cases, destaques e peças |
-| `08 VÍDEOS` | título, categoria, acessos, duração e miniatura |
-| `09 APRENDIZADOS` | o que aconteceu, o que aprendemos, o que levamos e o foco do mês |
-| `10 LINKS` | links dos botões e dos vídeos |
+### Atualizar o mês
 
-Regra de ouro: **troque só o texto entre `>` e `<`**. Não apague tags nem o que está dentro de `style="..."`.
+1. Copie o report do mês anterior para `reports/AAAA-MM.html`.
+2. Crie a pasta `assets/AAAA-MM/` com as imagens do mês.
+3. Pesquise `EDITAR AQUI` e atualize textos, números, imagens e links.
+4. Revise no navegador.
 
-## Como trocar uma imagem
+O passo a passo completo, com exemplos de troca de imagem, vídeo, Creative X e aprendizados, está em [docs/HOW_TO_EDIT.md](docs/HOW_TO_EDIT.md).
 
-1. Salve a imagem em `assets/AAAA-MM/` como **JPG**, no **dobro da largura** indicada no comentário (ex.: espaço de 240 px → exporte com 480 px), até ~200 KB.
-2. No HTML, ache o `EDITAR AQUI · 07 IMAGENS` daquele espaço.
-3. Apague a tabela que vem depois de `<!-- PLACEHOLDER · ... -->` (a caixa tracejada).
-4. Tire os sinais de comentário da linha `<img ...>` que está logo acima e ajuste o nome do arquivo e o `alt`:
+### Gerar e enviar o .eml
 
-```html
-<!-- antes -->
-<!-- <img src="../assets/2026-09/visual-principal.jpg" width="240" alt="[Descreva a imagem]" ...> -->
+1. Abra `tools/gerar-eml.html` no Edge ou no Chrome.
+2. Selecione a pasta principal do projeto.
+3. Confira as pendências e a prévia.
+4. Clique em **Baixar .eml** e abra o arquivo no Outlook.
+5. Envie primeiro para você; depois, para a área.
 
-<!-- depois -->
-<img src="../assets/2026-10/visual-principal.jpg" width="240" alt="Campanha Dia das Crianças" ...>
+Detalhes, alternativas para o novo Outlook e soluções de problemas: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
+
+## Compatibilidade e limitações
+
+- O layout foi escrito para o Outlook para Windows, o cliente mais restritivo; os demais clientes Outlook seguem o mesmo resultado.
+- No celular, as colunas empilham onde o cliente aceita CSS de tela pequena. No Outlook para Windows, o layout é sempre o de 680 px.
+- O HTML foi verificado no Chromium (computador e celular) e a estrutura do `.eml` foi validada, mas o envio ainda não foi testado em um Outlook real. Antes do primeiro envio, siga o [checklist de testes](docs/TEST_CHECKLIST.md).
+- No novo Outlook e no Outlook para Mac, o `.eml` pode abrir como mensagem recebida; nesse caso, use **Encaminhar**.
+- A formiguinha atual foi recortada do esboço, em baixa resolução. Substitua pelo arquivo original mantendo o nome `assets/mascote/formiga.jpg`.
+
+A análise por recurso (imagens, fundos, fontes, GIF, SVG, vídeo, modo escuro) está em [docs/OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md).
+
+## Colaboração
+
+O projeto utiliza GitHub para versionamento. Cada mês entra como um commit próprio, mantendo separados os reports, os assets, a ferramenta e a documentação:
+
+```text
+report: setembro 2026
+assets: peças de setembro 2026
+docs: atualizar guia de edição
+tools: ajustar conferência do .eml
 ```
 
-Mantenha o `width="..."`: é ele que o Outlook usa para o tamanho.
-
-## Como adicionar um vídeo
-
-O vídeo **não toca dentro do e-mail** em nenhuma versão do Outlook. O report mostra uma miniatura e um botão **ASSISTIR**, que abrem o vídeo no Stream.
-
-1. No Stream, copie o **link de compartilhamento** do vídeo (o mesmo público do e-mail precisa ter acesso).
-2. No HTML, ache o bloco `INÍCIO BLOCO · CONTEÚDO (VÍDEO)`.
-3. Troque título, categoria, acessos, duração e descrição (`08 VÍDEOS`).
-4. Troque `#COLE-O-LINK-DO-STREAM` pelo link (`10 LINKS`).
-5. Para a miniatura, tire um print do vídeo em 16:9, salve com 440 x 248 px e siga "Como trocar uma imagem". Envolva a imagem no mesmo link: `<a href="LINK"><img ...></a>` (o exemplo já está no comentário).
-
-Mais um vídeo? Copie o bloco inteiro, do `INÍCIO BLOCO` ao `FIM BLOCO`, e cole logo abaixo. Ordene do mais visto para o menos visto.
-
-## Como atualizar métricas
-
-Cada número é um texto comum dentro de um `<p>`. Ache o `EDITAR AQUI · 04 MÉTRICAS` e troque o valor e o rótulo. Use o padrão brasileiro: `3,6x`, `+89%`, `R$ 0,68`, `&minus;12%` (o `&minus;` desenha o sinal de menos tipográfico).
-
-Para mais uma linha "antes → depois" num case, copie um `<tr>...</tr>` inteiro da tabela de resultado.
-
-## Como atualizar Creative X
-
-Busque `06 SCORES`:
-
-1. **Anterior → Atual → Variação**: troque `00%`, `80%` e `+00 p.p.` (variação = atual − anterior, em pontos percentuais).
-2. **Barras**: cada barra tem duas células que somam 100%. Score de 85% → `width="85%"` na primeira e `width="15%"` na segunda.
-3. **Referências** (`05 CREATIVE X`): média do ano, meta ou média global, com uma frase de comparação.
-4. **Principal ganho**: uma frase sobre o que puxou o score.
-
-## Como atualizar aprendizados
-
-Busque `09 APRENDIZADOS`. Cada linha segue a mesma lógica:
-
-| O que aconteceu? | O que aprendemos? | O que levamos? |
-|---|---|---|
-| resultado observado, com número | o que isso nos ensina | o que muda daqui para frente |
-
-Escreva o aprendizado como uma conclusão, não como um número repetido. Mais um aprendizado: copie o bloco `INÍCIO BLOCO · APRENDIZADO`.
-
-## Como gerar/testar o HTML
-
-- **Ver o report:** dê dois cliques em `reports/AAAA-MM.html`. O navegador mostra o e-mail como ele vai ficar (com as imagens). Para ver no tamanho de celular, aperte F12 e ative o modo de dispositivo (Ctrl+Shift+M).
-- **Conferir:** abra `tools/gerar-eml.html`, selecione a pasta do projeto e leia a lista de pendências e o resultado da checagem de compatibilidade.
-
-## Como transformar/enviar como .eml
-
-1. Abra `tools/gerar-eml.html` no Edge ou Chrome.
-2. Clique em **Selecionar pasta do projeto** e escolha a pasta principal (a que contém `reports/`).
-3. Confira o report selecionado, as pendências e a prévia.
-4. Clique em **Baixar .eml**.
-5. Dê dois cliques no `.eml`: o Outlook abre uma mensagem nova com o report. Preencha os destinatários e envie.
-
-Detalhes, alternativas e problemas comuns: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
-
-## Como testar no Outlook
-
-Sempre **envie primeiro para você mesmo** e abra no Outlook do computador, no Outlook na Web e no celular. Use [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
-
-## Limitações
-
-- **Vídeo não toca no e-mail.** Nenhum Outlook reproduz vídeo; o report usa miniatura + link para o Stream.
-- **Não testado em Outlook real.** O HTML foi verificado no Chromium (desktop e celular) e o `.eml` foi validado na estrutura, mas este ambiente não tem Outlook. O primeiro envio deve ser um teste para você.
-- **Novo Outlook:** o `.eml` pode abrir como mensagem recebida em vez de rascunho. Nesse caso, use **Encaminhar** (veja o guia do .eml).
-- **Formiguinha em baixa resolução.** O arquivo atual foi recortado do esboço. Troque pelo arquivo original (PNG ou JPG em alta) mantendo o nome `assets/mascote/formiga.jpg`.
-- **Modo escuro:** cada Outlook escurece cores de um jeito; o report foi desenhado para continuar legível, mas o resultado exato precisa ser conferido.
-- **Celular:** o empilhamento das colunas funciona onde o cliente aceita CSS de celular (Outlook iOS/Android, Outlook na Web). No Outlook do Windows o layout é sempre o de 680 px.
-
-## Compatibilidade
-
-| Cliente | Situação |
-|---|---|
-| Outlook clássico para Windows (motor do Word) | Layout em tabelas pensado para ele; principal alvo |
-| Novo Outlook para Windows / Outlook na Web | Compatível (motor de navegador) |
-| Outlook para iOS e Android | Compatível; colunas empilham |
-| Outlook para Mac | Compatível |
-
-O detalhamento por recurso (imagens, fundos, fontes, GIF, SVG, vídeo, modo escuro) está em [docs/OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md).
-
-## Troubleshooting
-
-| Problema | Causa provável | Solução |
-|---|---|---|
-| Imagem aparece como quadro vazio no navegador | Caminho errado no `src` | Confira o nome do arquivo e a pasta; os reports usam `../assets/...` |
-| A ferramenta diz "Imagem não encontrada" | Mesmo motivo acima, ou pasta errada selecionada | Selecione a pasta principal do projeto |
-| Layout "quebrou" depois de editar | Uma tag `<` `>` ou aspas `"` apagada | Desfaça (Ctrl+Z) ou compare com o mês anterior |
-| Texto aparece em Times New Roman no Outlook | `font-family` removido | Copie o `style` de um parágrafo vizinho |
-| O `.eml` abre como "recebido" e não deixa editar | Novo Outlook ou Outlook para Mac | Use **Encaminhar** e apague o cabeçalho de encaminhamento |
-| Link do vídeo pede acesso | Vídeo não compartilhado com o público do e-mail | No Stream, compartilhe com o grupo/lista de distribuição |
-| Imagem muito grande no Outlook | `width` removido da tag `<img>` | Recoloque `width="..."` com o valor do comentário |
+Os reports dos meses anteriores não são alterados depois do envio; eles formam o histórico da área.
