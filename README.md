@@ -63,8 +63,7 @@ report_mensal_st/
 │   └── report-template.html      # modelo em branco, só com placeholders
 ├── assets/                       # imagens usadas pelos reports
 │   ├── mascote/formiga.jpg       # a formiguinha (fixa)
-│   ├── marca/creativex.jpg       # logo CreativeX (fixo)
-│   ├── icones/                   # ícones reutilizáveis
+│   ├── icones/                   # ícones em vetor, exportados em PNG
 │   └── 2026-09/                  # peças e miniaturas do mês
 ├── tools/
 │   └── gerar-eml.html            # conferência e geração do .eml
@@ -112,7 +111,7 @@ Detalhes, alternativas para o novo Outlook e soluções de problemas: [docs/HOW_
 - No celular, as colunas empilham onde o cliente aceita CSS de tela pequena. No Outlook para Windows, o layout é sempre o de 680 px.
 - O HTML foi verificado no Chromium (computador e celular) e a estrutura do `.eml` foi validada, mas o envio ainda não foi testado em um Outlook real. Antes do primeiro envio, siga o [checklist de testes](docs/TEST_CHECKLIST.md).
 - No novo Outlook e no Outlook para Mac, o `.eml` pode abrir como mensagem recebida; nesse caso, use **Encaminhar**.
-- A formiguinha atual foi recortada do esboço, em baixa resolução. Substitua pelo arquivo original mantendo o nome `assets/mascote/formiga.jpg`.
+- A formiguinha e as imagens de setembro foram recortadas do esboço e tratadas para tirar a textura de pixel, mas continuam em resolução baixa. Substitua pelos arquivos originais mantendo os mesmos nomes.
 
 A análise por recurso (imagens, fundos, fontes, GIF, SVG, vídeo, modo escuro) está em [docs/OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md).
 

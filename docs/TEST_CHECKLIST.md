@@ -10,7 +10,7 @@ Copie esta lista a cada mês (ou marque direto aqui no GitHub). A primeira colun
 | [ ] | Mês certo em todos os lugares | Ctrl+F `01 MÊS`: 6 pontos | Sim (setembro) |
 | [ ] | Números conferidos com a fonte | Compare com o painel/planilha de origem | Números de set/2026 copiados do esboço |
 | [ ] | Placeholders zerados | `tools/gerar-eml.html` → "Pendências de conteúdo" | Não: o report de setembro ainda tem placeholders de propósito |
-| [ ] | Imagens | Nenhum quadro vazio no navegador; ferramenta sem "não encontrada" | Sim (14 imagens, recortes do esboço) |
+| [ ] | Imagens | Nenhum quadro vazio no navegador; ferramenta sem "não encontrada" | Sim (13 imagens: recortes tratados do esboço e ícones em vetor) |
 | [ ] | Formiguinha | Aparece no cabeçalho, em "O que aprendemos" e no encerramento | Sim |
 | [ ] | Creative X | Anterior, atual, variação e barras batem entre si | Estrutura sim; score anterior ainda é placeholder |
 | [ ] | Aprendizados | Cada linha tem aconteceu → aprendemos → levamos | Estrutura sim; conteúdo é placeholder |

@@ -3,8 +3,7 @@
 | Pasta | Conteúdo | Muda todo mês? |
 |---|---|---|
 | `mascote/` | A formiguinha, mascote da área | Não |
-| `marca/` | Logo CreativeX | Não |
-| `icones/` | Ícones reutilizáveis (Briefing Agent, Creative Checker) | Não |
+| `icones/` | Ícones recriados em vetor (Briefing Agent, Creative Checker), PNG 96 x 96 px | Não |
 | `AAAA-MM/` | Peças, visual principal e miniaturas de vídeo do mês | Sim |
 
 ## Padrão das imagens

@@ -1,6 +1,6 @@
 # Imagens de setembro 2026
 
-Todas as imagens desta pasta são **recortes do esboço original**, em baixa resolução. Substitua pelos arquivos originais mantendo o mesmo nome: o report continua funcionando sem nenhuma alteração no HTML.
+Todas as imagens desta pasta são **recortes do esboço original**, tratados para remover a textura de pixel do print, mas ainda em baixa resolução. Substitua pelos arquivos originais mantendo o mesmo nome: o report continua funcionando sem nenhuma alteração no HTML.
 
 | Arquivo | Espaço no report | Tamanho ideal |
 |---|---|---|
