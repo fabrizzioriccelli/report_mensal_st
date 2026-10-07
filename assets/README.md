@@ -16,8 +16,8 @@
 
 | Espaço no e-mail | Formato (o recorte é automático) |
 |---|---|
-| Peça do projeto principal | Quadrada |
-| Peça do projeto em destaque | Vertical, qualquer proporção (aparece com 140 px de largura) |
+| Peça do projeto principal | Quadrada (184 x 184 px na tela) |
+| Peça do projeto em destaque | Vertical, recortada em 184 x 300 px. Use `enquadramento: topo`, `centro` ou `baixo` no arquivo de dados para escolher a parte que fica |
 | Miniatura de lançamento | Faixa horizontal (~2,5 : 1). Centralize o que importa: as bordas podem ser cortadas |
 | Print de Creative Transformation | Horizontal (~4 : 3) |
 

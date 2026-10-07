@@ -200,7 +200,7 @@ Com o layout aprovado, a rodada seguinte não mudou a estrutura visual. Ela tran
 - **Marca centralizada** (`config/marca.txt`): fontes (com espaço para a fonte oficial e uma configuração própria para o Outlook para Windows), cores, modo das imagens e domínios de link.
 - **Geração no navegador** (`gerar-report.html`): confere, reduz e recorta as imagens, desenha o ▶ dos vídeos e gera o `.eml` com versão em texto e imagens embutidas.
 - **Interatividade que funciona em qualquer Outlook:** miniatura clicável e botões em texto ("Ver peça →", "▶ Assistir", "Ver projeto →", "Ver demonstração →") que abrem o SharePoint/Stream. Sem JavaScript, modal ou vídeo embutido, que o Outlook não suporta.
-- **Única mudança visual:** as colunas de números da abertura passaram de 26/20/20/18% para 29/19/18/18%, para dar folga a uma fonte corporativa mais larga, e os botões de link aparecem no fim das frases.
+- **Única mudança visual:** as colunas de números da abertura ganharam folga para uma fonte corporativa mais larga (depois substituídas pela grade da seção 11), e os botões de link aparecem no fim das frases.
 
 Decisões, alternativas descartadas, auditoria de dependências e o que foi testado: [ARQUITETURA.md](ARQUITETURA.md).
 
@@ -221,4 +221,17 @@ A abertura (cabeçalho + projeto principal) estava correta, mas simples e alta. 
 | Altura total, celular (390 px) | 4.834 px | **4.648 px** |
 
 Nenhuma informação saiu. Com uma fonte bem mais larga simulada, nada vaza e os números continuam numa linha.
+
+## 11. Grade
+
+Para tudo ficar alinhado no `.eml` final, o report passou a usar **uma grade única**:
+
+- **computador:** 600 px de conteúdo, 3 colunas de 184 px e espaços de 24 px. As colunas começam sempre nas mesmas linhas, em todas as seções. Os blocos com fundo (Creative Transformation e Foco) têm o mesmo recuo interno (28 px);
+- **capa:** o texto ocupa as colunas 1 e 2 e a peça, a coluna 3;
+- **números:** o principal ocupa a coluna 1; os demais começam na coluna 2;
+- **destaque:** a peça (recortada em 184 x 300 px, com o novo campo `enquadramento`) ocupa a coluna 1 e o texto, as colunas 2 e 3;
+- **Creative X:** o score na coluna 1, a variação e a barra nas colunas 2 e 3;
+- **celular:** tudo empilha na mesma margem de 20 px.
+
+Larguras em px (e não em %) são mais estáveis no Outlook para Windows. Altura final: 2.729 px no computador e 4.636 px no celular. O teste automático confere que nada vaza para o lado em 760 px e em 390 px.
 

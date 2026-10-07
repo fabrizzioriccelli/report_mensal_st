@@ -141,6 +141,16 @@ Se uma seção inteira ficar sem itens (por exemplo, nenhum `[TRANSFORMATION 1]`
    ```
 4. No e-mail aparecem o ▶ sobre a miniatura e o texto "▶ Assistir".
 
+### Escolher a parte da imagem que aparece no recorte
+
+As imagens são recortadas no formato do espaço. Se a parte importante sumir, diga qual parte manter:
+
+```text
+enquadramento: baixo
+```
+
+Use `centro` (padrão), `topo` ou `baixo`. Vale para qualquer peça (projeto principal, destaque, lançamentos).
+
 ### Inserir ou trocar um link
 
 Procure o bloco e cole o link depois de `link: `, numa linha só. Para tirar o botão, deixe `link:` vazio.
