@@ -2,7 +2,7 @@
 
 | Arquivo | O que é |
 |---|---|
-| `logo-santander-branco.png` | **Logo usado no e-mail**: versão branca, sobre o vermelho da capa. PNG transparente, 480 px de largura (aparece com 104 px) |
+| `logo-santander-branco.png` | **Logo usado no e-mail**: versão branca, na capa (104 px) e no rodapé (88 px). PNG transparente, 480 px de largura |
 | `logo-santander.png` | Versão vermelha, para usos sobre fundo branco (não usada no e-mail hoje) |
 | `svg/logo-santander.svg` | Arquivo vetorial original, recebido da área |
 | `svg/logo-santander-branco.svg` | O mesmo vetor, com a cor trocada para branco |

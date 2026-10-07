@@ -91,7 +91,7 @@ Antes de enviar, siga o [checklist](TEST_CHECKLIST.md).
 
 | Bloco no arquivo | Onde aparece no e-mail |
 |---|---|
-| `[EDICAO]` | Selo do mês na capa ("REPORT MENSAL · OUTUBRO 2026"), "Foco de…", "Até…", assunto e contato no rodapé |
+| `[EDICAO]` | Selo do mês na capa ("REPORT MENSAL · OUTUBRO 2026"), "Foco de…", assunto, e "Até [próximo mês]." e contato no rodapé |
 | `[ABERTURA]` | **01** · a frase do mês na capa vermelha (`frase` na 1ª linha, `frase_final` em itálico na 2ª) e o texto da caixa de entrada (`previa`) |
 | `[PROJETO PRINCIPAL]` | **01** · nome, resumo e peça na capa; formiguinha na faixa dos números |
 | `[NUMERO 1]` a `[NUMERO 4]` | **01** · os números da abertura (o 1º fica em vermelho) |

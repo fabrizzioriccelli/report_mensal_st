@@ -38,7 +38,7 @@ Legenda: ✓ funciona · △ parcial ou depende da versão · ✕ não funciona.
 | Recurso | Como o report usa |
 |---|---|
 | ✓ Tabelas para layout, estilo inline | Toda a grade |
-| ✓ Cor de fundo em células | Capa vermelha, faixa creme dos números, petróleo (Transformation), vermelho (Foco), selo do mês, etiquetas |
+| ✓ Cor de fundo em células | Capa vermelha, faixa creme dos números, petróleo (Transformation), vermelho (Foco), rodapé vermelho-escuro, selo do mês, etiquetas |
 | ✓ Bordas em células | Filetes, divisórias, caixas tracejadas (só no rascunho) |
 | ✓ `margin` em parágrafos e `padding` em células | Espaçamentos (o Word ignora `margin` em tabelas) |
 | ✓ Imagens JPG/PNG com `width`, `height` e `alt` | Peças em JPG; formiguinha e ícones em PNG transparente; tudo **embutido** no `.eml` (`cid:`) |
@@ -84,7 +84,7 @@ Uma regra `@media (max-width:620px)`:
 
 - empilha as colunas (`col`);
 - coloca os números em pares (`half`);
-- na capa, o selo do mês desce para baixo do logo (`selo`) e a peça principal fica com 180 px, centralizada (`himg`);
+- na capa, o selo do mês desce para baixo do logo (`selo`) e a peça principal fica com 180 px, centralizada (`himg`); no rodapé, o logo e a assinatura passam para baixo da despedida, alinhados à esquerda (`al-m`);
 - esconde a formiguinha da faixa dos números e a do Foco, e a peça vertical do projeto em destaque, que não cabem (`hide-m`). O botão "Ver peça →" continua visível;
 - aumenta as miniaturas para a largura da tela (`fluid`). Elas são exportadas com até 700 px para ficarem nítidas;
 - ajusta os tamanhos de títulos e números (`h1`, `h2`, `num`, `brand`).

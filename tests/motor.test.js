@@ -32,7 +32,7 @@ console.log("Motor do report");
 teste("o report de setembro monta sem erros", function () {
   var r = montar(ler("dados/2026-09.txt"));
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
-  assert.strictEqual(r.imagens.length, 11); /* logo + 5 peças + 3 formiguinhas + 2 ícones */
+  assert.strictEqual(r.imagens.length, 12); /* logo (capa e rodapé) + 5 peças + 3 formiguinhas + 2 ícones */
   assert.ok(!/\{\{|\}\}/.test(r.html), "sobrou {{campo}} no HTML");
   assert.ok(niveis(r, "pendencia").length > 0, "setembro tem pendências de propósito");
   assert.strictEqual(r.nomeArquivo, "report-2026-09");

@@ -93,7 +93,7 @@
 
   var CORES = ["marca", "texto", "texto_corpo", "texto_apoio", "positivo", "positivo_fundo", "atencao", "atencao_fundo", "fundo_pagina", "fundo_email"];
   var CORES_APOIO = ["capa_selo", "capa_filete", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
-    "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto",
+    "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto", "rodape_fundo",
     "placeholder_fundo", "placeholder_borda"];
   function obrig(lista) { var o = {}; lista.forEach(function (k) { o[k] = 1; }); return o; }
 
@@ -413,12 +413,15 @@
     }
 
     /* Logo (config/marca.txt, bloco [LOGO]) */
-    var LG = M.simples.LOGO || {}, logo = null;
+    var LG = M.simples.LOGO || {}, logo = null, rodapeLogo = null;
     if (LG.arquivo) {
       var lw = parseInt(LG.largura || "100", 10);
       if (!(lw >= 40 && lw <= 200)) { problema(prob, "aviso", arqM, LG._linhas.largura, "Logo: largura deve ficar entre 40 e 200 px. Usei 100."); lw = 100; }
       var lc = LG.arquivo.replace(/\\/g, "/").replace(/^\.?\/+/, "");
-      if (existe(lc)) logo = { img: imagem(lc, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" }), placeholder: null };
+      if (existe(lc)) {
+        logo = { img: imagem(lc, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" }), placeholder: null };
+        rodapeLogo = imagem(lc, Math.round(lw * 0.85), 0, { alt: LG.descricao || "Santander", papel: "logo" });
+      }
       else {
         problema(prob, "pendencia", arqM, LG._linhas.arquivo, "Logo não encontrado: " + lc + ". Salve o logo oficial (versão branca, PNG) nesse caminho ou ajuste o nome em config/marca.txt.");
         logo = { img: null, placeholder: seguro('<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td height="20" align="center" valign="middle" style="height:20px;width:' + lw + "px;border:1px dashed " + cor.foco_rotulo.s +
@@ -566,7 +569,7 @@
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
       assunto: assunto, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
-      logo: logo, edicao: maiusculas(mes + " " + ano), proximo_mes: prox, proximo_mes_minusculo: prox.toLocaleLowerCase("pt-BR"), contato: texto(E.contato),
+      logo: logo, rodape_logo: rodapeLogo, edicao: maiusculas(mes + " " + ano), proximo_mes: prox, proximo_mes_minusculo: prox.toLocaleLowerCase("pt-BR"), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
     };
