@@ -9,7 +9,7 @@ Template do report mensal da Creative Strategy PF (Marketing PF), construído co
 - **[Report de setembro 2026](reports/2026-09.html)**: arquivo editável do mês.
 - **[Exemplo de .eml](examples/report-2026-09.eml)**: mensagem pronta para abrir no Outlook, gerada pela ferramenta do projeto.
 
-O report apresenta a visão geral do mês, os principais resultados, o Creative X, os destaques, as peças e vídeos, os aprendizados e os próximos passos, mantendo a identidade da área: vermelho, seções numeradas e a formiguinha.
+O report apresenta, em uma leitura curta e executiva, a visão geral do mês, os resultados, o Creative X, os destaques, as peças e vídeos, os aprendizados e os próximos passos, mantendo a identidade da área: vermelho, seções numeradas e a formiguinha, que ganha uma versão temática para cada projeto.
 
 ## Por que este projeto existe
 
@@ -21,7 +21,7 @@ O report da área era montado em formato de slide. O desafio foi transformá-lo 
 - ser atualizada todo mês por uma pessoa com conhecimento básico de HTML;
 - reservar espaços para peças, imagens e vídeos do mês.
 
-Os números, textos e imagens de setembro vêm do esboço original da área; as imagens são recortes do esboço, em baixa resolução, e devem ser trocadas pelos arquivos originais. Informações que ainda não existem (score anterior do Creative X, aprendizados, links e acessos dos vídeos, o segundo vídeo e a peça em destaque) aparecem como placeholders identificados.
+Os números, textos e imagens de setembro vêm do esboço original da área; as imagens das peças são recortes do esboço, em baixa resolução, e devem ser trocadas pelos arquivos originais. Informações que ainda não existem (score anterior do Creative X, aprendizados, links e acessos dos vídeos, datas dos próximos projetos) aparecem como placeholders identificados.
 
 ## Base técnica
 
@@ -29,14 +29,30 @@ Os números, textos e imagens de setembro vêm do esboço original da área; as 
 
 O report está em `reports/AAAA-MM.html`, um arquivo por mês. O layout usa tabelas e estilos inline, porque o Outlook para Windows desenha e-mails com o motor do Word e ignora CSS moderno como flexbox, grid e `position`.
 
-Todo o conteúdo fica escrito diretamente no HTML. Comentários `EDITAR AQUI` marcam cada ponto que muda no mês, numerados de 01 a 10:
+Todo o conteúdo fica escrito diretamente no HTML. Comentários `EDITAR AQUI` marcam cada ponto que muda no mês, numerados de 01 a 11:
 
 ```text
-01 MÊS · 02 TÍTULO · 03 RESUMO · 04 MÉTRICAS · 05 CREATIVE X
-06 SCORES · 07 IMAGENS · 08 VÍDEOS · 09 APRENDIZADOS · 10 LINKS
+01 MÊS · 02 TÍTULO · 03 RESUMO · 04 MÉTRICAS · 05 CREATIVE X · 06 SCORES
+07 IMAGENS · 08 VÍDEOS · 09 APRENDIZADOS · 10 LINKS · 11 FORMIGUINHA
 ```
 
-Blocos que se repetem (case, destaque, vídeo, aprendizado, item da agenda) são delimitados por `INÍCIO BLOCO` e `FIM BLOCO` e podem ser duplicados ou removidos inteiros.
+Blocos que se repetem (case, destaque, conteúdo secundário, projeto em destaque) são delimitados por `INÍCIO BLOCO` e `FIM BLOCO` e podem ser duplicados ou removidos inteiros.
+
+### Sistema visual
+
+| Elemento | Regra |
+|---|---|
+| Cantos | 6 px miniaturas · 12 px cartões e imagens · 16 px blocos grandes · etiquetas em pílula |
+| Vermelho `#9E1218` | Marca, números principais e numeração das seções |
+| Verde | Resultado positivo, só em etiquetas (`▲ +89%`, e `▼ −12%` quando cair é bom) |
+| Âmbar | Previsto, pendente ou atenção |
+| Grafite | Assinatura exclusiva do Creative X |
+
+No Outlook para Windows os cantos aparecem retos; o layout continua o mesmo.
+
+### Formiguinha
+
+A personagem tem uma versão base e variações temáticas (viagem, música, proteção, futebol, conversa, creator, cartão, prancheta e lupa). Cada projeto do report usa a sua. As versões estão em `assets/formiguinha/`, com o catálogo e as regras em [assets/formiguinha/README.md](assets/formiguinha/README.md).
 
 ### Ferramenta de .eml
 
@@ -62,7 +78,8 @@ report_mensal_st/
 ├── template/
 │   └── report-template.html      # modelo em branco, só com placeholders
 ├── assets/                       # imagens usadas pelos reports
-│   ├── mascote/formiga.jpg       # a formiguinha (fixa)
+│   ├── formiguinha/              # personagem: versão base + variações por projeto
+│   │   └── svg/                  # fonte vetorial de cada versão
 │   ├── icones/                   # ícones em vetor, exportados em PNG
 │   └── 2026-09/                  # peças e miniaturas do mês
 ├── tools/
@@ -74,7 +91,9 @@ report_mensal_st/
     ├── HOW_TO_EXPORT_EML.md      # o que é o .eml, como gerar e enviar
     ├── OUTLOOK_COMPATIBILITY.md  # o que funciona e o que evitar
     ├── TEST_CHECKLIST.md         # checklist antes de cada envio
-    ├── ANALISE_E_DECISOES.md     # análise do esboço e decisões de UX/UI
+    ├── ANALISE_E_DECISOES.md     # análise do esboço, auditoria e decisões de UX/UI
+    ├── apresentacao-report-mensal.pptx / .pdf  # apresentação das mudanças
+    ├── formiguinha-catalogo.png  # as versões da formiguinha
     └── preview-2026-09.jpg       # prévia usada neste README
 ```
 
@@ -111,7 +130,8 @@ Detalhes, alternativas para o novo Outlook e soluções de problemas: [docs/HOW_
 - No celular, as colunas empilham onde o cliente aceita CSS de tela pequena. No Outlook para Windows, o layout é sempre o de 680 px.
 - O HTML foi verificado no Chromium (computador e celular) e a estrutura do `.eml` foi validada, mas o envio ainda não foi testado em um Outlook real. Antes do primeiro envio, siga o [checklist de testes](docs/TEST_CHECKLIST.md).
 - No novo Outlook e no Outlook para Mac, o `.eml` pode abrir como mensagem recebida; nesse caso, use **Encaminhar**.
-- A formiguinha e as imagens de setembro foram recortadas do esboço e tratadas para tirar a textura de pixel, mas continuam em resolução baixa. Substitua pelos arquivos originais mantendo os mesmos nomes.
+- As imagens das peças de setembro foram recortadas do esboço e continuam em resolução baixa. Substitua pelos arquivos originais mantendo os mesmos nomes.
+- A formiguinha foi redesenhada em vetor a partir da imagem de referência. É uma releitura em ilustração, não o arquivo original de marca.
 
 A análise por recurso (imagens, fundos, fontes, GIF, SVG, vídeo, modo escuro) está em [docs/OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md).
 

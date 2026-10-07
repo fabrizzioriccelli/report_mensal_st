@@ -73,6 +73,52 @@ O report de setembro usa **somente** os números, títulos, textos e imagens que
 - aprendizados e foco do próximo mês;
 - acessos, duração e links dos vídeos;
 - o segundo vídeo e a peça em destaque da seção 04;
-- datas marcadas como `[dd/mm]` e trechos cortados (`[COMPLETAR]`).
+- datas marcadas como `[dd/mm]` e as datas e descrições de Milheiros e S Music (projetos do próximo mês informados pela área).
+
+As etiquetas **2,5x** (produção) e **+81%** (ticket médio) não estão escritas no esboço: foram calculadas a partir dos números dele (262 → 651,9 e R$ 16 → R$ 29). As demais variações (+89%, −12%, −29%, 3,6x, 3,0x) são do esboço.
 
 A manchete ("Escala e eficiência no mesmo mês.") e a síntese da visão geral resumem textos do próprio esboço ("ampliação de volume e valor", "ganhos de eficiência"). Valide com a área antes do envio.
+
+## 7. Rodada de refinamento (versão aprovada → versão executiva)
+
+Feedback da gerência: o report estava **longo**, com informação repetida, e o **Creative X ocupava espaço demais**. A rodada manteve a estrutura e a identidade, e trabalhou redução, consolidação e acabamento.
+
+### Auditoria da versão anterior
+
+| Elemento | Problema | Decisão |
+|---|---|---|
+| Faixa vermelha de KPIs (01) | Repetia ~R$ 100 mil, 3,6x e +89% que já estavam na visão geral | **Removida.** Os números ficam na visão geral; os cases trazem só o contexto |
+| Manchete com "~R$ 100 mil" | Mesmo número da métrica 1 | Já tinha virado "Escala e eficiência"; mantida |
+| Métrica "3,6x impressões" na visão geral | Repetida no case 1.1 | **Trocada** por "2,5x produção" (262 → 651,9), mais forte e sem repetir |
+| Cases em linhas inteiras com imagem de 130 px | Ocupavam 2 telas; as peças já estavam no visual central | **Unificados** em 2 cartões lado a lado, sem imagem, com etiquetas de variação |
+| Creative X: selo + 3 blocos + barras + referências em linhas | 429 px de altura | **Uma composição** em grafite: evolução e barras, variação e referências em 3 colunas, e uma frase de insight |
+| Foto do Creative X e imagens da agenda | Pouco valor para o espaço | **Removidas** |
+| Destaques em grade 2x2 com imagem grande | 683 px | **Lista compacta**: formiguinha do projeto, status, 1 frase e miniatura |
+| Peças e vídeos, um por linha | 576 px | **Composição editorial**: 1 principal grande + 2 secundários |
+| Aprendizados em 3 caixas por linha, 2 linhas | Repetiam o rótulo em cada caixa | **3 cartões**: título curto, 1 frase e "Levamos" |
+| "O que levamos para frente" + agenda de 6 linhas | 764 px, com descrições longas | **Próximos passos**: foco do mês, 2 projetos com formiguinha e agenda em 2 colunas |
+| Encerramento com formiguinha recortada | Repetia o asset do cabeçalho | Faixa curta, sem repetir a personagem |
+
+### Resultado
+
+| Medida (desktop, 760 px) | Antes | Depois |
+|---|---|---|
+| Altura total | 4.541 px | 2.997 px (**−34%**) |
+| Principais resultados | 966 px | 401 px |
+| Creative X | 429 px | 363 px, com mais informação (barras e insight juntos) |
+| Destaques | 683 px | 488 px |
+| Peças e vídeos | 576 px | 377 px |
+| Aprendizados + próximos passos | 1.176 px | 757 px |
+
+Nenhuma informação do esboço saiu do report: o que foi removido era repetição ou imagem decorativa.
+
+### Sistema visual
+
+- **Cantos:** 6 px (miniaturas), 12 px (cartões e imagens), 16 px (blocos grandes), pílula (etiquetas e botão).
+- **Cor com significado:** vermelho = marca e destaque; verde = resultado positivo (inclusive custo que caiu, com ▼); âmbar = previsto/atenção; grafite = assinatura do Creative X. O resto é neutro.
+- **Tipografia:** rótulo 10 px em caixa alta espaçada → título de seção 12 px → manchete 28 px → número principal 28 a 46 px → número secundário 18 a 20 px → texto 12 a 13 px → legenda 10 a 11 px. Negrito só em títulos e números.
+- **Ritmo:** blocos densos (cases, destaques) alternam com blocos de respiro (visão geral, Creative X em fundo escuro).
+
+### Formiguinha como sistema
+
+A personagem foi redesenhada em vetor a partir da imagem de referência (boneco de madeira articulado, luvas, botas e pontas das antenas em vermelho). Existe uma versão base e variações que mudam só pose e um acessório, uma por universo de projeto. Ela aparece onde identifica um projeto: no cabeçalho (base), em cada case, no Creative X, em cada destaque e nos projetos do próximo mês, sempre dentro de um componente existente, sem criar seção nova. Regras e catálogo em `assets/formiguinha/README.md`.

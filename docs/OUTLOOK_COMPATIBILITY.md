@@ -20,7 +20,7 @@ O report é distribuído por Outlook. O ponto crítico é o **Outlook clássico 
 | ✓ Cor de fundo em células | Faixa vermelha, caixas de aprendizado, selo CreativeX (`bgcolor` + `background`) |
 | ✓ Bordas em células | Linhas de seção, divisórias, caixas tracejadas dos placeholders |
 | ✓ `margin` em parágrafos e `padding` em células | Espaçamentos (o Word não respeita `padding` em `<p>`/`<div>` nem `margin` em tabelas) |
-| ✓ Imagens JPG/PNG com `width` | Formiguinha, logo, peças; anexadas ao e-mail (CID) |
+| ✓ Imagens JPG/PNG com `width` | Peças em JPG; formiguinha e ícones em PNG com fundo transparente (`AllowPNG` declarado para o Outlook); tudo anexado ao e-mail (CID) |
 | ✓ Links | Botões e vídeos |
 | ✓ Arial | Única fonte; existe em todos os computadores |
 | ✓ Caracteres especiais (▶ → ● ○) | Ícones de play, setas e status, sem imagem |
@@ -30,12 +30,13 @@ O report é distribuído por Outlook. O ponto crítico é o **Outlook clássico 
 | Recurso | Comportamento | Como o report trata |
 |---|---|---|
 | △ Responsividade (`@media`) | Ignorada no Outlook para Windows; funciona no celular e na web | Layout fixo de 680 px no computador; colunas empilham no celular |
-| △ Cantos arredondados | Ignorados no Outlook para Windows (ficam retos) | O design usa cantos retos de propósito |
+| △ Cantos arredondados (`border-radius`) | Funcionam no novo Outlook, Outlook na Web, iOS, Android e Mac. O Outlook para Windows ignora e mostra cantos retos | Usados em um sistema de 4 tamanhos (6, 12, 16 px e pílula). Sem eles, o layout e as cores continuam iguais: o fallback é o mesmo bloco com canto reto. Não usamos VML para arredondar, para não complicar a edição |
+| △ Etiquetas em pílula (`span` com fundo e `padding`) | O Outlook para Windows mostra o fundo colado ao texto, sem o respiro lateral | A etiqueta continua legível e colorida; só fica mais justa |
 | △ GIF animado | Versões antigas do Outlook para Windows mostram só o 1º quadro | Não usado. Se usar, o 1º quadro precisa funcionar sozinho |
-| △ Modo escuro | Cada Outlook escurece cores de um jeito (alguns invertem fundos claros e textos escuros) | Texto branco sobre vermelho e texto escuro sobre claro continuam legíveis. Imagens JPG não são invertidas: a formiguinha fica numa moldura clara. **Conferir em cada envio** |
+| △ Modo escuro | Cada Outlook escurece cores de um jeito (alguns invertem fundos claros e textos escuros) | Texto branco sobre vermelho e texto escuro sobre claro continuam legíveis. Imagens não são invertidas; a formiguinha tem fundo transparente e contorno próprio, então funciona em fundo claro ou escuro. O Creative X já é escuro por design. **Conferir em cada envio** |
 | △ Imagem hospedada (link `https://`) | Bloqueada até "Baixar imagens" | Imagens vão anexadas (CID) |
-| △ Tamanho do e-mail | Mensagens grandes demoram e podem ser barradas | HTML ~55 KB; imagens até ~200 KB cada, ~3 MB no total |
-| △ Botão | Botão com `<a>` estilizado perde o fundo no Word | Botão feito com célula de tabela colorida e link dentro |
+| △ Tamanho do e-mail | Mensagens grandes demoram e podem ser barradas | HTML ~50 KB; imagens até ~200 KB cada, ~3 MB no total |
+| △ Botão | Botão com `<a>` estilizado perde o fundo no Word | Botão feito com célula de tabela colorida (pílula fora do Windows) e link dentro |
 
 ## Não depender
 

@@ -10,8 +10,10 @@ Copie esta lista a cada mês (ou marque direto aqui no GitHub). A primeira colun
 | [ ] | Mês certo em todos os lugares | Ctrl+F `01 MÊS`: 6 pontos | Sim (setembro) |
 | [ ] | Números conferidos com a fonte | Compare com o painel/planilha de origem | Números de set/2026 copiados do esboço |
 | [ ] | Placeholders zerados | `tools/gerar-eml.html` → "Pendências de conteúdo" | Não: o report de setembro ainda tem placeholders de propósito |
-| [ ] | Imagens | Nenhum quadro vazio no navegador; ferramenta sem "não encontrada" | Sim (13 imagens: recortes tratados do esboço e ícones em vetor) |
-| [ ] | Formiguinha | Aparece no cabeçalho, em "O que aprendemos" e no encerramento | Sim |
+| [ ] | Imagens | Nenhum quadro vazio no navegador; ferramenta sem "não encontrada" | Sim (5 peças do esboço, 10 formiguinhas e 2 ícones em PNG) |
+| [ ] | Formiguinha | Base no cabeçalho; versão temática em cada case, no Creative X, em cada destaque e nos projetos do próximo mês; versão certa para cada projeto | Sim |
+| [ ] | Etiquetas de resultado | Verde só para resultado bom (inclusive custo que caiu); âmbar para previsto | Sim |
+| [ ] | Cada número uma vez | Os 4 números da visão geral não se repetem nas seções | Sim |
 | [ ] | Creative X | Anterior, atual, variação e barras batem entre si | Estrutura sim; score anterior ainda é placeholder |
 | [ ] | Aprendizados | Cada linha tem aconteceu → aprendemos → levamos | Estrutura sim; conteúdo é placeholder |
 | [ ] | Celular | F12 → Ctrl+Shift+M → 390 px: nada cortado, sem rolagem lateral | Sim (Chromium, 390 px) |
