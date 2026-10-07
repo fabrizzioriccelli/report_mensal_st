@@ -43,13 +43,13 @@ Só **uma** coisa: a pose de um braço e **um** elemento ligado ao tema. Nada de
 
 ## Como trocar a versão no report
 
-Pesquise `12 FORMIGUINHA` e troque só o nome do arquivo:
+No arquivo do mês (`dados/AAAA-MM.txt`), bloco `[PROJETO PRINCIPAL]`:
 
-```html
-<img src="../assets/formiguinha/formiga-viagem.png" width="86" alt="Formiguinha com uma mala de viagem" ...>
+```text
+formiguinha: viagem
 ```
 
-Atualize também o `alt` (o texto que aparece com imagens bloqueadas).
+Use o nome da tabela acima, sem `formiga-` e sem `.png`. A descrição para quem não vê a imagem é preenchida sozinha. As versões do Transformation e do Foco são fixas e ficam em `config/marca.txt`.
 
 ## Como criar uma variação nova
 
@@ -57,7 +57,7 @@ Atualize também o `alt` (o texto que aparece com imagens bloqueadas).
 2. Mude a pose de **um** braço e acrescente **um** elemento do tema, em vermelho, grafite, branco ou petróleo.
 3. Confira a mão em tamanho real (80 px): o gesto precisa ser lido sem ambiguidade.
 4. Exporte em PNG transparente, 240 px de largura, e salve como `formiga-<tema>.png`. Use o tema, não o nome da campanha (`formiga-viagem`, não `formiga-milheiros`), para reaproveitar em outros meses.
-5. Acrescente a versão na tabela acima e no passo 10 de [docs/HOW_TO_EDIT.md](../../docs/HOW_TO_EDIT.md).
+5. Acrescente a versão na tabela acima e na tabela "Formiguinha do projeto principal" de [docs/HOW_TO_EDIT.md](../../docs/HOW_TO_EDIT.md). Para uma versão nova aparecer com descrição própria, acrescente o nome em `FORMIGA_ALT` em `tools/motor.js` (sem isso, a descrição fica "Formiguinha").
 
 ## Origem
 

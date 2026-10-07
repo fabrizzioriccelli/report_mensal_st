@@ -2,7 +2,7 @@
 
 Este documento explica como o esboço do report (formato de slide, setembro 2026) virou um template de e-mail de uma página, e por quê.
 
-Ele registra as rodadas em ordem. **A estrutura atual é a da seção 8** (reestruturação editorial); as seções 3, 4 e 7 descrevem versões anteriores e ficam como histórico das decisões.
+Ele registra as rodadas em ordem. **A estrutura visual atual é a da seção 8** (reestruturação editorial); o funcionamento técnico (dados em texto, geração, links e .eml) está na seção 9 e em [ARQUITETURA.md](ARQUITETURA.md); as seções 3, 4 e 7 descrevem versões anteriores e ficam como histórico das decisões.
 
 ## 1. O que o esboço tem de bom
 
@@ -191,3 +191,15 @@ Redesenhada do zero a partir da imagem de referência:
 - **volume:** gradientes em cada peça de madeira (luz no alto à esquerda), juntas esféricas, veios na cabeça, brilho nos olhos e sombra no chão;
 - **mãos:** o joinha virou um punho fechado e largo, com o polegar curto e curvo para cima, conferido em tamanho real; a outra mão fica na cintura, como na referência;
 - **sistema:** uma base e 5 variações, cada uma com **um** elemento (escudo, mala, fones, tablet, alvo). Biblioteca em `assets/formiguinha/`, com SVG de origem e regras de uso.
+
+## 9. Do layout ao produto: dados, geração e interatividade
+
+Com o layout aprovado, a rodada seguinte não mudou a estrutura visual. Ela transformou o report numa ferramenta que funciona no ambiente do banco:
+
+- **Conteúdo em texto** (`dados/AAAA-MM.txt`): ninguém edita HTML no mês a mês.
+- **Marca centralizada** (`config/marca.txt`): fontes (com espaço para a fonte oficial e uma configuração própria para o Outlook para Windows), cores, modo das imagens e domínios de link.
+- **Geração no navegador** (`gerar-report.html`): confere, reduz e recorta as imagens, desenha o ▶ dos vídeos e gera o `.eml` com versão em texto e imagens embutidas.
+- **Interatividade que funciona em qualquer Outlook:** miniatura clicável e botões em texto ("Ver peça →", "▶ Assistir", "Ver projeto →", "Ver demonstração →") que abrem o SharePoint/Stream. Sem JavaScript, modal ou vídeo embutido, que o Outlook não suporta.
+- **Única mudança visual:** as colunas de números da abertura passaram de 26/20/20/18% para 29/19/18/18%, para dar folga a uma fonte corporativa mais larga, e os botões de link aparecem no fim das frases.
+
+Decisões, alternativas descartadas, auditoria de dependências e o que foi testado: [ARQUITETURA.md](ARQUITETURA.md).

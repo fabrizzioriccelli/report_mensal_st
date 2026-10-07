@@ -2,75 +2,56 @@
 
 ## O que é um .eml
 
-Um `.eml` é **uma mensagem de e-mail inteira salva num único arquivo de texto**, no formato padrão da internet (MIME, RFC 5322). Ele contém o assunto, o corpo em HTML e os anexos. O Outlook, o Windows Mail e o Thunderbird abrem esse formato.
+Um `.eml` é **uma mensagem de e-mail inteira salva num único arquivo**, no formato padrão da internet (MIME). Ele contém o assunto, o corpo e as imagens. O Outlook, o Windows Mail e o Thunderbird abrem esse formato.
 
 O `.eml` gerado aqui leva o cabeçalho `X-Unsent: 1`. Com ele, o Outlook clássico para Windows abre o arquivo **como mensagem nova, pronta para enviar**, e não como um e-mail recebido.
 
-## Como o HTML entra no .eml
+## Por que .eml (e não colar no Outlook)
 
-A ferramenta `tools/gerar-eml.html` monta o arquivo assim:
+| Caminho | Resultado |
+|---|---|
+| **Gerar .eml → abrir no Outlook → enviar** | O HTML entra exatamente como foi gerado, com as imagens dentro. **Usado** |
+| Copiar a página do navegador e colar no e-mail | Perde larguras e espaçamentos; no novo Outlook e na Web, as imagens não vão junto |
+| Anexar o .html | O destinatário recebe um anexo, não o report no corpo |
+| Outlook na Web | Não tem como importar HTML nem abrir .eml como rascunho |
+| Imagem do report (print) | Sem links, sem texto selecionável, ilegível no celular. É o que o HTML evita |
 
-```
+O `.eml` continua sendo a etapa final mais robusta para quem envia pelo Outlook do computador.
+
+## Como o arquivo é montado
+
+```text
 X-Unsent: 1
-Subject: Creative Strategy PF | Report de Setembro 2026
-MIME-Version: 1.0
-Content-Type: multipart/related; boundary="..."; type="text/html"
-
---boundary
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: base64
-(o HTML do report, sem os comentários de edição)
-
---boundary
-Content-Type: image/jpeg; name="img01-visual-principal.jpg"
-Content-ID: <img01-visual-principal.jpg@report>
-Content-Disposition: inline; filename="img01-visual-principal.jpg"
-(a imagem)
-
---boundary--
+Subject: Creative Strategy PF | Report de Outubro 2026
+Content-Type: multipart/alternative
+├─ text/plain              ← versão em texto, com os links por extenso
+└─ multipart/related
+   ├─ text/html            ← o report
+   ├─ image/jpeg  (cid)    ← imagens embutidas, já reduzidas
+   └─ image/png   (cid)
 ```
 
-- O **assunto** vem do `<title>` do report.
-- Os **comentários** (`EDITAR AQUI`, instruções) são removidos. Os comentários condicionais do Outlook (`<!--[if mso]>`) são mantidos, porque fazem parte do layout.
-- Cada `<img src="../assets/...">` vira `<img src="cid:img01-...@report">`, apontando para a imagem anexada na mesma mensagem.
-
-## Como os assets funcionam: anexada (CID) × hospedada × base64
-
-| Forma | Como aparece no Outlook | Decisão |
-|---|---|---|
-| **Anexada inline (CID)** | A imagem viaja dentro do e-mail e aparece sem precisar de internet nem clicar em "Baixar imagens" | **Usada** |
-| Hospedada num site público (`https://...`) | Bloqueada até a pessoa clicar em "Baixar imagens", conforme a política da empresa | Evitada |
-| Hospedada no SharePoint/OneDrive | Geralmente **não aparece**: o Outlook não envia o login do SharePoint ao buscar a imagem | Evitada |
-| Base64 dentro do HTML (`data:`) | Bloqueada no Outlook clássico para Windows | Evitada |
-
-O custo da imagem anexada é o tamanho da mensagem. Por isso o limite recomendado é ~200 KB por imagem e ~3 MB no total; a ferramenta avisa quando passa.
-
-## Links externos
-
-- Links (`<a href="https://...">`) funcionam em todos os Outlooks. Em empresas com Microsoft 365, o **Safe Links** pode reescrever o endereço para verificação; isso é normal.
-- Links de vídeo do **Stream** abrem no navegador, com o login da empresa. O vídeo precisa estar **compartilhado com o mesmo público** do e-mail.
-- Link ainda não preenchido aparece como `#COLE-O-LINK-...`. Ele não leva a lugar nenhum, e a ferramenta lista todos antes do envio.
+- O **assunto** vem do mês (`Creative Strategy PF | Report de [Mês] [Ano]`). No rascunho, começa com `[RASCUNHO]`.
+- Cada imagem do report vira `cid:...`, apontando para a imagem anexada na própria mensagem. Por isso aparece sem internet e sem "Baixar imagens".
+- A **versão em texto** existe para quem não vê HTML (alguns leitores de tela e pré-visualizações) e é a base mínima: o conteúdo e os links continuam acessíveis.
 
 ## Passo a passo
 
 ### 1. Gerar
 
-1. Abra `tools/gerar-eml.html` no **Edge** ou **Chrome** (dois cliques).
-2. Clique em **Selecionar pasta do projeto** e escolha a pasta principal (a que contém `reports/` e `assets/`). O navegador pode perguntar se você quer "carregar" os arquivos: confirme. Nada é enviado para a internet.
-3. O report mais recente é selecionado sozinho. Troque no seletor, se quiser outro.
-4. Leia a **conferência**:
-   - **Pendências de conteúdo:** placeholders `[...]`, valores de exemplo (`00%`, `0.000`), caixas tracejadas e links vazios.
-   - **Imagens:** cada arquivo usado, com o peso. Imagem não encontrada bloqueia a geração.
-   - **Compatibilidade com Outlook:** script, vídeo, iframe, flex/grid, imagem de fundo, cores rgba, fonte externa, imagem sem `width` ou `alt`.
-5. Confira a **prévia** (botões Computador/Celular).
-6. Clique em **Baixar .eml**. O arquivo vai para a pasta Downloads com o nome do mês (`report-2026-10.eml`).
+1. Dois cliques em `gerar-report.html` (abre no Edge ou Chrome).
+2. **Selecionar a pasta do projeto** → escolha a pasta principal. O navegador pergunta se quer "carregar" os arquivos: confirme. Nada sai do seu computador.
+3. O mês mais recente de `dados/` é escolhido sozinho.
+4. Leia a **Conferência** (erros, pendências, avisos), teste os links e veja a **Prévia**.
+5. **Baixar e-mail final (.eml)**. Com pendências, só dá para gerar o **RASCUNHO** (marque a opção).
+6. **Baixar página do mês (.html)** e guarde em `reports/`: é o arquivo histórico, com as imagens dentro, que abre em qualquer navegador.
 
 ### 2. Abrir e enviar
 
 **Outlook clássico para Windows** (o caminho principal):
 
-1. Dê dois cliques no `.eml`.
-2. Abre uma **mensagem nova** com o report no corpo e o assunto preenchido.
+1. Dois cliques no `.eml`.
+2. Abre uma **mensagem nova** com o report e o assunto preenchidos.
 3. Preencha **Para** (de preferência a lista de distribuição da área) e envie.
 
 **Novo Outlook para Windows / Outlook para Mac:** dependendo da versão, o `.eml` abre como **mensagem recebida** (só leitura). Nesse caso:
@@ -79,28 +60,35 @@ O custo da imagem anexada é o tamanho da mensagem. Por isso o limite recomendad
 2. Apague o cabeçalho "De / Enviado / Para / Assunto" que o Outlook insere no topo.
 3. Ajuste o assunto (tire o "ENC:") e envie.
 
-O encaminhamento mantém o HTML e as imagens embutidas.
-
 **Outlook na Web:** não abre `.eml` como rascunho. Gere e envie pelo Outlook do computador.
 
 ### 3. Testar antes do envio geral
 
 1. Envie o primeiro só para você.
-2. Abra o e-mail recebido no **Outlook do computador**, no **Outlook na Web** e no **celular**.
-3. Clique em todos os links e vídeos, de preferência com alguém de fora do time.
-4. Siga [TEST_CHECKLIST.md](TEST_CHECKLIST.md).
+2. Abra o e-mail **recebido** no Outlook do computador, no Outlook na Web e no celular.
+3. Clique em todos os links e vídeos. Na primeira vez, peça para alguém de outra equipe fazer o mesmo.
+4. Siga o [checklist](TEST_CHECKLIST.md).
 
-## Por que não colar o HTML direto no Outlook
+## O que você precisa saber sobre HTML → .eml → Outlook
 
-O Outlook não tem campo para colar código HTML. Copiar a página aberta no navegador e colar na mensagem perde parte do layout (larguras, espaçamentos) e, no novo Outlook e no Outlook na Web, as imagens que estão no seu computador não vão junto. O `.eml` preserva o HTML exatamente como foi feito e leva as imagens dentro.
+| Ponto | Por que importa | O que fazer |
+|---|---|---|
+| **O Outlook reescreve o HTML ao enviar.** Ao clicar em Enviar, o Outlook para Windows passa o corpo pelo editor do Word | Pode simplificar parte do CSS (por exemplo, regras de celular e cantos arredondados) no e-mail que os outros recebem | **Sempre confira o e-mail recebido**, não só o rascunho. Por isso o teste é "enviar para você e abrir no celular" |
+| Não edite o texto no Outlook | Qualquer edição passa pelo Word e pode desalinhar o layout | Corrija no arquivo de dados e gere de novo |
+| **Safe Links** | O Microsoft 365 pode reescrever os links para verificação | Normal. O destino continua o mesmo |
+| Tamanho | Mensagens grandes demoram e podem ser barradas | O report fica em ~200–400 KB. A página avisa acima de 3 MB. VALIDAR COM TI o limite interno |
+| Imagens aparecem também como anexo | Alguns clientes listam imagens embutidas como anexos | O corpo continua certo |
+| Encaminhamento | O destinatário pode encaminhar | Encaminhar mantém imagens e links. Quem receber precisa ter permissão no SharePoint |
+| Destinatários externos | Links "Pessoas em [empresa]" não abrem para quem é de fora | O report é interno; não envie para fora |
 
 ## Exemplo
 
-[`examples/report-2026-09.eml`](../examples/report-2026-09.eml) foi gerado pela ferramenta a partir de `reports/2026-09.html`. A estrutura foi validada com um leitor de e-mail padrão (Python `email`):
+[`examples/report-2026-09-RASCUNHO.eml`](../examples/report-2026-09-RASCUNHO.eml) foi gerado pela página a partir de `dados/2026-09.txt`. Como setembro ainda tem pendências (aprendizados, foco, links), ele é um **rascunho**. A estrutura foi validada com um leitor de e-mail padrão (Python `email`):
 
-- 1 parte HTML (UTF-8) + 10 imagens inline: 5 JPG (peças) e 5 PNG (3 formiguinhas e 2 ícones), cerca de 216 KB no total;
-- todas as referências `cid:` do HTML têm a imagem correspondente, e nenhuma imagem sobra;
-- nenhum comentário de edição e nenhum caminho local no HTML final.
+- texto puro + HTML (UTF-8) + 10 imagens embutidas: 5 JPG (peças) e 5 PNG (3 formiguinhas, 2 ícones), cerca de 220 KB;
+- todas as referências `cid:` do HTML têm a imagem correspondente;
+- nenhum comentário interno, nenhum caminho local, nenhuma requisição externa;
+- linhas com no máximo 76 caracteres, como pede o padrão.
 
 Esse exemplo **não foi aberto num Outlook real** (este ambiente não tem Outlook). Faça o teste do passo 3 antes do primeiro envio.
 
@@ -108,10 +96,10 @@ Esse exemplo **não foi aberto num Outlook real** (este ambiente não tem Outloo
 
 | Problema | O que fazer |
 |---|---|
-| Dois cliques no `.eml` abrem outro programa | Clique com o botão direito → Abrir com → Outlook |
+| Dois cliques no `.eml` abrem outro programa | Botão direito → Abrir com → Outlook |
 | O `.eml` abre como recebido, sem botão Enviar | Use **Encaminhar** (veja acima) |
-| Imagens aparecem como anexos no rodapé, além do corpo | Alguns clientes listam imagens inline como anexos; o corpo continua certo |
-| Imagem com um "x" vermelho | A imagem não foi embutida: gere o `.eml` de novo e confira a lista de imagens da ferramenta |
-| Mensagem bloqueada por tamanho | Reduza as imagens (JPG, ~200 KB cada, no máximo ~3 MB no total) |
-| Assunto com caracteres estranhos | Gere de novo; o assunto é codificado em UTF-8 pela ferramenta |
-| A ferramenta não mostra nenhum report | A pasta escolhida não é a principal; escolha a que contém `reports/` |
+| Imagem com um "x" vermelho | Gere o `.eml` de novo e confira a lista "Imagens preparadas" |
+| Mensagem bloqueada por tamanho | Use imagens menores; confira o limite com a TI |
+| Assunto com caracteres estranhos | Gere de novo; o assunto é codificado em UTF-8 |
+| A página diz que não encontrou a pasta | Escolha a pasta principal (a que tem `dados`, `config`, `template`) |
+| A página mostra uma mensagem sobre `tools/motor.js` | A página foi movida para fora da pasta do projeto. Abra-a de dentro da pasta |

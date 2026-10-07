@@ -1,0 +1,288 @@
+# ======================================================================
+#  REPORT MENSAL · CREATIVE STRATEGY PF · MODELO EM BRANCO
+# ======================================================================
+#  ESTE É O ÚNICO ARQUIVO QUE VOCÊ EDITA TODO MÊS.
+#  Modelo em branco: copie para dados/AAAA-MM.txt (ex.: dados/2026-10.txt)
+#  e troque cada [texto entre colchetes]. Mais simples ainda: copie o
+#  arquivo do mês anterior e troque só o que mudou.
+#
+#  Regras:
+#   1. Cada linha é "campo: valor". Troque só o que vem depois dos ":".
+#   2. Linhas que começam com # são instruções. Não vão para o e-mail.
+#   3. Os [BLOCOS EM COLCHETES] organizam o arquivo. Não renomeie.
+#      Para tirar um item (um lançamento, um número), apague o bloco
+#      inteiro. Para recolocar, copie um bloco igual e troque o número.
+#   4. Campo vazio = aquele elemento não aparece.
+#      Ex.: "link:" vazio = a peça aparece, mas sem "Ver peça".
+#   5. Texto [entre colchetes] dentro de um valor = PENDÊNCIA.
+#      A ferramenta lista e só gera a versão final quando não houver.
+#   6. Quebra de linha forçada num título: escreva <br>.
+#
+#  Imagens: coloque o arquivo na pasta indicada em "pasta_imagens" e
+#  escreva só o nome (ex.: openai-ads.jpg). Pode ser a imagem original,
+#  em alta: a ferramenta recorta e reduz para o e-mail sozinha.
+#
+#  Tipos de link (campo "tipo"), cada um com o seu texto fixo:
+#    peca     -> "Ver peça →"          imagem ou peça em tamanho grande
+#    video    -> "▶ Assistir"          vídeo (Stream / SharePoint)
+#    projeto  -> "Ver projeto →"       página, documento, apresentação
+#    demo     -> "Ver demonstração →"  protótipo ou demonstração
+#  Que link colar: docs/LINKS_SHAREPOINT_STREAM.md
+#
+#  Depois de salvar: abra tools/gerar-report.html no Edge.
+# ======================================================================
+
+
+# ----------------------------------------------------------------------
+#  01 · MÊS
+# ----------------------------------------------------------------------
+[EDICAO]
+mes: [Mês, ex.: Outubro]
+ano: [AAAA]
+proximo_mes: [Mês seguinte]
+pasta_imagens: assets/[AAAA-MM]
+contato: [e-mail ou canal do time]
+
+
+# ----------------------------------------------------------------------
+#  02 · FRASE DO MÊS (abertura)
+#  frase + frase_final formam uma frase de até ~8 palavras.
+#  frase_final aparece em itálico vermelho.
+#  previa: o texto cinza que aparece ao lado do assunto na caixa de
+#  entrada (até ~110 caracteres).
+# ----------------------------------------------------------------------
+[ABERTURA]
+frase: [INÍCIO DA FRASE DO MÊS]
+frase_final: [final da frase.]
+previa: [A FRASE DO MÊS + O PRINCIPAL NÚMERO, ATÉ ~110 CARACTERES]
+
+
+# ----------------------------------------------------------------------
+#  03 · PROJETO PRINCIPAL
+#  Aparece só na abertura, com a peça e até 4 números.
+#  formiguinha: base, protecao, viagem, musica, transformacao ou foco.
+# ----------------------------------------------------------------------
+[PROJETO PRINCIPAL]
+nome: [NOME DO PROJETO PRINCIPAL]
+resumo: [O QUE FOI FEITO E POR QUÊ, EM 1 A 2 LINHAS]
+imagem: [ARQUIVO DA PEÇA PRINCIPAL, ex.: projeto-principal.jpg]
+descricao_imagem: [O que a peça mostra, para quem não vê a imagem]
+tipo: peca
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
+formiguinha: base
+
+# Números do projeto principal (até 4). O 1º aparece em vermelho.
+#  valor: o número (até ~10 caracteres)
+#  titulo: o que é (negrito)        detalhe: comparação ou contexto
+#  variacao: etiqueta verde opcional. Começa com "-" → seta para baixo.
+#  variacao_cor: verde (padrão) ou ambar (atenção)
+[NUMERO 1]
+valor: [000]
+titulo: [Métrica]
+detalhe: era [valor anterior]
+variacao: [+00%]
+
+[NUMERO 2]
+valor: [000]
+titulo: [Métrica]
+detalhe: era [valor anterior]
+variacao: [+00%]
+
+[NUMERO 3]
+valor: [000]
+titulo: [Métrica]
+detalhe: era [valor anterior]
+variacao: [+00%]
+
+[NUMERO 4]
+valor: [000]
+titulo: [Métrica]
+detalhe: era [valor anterior]
+variacao: [+00%]
+
+
+# ----------------------------------------------------------------------
+#  04 · O QUE LANÇAMOS
+#  1 projeto em destaque (com resultados) + até 3 lançamentos compactos.
+# ----------------------------------------------------------------------
+[LANCAMOS]
+titulo: [UMA FRASE QUE RESUME OS LANÇAMENTOS]
+
+# Projeto em destaque. A imagem é vertical (aparece com 140 px de
+# largura) e some no celular; o "Ver peça" continua.
+[DESTAQUE]
+categoria: [Área] · [Campanha]
+titulo: [TÍTULO DO PROJETO EM DESTAQUE]
+texto: [O QUE FIZEMOS E O QUE ACONTECEU, EM 2 LINHAS]
+imagem: [ARQUIVO DA PEÇA, ex.: projeto-destaque.jpg]
+descricao_imagem: [O que a peça mostra]
+tipo: peca
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
+nota: [Base de comparação.] Etiqueta verde = resultado positivo; custo menor também é bom.
+
+# Resultados do projeto em destaque (até 3).
+[RESULTADO 1]
+valor: [000]
+titulo: [Métrica]
+detalhe: era [valor anterior]
+variacao: [+00%]
+
+[RESULTADO 2]
+valor: [000]
+titulo: [Métrica]
+detalhe: era [valor anterior]
+variacao: [+00%]
+
+[RESULTADO 3]
+valor: [000]
+titulo: [Métrica]
+detalhe: era [valor anterior]
+variacao: [+00%]
+
+# Lançamentos compactos ("Também no ar", até 3).
+#  status: etiqueta curta. status_cor: verde (no ar / implementado)
+#  ou ambar (previsto / aguardando resultado).
+#  A miniatura é recortada no formato 368 x 144 px. Em vídeo, a
+#  ferramenta desenha o botão ▶ sobre a miniatura.
+[LANCAMENTO 1]
+status: Resultado em [dd/mm]
+status_cor: ambar
+nome: [NOME DO PROJETO]
+texto: [1 FRASE SOBRE O PROJETO]
+imagem: [ARQUIVO DA MINIATURA]
+descricao_imagem: [O que a imagem mostra]
+tipo: peca
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
+
+[LANCAMENTO 2]
+status: Resultado em [dd/mm]
+status_cor: ambar
+nome: [NOME DO PROJETO]
+texto: [1 FRASE SOBRE O PROJETO]
+imagem: [ARQUIVO DA MINIATURA]
+descricao_imagem: [O que a imagem mostra]
+tipo: peca
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
+
+[LANCAMENTO 3]
+status: Resultado em [dd/mm]
+status_cor: ambar
+nome: [NOME DO PROJETO]
+texto: [1 FRASE SOBRE O PROJETO]
+imagem: [ARQUIVO DA MINIATURA]
+descricao_imagem: [O que a imagem mostra]
+tipo: peca
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
+
+
+# ----------------------------------------------------------------------
+#  05 · CREATIVE X
+#  anterior e atual em %. A barra e a variação são calculadas sozinhas
+#  quando os dois são números (deixe "variacao" vazio).
+# ----------------------------------------------------------------------
+[CREATIVE X]
+subtitulo: Score criativo · Operações PF
+anterior: [00%]
+atual: [00%]
+variacao:
+periodo: [período atual] vs. [período anterior]
+referencia: [REFERÊNCIA OPCIONAL: MÉDIA GLOBAL, MÉDIA DO ANO OU META]
+significado: [O QUE O SCORE SIGNIFICA, EM 1 FRASE CURTA]
+
+
+# ----------------------------------------------------------------------
+#  06 · CREATIVE TRANSFORMATION (até 3 projetos)
+#  icones: nomes de assets/icones/ separados por vírgula, OU
+#  imagem: um print (na pasta do mês). Sem os dois, o texto ocupa a linha.
+#  citacao e resultado são opcionais.
+# ----------------------------------------------------------------------
+[TRANSFORMATION]
+titulo: Como estamos transformando<br>a forma de criar.
+
+[TRANSFORMATION 1]
+status: [Em teste / Implementado] · [dd/mm]
+status_cor: verde
+nome: [NOME DO PROJETO DE IA OU AUTOMAÇÃO]
+texto: [O QUE FAZ, EM 1 FRASE]
+citacao:
+resultado: [ADOÇÃO, TEMPO GANHO OU OUTRO INDICADOR]
+icones:
+imagem: [PRINT DA FERRAMENTA]
+descricao_imagem:
+tipo: demo
+link:
+
+[TRANSFORMATION 2]
+status: [Em teste / Implementado]
+status_cor: ambar
+nome: [NOME DO PROJETO DE IA OU AUTOMAÇÃO]
+texto: [O QUE FAZ, EM 1 FRASE]
+citacao:
+resultado: [INDICADOR OU PRÓXIMO PASSO]
+icones:
+imagem: [PRINT DA FERRAMENTA]
+descricao_imagem:
+tipo: projeto
+link:
+
+
+# ----------------------------------------------------------------------
+#  07 · O QUE APRENDEMOS (até 3)
+# ----------------------------------------------------------------------
+[APRENDIZADO 1]
+titulo: [TÍTULO CURTO]
+texto: [O que aconteceu e o que isso ensina, em 1 frase.]
+levamos: [ação curta]
+
+[APRENDIZADO 2]
+titulo: [TÍTULO CURTO]
+texto: [O que aconteceu e o que isso ensina, em 1 frase.]
+levamos: [ação curta]
+
+[APRENDIZADO 3]
+titulo: [TÍTULO CURTO]
+texto: [O que aconteceu e o que isso ensina, em 1 frase.]
+levamos: [ação curta]
+
+
+# ----------------------------------------------------------------------
+#  08 · FOCO DO PRÓXIMO MÊS
+# ----------------------------------------------------------------------
+[FOCO]
+prioridade: [PRINCIPAL PRIORIDADE DO PRÓXIMO MÊS]
+texto: Com base no que aprendemos em [mês], em [próximo mês] vamos priorizar [O QUÊ E POR QUÊ, EM 1 FRASE].
+
+
+# ----------------------------------------------------------------------
+#  09 · TAMBÉM VEM AÍ (até 6, em linhas de 3)
+#  data: "12 OUT" (dia + mês) ou um texto como "A DEFINIR".
+# ----------------------------------------------------------------------
+[AGENDA 1]
+data: [00 MÊS ou A DEFINIR]
+titulo: [TÍTULO]
+detalhe: [detalhe]
+
+[AGENDA 2]
+data: [00 MÊS ou A DEFINIR]
+titulo: [TÍTULO]
+detalhe: [detalhe]
+
+[AGENDA 3]
+data: [00 MÊS ou A DEFINIR]
+titulo: [TÍTULO]
+detalhe: [detalhe]
+
+[AGENDA 4]
+data: [00 MÊS ou A DEFINIR]
+titulo: [TÍTULO]
+detalhe: [detalhe]
+
+[AGENDA 5]
+data: [00 MÊS ou A DEFINIR]
+titulo: [TÍTULO]
+detalhe: [detalhe]
+
+[AGENDA 6]
+data: [00 MÊS ou A DEFINIR]
+titulo: [TÍTULO]
+detalhe: [detalhe]

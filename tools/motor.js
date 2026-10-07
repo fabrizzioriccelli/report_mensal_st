@@ -37,6 +37,9 @@
   function ler(texto, arquivo) {
     var out = { arquivo: arquivo, blocos: {}, ordem: [], problemas: [] };
     var atual = null;
+    /* Arquivo salvo como ANSI (e não UTF-8) chega com "�" no lugar dos acentos. */
+    var ruim = String(texto).split(/\r\n|\r|\n/).map(function (l, i) { return l.indexOf("\uFFFD") >= 0 ? i + 1 : 0; }).filter(Boolean);
+    if (ruim.length) problema(out.problemas, "erro", arquivo, ruim[0], "O arquivo não está salvo em UTF-8 e os acentos foram perdidos (linhas " + ruim.slice(0, 5).join(", ") + (ruim.length > 5 ? "…" : "") + "). No Bloco de Notas: Arquivo → Salvar como → Codificação: UTF-8. Depois confira os acentos dessas linhas.");
     String(texto).replace(/^﻿/, "").split(/\r\n|\r|\n/).forEach(function (bruta, i) {
       var n = i + 1, linha = bruta.trim();
       if (!linha || linha.charAt(0) === "#") return;
@@ -325,7 +328,8 @@
     var E = D.simples.EDICAO, pasta = E.pasta_imagens.replace(/\\/g, "/").replace(/^\.?\/+|\/+$/g, "");
     var imagens = [], porCaminho = {};
     function caminhoImagem(nome) { return nome.indexOf("/") >= 0 ? nome.replace(/^\.?\/+/, "") : pasta + "/" + nome; }
-    /* Registra uma imagem do e-mail. w/h = tamanho na tela (px). recorte = encaixa exatamente em w × h. */
+    /* Registra uma imagem do e-mail. w/h = tamanho na tela (px). recorte = encaixa exatamente em w × h.
+       fluida = no celular ocupa a largura da tela, então é exportada com até 700 px. */
     function imagem(caminho, w, h, op) {
       op = op || {};
       var med = medidas[caminho];
@@ -333,7 +337,7 @@
       var chave = caminho + "|" + w + "|" + (h || "") + "|" + (op.play ? 1 : 0);
       var reg = porCaminho[chave];
       if (!reg) {
-        reg = { id: imagens.length + 1, caminho: caminho, w: w, h: h || 0, recorte: !!op.recorte, play: !!op.play, papel: op.papel || "" };
+        reg = { id: imagens.length + 1, caminho: caminho, w: w, h: h || 0, recorte: !!op.recorte, play: !!op.play, papel: op.papel || "", fluida: !!op.fluida };
         reg.token = "@@IMG" + reg.id + "@@";
         imagens.push(reg); porCaminho[chave] = reg;
       }
@@ -368,7 +372,7 @@
         var cam = caminhoImagem(nome);
         if (!existe(cam)) problema(prob, "erro", arqD, v._linhas.imagem, "[" + nomeBloco + "] imagem não encontrada: " + cam + ". Confira o nome do arquivo (maiúsculas, acentos, extensão .jpg/.png).");
         var alt = (tipo === "video" ? "Vídeo: " : "") + desc + (href ? " (" + CTA[tipo].alt.toLowerCase() + ")" : "");
-        r.img = imagem(cam, w, h, { recorte: !!h, play: tipo === "video", alt: alt, papel: nomeBloco });
+        r.img = imagem(cam, w, h, { recorte: !!h, play: tipo === "video", alt: alt, papel: nomeBloco, fluida: !!(op && op.fluida) });
         r.img.link = href;
       }
       return r;
@@ -414,7 +418,7 @@
     function proxSecao() { secoes++; return (secoes < 10 ? "0" : "") + secoes; }
 
     /* 01 · Abertura */
-    var pp = peca(P, "PROJETO PRINCIPAL", 230, 230, 14, { dica: "460 x 460 px" });
+    var pp = peca(P, "PROJETO PRINCIPAL", 230, 230, 14, { dica: "460 x 460 px", fluida: true });
     var nums = (L.NUMERO || []), larg = LARG[nums.length] || LARG[4];
     var abertura = {
       n: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
@@ -452,7 +456,7 @@
           })
         } : null,
         compactos: lanc.map(function (v, i) {
-          var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, 184, 72, 8, { dica: "368 x 144 px" }), ult = i === lanc.length - 1;
+          var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, 184, 72, 8, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
           var pad = lanc.length === 1 ? "" : i === 0 ? "padding-right:12px;" : ult ? "padding-left:12px;" : "padding:0 6px;";
           return { status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lc[i] + "%", estilo: pad, classe: ult ? "col" : "col gap" };
         })
@@ -571,7 +575,7 @@
     var slug = ano + "-" + String(mesNumero(mes) || "00").padStart(2, "0");
     return {
       ok: true, problemas: prob, modelo: modelo, imagens: imagens, html: html, links: links,
-      texto: textoPuro(D, links), assunto: assunto, nomeArquivo: "report-" + slug,
+      texto: textoPuro(D, links), assunto: assunto, nomeArquivo: ("report-" + slug).replace(/[^\w-]/g, ""),
       config: { modo: modo, base: base, qualidade: qualidade / 100, dominios: dominios, corMarca: cor.marca.s }
     };
   }

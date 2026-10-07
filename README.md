@@ -1,171 +1,162 @@
 # Report Mensal · Creative Strategy PF
 
-Template do report mensal da Creative Strategy PF (Marketing PF), construído como uma newsletter executiva em HTML de uma única página, distribuída pelo Outlook em formato `.eml`.
+Newsletter executiva mensal da Creative Strategy PF (Marketing PF), enviada pelo Outlook. É um e-mail em HTML de uma página, com peças e vídeos clicáveis, gerado a partir de **um arquivo de texto por mês**.
 
-## Prévia do report
+<p>
+<img src="docs/preview-2026-09.jpg" width="420" alt="Prévia do report de setembro no computador">
+&nbsp;
+<img src="docs/preview-2026-09-celular.jpg" width="200" alt="Prévia do report de setembro no celular">
+</p>
 
-<img src="docs/preview-2026-09.jpg" width="340" alt="Prévia do report de setembro de 2026">
+- **[Report de setembro 2026](reports/2026-09.html)**: a página do mês (abre no navegador).
+- **[Exemplo de .eml](examples/report-2026-09-RASCUNHO.eml)**: rascunho pronto para abrir no Outlook.
+- **[Dados de setembro](dados/2026-09.txt)**: o arquivo de texto que gerou tudo isso.
 
-- **[Report de setembro 2026](reports/2026-09.html)**: arquivo editável do mês.
-- **[Exemplo de .eml](examples/report-2026-09.eml)**: mensagem pronta para abrir no Outlook, gerada pela ferramenta do projeto.
-- **[Modelo em branco](template/report-template.html)**: a mesma estrutura, só com placeholders.
+## Como funciona
+
+```text
+  VOCÊ EDITA                       CLICA                    RESULTADO
+  dados/2026-10.txt  (texto)  ─┐
+  assets/2026-10/    (imagens) ─┼──►  gerar-report.html  ──►  report-2026-10.eml  → Outlook → enviar
+                                │     (abre no Edge)     └──►  2026-10.html       → reports/ (arquivo)
+  config/marca.txt   (raro)    ─┘
+```
+
+**Você não edita HTML.** Escreve o conteúdo do mês num arquivo de texto, coloca as imagens numa pasta e clica em um botão. A página confere tudo, prepara as imagens e gera o `.eml`.
+
+## Todo mês, em 6 passos
+
+1. **Copie** `dados/2026-09.txt` → `dados/2026-10.txt`.
+2. **Crie** `assets/2026-10/` e coloque as imagens do mês. Pode ser a original, em alta: a ferramenta reduz e recorta.
+3. **Edite** `dados/2026-10.txt` no Bloco de Notas: troque o que vem depois de `campo:`.
+4. **Cole os links** das peças (SharePoint) e dos vídeos (Stream) nos campos `link:`.
+5. **Abra `gerar-report.html`**, selecione a pasta do projeto, confira e clique em **Baixar e-mail final (.eml)**.
+6. **Abra o `.eml` no Outlook**, envie para você, confira e envie para a área.
+
+Guia completo, para quem não programa: **[docs/HOW_TO_EDIT.md](docs/HOW_TO_EDIT.md)**.
+
+## O arquivo de dados
+
+Cada parte do e-mail é um bloco. Exemplo de um lançamento com vídeo:
+
+```text
+[LANCAMENTO 2]
+status: Resultado em 28/09
+status_cor: ambar
+nome: Creator em Reneg
+texto: Creator mostra que quitar uma dívida começa com um passo simples.
+imagem: creator-reneg.jpg
+descricao_imagem: Creator falando sobre renegociação de dívidas
+tipo: video
+link: https://empresa.sharepoint.com/:v:/s/creative/...
+```
+
+No e-mail, isso vira a miniatura com ▶, a etiqueta âmbar, o título, a frase e **▶ Assistir** no fim da frase. Clicar na miniatura ou no botão abre o vídeo no Stream.
+
+**O mapa de assets do mês é o próprio arquivo:** cada projeto tem a imagem (`imagem`), o tipo (`tipo`) e o link (`link`) juntos no mesmo bloco.
+
+## Interatividade
+
+O report é um e-mail, não um site: nenhum Outlook executa JavaScript, toca vídeo dentro da mensagem ou abre janelas por cima. A interação confiável em e-mail é **clicar e abrir um destino**, e é ela que o report usa:
+
+| Conteúdo | No e-mail | Ao clicar |
+|---|---|---|
+| Peça (imagem) | Miniatura + **Ver peça →** | Abre a peça grande no SharePoint, com login da empresa |
+| Vídeo | Miniatura com ▶ + **▶ Assistir** | Abre o vídeo no Stream, com som, controles e legendas |
+| Projeto | **Ver projeto →** / **Ver demonstração →** | Abre o documento, a apresentação ou a demonstração |
+
+- Sem link, sem botão: a peça aparece normalmente.
+- O botão fica no fim da frase do bloco, sem linha extra.
+
+### Receitas rápidas
+
+| Quero… | Faço… |
+|---|---|
+| **Adicionar uma imagem clicável** | Imagem em `assets/AAAA-MM/`; no bloco: `imagem: arquivo.jpg`, `tipo: peca`, `link: [link do SharePoint]` |
+| **Adicionar um vídeo** | Capa do vídeo em `assets/AAAA-MM/` (sem ▶, a ferramenta desenha); `tipo: video`, `link: [link do Stream]` |
+| **Trocar uma miniatura** | Troque o arquivo em `assets/AAAA-MM/` (mesmo nome) ou mude o nome em `imagem:` |
+| **Inserir um link** | Cole depois de `link: `, numa linha só |
+| **Usar o SharePoint** | Arquivo na pasta do time → Compartilhar → "Pessoas em [empresa]" → Copiar link |
+| **Usar o Stream** | Vídeo no Stream (SharePoint) → Compartilhar → Copiar link (formato `/:v:/`) |
+| **Testar** | Na página, seção "Teste os links" → Abrir; depois, envie para você e para alguém de outra equipe |
+| **Gerar o .eml** | `gerar-report.html` → Selecionar pasta → Baixar e-mail final |
+| **Ver se o link funciona para todos** | Peça para uma pessoa de **outra equipe** abrir (veja [LINKS_SHAREPOINT_STREAM.md](docs/LINKS_SHAREPOINT_STREAM.md)) |
+
+## Pensado para um ambiente corporativo restrito
+
+- **Sem dependência externa:** o e-mail não busca nada na internet. As imagens vão dentro do `.eml`, sem CDN, sem fonte baixada e sem serviço de terceiros.
+- **Sem instalação:** a página de geração roda no Edge, a partir do arquivo, sem servidor e sem enviar dados para fora.
+- **Links corporativos:** peças e vídeos abrem no SharePoint/Stream, com autenticação e permissões do Microsoft 365. A ferramenta recusa caminhos de rede e arquivos locais e avisa sobre links de download, de incorporação ou fora dos domínios aprovados.
+- **Proteções contra erro:** pendências (`[texto entre colchetes]`) bloqueiam a versão final; só sai um RASCUNHO, com "[RASCUNHO]" no assunto.
+- **Fonte oficial configurável** num lugar só, com fallback seguro para quem não tem a fonte e para o Outlook para Windows.
+
+Decisões e limitações: **[docs/ARQUITETURA.md](docs/ARQUITETURA.md)**. Primeiro uso no banco: **[docs/CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md)**.
 
 ## A história do report
 
-O report é lido de cima para baixo como uma narrativa curta. **Cada projeto aparece uma vez só**, com contexto, resultado e peça juntos:
-
 | | Seção | Pergunta que responde |
 |---|---|---|
-| 01 | **O mês em uma frase** | Qual foi o mês? A frase do mês e o projeto principal, com a peça e os números |
-| 02 | **O que lançamos** | O que mais foi para o ar? 1 projeto em destaque com resultados + projetos compactos |
-| 03 | **Creative X** | Como está a qualidade criativa? Score anterior → atual, em 3 segundos |
-| 04 | **Creative Transformation** | O que estamos mudando na forma de criar? Projetos de IA e inovação |
-| 05 | **O que aprendemos** | O que levamos do mês? Até 3 aprendizados com a ação |
-| 06 | **Foco do próximo mês** | O que vem agora? A prioridade, em destaque |
-| 07 | **Também vem aí** | O que está na agenda? Datas e projetos |
+| 01 | **O mês em uma frase** | Qual foi o mês? A frase e o projeto principal, com peça e números |
+| 02 | **O que lançamos** | O que mais foi para o ar? 1 projeto em destaque + até 3 compactos |
+| 03 | **Creative X** | Como está a qualidade criativa? Anterior → atual |
+| 04 | **Creative Transformation** | O que estamos mudando na forma de criar? |
+| 05 | **O que aprendemos** | O que levamos do mês? |
+| 06 | **Foco do próximo mês** | Qual é a prioridade agora? |
+| 07 | **Também vem aí** | O que está na agenda? |
 
-Os números, textos e imagens de setembro vêm do esboço original da área; as peças são recortes do esboço, em resolução baixa, e devem ser trocadas pelos arquivos originais. O que ainda não existe (score anterior do Creative X, aprendizados, foco, links dos vídeos, datas) aparece como placeholder identificado entre colchetes. Nenhum número foi inventado; as duas variações calculadas (`2,5x` e `+81%`) saem dos próprios números do esboço.
+Cada projeto aparece **uma vez**. A formiguinha aparece no máximo 3 vezes: no projeto principal (com o tema dele), no Creative Transformation e no Foco. Catálogo: [assets/formiguinha/README.md](assets/formiguinha/README.md).
 
-## Por que este projeto existe
-
-O report da área era montado em formato de slide. O desafio foi transformá-lo em uma leitura única, vertical e editorial no canal em que ele é realmente lido: o Outlook. A solução precisava:
-
-- caber em uma página contínua e curta, sem abas, menus ou repetição de informação;
-- abrir da mesma forma no Outlook para Windows, no novo Outlook, no Outlook na Web e no celular;
-- funcionar sem JavaScript, já que nenhum cliente de e-mail executa scripts;
-- ser atualizada todo mês por uma pessoa com conhecimento básico de HTML, só com Bloco de Notas e navegador;
-- reservar espaços para peças, imagens e vídeos de cada projeto.
-
-## Base técnica
-
-### HTML para e-mail
-
-O report está em `reports/AAAA-MM.html`, um arquivo por mês. O layout usa tabelas e estilos inline, porque o Outlook para Windows desenha e-mails com o motor do Word e ignora CSS moderno como flexbox, grid e `position`.
-
-Todo o conteúdo fica escrito diretamente no HTML. Comentários `EDITAR AQUI` marcam cada ponto que muda no mês, numerados de 01 a 12:
-
-```text
-01 MÊS · 02 FRASE DO MÊS · 03 PROJETO PRINCIPAL · 04 O QUE LANÇAMOS
-05 CREATIVE X · 06 TRANSFORMATION · 07 IMAGENS · 08 VÍDEOS E LINKS
-09 APRENDIZADOS · 10 FOCO · 11 AGENDA · 12 FORMIGUINHA
-```
-
-Blocos que se repetem (projeto em destaque, projeto compacto, projeto de Transformation) são delimitados por `INÍCIO BLOCO` e `FIM BLOCO` e podem ser duplicados ou removidos inteiros.
-
-### Sistema visual
-
-| Elemento | Regra |
-|---|---|
-| Tipografia | Georgia para frase do mês, títulos e números; Arial para rótulos e texto. As duas existem em qualquer computador |
-| Hierarquia | rótulo (10 px, caixa alta) → título (Georgia) → número → etiqueta de variação → texto → legenda |
-| Cantos | 8 px miniaturas · 14 px imagens e cartões · 20 px blocos grandes · pílula nas etiquetas |
-| Vermelho `#9E1218` | Marca, numeração das seções, número principal e o bloco do Foco |
-| Verde | Resultado positivo (`▲ +89%`, e `▼ −12%` quando cair é bom) e "implementado" |
-| Âmbar | Previsto, pendente ou atenção |
-| Grafite | Assinatura do Creative X (filetes e score, sem caixa pesada) |
-| Petróleo | Assinatura do Creative Transformation |
-| Creme | Superfície da abertura |
-
-No Outlook para Windows os cantos aparecem retos; o layout e as cores continuam os mesmos.
-
-### Formiguinha
-
-A personagem da área tem uma versão base e variações com **um** elemento cada: proteção (seguros), viagem (Milheiros), música (S Music), tecnologia (Creative Transformation) e foco. Ela aparece no máximo 3 vezes por edição, em pontos fixos: no projeto principal, no Creative Transformation e no Foco do próximo mês.
-
-<img src="docs/formiguinha-catalogo.png" width="720" alt="As 6 versões da formiguinha">
-
-As versões estão em `assets/formiguinha/`, com as regras de uso e de criação em [assets/formiguinha/README.md](assets/formiguinha/README.md).
-
-### Ferramenta de .eml
-
-O arquivo `tools/gerar-eml.html` abre no Edge ou no Chrome, sem instalação. Ele:
-
-1. lê o report e as imagens da pasta do projeto;
-2. lista pendências de conteúdo e problemas de compatibilidade com o Outlook;
-3. embute as imagens na mensagem (anexos inline `cid:`);
-4. gera um `.eml` que o Outlook abre como mensagem nova, pronta para envio.
-
-As imagens vão dentro do e-mail porque imagens hospedadas no SharePoint não aparecem no Outlook, e imagens com link externo ficam bloqueadas até o leitor clicar em "Baixar imagens".
-
-### Vídeos
-
-Nenhuma versão do Outlook reproduz vídeo dentro do e-mail. O vídeo entra no projeto a que pertence, como miniatura clicável e um link **▶ Assistir**, que abre o Microsoft Stream.
-
-## Estrutura do repositório
+## Estrutura do projeto
 
 ```text
 report_mensal_st/
-├── reports/                      # um report por mês (arquivo editado)
-│   └── 2026-09.html              # report de setembro de 2026
+├── gerar-report.html            ← ABRA ESTE para gerar o e-mail
+├── dados/                       ← O QUE VOCÊ EDITA TODO MÊS
+│   ├── 2026-09.txt              conteúdo de setembro
+│   └── MODELO.txt               modelo em branco
+├── assets/                      ← AS IMAGENS
+│   ├── 2026-09/                 imagens do mês (uma pasta por mês)
+│   ├── formiguinha/             a personagem: base + 5 variações
+│   └── icones/                  ícones do Creative Transformation
+├── config/
+│   └── marca.txt                fontes, cores, modo das imagens, domínios (raramente)
+├── reports/                     a página de cada mês, gerada (histórico)
+├── examples/                    exemplo de .eml gerado
+├── docs/                        guias
 ├── template/
-│   └── report-template.html      # modelo em branco, só com placeholders
-├── assets/                       # imagens usadas pelos reports
-│   ├── formiguinha/              # personagem: base + 5 variações (PNG)
-│   │   └── svg/                  # fonte vetorial de cada versão
-│   ├── icones/                   # ícones do Creative Transformation
-│   └── 2026-09/                  # peças e miniaturas do mês
+│   └── report.html              layout aprovado com {{campos}} (técnico)
 ├── tools/
-│   └── gerar-eml.html            # conferência e geração do .eml
-├── examples/
-│   └── report-2026-09.eml        # exemplo gerado pela ferramenta
-└── docs/                         # documentação complementar
-    ├── HOW_TO_EDIT.md            # atualização mensal em 10 passos
-    ├── HOW_TO_EXPORT_EML.md      # o que é o .eml, como gerar e enviar
-    ├── OUTLOOK_COMPATIBILITY.md  # o que funciona e o que evitar
-    ├── TEST_CHECKLIST.md         # checklist antes de cada envio
-    ├── ANALISE_E_DECISOES.md     # análise, auditorias e decisões de UX/UI
-    ├── apresentacao-report-mensal.pptx / .pdf  # apresentação das mudanças
-    ├── formiguinha-catalogo.png  # as versões da formiguinha
-    └── preview-2026-09.jpg       # prévia usada neste README
+│   └── motor.js                 o motor de geração (técnico)
+└── tests/                       testes automáticos (técnico, opcional)
 ```
 
-Vídeos não ficam no repositório: eles são publicados no Stream, e o report leva apenas a miniatura e o link.
+## Documentação
 
-## Como usar
+| Guia | Para quê |
+|---|---|
+| [HOW_TO_EDIT.md](docs/HOW_TO_EDIT.md) | **Atualizar o mês** (comece por aqui) |
+| [TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md) | Checklist antes de enviar |
+| [LINKS_SHAREPOINT_STREAM.md](docs/LINKS_SHAREPOINT_STREAM.md) | Qual link copiar, permissões, como testar |
+| [CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md) | Primeiro uso no banco: levar o projeto, fonte, SharePoint, teste piloto |
+| [HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md) | O que é o .eml, como abrir e enviar |
+| [OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md) | O que funciona em cada Outlook e os fallbacks |
+| [ARQUITETURA.md](docs/ARQUITETURA.md) | Decisões técnicas e o que foi testado |
+| [ANALISE_E_DECISOES.md](docs/ANALISE_E_DECISOES.md) | Histórico de design (das versões anteriores à atual) |
 
-### Ver o report
+## Levar para a máquina do trabalho
 
-Abra `reports/2026-09.html` no navegador. A página mostra o e-mail como ele será recebido. Para conferir a versão de celular, pressione F12 e depois Ctrl+Shift+M.
+No GitHub: **Code → Download ZIP**. Depois, extraia na máquina do trabalho e abra `gerar-report.html`. Use um caminho de transferência **aprovado pela empresa**: e-mails corporativos costumam bloquear `.zip`, `.html` e `.js`. Os dados reais do banco ficam só no ambiente corporativo. Detalhes em [CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md#0-levar-o-projeto-para-a-máquina-do-trabalho).
 
-### Atualizar o mês
+## Limitações conhecidas
 
-1. Copie o report do mês anterior para `reports/AAAA-MM.html`.
-2. Crie a pasta `assets/AAAA-MM/` com as imagens do mês.
-3. Pesquise `EDITAR AQUI` e atualize textos, números, imagens e links.
-4. Revise no navegador.
+- **Não testado num Outlook real** (este ambiente não tem Outlook). A geração, o layout (computador e celular) e a estrutura do `.eml` foram verificados no Chromium e com um leitor de e-mail. Antes do primeiro envio, faça o **teste piloto** com outra pessoa.
+- No Outlook para Windows, os cantos aparecem retos e o layout é sempre o de 680 px.
+- Ao enviar, o Outlook para Windows reescreve o HTML. Confira o e-mail **recebido**, não só o rascunho.
+- Links, permissões e vídeo com som dependem do SharePoint/Stream do banco e só podem ser testados lá.
+- As peças de setembro são recortes do esboço, em baixa resolução. A formiguinha é uma releitura em ilustração, não o arquivo original de marca.
 
-O passo a passo completo, com exemplos de etiquetas, imagens, Creative X, Transformation e formiguinha, está em [docs/HOW_TO_EDIT.md](docs/HOW_TO_EDIT.md).
+## Para quem for manter o código
 
-### Gerar e enviar o .eml
-
-1. Abra `tools/gerar-eml.html` no Edge ou no Chrome.
-2. Selecione a pasta principal do projeto.
-3. Confira as pendências e a prévia.
-4. Clique em **Baixar .eml** e abra o arquivo no Outlook.
-5. Envie primeiro para você; depois, para a área.
-
-Detalhes, alternativas para o novo Outlook e soluções de problemas: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
-
-## Compatibilidade e limitações
-
-- O layout foi escrito para o Outlook para Windows, o cliente mais restritivo; os demais clientes Outlook seguem o mesmo resultado.
-- No celular, as colunas empilham onde o cliente aceita CSS de tela pequena. No Outlook para Windows, o layout é sempre o de 680 px.
-- O HTML foi verificado no Chromium (computador e celular) e a estrutura do `.eml` foi validada, mas o envio ainda não foi testado em um Outlook real. Antes do primeiro envio, siga o [checklist de testes](docs/TEST_CHECKLIST.md).
-- No novo Outlook e no Outlook para Mac, o `.eml` pode abrir como mensagem recebida; nesse caso, use **Encaminhar**.
-- As peças de setembro foram recortadas do esboço e continuam em resolução baixa. Substitua pelos arquivos originais mantendo os mesmos nomes.
-- A formiguinha foi redesenhada em vetor a partir da imagem de referência. É uma releitura em ilustração, não o arquivo original de marca.
-
-A análise por recurso (imagens, fundos, fontes, GIF, SVG, vídeo, modo escuro) está em [docs/OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md).
-
-## Colaboração
-
-O projeto utiliza GitHub para versionamento. Cada mês entra como um commit próprio, mantendo separados os reports, os assets, a ferramenta e a documentação:
-
-```text
-report: outubro 2026
-assets: peças de outubro 2026
-docs: atualizar guia de edição
-tools: ajustar conferência do .eml
-```
-
-Os reports dos meses anteriores não são alterados depois do envio; eles formam o histórico da área.
+- Testes do motor: `node tests/motor.test.js` (só Node.js).
+- Teste da página de ponta a ponta: `node tests/ferramenta.e2e.js` (Node.js + Playwright).
+- Commits por assunto: `report: outubro 2026`, `assets: peças de outubro`, `docs: ...`, `tools: ...`. Os meses já enviados não são alterados: `reports/` e `dados/` formam o histórico.

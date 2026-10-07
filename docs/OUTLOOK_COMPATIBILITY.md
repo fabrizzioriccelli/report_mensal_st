@@ -1,89 +1,101 @@
-# Compatibilidade com o Outlook
+# Compatibilidade com o Outlook e interatividade possível
 
-O report é distribuído por Outlook. O ponto crítico é o **Outlook clássico para Windows**, que desenha e-mails com o **motor do Word**, e não com um navegador. O que funciona nele funciona nos outros. Por isso o template foi escrito para esse motor.
+O report é distribuído por Outlook. O ponto crítico é o **Outlook clássico para Windows**, que desenha e-mails com o **motor do Word**, e não com um navegador. O que funciona nele funciona nos outros, por isso o template foi escrito para esse motor.
 
 | Cliente | Motor | Observação |
 |---|---|---|
-| Outlook clássico para Windows (2016, 2019, 2021, Microsoft 365) | Word | O mais restritivo. A Microsoft mantém suporte a ele pelos próximos anos |
+| Outlook clássico para Windows (2016, 2019, 2021, Microsoft 365) | Word | O mais restritivo |
 | Novo Outlook para Windows | Navegador (Edge) | Aceita mais CSS; remove scripts |
 | Outlook na Web | Navegador | Igual ao novo Outlook |
-| Outlook para iOS e Android | Nativo/WebView | Aceita CSS de celular (media queries) |
+| Outlook para iOS e Android | Nativo/WebView | Aceita CSS de celular (`@media`) |
 | Outlook para Mac | WebKit | Bom suporte |
 
-## Funciona (usado no report)
+O suporte de cada cliente muda com as atualizações da Microsoft. A tabela reflete o comportamento conhecido e documentado. **Nada aqui foi testado num Outlook real** (este ambiente não tem Outlook): o teste piloto em [CORPORATE_SETUP.md](CORPORATE_SETUP.md) confirma no ambiente do banco.
+
+## Interatividade: o que dá para fazer num e-mail
+
+| Recurso | Outlook Windows (clássico) | Novo Outlook / Web | Celular (iOS/Android) | No report |
+|---|---|---|---|---|
+| **Link em texto** (`<a href>`) | ✓ | ✓ | ✓ | **Usado**: "Ver peça →", "▶ Assistir" |
+| **Imagem clicável** (imagem dentro de `<a>`) | ✓ | ✓ | ✓ | **Usado**: miniaturas abrem o mesmo link do botão |
+| Sublinhado ao passar o mouse (`:hover`) | ✕ ignora | △ geralmente aceita | — (sem mouse) | Usado como melhoria; sem ele nada muda |
+| Cantos arredondados | ✕ cantos retos | ✓ | ✓ | Usado; o canto reto é o fallback |
+| Colunas que empilham no celular (`@media`) | — | △ | ✓ | Usado |
+| JavaScript | ✕ | ✕ removido | ✕ | **Não usado** |
+| Modal / lightbox (janela por cima) | ✕ | ✕ | ✕ (só alguns apps não Microsoft) | **Não usado**: o clique abre o SharePoint |
+| Abas, acordeão, carrossel em CSS (`:checked`) | ✕ | ✕ | △ | **Não usado** |
+| Vídeo dentro do e-mail (`<video>`) | ✕ | ✕ | ✕ (só Apple Mail) | **Não usado**: miniatura + link do Stream |
+| iframe / player incorporado | ✕ removido | ✕ removido | ✕ | **Não usado** |
+| GIF animado | △ versões antigas mostram só o 1º quadro | ✓ | ✓ | Não usado |
+| Formulário, enquete | ✕ | ✕ | ✕ | Não usado |
+
+Legenda: ✓ funciona · △ parcial ou depende da versão · ✕ não funciona.
+
+**Conclusão:** a interação confiável em e-mail é **clicar e abrir um destino**. O report faz isso bem e sem quebrar: cada peça e cada vídeo tem um botão em texto que diz a ação e uma miniatura clicável, e o destino é o SharePoint ou o Stream da empresa. Detalhes da decisão: [ARQUITETURA.md](ARQUITETURA.md).
+
+## Recursos usados no report
 
 | Recurso | Como o report usa |
 |---|---|
-| ✓ Texto, negrito, itálico | Todo o conteúdo |
-| ✓ Tabelas para layout | Toda a grade (colunas, faixas, caixas) |
-| ✓ Estilo inline (`style="..."`) | Cores, tamanhos e espaçamentos em cada elemento |
-| ✓ Cor de fundo em células | Superfície creme da abertura, superfície petróleo do Transformation, bloco vermelho do Foco, etiquetas (`bgcolor` + `background`) |
-| ✓ Bordas em células | Filetes editoriais (cabeçalho, Creative X, agenda), divisórias entre números, caixas tracejadas dos placeholders |
-| ✓ `margin` em parágrafos e `padding` em células | Espaçamentos (o Word não respeita `padding` em `<p>`/`<div>` nem `margin` em tabelas) |
-| ✓ Imagens JPG/PNG com `width` | Peças em JPG; formiguinha e ícones em PNG com fundo transparente (`AllowPNG` declarado para o Outlook); tudo anexado ao e-mail (CID) |
-| ✓ Links | Miniaturas e "▶ Assistir" dos vídeos |
-| ✓ Georgia + Arial | Georgia nos títulos e números, Arial no texto. As duas vêm instaladas no Windows, no Mac, no iOS e no Android. Fallback: Times New Roman / Helvetica |
-| ✓ Caracteres especiais (▶ → ● ○) | Ícones de play, setas e status, sem imagem |
+| ✓ Tabelas para layout, estilo inline | Toda a grade |
+| ✓ Cor de fundo em células | Superfície creme (abertura), petróleo (Transformation), vermelho (Foco), etiquetas |
+| ✓ Bordas em células | Filetes, divisórias, caixas tracejadas (só no rascunho) |
+| ✓ `margin` em parágrafos e `padding` em células | Espaçamentos (o Word ignora `margin` em tabelas) |
+| ✓ Imagens JPG/PNG com `width`, `height` e `alt` | Peças em JPG; formiguinha e ícones em PNG transparente; tudo **embutido** no `.eml` (`cid:`) |
+| ✓ Fontes instaladas no sistema | Georgia (títulos) + Arial (texto), configuráveis em `config/marca.txt` |
+| ✓ Caracteres especiais (▶ → ● ○ ▲ ▼) | Play, setas e status, sem imagem |
+| ✓ Texto de pré-visualização escondido | O que aparece ao lado do assunto na caixa de entrada |
 
-## Usar com cuidado
+## Fontes
 
-| Recurso | Comportamento | Como o report trata |
-|---|---|---|
-| △ Responsividade (`@media`) | Ignorada no Outlook para Windows; funciona no celular e na web | Layout fixo de 680 px no computador; colunas empilham no celular |
-| △ Cantos arredondados (`border-radius`) | Funcionam no novo Outlook, Outlook na Web, iOS, Android e Mac. O Outlook para Windows ignora e mostra cantos retos | Usados em um sistema de 4 tamanhos (8, 14, 20 px e pílula). Sem eles, o layout e as cores continuam iguais: o fallback é o mesmo bloco com canto reto. Não usamos VML para arredondar, para não complicar a edição |
-| △ Etiquetas em pílula (`span` com fundo e `padding`) | O Outlook para Windows mostra o fundo colado ao texto, sem o respiro lateral | A etiqueta continua legível e colorida; só fica mais justa |
-| △ GIF animado | Versões antigas do Outlook para Windows mostram só o 1º quadro | Não usado. Se usar, o 1º quadro precisa funcionar sozinho |
-| △ Modo escuro | Cada Outlook escurece cores de um jeito (alguns invertem fundos claros e textos escuros) | Texto branco sobre vermelho e texto escuro sobre claro continuam legíveis. Imagens não são invertidas; a formiguinha tem fundo transparente e contorno próprio, então funciona em fundo claro ou escuro. O bloco vermelho do Foco tem texto branco e continua legível. **Conferir em cada envio** |
-| △ Imagem hospedada (link `https://`) | Bloqueada até "Baixar imagens" | Imagens vão anexadas (CID) |
-| △ Tamanho do e-mail | Mensagens grandes demoram e podem ser barradas | HTML ~50 KB; imagens até ~200 KB cada, ~3 MB no total |
-| △ Botão | Botão com `<a>` estilizado perde o fundo no Word | O report não usa botões: o link de vídeo é texto ("▶ Assistir") e miniatura clicável |
+| Situação | O que acontece |
+|---|---|
+| Fonte instalada no computador (Georgia, Arial, fonte corporativa instalada pela TI) | Aparece em todos os Outlooks daquele computador |
+| Fonte **não** instalada | O navegador usa a próxima da lista. O Outlook para Windows usa a fonte definida em `titulos_outlook_windows`/`texto_outlook_windows` (se ela também faltar, troca por Times New Roman) |
+| Fonte baixada da internet ou da rede (`@font-face`, Google Fonts) | **Não funciona no Outlook para Windows** e é bloqueada no ambiente corporativo. Não usada; a ferramenta recusa |
 
-## Não depender
+Por isso a fonte é uma **lista**, configurada num lugar só ([CORPORATE_SETUP.md › Fonte oficial](CORPORATE_SETUP.md#1-fonte-oficial)). O Outlook para Windows recebe a dele por um bloco que só ele lê (`<!--[if mso]>`) e pelas classes `ft`/`fx` de cada texto.
 
-| Recurso | Por quê | Alternativa no report |
-|---|---|---|
-| ✕ JavaScript | Nenhum Outlook executa | Conteúdo escrito direto no HTML; nada é gerado por script |
-| ✕ Vídeo (`<video>`) | Nenhum Outlook reproduz | Miniatura clicável + "▶ Assistir" com link para o Stream, dentro do projeto |
-| ✕ iframe / incorporar Stream | Removido por todos | Link para o Stream |
-| ✕ Flexbox, Grid, `position` | Ignorados pelo motor do Word | Tabelas |
-| ✕ Imagem de fundo (`background-image`) | Não aparece no Outlook para Windows sem VML | Fundos em cor sólida |
-| ✕ SVG | Não aparece no Outlook para Windows | JPG/PNG e caracteres de texto |
-| ✕ Fontes externas (Google Fonts, fonte Santander) | Bloqueadas | Georgia e Arial, fontes do sistema |
-| ✕ Cores `rgba()` / transparência | O Word não entende | Cores em hexadecimal (`#9E1218`) |
-| ✕ Imagem em base64 (`data:`) | Bloqueada no Outlook para Windows | Anexo inline (CID) |
-| ✕ Formulários, animações CSS, hover | Removidos ou ignorados | Não usados |
+## Imagens: embutidas × hospedadas × caminho de rede
 
-## Decisões específicas para Outlook no template
+| Forma | Outlook para Windows | Outlook na Web / celular | Decisão |
+|---|---|---|---|
+| **Embutida no .eml (`cid:`)** | Aparece direto | Aparece | **Usada** (modo padrão) |
+| Hospedada num servidor interno `https://` | Bloqueada até "Baixar imagens", salvo política da TI | Depende do acesso ao servidor | Opcional, VALIDAR COM TI |
+| Hospedada no SharePoint | Não aparece: o Outlook não faz login para buscar imagem | Geralmente não aparece | Descartada |
+| Caminho de rede `\\servidor\...` ou `file://`, `C:\` | Não aparece para quem recebe; costuma ser bloqueado por segurança | Não funciona | Recusada pela ferramenta |
+| Base64 no HTML (`data:`) | Não aparece | Varia | Recusada pela ferramenta |
 
-1. **Largura de 680 px**, com uma tabela "fantasma" condicional (`<!--[if mso]>`) que trava a largura no Outlook para Windows, que não entende `max-width`.
-2. **`font-family` repetido** em cada parágrafo, além de um estilo condicional para o Outlook (Arial como base, sem `!important`, para a Georgia inline prevalecer nos títulos). Sem isso o Word volta para Times New Roman.
-3. **`line-height` em px** em todo texto, para o Word não inventar espaçamento.
-4. **Espaçadores** (`<div style="font-size:Npx;line-height:Npx">`) no lugar de `margin` em tabelas.
-5. **Barra do Creative X** feita com duas células de tabela coloridas, em porcentagem. Funciona em qualquer Outlook, sem imagem nem gráfico.
-6. **Placeholders em HTML puro** (célula com borda tracejada e texto), sem arquivos de imagem extras.
-7. **Texto de pré-visualização** escondido (`display:none; mso-hide:all`) para controlar o que aparece ao lado do assunto na caixa de entrada.
-8. **`alt` em todas as imagens**, para quem recebe com imagens bloqueadas ver um texto no lugar. A formiguinha decorativa usa `alt=""`.
-9. **Comentários de edição removidos** no `.eml`: o arquivo enviado fica menor e sem instruções internas.
+## Fallbacks
+
+| Se… | Então… |
+|---|---|
+| a imagem não carregar ou for bloqueada | O espaço mantém o tamanho (`width`/`height`) e mostra a descrição (`alt`). O texto e o botão continuam lá |
+| o cliente não mostrar HTML | O `.eml` leva uma versão em **texto puro** com todo o conteúdo e os links escritos por extenso |
+| o cliente ignorar cantos arredondados | Aparecem cantos retos; layout e cores iguais |
+| o cliente ignorar `@media` (celular) | Mostra o layout de computador reduzido, sem quebrar |
+| a pessoa não tiver a fonte oficial | Usa a fonte de reserva da lista; as colunas têm folga para larguras diferentes |
+| o link exigir login | O Microsoft 365 pede o login e depois abre o arquivo |
+| a pessoa não tiver permissão | O SharePoint mostra "Você precisa de permissão". **Prevenção:** o teste com outra pessoa antes do envio |
 
 ## Celular
 
-No celular (Outlook iOS/Android e Outlook na Web em tela pequena), uma regra `@media (max-width:620px)`:
+Uma regra `@media (max-width:620px)`:
 
-- empilha as colunas (classe `col`);
-- coloca os números da abertura e do projeto em destaque em pares (classe `half`);
-- esconde a formiguinha da abertura e a peça vertical do projeto em destaque, que não cabem na largura (classe `hide-m`);
-- reduz a frase do mês, os títulos e os números (classes `h1`, `h2`, `num`, `brand`).
-
-Onde a regra não é aceita, o e-mail mostra o layout de computador reduzido, sem quebrar.
+- empilha as colunas (`col`);
+- coloca os números em pares (`half`);
+- esconde a formiguinha da abertura e a peça vertical do projeto em destaque, que não cabem (`hide-m`). O botão "Ver peça →" continua visível;
+- aumenta as miniaturas para a largura da tela (`fluid`). Elas são exportadas com até 700 px para ficarem nítidas;
+- ajusta os tamanhos de títulos e números (`h1`, `h2`, `num`, `brand`).
 
 ## O que foi testado e o que não foi
 
 | Verificação | Status |
 |---|---|
-| Renderização no Chromium a 760 px (computador) e 390 px (celular) | Testado, screenshots conferidos |
-| Ausência de recursos incompatíveis (script, flex, grid, position, fundo, rgba, base64, fonte externa) | Testado pela ferramenta |
-| Estrutura do `.eml` (MIME, UTF-8, CIDs, imagens) | Testado com o leitor de e-mail do Python |
+| Renderização no Chromium a 760 px (computador) e 390 px (celular) | Testado, capturas conferidas |
+| Ausência de recursos incompatíveis (script, flex, grid, position, fundo, rgba, base64, fonte externa, caminho local) | Testado automaticamente a cada geração |
+| Estrutura do `.eml` (MIME, UTF-8, texto + HTML, `cid:`) | Testado com o leitor de e-mail do Python |
 | Outlook clássico, novo Outlook, Outlook na Web, Outlook iOS/Android, Mac | **Não testado** (sem Outlook neste ambiente) |
 | Modo escuro | **Não testado** |
 
-Antes do primeiro envio, faça o teste descrito em [TEST_CHECKLIST.md](TEST_CHECKLIST.md).
+Antes do primeiro envio, faça o teste piloto ([CORPORATE_SETUP.md](CORPORATE_SETUP.md)) e, a cada mês, o [checklist](TEST_CHECKLIST.md).

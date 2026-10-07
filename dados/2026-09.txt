@@ -65,7 +65,7 @@ resumo: Ampliação de volume e valor do seguro, com atuação integrada entre C
 imagem: seguro-conta-cartao.jpg
 descricao_imagem: Peça da campanha Seguro Conta e Cartão no app
 tipo: peca
-link:
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
 formiguinha: protecao
 
 # Números do projeto principal (até 4). O 1º aparece em vermelho.
@@ -116,7 +116,7 @@ texto: Conectamos o contexto da Copa do Mundo à operação de Aquisição PF e 
 imagem: copa-do-mundo.jpg
 descricao_imagem: Peça da Copa do Mundo com a formiguinha e uma bola
 tipo: peca
-link:
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
 nota: Comparativo entre grupos de anúncios. Etiqueta verde = resultado positivo; custo menor também é bom.
 
 # Resultados do projeto em destaque (até 3).
@@ -151,7 +151,7 @@ texto: Primeiro teste para levar soluções do banco a um ambiente conversaciona
 imagem: openai-ads.jpg
 descricao_imagem: Anúncio de OpenAI Ads
 tipo: peca
-link:
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
 
 [LANCAMENTO 2]
 status: Resultado em 28/09
@@ -171,7 +171,7 @@ texto: Qual atributo do Cartão Elite performa melhor: controle, segurança ou b
 imagem: pay-smarter.jpg
 descricao_imagem: Peça Pay Smarter do Cartão Elite
 tipo: peca
-link:
+link: [COLE O LINK DA PEÇA NO SHAREPOINT]
 
 
 # ----------------------------------------------------------------------

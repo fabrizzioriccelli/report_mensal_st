@@ -1,0 +1,181 @@
+# Arquitetura: como o report funciona de verdade
+
+Este documento registra as decisões técnicas da versão funcional do report. O objetivo foi transformar o layout aprovado em uma ferramenta que funcione para **todos os destinatários**, dentro de um ambiente bancário restrito. Ordem de prioridade usada em cada decisão:
+
+1. segurança e políticas corporativas;
+2. funcionar para todos os destinatários;
+3. compatibilidade com Outlook e `.eml`;
+4. clareza da experiência;
+5. facilidade de atualização;
+6. peso;
+7. interatividade;
+8. sofisticação técnica.
+
+Quando uma solução mais sofisticada prejudicava um item de cima, ela foi descartada.
+
+## Visão geral
+
+```text
+  O QUE VOCÊ EDITA                    O QUE FAZ FUNCIONAR (não precisa abrir)
+  ─────────────────                   ──────────────────────────────────────
+  dados/AAAA-MM.txt  ─┐
+  config/marca.txt   ─┼──►  gerar-report.html  ──►  tools/motor.js  ──►  template/report.html
+  assets/AAAA-MM/    ─┘     (abre no Edge)          (confere e monta)     (layout aprovado)
+                                    │
+                                    ├──►  report-AAAA-MM.eml   → Outlook → envio
+                                    └──►  AAAA-MM.html         → reports/ (arquivo do mês)
+```
+
+- **Você edita só texto** (`dados/AAAA-MM.txt`) e coloca imagens numa pasta. Não abre HTML.
+- **A página `gerar-report.html`** roda no Edge ou Chrome, direto do arquivo, sem instalação, sem servidor e sem internet.
+- **O HTML do e-mail continua sendo HTML de e-mail**: tabelas, estilos inline, nada de JavaScript. Toda a "inteligência" fica na geração, não no e-mail.
+
+### Por que separar dados, template e geração
+
+| Antes | Agora |
+|---|---|
+| Editar um HTML de 550 linhas, procurando `EDITAR AQUI` | Editar um arquivo de texto com `campo: valor` |
+| Cor repetida em 50 lugares | Cor definida 1 vez em `config/marca.txt` |
+| Link, imagem e tipo espalhados | Imagem, tipo e link juntos no bloco de cada peça |
+| Placeholder esquecido só aparecia na conferência visual | A geração lista cada pendência com o número da linha e bloqueia a versão final |
+| Imagem precisava ser exportada no tamanho certo | A página reduz, recorta e desenha o ▶ sozinha |
+| Barra do Creative X com duas larguras que precisavam somar 100% | Barra e variação calculadas a partir de "anterior" e "atual" |
+
+A automação só foi criada porque **reduz** o trabalho mensal e os erros possíveis. Ela não exige instalar nada: usa o navegador que já existe na máquina.
+
+## As 4 decisões
+
+### 1. Renderização do e-mail
+
+**Solução:** o HTML aprovado, em tabelas com estilos inline, largura fixa de 680 px e regras de celular em `@media` (empilham as colunas onde o cliente aceita).
+
+- Cada texto tem uma classe `ft` (títulos) ou `fx` (texto). Num bloco que só o Outlook para Windows lê (`<!--[if mso]>`), essas classes recebem a fonte configurada para ele.
+- O Outlook para Windows lê só a 1ª fonte da lista e cai para Times New Roman se ela não existir. Por isso ele tem uma configuração própria, com uma fonte só.
+- Os números da abertura não quebram linha (`nowrap`). Para tolerar uma fonte corporativa mais larga, as colunas foram redistribuídas (29/19/18/18%), com folga de ~15% em cada uma.
+
+**Limitações:**
+- No Outlook para Windows, os cantos aparecem retos e o layout é sempre o de 680 px.
+- O efeito de passar o mouse (sublinhado nos botões) só aparece onde o cliente aceita.
+
+### 2. Assets do e-mail (o que precisa aparecer no corpo)
+
+**Solução: imagens embutidas no `.eml` (anexos inline, `cid:`).** É o modo A, o padrão.
+
+| Opção | No Outlook para Windows | No Outlook na Web e no celular | Rede restrita | Decisão |
+|---|---|---|---|---|
+| **A. Embutida no .eml (`cid:`)** | Aparece sem clicar em "Baixar imagens" | Aparece | Não depende de rede | **Usada** |
+| B. Hospedada num servidor interno (`https://`) | Bloqueada até "Baixar imagens", salvo política da TI | Depende do acesso ao servidor | Depende do servidor ser alcançável por todos | Opcional (`modo: hospedadas`), **validar com TI** |
+| Hospedada no SharePoint | **Não aparece**: o Outlook não faz login para buscar imagem | Geralmente não aparece | — | Descartada |
+| CDN ou serviço público | Bloqueada ou proibida pela política | Bloqueada | Proibido | Descartada |
+| Caminho de rede (`\\servidor\...`) ou `file://` | Não aparece para o destinatário; é um risco de segurança conhecido e costuma ser bloqueado | Não funciona | — | **Bloqueada pela ferramenta** |
+| Base64 no HTML (`data:`) | Não aparece | Varia | — | Descartada |
+
+**Peso:** cada imagem é reduzida para o dobro do tamanho em que aparece. As que ocupam a tela inteira no celular vão com até 700 px. A peça de setembro com 4,8 MB virou 16 KB, e o `.eml` inteiro tem ~220 KB. Um PNG já otimizado (formiguinha) é mantido como está.
+
+### 3. Conteúdo ampliado (peça em tamanho grande)
+
+**Solução: a miniatura e o texto "Ver peça →" levam a um link do SharePoint** (modo B dos links), onde a peça abre no visualizador do Microsoft 365, com login e permissões da empresa.
+
+| Opção | Funciona no Outlook para Windows? | Decisão |
+|---|---|---|
+| **Link para o arquivo no SharePoint/OneDrive** | Sim: abre o navegador, com login corporativo | **Usada** |
+| Link para uma página interna aprovada (intranet) | Sim, se todos tiverem acesso | Aceita (modo C) |
+| Modal/lightbox em CSS ou JavaScript | Não: o Outlook não executa JavaScript e não suporta CSS interativo | Descartada |
+| Link para a imagem anexada (`cid:`) | Não é confiável em nenhum cliente | Descartada |
+
+O clique abre o destino corporativo; o e-mail não tenta simular uma janela.
+
+### 4. Vídeo com som
+
+**Solução: miniatura com ▶ desenhado na própria imagem + texto "▶ Assistir" → link do vídeo no Stream (SharePoint).** O Stream abre o player corporativo com som, controles, legendas e as permissões do arquivo.
+
+| Opção | Outlook para Windows | Outlook na Web | Outlook iOS/Android | Decisão |
+|---|---|---|---|---|
+| **Miniatura + link para o Stream** | Funciona | Funciona | Funciona (pode pedir login) | **Usada** |
+| `<video>` dentro do e-mail | Não toca | Não toca | Não toca | Descartada |
+| iframe/embed do Stream | Removido | Removido | Removido | Descartada |
+| GIF animado de prévia | Versões antigas mostram só o 1º quadro | Toca | Toca | Não usado (peso; sem som de qualquer forma) |
+| Link direto para o `.mp4` | Abre o player do navegador, sem as legendas e os controles do Stream | — | — | A ferramenta avisa |
+
+O ▶ faz parte da imagem: aparece em qualquer cliente, inclusive no Outlook para Windows, que não sobrepõe elementos.
+
+## Progressive enhancement
+
+| Camada | O que é | Onde funciona |
+|---|---|---|
+| Base | Texto + link escrito por extenso | **Todos**, inclusive quem lê só texto: o `.eml` leva uma versão em texto puro com os links |
+| Padrão | Layout, imagens, miniaturas, "Ver peça →" e "▶ Assistir" | Todos os Outlooks |
+| Melhoria | Cantos arredondados, colunas empilhadas no celular, sublinhado ao passar o mouse | Outlook na Web, novo Outlook, Mac, iOS, Android |
+
+O conteúdo nunca depende da camada de melhoria.
+
+**Imagens bloqueadas ou que não carregam:**
+- toda imagem tem `width`, `height` e um `alt` descritivo ("Vídeo: Creator falando sobre renegociação (assistir ao vídeo)"), então o layout não desmonta;
+- o texto principal de cada bloco está em HTML, nunca dentro de imagem;
+- o botão do link é texto, não imagem: continua clicável mesmo sem imagens.
+
+## Sistema de links (CTAs)
+
+Quatro tipos, cada um com um texto fixo. A pessoa sempre sabe o que vai acontecer:
+
+| `tipo:` | Texto no e-mail | Destino |
+|---|---|---|
+| `peca` | Ver peça → | Peça em tamanho grande (SharePoint) |
+| `video` | ▶ Assistir | Vídeo no Stream |
+| `projeto` | Ver projeto → | Documento, apresentação ou página |
+| `demo` | Ver demonstração → | Protótipo ou demonstração |
+
+**Regras:**
+- Sem link, sem botão.
+- O botão fica no fim da frase do próprio bloco, sem linha extra.
+- A miniatura leva ao mesmo link do botão.
+- O título não é link, para manter o visual editorial.
+- Nunca há área clicável sem texto que diga a ação.
+
+## Validações automáticas
+
+| Verificação | Resultado |
+|---|---|
+| Bloco ou campo com nome errado, linha sem `:`, campo obrigatório vazio | Erro, com arquivo e linha |
+| Imagem, ícone ou formiguinha que não existe | Erro |
+| Texto `[entre colchetes]` em qualquer campo | Pendência: só gera RASCUNHO, com "[RASCUNHO]" no assunto |
+| Link com `\\servidor`, `C:\`, `file:`, `javascript:` ou espaço | Erro |
+| Link `http://`, fora dos domínios aprovados, de incorporação (embed), de download, do Stream Clássico ou direto para `.mp4` | Aviso |
+| Cor fora do formato `#RRGGBB`; fonte com caracteres que quebram o HTML | Erro |
+| HTML final com script, vídeo, iframe, flex/grid, imagem de fundo, `rgba()`, base64, fonte externa, imagem sem `width`/`alt` | Erro |
+| Texto longo demais para o espaço (frase do mês, números) | Aviso |
+
+O que a ferramenta **não** consegue verificar: se o link abre e se o destinatário tem permissão. Um link do SharePoint exige login, e a página roda fora dele. Para isso existem a lista "Teste os links" e o teste com outra pessoa (veja [LINKS_SHAREPOINT_STREAM.md](LINKS_SHAREPOINT_STREAM.md)).
+
+## Auditoria de dependências externas
+
+| Item | Resultado |
+|---|---|
+| E-mail final | Nenhuma requisição externa. Imagens só por `cid:`; nenhuma fonte, CSS ou script externo. A única URL é o identificador padrão `xmlns` do HTML, que não é carregado |
+| Fontes | Fontes do sistema (Georgia, Arial), configuráveis. Nenhuma fonte baixada |
+| `gerar-report.html` | Carrega apenas `tools/motor.js`, local. Sem CDN, sem bibliotecas, sem chamadas de rede |
+| `tools/motor.js` | JavaScript puro, sem dependências |
+| Testes (`tests/`) | Opcionais, para desenvolvimento. `motor.test.js` usa só o Node.js; `ferramenta.e2e.js` usa o Playwright. Nenhum deles é necessário para gerar o report |
+
+## Modos de operação
+
+| Modo | Para quê | Onde configurar | Status |
+|---|---|---|---|
+| **A. Imagens embutidas** | Formiguinha, miniaturas, ícones | `config/marca.txt` → `modo: embutidas` | Padrão |
+| **B. SharePoint / Microsoft 365** | Peça ampliada e vídeo | Campo `link:` de cada peça | Padrão para os links. **Validar** tipo de link e permissões com a TI |
+| **C. Recursos internos aprovados** | Imagens hospedadas num servidor interno ou links para a intranet | `modo: hospedadas` + `endereco_base`; ou `link:` | Opcional. **VALIDAR COM TI / SEGURANÇA / ADMINISTRAÇÃO MICROSOFT 365** |
+
+## O que foi testado e o que não foi
+
+| Teste | Status |
+|---|---|
+| Motor: 19 testes automáticos (`node tests/motor.test.js`) | Passam |
+| Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`) | Passa (`tests/ferramenta.e2e.js`) |
+| Imagem original de 3000 px e de 4,8 MB reduzida e recortada | Conferido visualmente |
+| Versão final (sem pendências, com links): botão liberado, links nos CTAs, assunto sem [RASCUNHO] | Conferido |
+| Estrutura do `.eml` (MIME, texto + HTML, `cid:`, linhas ≤ 76) | Conferido com o leitor de e-mail do Python |
+| Layout gerado = layout aprovado, no computador (760 px) e no celular (390 px) | Comparado por captura de tela |
+| **Outlook para Windows, novo Outlook, Outlook na Web, Outlook iOS/Android** | **Não testado**: não há Outlook neste ambiente |
+| **Links reais do SharePoint/Stream, permissões, vídeo com som** | **Não testado**: depende do ambiente do banco |
+
+Por isso, o primeiro envio precisa passar pelo **teste piloto com outra pessoa** descrito em [CORPORATE_SETUP.md](CORPORATE_SETUP.md).
