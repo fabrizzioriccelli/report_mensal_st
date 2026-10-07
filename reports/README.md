@@ -1,19 +1,11 @@
 # Reports
 
-Um arquivo HTML por mês, no formato `AAAA-MM.html`. Cada arquivo é o e-mail completo daquele mês.
+A página de cada mês, **gerada** por `gerar-report.html` (botão "Baixar página do mês"). Ela é o arquivo histórico: as imagens vão dentro do próprio arquivo, então abre em qualquer navegador, mesmo sem a pasta `assets`.
 
-| Arquivo | Mês | Situação |
-|---|---|---|
-| [2026-09.html](2026-09.html) | Setembro 2026 | Números, textos e imagens do esboço (recortes em baixa resolução); aprendizados, links e acessos dos vídeos como placeholder |
+| Arquivo | Mês | Gerado a partir de | Situação |
+|---|---|---|---|
+| [2026-09.html](2026-09.html) | Setembro 2026 | [dados/2026-09.txt](../dados/2026-09.txt) | Rascunho: aprendizados, foco, links e algumas datas ainda pendentes |
 
-## Novo mês
+**Não edite estes arquivos.** Para mudar um mês, edite `dados/AAAA-MM.txt` e gere de novo. Meses já enviados não devem ser alterados.
 
-1. Copie o arquivo do mês anterior e renomeie: `2026-09.html` → `2026-10.html`.
-2. Pesquise `EDITAR AQUI` e atualize o conteúdo.
-3. Gere o `.eml` com `tools/gerar-eml.html`.
-
-Para começar do zero, copie `template/report-template.html` para esta pasta.
-
-As imagens são referenciadas a partir daqui com `../assets/...`. Mantenha os reports nesta pasta para os caminhos continuarem válidos.
-
-Guia completo: [docs/HOW_TO_EDIT.md](../docs/HOW_TO_EDIT.md).
+Guia: [docs/HOW_TO_EDIT.md](../docs/HOW_TO_EDIT.md).

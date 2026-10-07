@@ -1,44 +1,66 @@
-# Checklist de testes
+# Checklist antes de enviar
 
-Copie esta lista a cada mês (ou marque direto aqui no GitHub). A primeira coluna é para você; a última mostra o que já foi verificado na construção do template.
+Copie esta lista a cada mês. Leva uns 10 minutos.
 
-## Antes de gerar o .eml
+## ANTES DE ENVIAR
 
-| ✓ | Item | Como verificar | Verificado na construção do template |
-|---|---|---|---|
-| [ ] | HTML abre corretamente | Dois cliques em `reports/AAAA-MM.html` | Sim (Chromium) |
-| [ ] | Mês certo em todos os lugares | Ctrl+F `01 MÊS`: 6 pontos | Sim (setembro) |
-| [ ] | Números conferidos com a fonte | Compare com o painel/planilha de origem | Números de set/2026 copiados do esboço |
-| [ ] | Placeholders zerados | `tools/gerar-eml.html` → "Pendências de conteúdo" | Não: o report de setembro ainda tem placeholders de propósito |
-| [ ] | Imagens | Nenhum quadro vazio no navegador; ferramenta sem "não encontrada" | Sim (13 imagens: recortes tratados do esboço e ícones em vetor) |
-| [ ] | Formiguinha | Aparece no cabeçalho, em "O que aprendemos" e no encerramento | Sim |
-| [ ] | Creative X | Anterior, atual, variação e barras batem entre si | Estrutura sim; score anterior ainda é placeholder |
-| [ ] | Aprendizados | Cada linha tem aconteceu → aprendemos → levamos | Estrutura sim; conteúdo é placeholder |
-| [ ] | Celular | F12 → Ctrl+Shift+M → 390 px: nada cortado, sem rolagem lateral | Sim (Chromium, 390 px) |
-| [ ] | Compatibilidade | Ferramenta → "Nenhum problema encontrado" | Sim |
+**Conteúdo** (no arquivo `dados/AAAA-MM.txt`)
 
-## Depois de gerar (envie só para você)
+- [ ] Mês correto (`mes`, `ano`, `proximo_mes`, `pasta_imagens`)
+- [ ] Projeto principal correto (nome, resumo, peça, formiguinha)
+- [ ] Métricas atualizadas e conferidas com a fonte (painel ou planilha)
+- [ ] Creative X atualizado (anterior, atual, período)
+- [ ] Creative Transformation atualizado (status, resultado)
+- [ ] Aprendizados e foco do próximo mês escritos
+- [ ] Agenda atualizada
 
-| ✓ | Item | Como verificar | Verificado na construção do template |
-|---|---|---|---|
-| [ ] | .eml | Abre no Outlook como mensagem nova (ou use Encaminhar) | Estrutura validada; **não aberto em Outlook** |
-| [ ] | Outlook Desktop (clássico) | Layout em 680 px, fontes em Arial, faixas vermelhas inteiras | **Não testado** |
-| [ ] | Outlook Web | Mesmo layout; imagens aparecem sem "Baixar imagens" | **Não testado** |
-| [ ] | Novo Outlook | Mesmo layout | **Não testado** |
-| [ ] | Mobile (Outlook iOS/Android) | Colunas empilhadas, métricas em pares, texto legível | **Não testado** em app real |
-| [ ] | Imagens | Todas visíveis, nítidas, sem "x" vermelho | **Não testado** em Outlook |
-| [ ] | Links | Cada botão/link abre o destino certo | Não há links reais ainda (`#COLE-O-LINK...`) |
-| [ ] | Vídeos/CTAs | ASSISTIR abre o Stream; uma pessoa de fora do time consegue ver | **Não testado** |
-| [ ] | Dark Mode | Ative o modo escuro no Outlook e no celular: textos legíveis, faixas visíveis | **Não testado** |
-| [ ] | Pré-visualização | Na caixa de entrada, o texto ao lado do assunto é o resumo do mês | **Não testado** |
-| [ ] | Imagens bloqueadas | Com imagens desligadas, os textos alternativos aparecem e o report ainda se entende | **Não testado** |
+**Na página `gerar-report.html`**
 
-## Atualização mensal
+- [ ] Conferência sem **erros** e sem **pendências** (faixa verde: "Tudo certo")
+- [ ] Miniaturas atualizadas (seção "Imagens preparadas" com os arquivos do mês)
+- [ ] Prévia conferida em **Computador** e em **Celular**
+- [ ] Todas as imagens abrem: "Ver peça" de cada uma abre a peça grande
+- [ ] Todos os vídeos abrem: "▶ Assistir" toca **com som**
+- [ ] Todos os links funcionam (seção "Teste os links" → **Abrir** em cada linha)
+- [ ] Nenhum placeholder restante (`[...]`)
 
-| ✓ | Item |
+**Envio de teste (só para você)**
+
+- [ ] `.eml` final gerado (o nome **não** tem "RASCUNHO")
+- [ ] Outlook Desktop revisado: layout, imagens e links
+- [ ] Outlook Web revisado (se a área usa)
+- [ ] Celular revisado: tudo legível, sem rolar para o lado, botões funcionam
+- [ ] Assunto e pré-visualização corretos na caixa de entrada
+
+**Envio para a área**
+
+- [ ] `.eml` final aberto de novo, destinatários preenchidos, enviado
+- [ ] `.html` do mês guardado em `reports/`
+
+## Permissões (quando houver peça ou vídeo novo)
+
+- [ ] O arquivo existe na pasta do mês no SharePoint
+- [ ] O link é de compartilhamento ("Copiar link"), não de download nem de incorporação
+- [ ] A opção de compartilhamento é "Pessoas em [empresa]" (ou o público tem acesso ao site)
+- [ ] Nenhuma permissão individual restringindo o arquivo ("Gerenciar acesso" mostra o link da empresa)
+- [ ] Uma pessoa de **outra equipe** abriu a peça e o vídeo (com som)
+
+Como fazer cada verificação: [LINKS_SHAREPOINT_STREAM.md](LINKS_SHAREPOINT_STREAM.md).
+
+## Primeira vez no banco
+
+Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (computador, web e celular, com a tabela de verificação) descrito em [CORPORATE_SETUP.md](CORPORATE_SETUP.md#9-teste-piloto-com-outro-usuário-obrigatório-antes-do-1º-envio).
+
+## O que já foi verificado na construção do projeto
+
+| Verificação | Status |
 |---|---|
-| [ ] | Arquivo novo em `reports/AAAA-MM.html` (o do mês anterior ficou intacto) |
-| [ ] | Imagens do mês em `assets/AAAA-MM/` |
-| [ ] | Envio de teste aprovado |
-| [ ] | Envio para a área |
-| [ ] | Commit no repositório: `Report AAAA-MM` |
+| Motor: 20 testes automáticos | Passam |
+| Página de geração de ponta a ponta no Chromium, sem vazar para o lado em 760 px e 390 px | Passa |
+| Fonte corporativa mais larga simulada (DejaVu Sans) e imagens bloqueadas | Layout se mantém |
+| E-mail gerado igual ao layout aprovado, em 760 px e 390 px | Conferido |
+| Estrutura do `.eml` (texto + HTML, imagens embutidas) | Conferida |
+| Imagens grandes reduzidas e recortadas com boa qualidade | Conferido |
+| Outlook Desktop, Outlook Web, novo Outlook, celular | **Não testado** (sem Outlook neste ambiente) |
+| Links reais, permissões, vídeo com som | **Não testado** (depende do SharePoint do banco) |
+| Modo escuro | **Não testado** |

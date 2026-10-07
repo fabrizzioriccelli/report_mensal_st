@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Gerar o e-mail do report · Creative Strategy PF</title>
+<!--
+  GERAR O E-MAIL DO REPORT
+  ----------------------------------------------------------------------
+  Abra este arquivo no Edge ou no Chrome (dois cliques). Não precisa
+  instalar nada e nada é enviado para a internet: a página só lê os
+  arquivos da pasta que você escolher.
+
+  O que ela faz:
+    1. lê dados/AAAA-MM.txt (conteúdo), config/marca.txt (fontes e cores)
+       e template/report.html (layout aprovado);
+    2. confere tudo e mostra o que falta, com o número da linha;
+    3. reduz e recorta as imagens para o tamanho certo do e-mail e
+       desenha o ▶ nas miniaturas de vídeo;
+    4. gera o .eml (para abrir no Outlook e enviar) e o .html (arquivo
+       do mês, para guardar).
+
+  Precisa do arquivo tools/motor.js na mesma estrutura de pastas.
+-->
+<style>
+  :root{--red:#9E1218;--ink:#1C1614;--gray:#5F5752;--rule:#E3DFDC;--bg:#F5F3F1;--ok:#1D7A4C;--okbg:#E4F2EA;--warn:#9A5B00;--warnbg:#FBF0DC;--errbg:#FBE7E8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Arial,sans-serif}
+  header{background:#fff;border-top:6px solid var(--red);border-bottom:1px solid var(--rule)}
+  header div{max-width:1100px;margin:0 auto;padding:18px 24px}
+  h1{margin:0;font:bold 22px Georgia,serif;color:var(--red)}
+  header p{margin:4px 0 0;color:var(--gray);font-size:14px}
+  main{max-width:1100px;margin:0 auto;padding:24px;display:grid;gap:18px}
+  section{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:18px 20px}
+  h2{margin:0 0 10px;font-size:16px;display:flex;gap:10px;align-items:center}
+  h2 b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:14px;flex:none}
+  h3{margin:14px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray)}
+  .muted{color:var(--gray);font-size:14px;margin:0}
+  label.btn,button,a.btn{font:inherit;font-size:14px;font-weight:600;border:1px solid #CFC9C4;background:#fff;color:var(--ink);border-radius:8px;padding:10px 16px;cursor:pointer;display:inline-block;position:relative;text-decoration:none}
+  label.btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+  .pri{background:var(--red)!important;border-color:var(--red)!important;color:#fff!important}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  label.btn:focus-within,button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  select{font:inherit;font-size:14px;padding:9px 10px;border:1px solid #CFC9C4;border-radius:8px;min-width:240px;background:#fff}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px}
+  .banner{border-radius:10px;padding:12px 16px;font-weight:600;margin:0}
+  .banner.ok{background:var(--okbg);color:var(--ok)}.banner.warn{background:var(--warnbg);color:var(--warn)}.banner.err{background:var(--errbg);color:var(--red)}
+  ul.list{margin:0;padding:0;list-style:none;font-size:14px}
+  ul.list li{padding:7px 0;border-bottom:1px solid #F0ECE9;display:flex;gap:10px;align-items:baseline}
+  ul.list li:last-child{border-bottom:0}
+  .tag{flex:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+  .tag.erro{background:var(--errbg);color:var(--red)}.tag.pendencia{background:var(--warnbg);color:var(--warn)}.tag.aviso{background:#EEF0F3;color:#3D4A5C}.tag.info{background:#F3F1EF;color:var(--gray)}.tag.ok{background:var(--okbg);color:var(--ok)}
+  .where{color:var(--gray);font-size:12px;white-space:nowrap}
+  table.t{width:100%;border-collapse:collapse;font-size:14px}
+  table.t th,table.t td{text-align:left;padding:8px 6px;border-bottom:1px solid #F0ECE9;vertical-align:top}
+  table.t th{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em}
+  table.t td.url{word-break:break-all;color:var(--gray);font-size:12px}
+  iframe{width:100%;height:820px;border:1px solid var(--rule);border-radius:8px;background:#EAE4DE;transition:width .2s}
+  .tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .frame{display:flex;justify-content:center}
+  details summary{cursor:pointer;font-weight:600;font-size:14px}
+  .draft{display:flex;gap:8px;align-items:center;font-size:14px}
+  code{background:#F3F1EF;padding:1px 5px;border-radius:4px;font-size:13px}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Gerar o e-mail do report</h1>
+  <p>Lê o arquivo de dados do mês, confere tudo, prepara as imagens e gera o arquivo <b>.eml</b> que o Outlook abre como mensagem nova.</p>
+</div></header>
+
+<main>
+  <section aria-labelledby="s1">
+    <h2 id="s1"><b>1</b>Escolha a pasta do projeto</h2>
+    <p class="muted">Clique no botão e escolha a <b>pasta principal</b> do report (a que tem as pastas <code>dados</code>, <code>assets</code> e <code>template</code>). O navegador pergunta se quer "carregar" os arquivos: confirme. É só leitura, nada sai do seu computador.</p>
+    <div class="row">
+      <label class="btn pri">Selecionar a pasta do projeto<input type="file" id="pasta" webkitdirectory multiple></label>
+      <span id="pastaInfo" class="muted"></span>
+    </div>
+    <div class="row" id="mesRow" hidden>
+      <label for="mes"><b>Mês:</b></label>
+      <select id="mes"></select>
+      <span class="muted">Editou o arquivo depois de escolher a pasta? Clique em <b>Selecionar a pasta</b> de novo para ler a versão salva.</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="s2" id="secConf" hidden>
+    <h2 id="s2"><b>2</b>Conferência</h2>
+    <p id="banner" class="banner"></p>
+    <div id="listas"></div>
+  </section>
+
+  <section aria-labelledby="s3" id="secLinks" hidden>
+    <h2 id="s3"><b>3</b>Teste os links</h2>
+    <p class="muted">Clique em cada link e confira se abre a peça ou o vídeo certo (com som, no caso do vídeo). Antes do envio geral, peça para <b>uma pessoa de outra equipe</b> testar também: é o único jeito de ter certeza de que o público do e-mail tem acesso. Passo a passo em <code>docs/LINKS_SHAREPOINT_STREAM.md</code>.</p>
+    <table class="t"><thead><tr><th>Onde</th><th>Botão no e-mail</th><th>Link</th><th></th></tr></thead><tbody id="links"></tbody></table>
+  </section>
+
+  <section aria-labelledby="s4" id="secGerar" hidden>
+    <h2 id="s4"><b>4</b>Gere os arquivos</h2>
+    <div class="row">
+      <button type="button" class="pri" id="bEml">Baixar e-mail final (.eml)</button>
+      <button type="button" id="bHtml">Baixar página do mês (.html)</button>
+      <button type="button" id="bZip" hidden>Baixar imagens otimizadas (.zip)</button>
+    </div>
+    <p class="draft" id="draftRow" hidden><input type="checkbox" id="rascunho"><label for="rascunho">Ainda há pendências. Gerar um <b>RASCUNHO</b> só para teste (o assunto começa com [RASCUNHO]).</label></p>
+    <p id="gerarInfo" class="muted" style="margin-top:10px"></p>
+    <details style="margin-top:12px">
+      <summary>Depois de baixar: como abrir e enviar</summary>
+      <ol class="muted">
+        <li>Na pasta Downloads, dê dois cliques no arquivo <code>.eml</code>. O Outlook abre uma <b>mensagem nova</b> com o report e o assunto preenchidos.</li>
+        <li>Envie primeiro <b>só para você</b>. Abra o e-mail recebido no computador e no celular e clique nos links.</li>
+        <li>Tudo certo? Abra o <code>.eml</code> de novo, coloque os destinatários e envie.</li>
+        <li>Guarde o <code>.html</code> na pasta <code>reports/</code>: é o arquivo do mês.</li>
+      </ol>
+      <p class="muted">Se o .eml abrir como mensagem recebida (sem botão Enviar), use <b>Encaminhar</b> e apague o cabeçalho que o Outlook coloca no topo. Detalhes em <code>docs/HOW_TO_EXPORT_EML.md</code>.</p>
+    </details>
+  </section>
+
+  <section aria-labelledby="s5" id="secImg" hidden>
+    <h2 id="s5">Imagens preparadas para o e-mail</h2>
+    <p class="muted">Cada imagem é reduzida para o dobro do tamanho em que aparece (nítida em telas de alta resolução) e recortada no formato do espaço. Os arquivos originais não são alterados.</p>
+    <table class="t"><thead><tr><th>Arquivo</th><th>Espaço no e-mail</th><th>Original</th><th>No e-mail</th></tr></thead><tbody id="imgs"></tbody></table>
+  </section>
+
+  <section aria-labelledby="s6" id="secPrev" hidden>
+    <h2 id="s6">Prévia</h2>
+    <div class="row tabs" role="group" aria-label="Tamanho da prévia">
+      <button type="button" data-w="100%" aria-pressed="true">Computador</button>
+      <button type="button" data-w="390px" aria-pressed="false">Celular</button>
+    </div>
+    <p class="muted" style="margin-top:8px">A prévia usa o navegador. O Outlook para Windows mostra cantos retos e pode variar um pouco: confira sempre com um envio de teste.</p>
+    <div class="frame" style="margin-top:12px"><iframe id="pv" title="Prévia do e-mail"></iframe></div>
+  </section>
+</main>
+
+<script src="tools/motor.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  if (!window.Motor) {
+    document.querySelector("main").innerHTML = '<section><p class="banner err">Não encontrei o arquivo tools/motor.js. Abra este arquivo de dentro da pasta do projeto, sem mover nem renomear as pastas.</p></section>';
+    return;
+  }
+  var ARQ = {};          /* caminho relativo à pasta do projeto → File */
+  var atual = null;      /* resultado da última montagem */
+  var prontas = [];      /* imagens processadas, na ordem do motor */
+  var urls = [];
+  var abertas = {};      /* caminho → imagem já aberta (para medir e redimensionar) */
+
+  /* ---------- utilidades ---------- */
+  function el(tag, attrs, filhos) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { if (k === "text") e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); });
+    (filhos || []).forEach(function (f) { e.appendChild(typeof f === "string" ? document.createTextNode(f) : f); });
+    return e;
+  }
+  function kb(n) { return n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + " KB" : (n / 1024 / 1024).toFixed(1).replace(".", ",") + " MB"; }
+  function baixar(nome, dados, tipo) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([dados], { type: tipo }));
+    a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 10000);
+  }
+  function lerTexto(caminho) { return ARQ[caminho] ? ARQ[caminho].text() : Promise.reject(new Error("Não encontrei " + caminho + " na pasta escolhida.")); }
+
+  /* ---------- 1. pasta ---------- */
+  $("#pasta").addEventListener("change", function (e) {
+    ARQ = {};
+    var meses = [];
+    Array.prototype.forEach.call(e.target.files, function (f) {
+      var rel = f.webkitRelativePath.split("/").slice(1).join("/");
+      ARQ[rel] = f;
+      if (/^dados\/[^/]+\.txt$/i.test(rel) && !/modelo/i.test(rel)) meses.push(rel);
+    });
+    meses.sort();
+    var aviso = !ARQ["template/report.html"] || !ARQ["config/marca.txt"]
+      ? "Essa não parece ser a pasta principal do projeto (faltam config/ ou template/). Escolha a pasta que contém este arquivo, gerar-report.html."
+      : !meses.length ? "Não há nenhum mês em dados/. Copie dados/MODELO.txt (ou o mês anterior) para dados/AAAA-MM.txt, por exemplo dados/2026-10.txt." : "";
+    if (aviso) {
+      $("#pastaInfo").replaceChildren(el("span", { style: "color:var(--red);font-weight:600", text: aviso }));
+      $("#mesRow").hidden = true;
+      ["#secConf", "#secLinks", "#secGerar", "#secImg", "#secPrev"].forEach(function (x) { $(x).hidden = true; });
+      return;
+    }
+    $("#pastaInfo").textContent = Object.keys(ARQ).length + " arquivos lidos.";
+    var sel = $("#mes"), anterior = sel.value;
+    sel.replaceChildren.apply(sel, meses.map(function (m) { return el("option", { value: m, text: m.replace(/^dados\//, "") }); }));
+    sel.value = meses.indexOf(anterior) >= 0 ? anterior : meses[meses.length - 1];
+    $("#mesRow").hidden = false;
+    conferir(sel.value);
+  });
+  $("#mes").addEventListener("change", function () { conferir(this.value); });
+
+  /* ---------- medidas das imagens ---------- */
+  function abrirImagem(file) {
+    return new Promise(function (res, rej) {
+      var u = URL.createObjectURL(file), im = new Image();
+      im.onload = function () { res(im); setTimeout(function () { URL.revokeObjectURL(u); }, 1000); };
+      im.onerror = function () { rej(new Error("Não consegui abrir a imagem " + file.name + ". Use JPG ou PNG.")); };
+      im.src = u;
+    });
+  }
+
+  /* ---------- 2. conferência ---------- */
+  function conferir(caminhoDados) {
+    abertas = {};
+    Promise.all([lerTexto(caminhoDados), lerTexto("config/marca.txt"), lerTexto("template/report.html")]).then(function (t) {
+      var entrada = { dados: t[0], arquivoDados: caminhoDados, marca: t[1], template: t[2], existe: function (p) { return !!ARQ[p]; }, medidas: {} };
+      var r1 = Motor.montar(entrada);
+      if (!r1.ok) return mostrar(r1);
+      /* 2ª passada, já com o tamanho real de cada imagem */
+      return Promise.all(r1.imagens.map(function (im) {
+        return abrirImagem(ARQ[im.caminho]).then(function (i) { abertas[im.caminho] = i; entrada.medidas[im.caminho] = { w: i.naturalWidth, h: i.naturalHeight }; });
+      })).then(function () {
+        var r = Motor.montar(entrada);
+        if (!r.ok) return mostrar(r);
+        return prepararImagens(r).then(function () { mostrar(r); });
+      });
+    }).catch(function (e) { mostrar({ ok: false, problemas: [{ nivel: "erro", arquivo: "", linha: 0, msg: e.message }] }); });
+  }
+
+  var ROTULO = { erro: "Erros: impedem gerar o e-mail", pendencia: "Pendências: impedem a versão final", aviso: "Avisos: confira", info: "Para saber" };
+  function mostrar(r) {
+    atual = r;
+    var p = r.problemas || [], n = {};
+    ["erro", "pendencia", "aviso", "info"].forEach(function (k) { n[k] = p.filter(function (x) { return x.nivel === k; }); });
+    var b = $("#banner");
+    if (n.erro.length) { b.className = "banner err"; b.textContent = n.erro.length + " erro(s). Corrija no arquivo indicado (a linha aparece ao lado) e selecione a pasta de novo."; }
+    else if (n.pendencia.length) { b.className = "banner warn"; b.textContent = "Quase lá: faltam " + n.pendencia.length + " item(ns). Dá para gerar um RASCUNHO para teste; a versão final libera quando a lista de pendências zerar."; }
+    else { b.className = "banner ok"; b.textContent = "Tudo certo: nenhuma pendência. Teste os links e gere o e-mail."; }
+    var box = $("#listas"); box.replaceChildren();
+    ["erro", "pendencia", "aviso", "info"].forEach(function (k) {
+      if (!n[k].length) return;
+      var ul = el("ul", { class: "list" }, n[k].map(function (x) {
+        return el("li", {}, [el("span", { class: "tag " + k, text: k === "pendencia" ? "falta" : k }), el("span", { text: x.msg }),
+          x.linha ? el("span", { class: "where", text: (x.arquivo || "").replace(/^dados\//, "") + " · linha " + x.linha }) : el("span")]);
+      }));
+      var d = el("details", k === "info" ? {} : { open: "" }, [el("summary", { text: ROTULO[k] + " (" + n[k].length + ")" }), ul]);
+      d.style.marginTop = "12px";
+      box.appendChild(d);
+    });
+    $("#secConf").hidden = false;
+    ["#secLinks", "#secGerar", "#secImg", "#secPrev"].forEach(function (s) { $(s).hidden = !r.ok; });
+    if (!r.ok) return;
+
+    /* links */
+    var tb = $("#links"); tb.replaceChildren();
+    if (!r.links.length) tb.appendChild(el("tr", {}, [el("td", { colspan: "4", class: "url", text: "Nenhum link neste mês. As peças aparecem sem botão." })]));
+    r.links.forEach(function (l) {
+      var pend = l.url.charAt(0) === "#";
+      tb.appendChild(el("tr", {}, [el("td", { text: l.onde }), el("td", { text: l.rotulo }), el("td", { class: "url", text: pend ? "(ainda não preenchido)" : l.url }),
+        el("td", {}, [pend ? el("span", { class: "tag pendencia", text: "falta" }) : el("a", { href: l.url, target: "_blank", rel: "noopener", class: "btn", text: "Abrir" })])]));
+    });
+
+    /* geração */
+    var temPend = n.pendencia.length > 0;
+    $("#draftRow").hidden = !temPend;
+    $("#rascunho").checked = false;
+    $("#bEml").disabled = temPend;
+    $("#bEml").textContent = "Baixar e-mail final (.eml)";
+    $("#bZip").hidden = r.config.modo !== "hospedadas";
+    $("#gerarInfo").textContent = "";
+
+    /* imagens */
+    var ti = $("#imgs"); ti.replaceChildren();
+    r.imagens.forEach(function (im, i) {
+      var pr = prontas[i];
+      ti.appendChild(el("tr", {}, [el("td", { text: im.caminho }), el("td", { text: im.w + " × " + im.h + " px" + (im.play ? " · com ▶" : "") }),
+        el("td", { text: kb(ARQ[im.caminho].size) + " · " + pr.ow + "×" + pr.oh }), el("td", { text: kb(pr.bytes.length) + " · " + pr.w + "×" + pr.h + (pr.mantida ? " (sem alteração)" : "") })]));
+    });
+    previa();
+  }
+  $("#rascunho").addEventListener("change", function () {
+    $("#bEml").disabled = !this.checked;
+    $("#bEml").textContent = this.checked ? "Baixar RASCUNHO para teste (.eml)" : "Baixar e-mail final (.eml)";
+  });
+
+  /* ---------- imagens: reduzir, recortar, desenhar o play ---------- */
+  function prepararImagens(r) {
+    prontas = [];
+    return r.imagens.reduce(function (p, im, i) {
+      return p.then(function () { return preparar(im, ARQ[im.caminho], r.config).then(function (x) { prontas[i] = x; }); });
+    }, Promise.resolve());
+  }
+  function canvas(w, h) { var c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+  function preparar(reg, file, cfg) {
+    var img = abertas[reg.caminho], nw = img.naturalWidth, nh = img.naturalHeight;
+    var png = /\.png$/i.test(file.name), jpg = /\.jpe?g$/i.test(file.name);
+    /* Largura final: o dobro da tela (nítida em telas de alta resolução); 700 px nas que ocupam a tela toda no celular. */
+    var alvo = reg.fluida ? Math.max(reg.w * 2, 700) : reg.w * 2;
+    var sx = 0, sy = 0, sw = nw, sh = nh, W, H;
+    if (reg.recorte && reg.h) {
+      var r = reg.w / reg.h;
+      if (nw / nh > r) { sw = Math.round(nh * r); sx = Math.round((nw - sw) / 2); } else { sh = Math.round(nw / r); sy = Math.round((nh - sh) / 2); }
+      W = Math.min(alvo, sw); H = Math.round(W / r);
+    } else { W = Math.min(alvo, nw); H = Math.round(W * nh / nw); }
+    var corta = sw !== nw || sh !== nh;
+    var nome = String(reg.id).padStart(2, "0") + "-" + file.name.replace(/[^\w.-]+/g, "_");
+    /* Já está no tamanho certo e leve? Usa o arquivo como está (sem perder qualidade). */
+    if ((png || jpg) && !corta && !reg.play && nw <= alvo * 1.2 && file.size <= 200 * 1024) {
+      return file.arrayBuffer().then(function (b) { return { bytes: new Uint8Array(b), nome: nome, w: nw, h: nh, ow: nw, oh: nh, mantida: true }; });
+    }
+    /* Reduz em etapas (metade por vez) para a imagem não serrilhar. */
+    var src = img, cw = sw, ch = sh;
+    while (cw / 2 >= W && ch / 2 >= H) {
+      var c = canvas(Math.round(cw / 2), Math.round(ch / 2)), g0 = c.getContext("2d");
+      g0.imageSmoothingQuality = "high"; g0.drawImage(src, sx, sy, cw, ch, 0, 0, c.width, c.height);
+      src = c; sx = 0; sy = 0; cw = c.width; ch = c.height;
+    }
+    var fim = canvas(W, H), g = fim.getContext("2d");
+    if (!png) { g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, W, H); }
+    g.imageSmoothingQuality = "high";
+    g.drawImage(src, sx, sy, cw, ch, 0, 0, W, H);
+    if (reg.play) desenharPlay(g, W, H, cfg.corMarca);
+    var tipo = png ? "image/png" : "image/jpeg";
+    if (!png) nome = nome.replace(/\.[^.]+$/, "") + ".jpg";
+    return new Promise(function (res) { fim.toBlob(res, tipo, cfg.qualidade); }).then(function (blob) { return blob.arrayBuffer(); })
+      .then(function (b) {
+        /* PNG reduzido pelo navegador pode ficar MAIS pesado que o original (que já vem otimizado). Nesse caso, mantém o original. */
+        if (!corta && !reg.play && b.byteLength >= file.size && (png || jpg)) return file.arrayBuffer().then(function (o) { return { bytes: new Uint8Array(o), nome: String(reg.id).padStart(2, "0") + "-" + file.name.replace(/[^\w.-]+/g, "_"), w: nw, h: nh, ow: nw, oh: nh, mantida: true }; });
+        return { bytes: new Uint8Array(b), nome: nome, w: W, h: H, ow: nw, oh: nh, mantida: false };
+      });
+  }
+  /* Botão ▶ padrão: círculo branco com sombra e triângulo na cor da marca. Faz parte da imagem, então aparece em qualquer Outlook. */
+  function desenharPlay(g, W, H, cor) {
+    var r = Math.round(Math.min(W, H) * 0.24), x = W / 2, y = H / 2;
+    g.save();
+    g.shadowColor = "rgba(0,0,0,0.35)"; g.shadowBlur = r * 0.5; g.shadowOffsetY = r * 0.08;
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = "rgba(255,255,255,0.94)"; g.fill();
+    g.restore();
+    g.beginPath();
+    var t = r * 0.42;
+    g.moveTo(x - t * 0.62, y - t); g.lineTo(x - t * 0.62, y + t); g.lineTo(x + t * 1.0, y); g.closePath();
+    g.fillStyle = cor; g.fill();
+  }
+
+  /* ---------- prévia ---------- */
+  function previa() {
+    urls.forEach(URL.revokeObjectURL); urls = [];
+    var html = Motor.trocarImagens(atual.html, function (id) {
+      var p = prontas[id - 1], u = URL.createObjectURL(new Blob([p.bytes], { type: Motor.tipoMime(p.nome) })); urls.push(u); return u;
+    });
+    $("#pv").srcdoc = html;
+  }
+  document.querySelectorAll("[data-w]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      $("#pv").style.width = b.dataset.w;
+      document.querySelectorAll("[data-w]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    });
+  });
+
+  /* ---------- 4. gerar ---------- */
+  function cidDe(p) { return "img" + p.nome + "@report"; }
+  function endereco(p) { return atual.config.modo === "hospedadas" ? atual.config.base.replace(/\/?$/, "/") + p.nome : "cid:" + cidDe(p); }
+  $("#bEml").addEventListener("click", function () {
+    var rasc = $("#rascunho").checked && !$("#draftRow").hidden;
+    var html = Motor.trocarImagens(atual.html, function (id) { return endereco(prontas[id - 1]); });
+    var assunto = (rasc ? "[RASCUNHO] " : "") + atual.assunto;
+    if (rasc) html = html.replace(/<title>/, "<title>[RASCUNHO] ");
+    var lint = Motor.conferirHtml(html).filter(function (x) { return x.nivel === "erro" || (!rasc && x.nivel === "pendencia"); });
+    if (lint.length) { $("#gerarInfo").textContent = "Não gerei: " + lint.map(function (x) { return x.msg; }).join(" "); return; }
+    var imagens = atual.config.modo === "hospedadas" ? [] : prontas.map(function (p) { return { cid: cidDe(p), nome: "img" + p.nome, bytes: p.bytes }; });
+    var eml = Motor.gerarEml({ assunto: assunto, html: html, texto: atual.texto, imagens: imagens });
+    var nome = atual.nomeArquivo + (rasc ? "-RASCUNHO" : "") + ".eml";
+    baixar(nome, eml, "message/rfc822");
+    var tam = new Blob([eml]).size;
+    $("#gerarInfo").textContent = "Baixado: " + nome + " (" + kb(tam) + (imagens.length ? ", " + imagens.length + " imagens dentro do e-mail" : "") + ")." +
+      (tam > 3 * 1024 * 1024 ? " Atenção: acima de 3 MB. Use imagens menores." : "") + " Abra o arquivo na pasta Downloads.";
+  });
+  $("#bHtml").addEventListener("click", function () {
+    /* Página do mês para guardar: as imagens vão dentro do arquivo, então ela abre em qualquer computador. */
+    var html = Motor.trocarImagens(atual.html, function (id) { var p = prontas[id - 1]; return "data:" + Motor.tipoMime(p.nome) + ";base64," + Motor.base64(p.bytes); });
+    html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Não edite: edite o arquivo de dados e gere de novo. -->");
+    var nome = atual.nomeArquivo.replace(/^report-/, "") + ".html";
+    baixar(nome, html, "text/html");
+    $("#gerarInfo").textContent = "Baixado: " + nome + ". Guarde na pasta reports/ do projeto.";
+  });
+  $("#bZip").addEventListener("click", function () {
+    baixar(atual.nomeArquivo + "-imagens.zip", Motor.zip(prontas.map(function (p) { return { nome: p.nome, bytes: p.bytes }; })), "application/zip");
+    $("#gerarInfo").textContent = "Copie as imagens do .zip para " + atual.config.base + " (modo hospedadas).";
+  });
+})();
+</script>
+</body>
+</html>

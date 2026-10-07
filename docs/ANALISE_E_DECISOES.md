@@ -2,6 +2,8 @@
 
 Este documento explica como o esboço do report (formato de slide, setembro 2026) virou um template de e-mail de uma página, e por quê.
 
+Ele registra as rodadas em ordem. **A estrutura visual atual é a da seção 8** (reestruturação editorial); o funcionamento técnico (dados em texto, geração, links e .eml) está na seção 9 e em [ARQUITETURA.md](ARQUITETURA.md); as seções 3, 4 e 7 descrevem versões anteriores e ficam como histórico das decisões.
+
 ## 1. O que o esboço tem de bom
 
 | Elemento | Por que funciona | O que foi mantido |
@@ -26,7 +28,7 @@ Este documento explica como o esboço do report (formato de slide, setembro 2026
 | Peças e vídeos como imagens soltas | Vídeo não toca em e-mail; leitor não sabe que pode clicar | Seção **Peças e vídeos em destaque** com miniatura, acessos e botão ASSISTIR |
 | Linha do tempo horizontal com 6 colunas | Ilegível no celular | Lista vertical "Vem aí", uma linha por item |
 
-## 3. Arquitetura da informação
+## 3. Arquitetura da informação (1ª versão)
 
 A ordem responde às perguntas que o leitor faz, nesta sequência:
 
@@ -67,12 +69,155 @@ Quem lê só a visão geral já sabe como foi o mês. Quem lê até 02 sabe os n
 
 ## 6. Conteúdo de setembro
 
-O report de setembro usa **somente** os números, títulos, textos e imagens que estão no esboço. As imagens são recortes do esboço, em baixa resolução; o visual central da visão geral é uma composição das duas peças dos cases. Ficaram como placeholder, por não existirem no esboço:
+O report de setembro usa **somente** os números, títulos, textos e imagens que estão no esboço. As imagens são recortes do esboço, em baixa resolução; a peça do projeto principal é o recorte da peça de Seguro, sobre fundo vermelho. Ficaram como placeholder, por não existirem no esboço:
 
-- score CreativeX do período anterior e a variação;
+- score Creative X do período anterior e a variação;
+- o que o score significa;
+- resultado (indicador) do Briefing Agent e Creative Checker e o segundo projeto de Transformation;
 - aprendizados e foco do próximo mês;
-- acessos, duração e links dos vídeos;
-- o segundo vídeo e a peça em destaque da seção 04;
-- datas marcadas como `[dd/mm]` e trechos cortados (`[COMPLETAR]`).
+- link do vídeo Creator em Reneg e contato do time;
+- datas marcadas como `[dd/mm]` e o detalhe da Black Friday.
 
-A manchete ("Escala e eficiência no mesmo mês.") e a síntese da visão geral resumem textos do próprio esboço ("ampliação de volume e valor", "ganhos de eficiência"). Valide com a área antes do envio.
+Milheiros e S Music (projetos de outubro informados pela área) saíram do report de setembro: sem data, peça nem resultado, viravam cartões soltos no fim. As versões da formiguinha para eles (viagem e música) estão prontas para o report de outubro.
+
+As etiquetas **2,5x** (produção) e **+81%** (ticket médio) não estão escritas no esboço: foram calculadas a partir dos números dele (262 → 651,9 e R$ 16 → R$ 29). As demais variações (+89%, −12%, −29%, 3,6x, 3,0x) são do esboço.
+
+A frase do mês ("Escala e eficiência no mesmo mês.") e o título de "O que lançamos" ("Contexto certo, mídia mais eficiente.") resumem textos do próprio esboço ("ampliação de volume e valor", "ganhos de eficiência"). Valide com a área antes do envio.
+
+## 7. Rodada de refinamento (versão aprovada → versão executiva)
+
+Feedback da gerência: o report estava **longo**, com informação repetida, e o **Creative X ocupava espaço demais**. A rodada manteve a estrutura e a identidade, e trabalhou redução, consolidação e acabamento.
+
+### Auditoria da versão anterior
+
+| Elemento | Problema | Decisão |
+|---|---|---|
+| Faixa vermelha de KPIs (01) | Repetia ~R$ 100 mil, 3,6x e +89% que já estavam na visão geral | **Removida.** Os números ficam na visão geral; os cases trazem só o contexto |
+| Manchete com "~R$ 100 mil" | Mesmo número da métrica 1 | Já tinha virado "Escala e eficiência"; mantida |
+| Métrica "3,6x impressões" na visão geral | Repetida no case 1.1 | **Trocada** por "2,5x produção" (262 → 651,9), mais forte e sem repetir |
+| Cases em linhas inteiras com imagem de 130 px | Ocupavam 2 telas; as peças já estavam no visual central | **Unificados** em 2 cartões lado a lado, sem imagem, com etiquetas de variação |
+| Creative X: selo + 3 blocos + barras + referências em linhas | 429 px de altura | **Uma composição** em grafite: evolução e barras, variação e referências em 3 colunas, e uma frase de insight |
+| Foto do Creative X e imagens da agenda | Pouco valor para o espaço | **Removidas** |
+| Destaques em grade 2x2 com imagem grande | 683 px | **Lista compacta**: formiguinha do projeto, status, 1 frase e miniatura |
+| Peças e vídeos, um por linha | 576 px | **Composição editorial**: 1 principal grande + 2 secundários |
+| Aprendizados em 3 caixas por linha, 2 linhas | Repetiam o rótulo em cada caixa | **3 cartões**: título curto, 1 frase e "Levamos" |
+| "O que levamos para frente" + agenda de 6 linhas | 764 px, com descrições longas | **Próximos passos**: foco do mês, 2 projetos com formiguinha e agenda em 2 colunas |
+| Encerramento com formiguinha recortada | Repetia o asset do cabeçalho | Faixa curta, sem repetir a personagem |
+
+### Resultado
+
+| Medida (desktop, 760 px) | Antes | Depois |
+|---|---|---|
+| Altura total | 4.541 px | 2.997 px (**−34%**) |
+| Principais resultados | 966 px | 401 px |
+| Creative X | 429 px | 363 px, com mais informação (barras e insight juntos) |
+| Destaques | 683 px | 488 px |
+| Peças e vídeos | 576 px | 377 px |
+| Aprendizados + próximos passos | 1.176 px | 757 px |
+
+Nenhuma informação do esboço saiu do report: o que foi removido era repetição ou imagem decorativa.
+
+### Sistema visual
+
+- **Cantos:** 6 px (miniaturas), 12 px (cartões e imagens), 16 px (blocos grandes), pílula (etiquetas e botão).
+- **Cor com significado:** vermelho = marca e destaque; verde = resultado positivo (inclusive custo que caiu, com ▼); âmbar = previsto/atenção; grafite = assinatura do Creative X. O resto é neutro.
+- **Tipografia:** rótulo 10 px em caixa alta espaçada → título de seção 12 px → manchete 28 px → número principal 28 a 46 px → número secundário 18 a 20 px → texto 12 a 13 px → legenda 10 a 11 px. Negrito só em títulos e números.
+- **Ritmo:** blocos densos (cases, destaques) alternam com blocos de respiro (visão geral, Creative X em fundo escuro).
+
+### Formiguinha como sistema
+
+A personagem foi redesenhada em vetor a partir da imagem de referência (boneco de madeira articulado, luvas, botas e pontas das antenas em vermelho). Existe uma versão base e variações que mudam só pose e um acessório, uma por universo de projeto. Ela aparece onde identifica um projeto: no cabeçalho (base), em cada case, no Creative X, em cada destaque e nos projetos do próximo mês, sempre dentro de um componente existente, sem criar seção nova. Regras e catálogo em `assets/formiguinha/README.md`.
+
+## 8. Reestruturação editorial (versão executiva → newsletter editorial)
+
+Feedback: mesmo mais curto, o report ainda parecia **template cru**, com projetos repetidos em várias seções (o mesmo case aparecia nos números, nos resultados e nos destaques), Creative X pesado, uma seção de "peças e vídeos" desconectada dos projetos, cartões soltos de Milheiros e S Music no fim e uma formiguinha fina, sem volume, com um joinha que podia ser lido como gesto ofensivo.
+
+A rodada repensou a arquitetura e a narrativa, não só o acabamento.
+
+### Auditoria da versão anterior
+
+| Elemento | Problema | Decisão |
+|---|---|---|
+| Visão geral + Resultados do mês | O mesmo projeto aparecia nos 4 números e de novo no cartão do case | **01 O mês em uma frase**: a frase do mês + o projeto principal com a peça e os números dele. Ele não volta depois |
+| Resultados + Destaques do mês | Projetos divididos entre "resultado" e "destaque" sem critério claro | **02 O que lançamos**: 1 projeto em destaque (peça + contexto + 3 resultados) e projetos compactos. Cada projeto aparece uma vez |
+| Peças e vídeos (seção isolada) | Peças sem o contexto do projeto | **Removida.** Cada peça e cada vídeo vão para o projeto a que pertencem |
+| Creative X em caixa grafite | Bloco escuro e pesado para uma informação secundária | Faixa entre dois filetes, sem caixa: anterior → **atual** grande → variação, uma barra e uma frase (−42% de altura) |
+| Briefing Agent e Creative Checker | Perdidos entre os destaques | **04 Creative Transformation**, frente própria com superfície petróleo, status, evidência e resultado |
+| Aprendizados em cartões | Caixas iguais, peso visual alto | 3 colunas sem caixa, numeral grande em Georgia, "→ Levamos" |
+| Foco do mês dentro de "Próximos passos" | A conclusão do report não tinha destaque | **06 Foco do próximo mês**: bloco vermelho, a única área de cor cheia do report, com a formiguinha em pé sobre ele |
+| Milheiros e S Music no fim | Cartões sem data, peça nem resultado | Removidos de setembro; entram em outubro com a sua formiguinha |
+| Formiguinha em 10+ lugares | Virou decoração | 3 aparições fixas (projeto principal, Transformation, Foco) |
+
+### Narrativa
+
+| | Seção | Pergunta |
+|---|---|---|
+| 01 | O mês em uma frase | Qual foi o mês? |
+| 02 | O que lançamos | O que mais foi para o ar e como foi? |
+| 03 | Creative X | Como está a qualidade criativa? |
+| 04 | Creative Transformation | O que estamos mudando na forma de criar? |
+| 05 | O que aprendemos | O que levamos do mês? |
+| 06 | Foco do próximo mês | O que vem agora? |
+| 07 | Também vem aí | O que está na agenda? |
+
+Quem lê só a abertura sabe o mês. Quem lê até 02 sabe o que foi entregue. Quem chega ao 06 sabe a prioridade.
+
+### Resultado
+
+| Medida (desktop, 760 px) | 1ª versão | Versão executiva | Editorial (atual) |
+|---|---|---|---|
+| Altura total | 4.541 px | 2.997 px | **2.813 px** |
+| Abertura (frase + projeto principal) | — | — | ~440 px |
+| O que lançamos | — | — | ~670 px (absorve resultados, destaques e peças) |
+| Creative X | 429 px | 363 px | **~210 px** |
+| Creative Transformation | — | — | ~510 px |
+| Aprendizados | — | — | ~310 px |
+| Foco + agenda | — | — | ~520 px |
+
+Com mais conteúdo (uma frente nova, Creative Transformation), o report ficou ~6% mais curto que a versão executiva e 38% mais curto que a primeira.
+
+### Sistema visual
+
+- **Tipografia editorial:** Georgia para a frase do mês, títulos e números; Arial para rótulos e texto. Hierarquia: rótulo (10 px, caixa alta, espaçado) → título (Georgia 21 a 38 px) → número (Georgia 28 a 54 px) → etiqueta → texto (12 a 13 px) → legenda (10 a 11 px).
+- **Cabeçalho de publicação:** nome em Georgia, edição em caixa alta e filete duplo, como uma newsletter.
+- **Cor com função:** vermelho = marca e conclusão (Foco); verde = positivo; âmbar = previsto/atenção; grafite = Creative X; petróleo = Creative Transformation; creme = superfície da abertura. O resto é branco e neutro.
+- **Superfícies em vez de cartões:** creme na abertura, petróleo claro no Transformation, vermelho no Foco. O resto usa filetes e espaço, não caixas.
+- **Cantos:** 8 / 14 / 20 px e pílula. No Outlook para Windows aparecem retos, sem mudar o layout.
+
+### Formiguinha
+
+Redesenhada do zero a partir da imagem de referência:
+
+- **volume:** gradientes em cada peça de madeira (luz no alto à esquerda), juntas esféricas, veios na cabeça, brilho nos olhos e sombra no chão;
+- **mãos:** o joinha virou um punho fechado e largo, com o polegar curto e curvo para cima, conferido em tamanho real; a outra mão fica na cintura, como na referência;
+- **sistema:** uma base e 5 variações, cada uma com **um** elemento (escudo, mala, fones, tablet, alvo). Biblioteca em `assets/formiguinha/`, com SVG de origem e regras de uso.
+
+## 9. Do layout ao produto: dados, geração e interatividade
+
+Com o layout aprovado, a rodada seguinte não mudou a estrutura visual. Ela transformou o report numa ferramenta que funciona no ambiente do banco:
+
+- **Conteúdo em texto** (`dados/AAAA-MM.txt`): ninguém edita HTML no mês a mês.
+- **Marca centralizada** (`config/marca.txt`): fontes (com espaço para a fonte oficial e uma configuração própria para o Outlook para Windows), cores, modo das imagens e domínios de link.
+- **Geração no navegador** (`gerar-report.html`): confere, reduz e recorta as imagens, desenha o ▶ dos vídeos e gera o `.eml` com versão em texto e imagens embutidas.
+- **Interatividade que funciona em qualquer Outlook:** miniatura clicável e botões em texto ("Ver peça →", "▶ Assistir", "Ver projeto →", "Ver demonstração →") que abrem o SharePoint/Stream. Sem JavaScript, modal ou vídeo embutido, que o Outlook não suporta.
+- **Única mudança visual:** as colunas de números da abertura passaram de 26/20/20/18% para 29/19/18/18%, para dar folga a uma fonte corporativa mais larga, e os botões de link aparecem no fim das frases.
+
+Decisões, alternativas descartadas, auditoria de dependências e o que foi testado: [ARQUITETURA.md](ARQUITETURA.md).
+
+## 10. Acabamento da abertura
+
+A abertura (cabeçalho + projeto principal) estava correta, mas simples e alta. Ela virou uma **capa**:
+
+- **faixa vermelha de ponta a ponta**, com o logo do Santander em branco, o nome da área ao lado (separado por um filete) e um **selo arredondado** com "REPORT MENSAL · MÊS ANO";
+- a **frase do mês** em branco, com o final em itálico rosado sempre na 2ª linha, e o projeto principal com a peça na mesma faixa;
+- logo abaixo, a **faixa creme dos números**, com a formiguinha;
+- o vermelho abre (capa) e fecha (Foco) o report. No Foco, a formiguinha passou para **dentro** do bloco, o que eliminou o espaço vazio acima dele.
+
+| Medida | Antes | Depois |
+|---|---|---|
+| Fim da abertura (computador) | 556 px | 478 px |
+| Altura total, computador (760 px) | 2.817 px | **2.686 px** |
+| Altura total, celular (390 px) | 4.834 px | **4.606 px** |
+
+Nenhuma informação saiu. Com uma fonte bem mais larga simulada, nada vaza e os números continuam numa linha.
+

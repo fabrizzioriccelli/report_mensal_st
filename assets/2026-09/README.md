@@ -1,17 +1,15 @@
 # Imagens de setembro 2026
 
-Todas as imagens desta pasta são **recortes do esboço original**, tratados para remover a textura de pixel do print, mas ainda em baixa resolução. Substitua pelos arquivos originais mantendo o mesmo nome: o report continua funcionando sem nenhuma alteração no HTML.
+São **recortes do esboço original**, tratados para remover a textura do print, mas em baixa resolução. Substitua pelos arquivos originais com o mesmo nome e gere o e-mail de novo: a página reduz e recorta sozinha.
 
-| Arquivo | Espaço no report | Tamanho ideal |
+| Arquivo | Bloco em `dados/2026-09.txt` | Tipo |
 |---|---|---|
-| `visual-principal.jpg` | Visual central da visão geral (composição das peças dos cases) | 480 x 480 px |
-| `case-1-1.jpg`, `case-1-2.jpg` | Peça de cada case | 260 px de largura |
-| `creativex-foto.jpg` | Foto no selo do Creative X | 228 px de largura |
-| `destaque-2-1.jpg`, `destaque-2-3.jpg` | Destaques do mês | 540 x 212 px |
-| `destaque-2-2.jpg` | Miniatura do vídeo do destaque 2.2 (com play) | 540 x 212 px |
-| `video-1.jpg` | Miniatura do vídeo 01 da seção 04 (16:9, com play) | 440 x 248 px |
-| `agenda-dia-das-criancas.jpg`, `agenda-carros-eletricos.jpg` | Imagens da agenda "Vem aí" | 240 px de largura |
+| `seguro-conta-cartao.jpg` | `[PROJETO PRINCIPAL]` | peça |
+| `copa-do-mundo.jpg` | `[DESTAQUE]` | peça |
+| `openai-ads.jpg` | `[LANCAMENTO 1]` | peça |
+| `creator-reneg.jpg` | `[LANCAMENTO 2]` | vídeo (capa sem ▶; o ▶ é desenhado na geração) |
+| `pay-smarter.jpg` | `[LANCAMENTO 3]` | peça |
 
-Ainda sem imagem (placeholder no report): o vídeo 02 e a peça 03 da seção 04.
+Ainda sem imagem: o print do segundo projeto de Creative Transformation.
 
-JPG, até ~200 KB cada. As peças originais podem ser extraídas do PowerPoint: renomeie o `.pptx` para `.zip` e abra a pasta `ppt/media/`.
+As peças originais podem ser extraídas do PowerPoint do esboço: renomeie o `.pptx` para `.zip` e abra a pasta `ppt/media/`.

@@ -13,3 +13,7 @@ desktop.ini
 
 # Arquivos temporários do Office
 ~$*
+
+# Saídas de teste e dependências técnicas (opcionais)
+tests/saida/
+node_modules/
