@@ -60,7 +60,7 @@ previa: Setembro: escala e eficiência no mesmo mês. ~R$ 100 mil de impacto com
 #  formiguinha: base, protecao, viagem, musica, transformacao ou foco.
 # ----------------------------------------------------------------------
 [PROJETO PRINCIPAL]
-nome: Seguro Conta e Cartão +<br>Banco do Dia a dia
+nome: Seguro Conta e Cartão + Banco do Dia a dia
 resumo: Ampliação de volume e valor do seguro, com atuação integrada entre Creative, Growth e Marketing Awareness.
 imagem: seguro-conta-cartao.jpg
 descricao_imagem: Peça da campanha Seguro Conta e Cartão no app

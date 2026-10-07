@@ -88,7 +88,7 @@ O report é um e-mail, não um site: nenhum Outlook executa JavaScript, toca ví
 - **Sem instalação:** a página de geração roda no Edge, a partir do arquivo, sem servidor e sem enviar dados para fora.
 - **Links corporativos:** peças e vídeos abrem no SharePoint/Stream, com autenticação e permissões do Microsoft 365. A ferramenta recusa caminhos de rede e arquivos locais e avisa sobre links de download, de incorporação ou fora dos domínios aprovados.
 - **Proteções contra erro:** pendências (`[texto entre colchetes]`) bloqueiam a versão final; só sai um RASCUNHO, com "[RASCUNHO]" no assunto.
-- **Fonte oficial configurável** num lugar só, com fallback seguro para quem não tem a fonte e para o Outlook para Windows.
+- **Logo e fonte oficial configuráveis** num lugar só (`config/marca.txt`), com fallback seguro para quem não tem a fonte e para o Outlook para Windows.
 
 Decisões e limitações: **[docs/ARQUITETURA.md](docs/ARQUITETURA.md)**. Primeiro uso no banco: **[docs/CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md)**.
 
@@ -117,9 +117,10 @@ report_mensal_st/
 ├── assets/                      ← AS IMAGENS
 │   ├── 2026-09/                 imagens do mês (uma pasta por mês)
 │   ├── formiguinha/             a personagem: base + 5 variações
+│   ├── marca/                   logo do Santander
 │   └── icones/                  ícones do Creative Transformation
 ├── config/
-│   └── marca.txt                fontes, cores, modo das imagens, domínios (raramente)
+│   └── marca.txt                logo, fontes, cores, modo das imagens, domínios (raramente)
 ├── reports/                     a página de cada mês, gerada (histórico)
 ├── examples/                    exemplo de .eml gerado
 ├── docs/                        guias

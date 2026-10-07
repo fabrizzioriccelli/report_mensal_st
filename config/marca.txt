@@ -43,6 +43,28 @@ texto_outlook_windows: Arial
 
 
 # ======================================================================
+#  EDITAR AQUI — LOGO DO SANTANDER
+# ======================================================================
+#  O logo aparece no topo do e-mail, sobre o vermelho da capa. Use a
+#  versão OFICIAL em BRANCO (negativa), em PNG com fundo transparente,
+#  fornecida pela área de Marca. Não redesenhe nem baixe da internet.
+#
+#  O logo já está no projeto (assets/marca/logo-santander-branco.png,
+#  gerado a partir do SVG oficial em assets/marca/svg/). Para trocar:
+#  1. Salve o novo arquivo em assets/marca/.
+#  2. Confira se o nome abaixo é igual ao do arquivo.
+#  3. largura: largura do logo no e-mail, em px (entre 70 e 140).
+#  Enquanto o arquivo não existir, o rascunho mostra um espaço tracejado
+#  "LOGO" e a ferramenta não libera a versão final.
+#  Para não usar logo, deixe "arquivo:" vazio.
+# ======================================================================
+[LOGO]
+arquivo: assets/marca/logo-santander-branco.png
+largura: 104
+descricao: Santander
+
+
+# ======================================================================
 #  CORES PRINCIPAIS
 # ======================================================================
 #  Use sempre o código hexadecimal com # e 6 dígitos (ex.: #9E1218).
@@ -72,7 +94,10 @@ fundo_email: #FFFFFF
 #  CORES DE APOIO (assinaturas das seções)
 # ======================================================================
 [CORES DE APOIO]
-# 01 · Abertura: superfície creme e divisórias entre os números.
+# 01 · Abertura: a capa é vermelha (cor "marca"). Selo do mês e filete
+# sobre o vermelho; faixa creme dos números e divisórias entre eles.
+capa_selo: #7A0D12
+capa_filete: #B8424A
 abertura_fundo: #F7F2EC
 abertura_linha: #E3D9CF
 # Divisórias finas e trilho da barra do Creative X.
@@ -87,7 +112,7 @@ transformation_fundo: #E8F1F1
 transformation_linha: #DCE8E9
 transformation_placeholder_fundo: #F2F7F7
 transformation_placeholder_borda: #A9C9CC
-# 06 · Foco: textos claros sobre o bloco vermelho.
+# Textos claros sobre o vermelho (capa da abertura e bloco do Foco).
 foco_rotulo: #F4C9CB
 foco_texto: #FBE3E4
 # Caixas tracejadas de imagem ainda não definida (só no rascunho).

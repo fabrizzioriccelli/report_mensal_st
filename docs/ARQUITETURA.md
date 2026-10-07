@@ -169,8 +169,10 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 
 | Teste | Status |
 |---|---|
-| Motor: 19 testes automáticos (`node tests/motor.test.js`) | Passam |
-| Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`) | Passa (`tests/ferramenta.e2e.js`) |
+| Motor: 20 testes automáticos (`node tests/motor.test.js`) | Passam |
+| Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`) e e-mail sem vazar para o lado em 760 px e 390 px | Passa (`tests/ferramenta.e2e.js`) |
+| Fonte mais larga que a Georgia/Arial simulada (DejaVu Sans) | Nada vaza; números continuam numa linha |
+| Todas as imagens bloqueadas | Mesma altura de página; cada espaço mostra a descrição (`alt`) |
 | Imagem original de 3000 px e de 4,8 MB reduzida e recortada | Conferido visualmente |
 | Versão final (sem pendências, com links): botão liberado, links nos CTAs, assunto sem [RASCUNHO] | Conferido |
 | Estrutura do `.eml` (MIME, texto + HTML, `cid:`, linhas ≤ 76) | Conferido com o leitor de e-mail do Python |

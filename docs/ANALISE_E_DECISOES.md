@@ -203,3 +203,21 @@ Com o layout aprovado, a rodada seguinte não mudou a estrutura visual. Ela tran
 - **Única mudança visual:** as colunas de números da abertura passaram de 26/20/20/18% para 29/19/18/18%, para dar folga a uma fonte corporativa mais larga, e os botões de link aparecem no fim das frases.
 
 Decisões, alternativas descartadas, auditoria de dependências e o que foi testado: [ARQUITETURA.md](ARQUITETURA.md).
+
+## 10. Acabamento da abertura
+
+A abertura (cabeçalho + projeto principal) estava correta, mas simples e alta. Ela virou uma **capa**:
+
+- **faixa vermelha de ponta a ponta**, com o logo do Santander em branco, o nome da área ao lado (separado por um filete) e um **selo arredondado** com "REPORT MENSAL · MÊS ANO";
+- a **frase do mês** em branco, com o final em itálico rosado sempre na 2ª linha, e o projeto principal com a peça na mesma faixa;
+- logo abaixo, a **faixa creme dos números**, com a formiguinha;
+- o vermelho abre (capa) e fecha (Foco) o report. No Foco, a formiguinha passou para **dentro** do bloco, o que eliminou o espaço vazio acima dele.
+
+| Medida | Antes | Depois |
+|---|---|---|
+| Fim da abertura (computador) | 556 px | 478 px |
+| Altura total, computador (760 px) | 2.817 px | **2.686 px** |
+| Altura total, celular (390 px) | 4.834 px | **4.606 px** |
+
+Nenhuma informação saiu. Com uma fonte bem mais larga simulada, nada vaza e os números continuam numa linha.
+

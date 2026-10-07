@@ -91,9 +91,9 @@ Antes de enviar, siga o [checklist](TEST_CHECKLIST.md).
 
 | Bloco no arquivo | Onde aparece no e-mail |
 |---|---|
-| `[EDICAO]` | Mês no topo, "Foco de…", "Até…", assunto e contato no rodapé |
-| `[ABERTURA]` | **01** · a frase grande do mês e o texto que aparece na caixa de entrada (`previa`) |
-| `[PROJETO PRINCIPAL]` | **01** · nome, resumo, peça e formiguinha da abertura |
+| `[EDICAO]` | Selo do mês na capa ("REPORT MENSAL · OUTUBRO 2026"), "Foco de…", "Até…", assunto e contato no rodapé |
+| `[ABERTURA]` | **01** · a frase do mês na capa vermelha (`frase` na 1ª linha, `frase_final` em itálico na 2ª) e o texto da caixa de entrada (`previa`) |
+| `[PROJETO PRINCIPAL]` | **01** · nome, resumo e peça na capa; formiguinha na faixa dos números |
 | `[NUMERO 1]` a `[NUMERO 4]` | **01** · os números da abertura (o 1º fica em vermelho) |
 | `[LANCAMOS]` | **02** · o título da seção "O que lançamos" |
 | `[DESTAQUE]` | **02** · o projeto em destaque (peça vertical, título, texto e nota) |
@@ -244,6 +244,6 @@ detalhe: KV de marca
 
 | Arquivo | Quando | Guia |
 |---|---|---|
-| `config/marca.txt` | Fonte oficial, cores, modo das imagens, domínios de link | Comentários do próprio arquivo e [CORPORATE_SETUP.md](CORPORATE_SETUP.md) |
+| `config/marca.txt` | Logo, fonte oficial, cores, modo das imagens, domínios de link | Comentários do próprio arquivo e [CORPORATE_SETUP.md](CORPORATE_SETUP.md) |
 | `template/report.html` | Mudar o **layout** (precisa de alguém que saiba HTML de e-mail) | [ARQUITETURA.md](ARQUITETURA.md) |
 | `tools/motor.js` | Nunca, no dia a dia | — |

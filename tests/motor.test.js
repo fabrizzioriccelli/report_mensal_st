@@ -32,7 +32,7 @@ console.log("Motor do report");
 teste("o report de setembro monta sem erros", function () {
   var r = montar(ler("dados/2026-09.txt"));
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
-  assert.strictEqual(r.imagens.length, 10);
+  assert.strictEqual(r.imagens.length, 11); /* logo + 5 peças + 3 formiguinhas + 2 ícones */
   assert.ok(!/\{\{|\}\}/.test(r.html), "sobrou {{campo}} no HTML");
   assert.ok(niveis(r, "pendencia").length > 0, "setembro tem pendências de propósito");
   assert.strictEqual(r.nomeArquivo, "report-2026-09");
@@ -62,7 +62,15 @@ teste("sem link: sem CTA e imagem sem <a>", function () {
 teste("vídeo: CTA Assistir e play desenhado na miniatura", function () {
   var r = montar(MINIMO.replace("tipo: peca", "tipo: video"));
   assert.ok(r.html.indexOf("&#9654;&nbsp;Assistir") > 0);
-  assert.ok(r.imagens[0].play);
+  assert.ok(r.imagens.some(function (i) { return i.play && /openai-ads/.test(i.caminho); }));
+});
+
+teste("logo: arquivo faltando vira pendência e espaço tracejado; sem logo, nada aparece", function () {
+  var r = M.montar({ dados: MINIMO, marca: MARCA.replace("arquivo: assets/marca/logo-santander-branco.png", "arquivo: assets/marca/nao-existe.png"), template: TEMPLATE, existe: existe });
+  assert.ok(r.ok && niveis(r, "pendencia").some(function (p) { return /Logo não encontrado/.test(p.msg); }));
+  assert.ok(r.html.indexOf(">LOGO</p>") > 0);
+  r = M.montar({ dados: MINIMO, marca: MARCA.replace("arquivo: assets/marca/logo-santander-branco.png", "arquivo:"), template: TEMPLATE, existe: existe });
+  assert.ok(r.ok && r.html.indexOf(">LOGO</p>") < 0 && !r.imagens.some(function (i) { return i.papel === "logo"; }));
 });
 
 teste("bloco desconhecido e linha sem dois-pontos viram erro com número da linha", function () {

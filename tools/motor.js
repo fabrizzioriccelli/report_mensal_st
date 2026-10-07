@@ -92,13 +92,14 @@
   ];
 
   var CORES = ["marca", "texto", "texto_corpo", "texto_apoio", "positivo", "positivo_fundo", "atencao", "atencao_fundo", "fundo_pagina", "fundo_email"];
-  var CORES_APOIO = ["abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
+  var CORES_APOIO = ["capa_selo", "capa_filete", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
     "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto",
     "placeholder_fundo", "placeholder_borda"];
   function obrig(lista) { var o = {}; lista.forEach(function (k) { o[k] = 1; }); return o; }
 
   var ESQUEMA_MARCA = [
     { bloco: "FONTES", obrigatorio: true, campos: { titulos: 1, texto: 1, titulos_outlook_windows: 1, texto_outlook_windows: 1 } },
+    { bloco: "LOGO", campos: { arquivo: 0, largura: 0, descricao: 0 } },
     { bloco: "CORES", obrigatorio: true, campos: obrig(CORES) },
     { bloco: "CORES DE APOIO", obrigatorio: true, campos: obrig(CORES_APOIO) },
     { bloco: "IMAGENS", obrigatorio: true, campos: { modo: 1, endereco_base: 0, qualidade_jpg: 0 } },
@@ -360,7 +361,7 @@
       var href = !link ? "" : ehPendencia(link) || /^(javascript|data|vbscript|file):/i.test(link) || /^\\\\|^[a-z]:\\/i.test(link) ? LINK_PENDENTE : link;
       if (href) {
         r.link = href;
-        r.cta = seguro('<a href="' + esc(href) + '" target="_blank" class="cta" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;white-space:nowrap;">' + CTA[tipo].rotulo + "</a>");
+        r.cta = seguro('<a href="' + esc(href) + '" target="_blank" class="cta" style="color:' + ((op && op.corCta) || cor.marca.s) + ';font-weight:bold;text-decoration:none;white-space:nowrap;">' + CTA[tipo].rotulo + "</a>");
       } else if (link === "" && v.tipo !== undefined) {
         problema(prob, "info", arqD, v._linhas.link, "[" + nomeBloco + "] sem link: a peça aparece sem \"" + CTA[tipo].texto + "\".");
       }
@@ -411,6 +412,20 @@
       return imagem(cam, w, 0, { alt: FORMIGA_ALT[n] || "Formiguinha", papel: papel });
     }
 
+    /* Logo (config/marca.txt, bloco [LOGO]) */
+    var LG = M.simples.LOGO || {}, logo = null;
+    if (LG.arquivo) {
+      var lw = parseInt(LG.largura || "100", 10);
+      if (!(lw >= 40 && lw <= 200)) { problema(prob, "aviso", arqM, LG._linhas.largura, "Logo: largura deve ficar entre 40 e 200 px. Usei 100."); lw = 100; }
+      var lc = LG.arquivo.replace(/\\/g, "/").replace(/^\.?\/+/, "");
+      if (existe(lc)) logo = { img: imagem(lc, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" }), placeholder: null };
+      else {
+        problema(prob, "pendencia", arqM, LG._linhas.arquivo, "Logo não encontrado: " + lc + ". Salve o logo oficial (versão branca, PNG) nesse caminho ou ajuste o nome em config/marca.txt.");
+        logo = { img: null, placeholder: seguro('<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td height="20" align="center" valign="middle" style="height:20px;width:' + lw + "px;border:1px dashed " + cor.foco_rotulo.s +
+          ';border-radius:4px;"><p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:12px;font-weight:bold;color:' + cor.foco_rotulo.s + ';letter-spacing:1.5px;">LOGO</p></td></tr></table>') };
+      }
+    }
+
     var A = D.simples.ABERTURA, P = D.simples["PROJETO PRINCIPAL"], L = D.listas;
     var mes = E.mes.trim(), ano = E.ano.trim(), prox = E.proximo_mes.trim();
     curto(A, "frase", 28, "ABERTURA");
@@ -418,11 +433,11 @@
     function proxSecao() { secoes++; return (secoes < 10 ? "0" : "") + secoes; }
 
     /* 01 · Abertura */
-    var pp = peca(P, "PROJETO PRINCIPAL", 230, 230, 14, { dica: "460 x 460 px", fluida: true });
+    var pp = peca(P, "PROJETO PRINCIPAL", 190, 190, 14, { dica: "380 x 380 px", fluida: true, corCta: "#FFFFFF" });
     var nums = (L.NUMERO || []), larg = LARG[nums.length] || LARG[4];
     var abertura = {
       n: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
-      nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp,
+      nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp, peca_largura: 190,
       numeros: nums.map(function (v, i) {
         curto(v, "valor", 11, "NUMERO " + (i + 1));
         var ult = i === nums.length - 1;
@@ -433,7 +448,7 @@
           estilo: i === 0 ? "padding:0 12px 20px 0;" : "padding:0 " + (ult && nums.length === 4 ? 6 : 10) + "px 20px 14px;border-left:1px solid " + cor.abertura_linha.s + ";"
         };
       }),
-      formiga: formiga(P.formiguinha, "", 86, "formiguinha", P._linhas.formiguinha)
+      formiga: formiga(P.formiguinha, "", 76, "formiguinha", P._linhas.formiguinha)
     };
 
     /* 02 · O que lançamos */
@@ -487,7 +502,7 @@
     if (tr.length) {
       transformation = {
         n: proxSecao(), titulo: texto((D.simples.TRANSFORMATION || {}).titulo || ""),
-        formiga: formiga(FM.transformation, "", 80, "formiguinha"),
+        formiga: formiga(FM.transformation, "", 70, "formiguinha"),
         projetos: tr.map(function (v, i) {
           var nb = "TRANSFORMATION " + (i + 1), p = peca(v, nb, 68, 52, 8, { dica: "136 x 104 px" }, "projeto");
           var icones = (v.icones || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean).map(function (ic, j) {
@@ -551,7 +566,7 @@
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
       assunto: assunto, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
-      edicao: maiusculas(mes + " " + ano), proximo_mes: prox, proximo_mes_minusculo: prox.toLocaleLowerCase("pt-BR"), contato: texto(E.contato),
+      logo: logo, edicao: maiusculas(mes + " " + ano), proximo_mes: prox, proximo_mes_minusculo: prox.toLocaleLowerCase("pt-BR"), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
     };

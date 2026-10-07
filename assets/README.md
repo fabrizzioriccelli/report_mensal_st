@@ -5,6 +5,7 @@
 | `AAAA-MM/` | Imagens do mês: peça do projeto principal, peça do destaque, miniaturas dos lançamentos, capas de vídeo | Sim |
 | `formiguinha/` | A personagem: base + 5 variações (PNG transparente e fonte SVG). Regras em [formiguinha/README.md](formiguinha/README.md) | Só quando surge um tema novo |
 | `icones/` | Ícones do Creative Transformation (PNG em petróleo) | Não |
+| `marca/` | Logo do Santander (versão branca usada na capa, vermelha e vetores). Regras em [marca/README.md](marca/README.md) | Não |
 
 ## Imagens do mês
 

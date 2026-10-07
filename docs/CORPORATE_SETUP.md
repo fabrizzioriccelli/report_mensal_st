@@ -17,7 +17,14 @@ Os itens marcados com **VALIDAR COM TI** dependem de políticas internas que est
 
 **VALIDAR COM TI:** como trazer o projeto (código-fonte e ferramenta HTML local) para a máquina corporativa, e se é permitido abrir um arquivo `.html` local no Edge.
 
-## 1. Fonte oficial
+## 1. Logo do Santander
+
+O logo já está no projeto: `assets/marca/logo-santander-branco.png`, gerado a partir do arquivo vetorial oficial. Ele aparece em branco, no topo da capa vermelha.
+
+- Para trocar, salve o novo PNG (versão branca, fundo transparente) em `assets/marca/` com o mesmo nome. Ou ajuste o nome e a largura em `config/marca.txt`, bloco `[LOGO]`.
+- **VALIDAR COM MARCA:** se a versão branca sobre o vermelho, o tamanho (104 px) e o espaço ao redor seguem o manual da marca.
+
+## 2. Fonte oficial
 
 1. Pergunte a Marca/TI o **nome exato** da fonte oficial instalada nos computadores (o nome que aparece na lista de fontes do Word).
 2. Abra `config/marca.txt` no Bloco de Notas e procure **EDITAR AQUI — FONTE OFICIAL DO BANCO**.
@@ -33,7 +40,7 @@ Como funciona: e-mail não carrega arquivo de fonte. O Outlook não aceita fonte
 
 **VALIDAR COM TI / MARCA:** nome da fonte, se está instalada em todos os computadores e se o uso em e-mail é permitido.
 
-## 2. Onde colocar os assets
+## 3. Onde colocar os assets
 
 | O quê | Onde | Por quê |
 |---|---|---|
@@ -43,7 +50,7 @@ Como funciona: e-mail não carrega arquivo de fonte. O Outlook não aceita fonte
 
 Pode colocar em `assets/AAAA-MM/` a imagem original, em alta: a página reduz e recorta sozinha. A original não é alterada.
 
-## 3. Método das imagens
+## 4. Método das imagens
 
 Em `config/marca.txt`, bloco `[IMAGENS]`:
 
@@ -52,7 +59,7 @@ Em `config/marca.txt`, bloco `[IMAGENS]`:
 
 **VALIDAR COM TI:** se o tamanho do e-mail (~200 a 400 KB com imagens embutidas) está dentro do limite e se há restrição a imagens embutidas.
 
-## 4. SharePoint e Stream
+## 5. SharePoint e Stream
 
 1. Crie (ou peça) uma pasta **Report mensal** na biblioteca do site do time, com uma subpasta por mês.
 2. Defina, com a TI, a opção de compartilhamento: de preferência "Pessoas em [empresa]".
@@ -60,20 +67,20 @@ Em `config/marca.txt`, bloco `[IMAGENS]`:
 
 Detalhes, tipos de link e problemas comuns: [LINKS_SHAREPOINT_STREAM.md](LINKS_SHAREPOINT_STREAM.md).
 
-## 5. Testar permissões
+## 6. Testar permissões
 
 Para cada peça e vídeo:
 1. No SharePoint: **⋯ → Gerenciar acesso**. O link deve ser para "Pessoas em [empresa]" (ou o público precisa ter acesso ao site).
 2. Peça a um colega de outra equipe para abrir o link. Se ele abrir, o público da empresa abre.
 
-## 6. Gerar o .eml
+## 7. Gerar o .eml
 
 1. Dois cliques em `gerar-report.html` (abre no Edge).
 2. **Selecionar a pasta do projeto** → escolha a pasta principal.
 3. Leia a conferência. Para o primeiro teste, marque **Gerar um RASCUNHO**.
 4. Clique em **Baixar**. O arquivo vai para Downloads.
 
-## 7. Abrir no Outlook
+## 8. Abrir no Outlook
 
 - **Outlook clássico (Windows):** dois cliques no `.eml`. Abre uma mensagem nova, pronta para enviar.
 - **Novo Outlook / Mac:** pode abrir como mensagem recebida. Use **Encaminhar** e apague o cabeçalho que o Outlook insere.
@@ -81,7 +88,7 @@ Para cada peça e vídeo:
 
 Mais detalhes: [HOW_TO_EXPORT_EML.md](HOW_TO_EXPORT_EML.md).
 
-## 8. Teste piloto com outro usuário (obrigatório antes do 1º envio)
+## 9. Teste piloto com outro usuário (obrigatório antes do 1º envio)
 
 Testar só na sua conta não basta: você é dono dos arquivos e tem todos os acessos.
 
@@ -92,7 +99,8 @@ Testar só na sua conta não basta: você é dono dos arquivos e tem todos os ac
 |---|---|---|---|---|
 | [ ] | Layout inteiro, sem cortes e sem rolagem para o lado | | | |
 | [ ] | Fontes legíveis (sem Times New Roman inesperada) | | | |
-| [ ] | Formiguinha aparece (3 vezes) | | | |
+| [ ] | Logo do Santander aparece no topo, nítido | | | |
+| [ ] | Formiguinha aparece (3 vezes no computador) | | | |
 | [ ] | Imagens e miniaturas aparecem sem clicar em "Baixar imagens" | | | |
 | [ ] | "Ver peça →" abre a peça grande | | | |
 | [ ] | Miniatura da peça também abre | | | |
@@ -103,11 +111,11 @@ Testar só na sua conta não basta: você é dono dos arquivos e tem todos os ac
 
 Anote o que falhou e em qual cliente. Um problema de permissão se resolve no SharePoint, sem gerar o e-mail de novo. Um problema de layout: envie a captura de tela para quem mantém o projeto.
 
-## 9. Testar a imagem ampliada
+## 10. Testar a imagem ampliada
 
 Clique na miniatura e no "Ver peça →" de cada peça. A peça precisa abrir **grande** e **nítida**. Se abrir pequena ou borrada, o arquivo no SharePoint está em baixa resolução: suba o original.
 
-## 10. Testar vídeo e áudio
+## 11. Testar vídeo e áudio
 
 No computador **e** no celular: abra o "▶ Assistir", dê play, confira o som, avance o vídeo e ative as legendas (se houver). Teste também com fone, no celular.
 

@@ -38,7 +38,7 @@ Legenda: ✓ funciona · △ parcial ou depende da versão · ✕ não funciona.
 | Recurso | Como o report usa |
 |---|---|
 | ✓ Tabelas para layout, estilo inline | Toda a grade |
-| ✓ Cor de fundo em células | Superfície creme (abertura), petróleo (Transformation), vermelho (Foco), etiquetas |
+| ✓ Cor de fundo em células | Capa vermelha, faixa creme dos números, petróleo (Transformation), vermelho (Foco), selo do mês, etiquetas |
 | ✓ Bordas em células | Filetes, divisórias, caixas tracejadas (só no rascunho) |
 | ✓ `margin` em parágrafos e `padding` em células | Espaçamentos (o Word ignora `margin` em tabelas) |
 | ✓ Imagens JPG/PNG com `width`, `height` e `alt` | Peças em JPG; formiguinha e ícones em PNG transparente; tudo **embutido** no `.eml` (`cid:`) |
@@ -54,7 +54,7 @@ Legenda: ✓ funciona · △ parcial ou depende da versão · ✕ não funciona.
 | Fonte **não** instalada | O navegador usa a próxima da lista. O Outlook para Windows usa a fonte definida em `titulos_outlook_windows`/`texto_outlook_windows` (se ela também faltar, troca por Times New Roman) |
 | Fonte baixada da internet ou da rede (`@font-face`, Google Fonts) | **Não funciona no Outlook para Windows** e é bloqueada no ambiente corporativo. Não usada; a ferramenta recusa |
 
-Por isso a fonte é uma **lista**, configurada num lugar só ([CORPORATE_SETUP.md › Fonte oficial](CORPORATE_SETUP.md#1-fonte-oficial)). O Outlook para Windows recebe a dele por um bloco que só ele lê (`<!--[if mso]>`) e pelas classes `ft`/`fx` de cada texto.
+Por isso a fonte é uma **lista**, configurada num lugar só ([CORPORATE_SETUP.md › Fonte oficial](CORPORATE_SETUP.md#2-fonte-oficial)). O Outlook para Windows recebe a dele por um bloco que só ele lê (`<!--[if mso]>`) e pelas classes `ft`/`fx` de cada texto.
 
 ## Imagens: embutidas × hospedadas × caminho de rede
 
@@ -84,7 +84,8 @@ Uma regra `@media (max-width:620px)`:
 
 - empilha as colunas (`col`);
 - coloca os números em pares (`half`);
-- esconde a formiguinha da abertura e a peça vertical do projeto em destaque, que não cabem (`hide-m`). O botão "Ver peça →" continua visível;
+- na capa, o selo do mês desce para baixo do logo (`selo`) e a peça principal fica com 180 px, centralizada (`himg`);
+- esconde a formiguinha da faixa dos números e a do Foco, e a peça vertical do projeto em destaque, que não cabem (`hide-m`). O botão "Ver peça →" continua visível;
 - aumenta as miniaturas para a largura da tela (`fluid`). Elas são exportadas com até 700 px para ficarem nítidas;
 - ajusta os tamanhos de títulos e números (`h1`, `h2`, `num`, `brand`).
 

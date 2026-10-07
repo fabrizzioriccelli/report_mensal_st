@@ -31,6 +31,16 @@ var RAIZ = path.join(__dirname, ".."), SAIDA = path.resolve(process.argv[2] || p
   await d[0].saveAs(path.join(SAIDA, d[0].suggestedFilename()));
   console.log("HTML:", d[0].suggestedFilename());
   await page.screenshot({ path: path.join(SAIDA, "ferramenta.png"), fullPage: true });
+  /* O e-mail gerado não pode vazar para o lado: nem no computador (760 px) nem no celular (390 px). */
+  var arquivoHtml = path.join(SAIDA, d[0].suggestedFilename());
+  for (var largura of [760, 390]) {
+    var p2 = await browser.newPage({ viewport: { width: largura, height: 900 } });
+    await p2.goto("file://" + arquivoHtml);
+    var sw = await p2.evaluate(function () { return document.documentElement.scrollWidth; });
+    console.log("LARGURA " + largura + " px: " + (sw <= largura ? "ok" : "VAZA (" + sw + " px)"));
+    if (sw > largura) erros.push("O e-mail vaza para o lado em " + largura + " px (" + sw + " px).");
+    await p2.close();
+  }
   await browser.close();
   if (erros.length) { console.log("ERROS NA PÁGINA:", erros); process.exit(1); }
 })();

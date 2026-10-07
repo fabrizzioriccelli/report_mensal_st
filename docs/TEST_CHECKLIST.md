@@ -49,14 +49,15 @@ Como fazer cada verificação: [LINKS_SHAREPOINT_STREAM.md](LINKS_SHAREPOINT_STR
 
 ## Primeira vez no banco
 
-Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (computador, web e celular, com a tabela de verificação) descrito em [CORPORATE_SETUP.md](CORPORATE_SETUP.md#8-teste-piloto-com-outro-usuário-obrigatório-antes-do-1º-envio).
+Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (computador, web e celular, com a tabela de verificação) descrito em [CORPORATE_SETUP.md](CORPORATE_SETUP.md#9-teste-piloto-com-outro-usuário-obrigatório-antes-do-1º-envio).
 
 ## O que já foi verificado na construção do projeto
 
 | Verificação | Status |
 |---|---|
-| Motor: 19 testes automáticos | Passam |
-| Página de geração de ponta a ponta no Chromium | Passa |
+| Motor: 20 testes automáticos | Passam |
+| Página de geração de ponta a ponta no Chromium, sem vazar para o lado em 760 px e 390 px | Passa |
+| Fonte corporativa mais larga simulada (DejaVu Sans) e imagens bloqueadas | Layout se mantém |
 | E-mail gerado igual ao layout aprovado, em 760 px e 390 px | Conferido |
 | Estrutura do `.eml` (texto + HTML, imagens embutidas) | Conferida |
 | Imagens grandes reduzidas e recortadas com boa qualidade | Conferido |

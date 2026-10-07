@@ -62,7 +62,9 @@
     .h2{font-size:22px !important;line-height:27px !important;}
     .fluid{width:100% !important;max-width:100% !important;height:auto !important;}
     .num{font-size:24px !important;line-height:28px !important;}
-    .brand{font-size:22px !important;line-height:26px !important;}
+    .brand{font-size:17px !important;line-height:20px !important;}
+    .selo{float:none !important;margin-top:14px !important;}
+    .himg{width:180px !important;max-width:100% !important;margin:0 auto !important;}
   }
 </style>
 </head>
@@ -81,69 +83,76 @@
 <!--[if mso]><table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
 <table role="presentation" class="container" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="width:680px;max-width:680px;background:{{cor.fundo_email}};border-radius:20px;">
 
-  <!-- CABEÇALHO · nome da publicação, edição e filete duplo -->
+  {{#abertura}}
+  <!-- 01 · CAPA · faixa vermelha de ponta a ponta: logo, nome da área, selo do mês,
+       frase do mês e projeto principal com a peça. Logo abaixo, a faixa creme dos números. -->
   <tr>
-    <td class="px" style="padding:30px 40px 0 40px;">
+    <td class="px" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:20px 20px 0 0;padding:24px 40px 30px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td valign="bottom" style="padding-bottom:12px;">
-            <p class="ft brand" style="margin:0;font-family:{{fonte.titulos}};font-size:28px;line-height:30px;font-weight:bold;color:{{cor.marca}};letter-spacing:-0.5px;">Creative Strategy PF</p>
+          <td class="col" valign="middle">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                {{#logo}}
+                <td valign="middle" style="padding-right:14px;">
+                  {{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#FFFFFF;">{{/img}}{{placeholder}}
+                </td>
+                {{/logo}}
+                <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid {{cor.capa_filete}};{{/logo}}">
+                  <p class="ft brand" style="margin:0;font-family:{{fonte.titulos}};font-size:19px;line-height:22px;font-weight:bold;color:#FFFFFF;letter-spacing:-0.2px;">Creative Strategy PF</p>
+                </td>
+              </tr>
+            </table>
           </td>
-          <td valign="bottom" align="right" style="padding-bottom:13px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;">REPORT MENSAL</p>
-            <p class="fx" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;color:{{cor.texto_apoio}};letter-spacing:2px;">{{edicao}}</p>
+          <td class="col" valign="middle" align="right">
+            <table role="presentation" class="selo" align="right" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td bgcolor="{{cor.capa_selo}}" style="background:{{cor.capa_selo}};border-radius:999px;padding:6px 12px;">
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:12px;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;white-space:nowrap;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;{{edicao}}</p>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
-        <tr><td colspan="2" height="3" bgcolor="{{cor.texto}}" style="height:3px;background:{{cor.texto}};font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td colspan="2" height="3" style="height:3px;font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td colspan="2" height="1" bgcolor="{{cor.texto}}" style="height:1px;background:{{cor.texto}};font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td colspan="2" style="padding:18px 0 24px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="{{cor.capa_filete}}" style="height:1px;background:{{cor.capa_filete}};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
+        <tr>
+          <td colspan="2">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td class="col gap" valign="middle" style="padding-right:28px;">
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;">{{n}}&nbsp;&nbsp;·&nbsp;&nbsp;O MÊS EM UMA FRASE</p>
+                  <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.titulos}};font-size:36px;line-height:40px;color:#FFFFFF;letter-spacing:-1px;">{{frase}}{{#frase_final}}<br><i style="color:{{cor.foco_rotulo}};">{{frase_final}}</i>{{/frase_final}}</p>
+                  <p class="fx" style="margin:18px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;">PROJETO PRINCIPAL</p>
+                  <p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:15px;line-height:20px;font-weight:bold;color:#FFFFFF;">{{nome}}</p>
+                  {{#resumo_cta}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">{{resumo_cta}}</p>{{/resumo_cta}}
+                </td>
+                <td class="col" width="{{peca_largura}}" valign="middle" align="center" style="width:{{peca_largura}}px;">
+                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:14px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
       </table>
     </td>
   </tr>
-
-  {{#abertura}}
-  <!-- 01 · O MÊS EM UMA FRASE · projeto principal: frase, peça e números -->
   <tr>
-    <td class="px" style="padding:24px 40px 0 40px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:20px;">
+    <td class="px" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};padding:20px 40px 0 40px;">
+      <!-- Números do projeto principal; a formiguinha fica em pé à direita -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td class="px" style="padding:30px 28px 0 28px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td class="col gap" valign="middle" style="padding-right:24px;">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.marca}};letter-spacing:2px;">{{n}}&nbsp;&nbsp;·&nbsp;&nbsp;O MÊS EM UMA FRASE</p>
-                  <p class="ft h1" style="margin:14px 0 0 0;font-family:{{fonte.titulos}};font-size:38px;line-height:42px;color:{{cor.texto}};letter-spacing:-1px;">{{frase}} {{#frase_final}}<i style="color:{{cor.marca}};">{{frase_final}}</i>{{/frase_final}}</p>
-                  <p class="fx" style="margin:20px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">PROJETO PRINCIPAL</p>
-                  <p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:15px;line-height:20px;font-weight:bold;color:{{cor.texto}};">{{nome}}</p>
-                  {{#resumo_cta}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{resumo_cta}}</p>{{/resumo_cta}}
-                </td>
-                <td class="col" width="230" valign="middle" align="center" style="width:230px;">
-                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:14px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
-                </td>
-              </tr>
-            </table>
+          {{#numeros}}
+          <td class="half" width="{{largura}}" valign="bottom" style="width:{{largura}};{{estilo}}">
+            <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;{{#principal}}letter-spacing:-0.5px;{{/principal}}">{{valor}}</p>
+            <p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><b style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br>{{detalhe}}{{/detalhe}}</p>
+            {{#variacao}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
           </td>
-        </tr>
-        <tr>
-          <td class="px" style="padding:22px 28px 0 28px;">
-            <!-- Números do projeto principal; a formiguinha fica em pé à direita -->
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                {{#numeros}}
-                <td class="half" width="{{largura}}" valign="bottom" style="width:{{largura}};{{estilo}}">
-                  <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;{{#principal}}letter-spacing:-0.5px;{{/principal}}">{{valor}}</p>
-                  <p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><b style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br>{{detalhe}}{{/detalhe}}</p>
-                  {{#variacao}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
-                </td>
-                {{/numeros}}
-                {{#formiga}}
-                <td class="hide-m" width="16%" valign="bottom" align="right" style="width:16%;">
-                  <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;">
-                </td>
-                {{/formiga}}
-              </tr>
-            </table>
+          {{/numeros}}
+          {{#formiga}}
+          <td class="hide-m" width="16%" valign="bottom" align="right" style="width:16%;">
+            <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">
           </td>
+          {{/formiga}}
         </tr>
       </table>
     </td>
@@ -153,7 +162,7 @@
   {{#lancamos}}
   <!-- 02 · O QUE LANÇAMOS · 1 projeto em destaque + compactos -->
   <tr>
-    <td class="px" style="padding:44px 40px 0 40px;">
+    <td class="px" style="padding:40px 40px 0 40px;">
       <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.marca}};letter-spacing:2px;">{{n}}&nbsp;&nbsp;·&nbsp;&nbsp;O QUE LANÇAMOS</p>
       {{#titulo}}<p class="ft h2" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-size:26px;line-height:31px;color:{{cor.texto}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
     </td>
@@ -273,7 +282,7 @@
                 </td>
                 {{#formiga}}
                 <td width="86" valign="bottom" align="right" style="width:86px;">
-                  <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;">
+                  <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">
                 </td>
                 {{/formiga}}
               </tr>
@@ -337,26 +346,21 @@
   {{/aprendizados}}
 
   {{#foco}}
-  <!-- 06 · FOCO DO PRÓXIMO MÊS · a formiguinha fica em pé sobre o bloco vermelho -->
+  <!-- 06 · FOCO DO PRÓXIMO MÊS · bloco vermelho; a formiguinha fica em pé dentro dele, à direita -->
   <tr>
-    <td class="px" style="padding:20px 40px 0 40px;">
-      {{#formiga}}
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td>&nbsp;</td>
-          <td width="100" valign="bottom" align="right" style="width:100px;padding-right:26px;">
-            <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;">
-          </td>
-        </tr>
-      </table>
-      {{/formiga}}
+    <td class="px" style="padding:40px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:20px;">
         <tr>
-          <td class="px" style="padding:26px 30px 28px 30px;">
+          <td class="px" valign="middle" style="padding:26px 20px 28px 30px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;">{{n}}&nbsp;&nbsp;·&nbsp;&nbsp;FOCO DE {{mes}}</p>
             <p class="ft h2" style="margin:10px 0 0 0;font-family:{{fonte.titulos}};font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">{{prioridade}}</p>
             {{#texto}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
           </td>
+          {{#formiga}}
+          <td class="hide-m" width="96" valign="bottom" align="center" style="width:96px;padding:16px 24px 0 0;">
+            <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.foco_rotulo}};">
+          </td>
+          {{/formiga}}
         </tr>
       </table>
     </td>
