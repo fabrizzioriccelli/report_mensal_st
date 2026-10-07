@@ -1,0 +1,142 @@
+# ======================================================================
+#  CONFIGURAÇÃO DE MARCA · REPORT MENSAL CREATIVE STRATEGY PF
+# ======================================================================
+#  Tudo o que define a aparência do report fica AQUI, em um lugar só:
+#  fontes, cores, como as imagens viajam e quais endereços de link são
+#  aceitos. Você não precisa mexer neste arquivo todo mês.
+#
+#  Como editar:
+#    - Cada linha é "campo: valor". Troque só o que vem depois dos ":".
+#    - Linhas que começam com # são explicações e não fazem nada.
+#    - Depois de salvar, gere o report de novo (tools/gerar-report.html).
+#      A ferramenta aplica estas escolhas em todo o e-mail.
+# ======================================================================
+
+
+# ======================================================================
+#  EDITAR AQUI — FONTE OFICIAL DO BANCO
+# ======================================================================
+#  O e-mail não "leva" a fonte junto: cada pessoa vê a fonte que está
+#  INSTALADA no computador ou celular dela. Por isso cada campo é uma
+#  lista: a 1ª fonte da lista que existir no aparelho é usada.
+#
+#  Para usar a fonte oficial:
+#    1. Confirme com Marca/TI o NOME EXATO da fonte instalada nas
+#       máquinas (o nome que aparece no Word, na lista de fontes).
+#    2. Coloque esse nome no COMEÇO da lista, entre aspas simples:
+#         titulos: 'Nome Exato da Fonte', Georgia, 'Times New Roman', serif
+#    3. Mantenha as fontes seguintes: são o plano B de quem não tem a
+#       fonte oficial (celular pessoal, por exemplo).
+#
+#  OUTLOOK PARA WINDOWS lê só UMA fonte e, se ela não existir no
+#  computador, troca por Times New Roman. Por isso ele tem campos
+#  próprios, com uma fonte só. Coloque a fonte oficial aqui SOMENTE se
+#  a TI confirmar que ela está instalada em TODOS os computadores que
+#  recebem o report. Na dúvida, deixe Georgia e Arial.
+#  -> VALIDAR COM TI / MARCA.
+# ======================================================================
+[FONTES]
+titulos: Georgia, 'Times New Roman', serif
+texto: Arial, Helvetica, sans-serif
+titulos_outlook_windows: Georgia
+texto_outlook_windows: Arial
+
+
+# ======================================================================
+#  CORES PRINCIPAIS
+# ======================================================================
+#  Use sempre o código hexadecimal com # e 6 dígitos (ex.: #9E1218).
+#  O Outlook para Windows não entende rgb(), nomes de cor nem transparência.
+[CORES]
+# Marca: nome do report, numeração das seções, número principal,
+# links ("Ver peça", "Assistir") e o bloco do Foco.
+marca: #9E1218
+# Texto principal (títulos, números) e filetes pretos.
+texto: #1C1614
+# Texto de leitura (resumos e descrições).
+texto_corpo: #4A423E
+# Texto de apoio (rótulos, legendas, "era ...").
+texto_apoio: #8C827C
+# Resultado positivo: etiquetas verdes (texto e fundo).
+positivo: #1D7A4C
+positivo_fundo: #E4F2EA
+# Previsto / pendente / atenção: etiquetas âmbar (texto e fundo).
+atencao: #9A5B00
+atencao_fundo: #FBF0DC
+# Fundo atrás do e-mail e fundo do cartão do e-mail.
+fundo_pagina: #EAE4DE
+fundo_email: #FFFFFF
+
+
+# ======================================================================
+#  CORES DE APOIO (assinaturas das seções)
+# ======================================================================
+[CORES DE APOIO]
+# 01 · Abertura: superfície creme e divisórias entre os números.
+abertura_fundo: #F7F2EC
+abertura_linha: #E3D9CF
+# Divisórias finas e trilho da barra do Creative X.
+linha: #E8E1DA
+# 03 · Creative X: barra e score; score anterior em cinza.
+creative_x: #2B2422
+creative_x_anterior: #A79C96
+# 04 · Creative Transformation: rótulo, títulos, superfície e divisórias.
+transformation: #1D6470
+transformation_titulo: #123E45
+transformation_fundo: #E8F1F1
+transformation_linha: #DCE8E9
+transformation_placeholder_fundo: #F2F7F7
+transformation_placeholder_borda: #A9C9CC
+# 06 · Foco: textos claros sobre o bloco vermelho.
+foco_rotulo: #F4C9CB
+foco_texto: #FBE3E4
+# Caixas tracejadas de imagem ainda não definida (só no rascunho).
+placeholder_fundo: #F7F2EC
+placeholder_borda: #D9C8BC
+
+
+# ======================================================================
+#  IMAGENS · como as imagens viajam no e-mail
+# ======================================================================
+#  modo: embutidas   (RECOMENDADO) As imagens vão DENTRO do .eml.
+#                    Aparecem para qualquer destinatário, sem internet,
+#                    sem login e sem clicar em "Baixar imagens".
+#  modo: hospedadas  As imagens ficam num servidor INTERNO e o e-mail
+#                    só aponta para elas. E-mail mais leve, mas o Outlook
+#                    pode bloquear até a pessoa clicar em "Baixar
+#                    imagens", e imagens do SharePoint NÃO aparecem
+#                    (o Outlook não faz login para buscar imagem).
+#                    Só use se a TI indicar um endereço interno que o
+#                    Outlook carrega sem login. -> VALIDAR COM TI.
+#  endereco_base:    Só no modo hospedadas. Ex.: https://servidor-interno/report/
+#                    A ferramenta gera as imagens otimizadas para você
+#                    copiar para esse endereço.
+#  qualidade_jpg:    60 a 95. 82 é um bom equilíbrio entre nitidez e peso.
+[IMAGENS]
+modo: embutidas
+endereco_base:
+qualidade_jpg: 82
+
+
+# ======================================================================
+#  LINKS · quais endereços são aceitos nos botões "Ver peça" e "Assistir"
+# ======================================================================
+#  Liste os domínios internos aprovados, separados por vírgula. Com a
+#  lista preenchida, a ferramenta avisa quando um link aponta para fora
+#  dela (por exemplo, um link pessoal ou público colado por engano).
+#  Ex.: empresa.sharepoint.com, empresa-my.sharepoint.com
+#  Use o domínio real do SharePoint de vocês (aparece no endereço do
+#  navegador quando você abre um arquivo do SharePoint).
+#  Vazio = a ferramenta só confere se o link é https:// e válido.
+[LINKS]
+dominios_permitidos:
+
+
+# ======================================================================
+#  FORMIGUINHA · versões fixas
+# ======================================================================
+#  A versão do projeto principal muda todo mês e fica no arquivo de
+#  dados. Estas duas são fixas. Nomes disponíveis em assets/formiguinha/.
+[FORMIGUINHA]
+transformation: transformacao
+foco: foco
