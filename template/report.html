@@ -64,6 +64,8 @@
     .num{font-size:24px !important;line-height:28px !important;}
     .brand{font-size:17px !important;line-height:20px !important;}
     .selo{float:none !important;margin-top:14px !important;}
+    .al-m{text-align:left !important;}
+    .al-m img{margin-left:0 !important;}
     .himg{width:180px !important;max-width:100% !important;margin:0 auto !important;}
   }
 </style>
@@ -394,18 +396,19 @@
   </tr>
   {{/agenda}}
 
-  <!-- RODAPÉ -->
+  <!-- RODAPÉ · contracapa: faixa vermelho-escura de ponta a ponta, fecha o report como a capa abre -->
+  <tr><td height="36" style="height:36px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px" style="padding:30px 40px 30px 40px;">
+    <td class="px" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:0 0 20px 20px;padding:26px 40px 28px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr><td colspan="2" height="1" bgcolor="{{cor.texto}}" style="height:1px;background:{{cor.texto}};font-size:0;line-height:0;">&nbsp;</td></tr>
         <tr>
-          <td class="col" valign="top" style="padding-top:14px;">
-            <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-size:18px;line-height:22px;font-style:italic;color:{{cor.texto}};">Até {{proximo_mes_minusculo}}.</p>
-            {{#contato}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};">Dúvidas, sugestões ou pedidos: {{contato}}</p>{{/contato}}
+          <td class="col gap" valign="middle">
+            <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-size:22px;line-height:26px;font-style:italic;color:#FFFFFF;">Até {{proximo_mes_minusculo}}.</p>
+            {{#contato}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.foco_texto}};">Dúvidas, sugestões ou pedidos: {{contato}}</p>{{/contato}}
           </td>
-          <td class="col" valign="top" align="right" style="padding-top:14px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:22px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">CREATIVE STRATEGY PF · MARKETING PF</p>
+          <td class="col al-m" valign="middle" align="right">
+            {{#rodape_logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#FFFFFF;">{{/rodape_logo}}
+            <p class="fx" style="margin:{{#rodape_logo}}8px{{/rodape_logo}}{{^rodape_logo}}0{{/rodape_logo}} 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;white-space:nowrap;">CREATIVE STRATEGY PF&nbsp;&nbsp;·&nbsp;&nbsp;MARKETING PF</p>
           </td>
         </tr>
       </table>

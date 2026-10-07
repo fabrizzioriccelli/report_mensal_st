@@ -85,7 +85,7 @@ Content-Type: multipart/alternative
 
 [`examples/report-2026-09-RASCUNHO.eml`](../examples/report-2026-09-RASCUNHO.eml) foi gerado pela página a partir de `dados/2026-09.txt`. Como setembro ainda tem pendências (aprendizados, foco, links), ele é um **rascunho**. A estrutura foi validada com um leitor de e-mail padrão (Python `email`):
 
-- texto puro + HTML (UTF-8) + 11 imagens embutidas: 5 JPG (peças) e 6 PNG (logo, 3 formiguinhas, 2 ícones), cerca de 230 KB;
+- texto puro + HTML (UTF-8) + 12 imagens embutidas: 5 JPG (peças) e 7 PNG (logo da capa e do rodapé, 3 formiguinhas, 2 ícones), cerca de 235 KB;
 - todas as referências `cid:` do HTML têm a imagem correspondente;
 - nenhum comentário interno, nenhum caminho local, nenhuma requisição externa;
 - linhas com no máximo 76 caracteres, como pede o padrão.

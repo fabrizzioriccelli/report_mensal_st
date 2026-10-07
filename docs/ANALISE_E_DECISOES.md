@@ -211,13 +211,14 @@ A abertura (cabeçalho + projeto principal) estava correta, mas simples e alta. 
 - **faixa vermelha de ponta a ponta**, com o logo do Santander em branco, o nome da área ao lado (separado por um filete) e um **selo arredondado** com "REPORT MENSAL · MÊS ANO";
 - a **frase do mês** em branco, com o final em itálico rosado sempre na 2ª linha, e o projeto principal com a peça na mesma faixa;
 - logo abaixo, a **faixa creme dos números**, com a formiguinha;
-- o vermelho abre (capa) e fecha (Foco) o report. No Foco, a formiguinha passou para **dentro** do bloco, o que eliminou o espaço vazio acima dele.
+- no Foco, a formiguinha passou para **dentro** do bloco, o que eliminou o espaço vazio acima dele;
+- o **rodapé** virou uma contracapa: faixa vermelho-escura de ponta a ponta, com cantos arredondados embaixo, "Até [mês]." em destaque, o contato e o logo com "Creative Strategy PF · Marketing PF". O vermelho abre (capa), marca a conclusão (Foco) e fecha (rodapé) o report.
 
 | Medida | Antes | Depois |
 |---|---|---|
 | Fim da abertura (computador) | 556 px | 478 px |
-| Altura total, computador (760 px) | 2.817 px | **2.686 px** |
-| Altura total, celular (390 px) | 4.834 px | **4.606 px** |
+| Altura total, computador (760 px) | 2.817 px | **2.707 px** |
+| Altura total, celular (390 px) | 4.834 px | **4.648 px** |
 
 Nenhuma informação saiu. Com uma fonte bem mais larga simulada, nada vaza e os números continuam numa linha.
 

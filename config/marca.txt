@@ -115,6 +115,8 @@ transformation_placeholder_borda: #A9C9CC
 # Textos claros sobre o vermelho (capa da abertura e bloco do Foco).
 foco_rotulo: #F4C9CB
 foco_texto: #FBE3E4
+# Rodapé: faixa de encerramento (vermelho mais escuro que o da capa).
+rodape_fundo: #7A0D12
 # Caixas tracejadas de imagem ainda não definida (só no rascunho).
 placeholder_fundo: #F7F2EC
 placeholder_borda: #D9C8BC
