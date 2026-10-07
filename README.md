@@ -1,6 +1,6 @@
 # Report Mensal · Creative Strategy PF
 
-Newsletter executiva mensal da Creative Strategy PF (Marketing PF), enviada pelo Outlook. É um e-mail em HTML de uma página, com peças e vídeos clicáveis, gerado a partir de **um arquivo de texto por mês**.
+Newsletter executiva mensal da Creative Strategy PF (Customer Interactions), enviada pelo Outlook. É um e-mail em HTML de uma página, com peças e vídeos clicáveis, gerado a partir de **um arquivo de texto por mês**.
 
 <p>
 <img src="docs/preview-2026-09.jpg" width="420" alt="Prévia do report de setembro no computador">

@@ -212,7 +212,7 @@ A abertura (cabeçalho + projeto principal) estava correta, mas simples e alta. 
 - a **frase do mês** em branco, com o final em itálico rosado sempre na 2ª linha, e o projeto principal com a peça na mesma faixa;
 - logo abaixo, a **faixa creme dos números**, com a formiguinha;
 - no Foco, a formiguinha passou para **dentro** do bloco, o que eliminou o espaço vazio acima dele;
-- o **rodapé** virou uma contracapa: faixa vermelho-escura de ponta a ponta, com cantos arredondados embaixo, "Até [mês]." em destaque, o contato e o logo com "Creative Strategy PF · Marketing PF". O vermelho abre (capa), marca a conclusão (Foco) e fecha (rodapé) o report.
+- o **rodapé** virou uma contracapa: faixa vermelho-escura de ponta a ponta, com cantos arredondados embaixo, "Até [mês]." em destaque, o contato e o logo com "Creative Strategy PF · Customer Interactions". O vermelho abre (capa), marca a conclusão (Foco) e fecha (rodapé) o report.
 
 | Medida | Antes | Depois |
 |---|---|---|
