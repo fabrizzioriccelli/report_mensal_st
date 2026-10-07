@@ -108,14 +108,16 @@ variacao: [+00%]
 [LANCAMOS]
 titulo: [UMA FRASE QUE RESUME OS LANÇAMENTOS]
 
-# Projeto em destaque. A imagem é vertical (aparece com 140 px de
-# largura) e some no celular; o "Ver peça" continua.
+# Projeto em destaque. A imagem é vertical e é recortada em 184 x 300 px
+# (some no celular; o "Ver peça" continua). enquadramento: qual parte
+# da imagem fica no recorte: centro, topo ou baixo.
 [DESTAQUE]
 categoria: [Área] · [Campanha]
 titulo: [TÍTULO DO PROJETO EM DESTAQUE]
 texto: [O QUE FIZEMOS E O QUE ACONTECEU, EM 2 LINHAS]
 imagem: [ARQUIVO DA PEÇA, ex.: projeto-destaque.jpg]
 descricao_imagem: [O que a peça mostra]
+enquadramento: centro
 tipo: peca
 link: [COLE O LINK DA PEÇA NO SHAREPOINT]
 nota: [Base de comparação.] Etiqueta verde = resultado positivo; custo menor também é bom.

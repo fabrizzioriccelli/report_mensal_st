@@ -71,7 +71,7 @@
   /* 1 = obrigatório, 0 = opcional. "max" = bloco numerado (NUMERO 1, 2…) */
 
   var NUM = { valor: 1, titulo: 0, detalhe: 0, variacao: 0, variacao_cor: 0 };
-  var PECA = { imagem: 0, descricao_imagem: 0, tipo: 0, link: 0 };
+  var PECA = { imagem: 0, descricao_imagem: 0, enquadramento: 0, tipo: 0, link: 0 };
   function junta() { var o = {}; for (var i = 0; i < arguments.length; i++) for (var k in arguments[i]) o[k] = arguments[i][k]; return o; }
 
   var ESQUEMA_DADOS = [
@@ -267,7 +267,15 @@
   /* Larguras das colunas de números da abertura (a formiguinha ocupa os 16% restantes).
      A 1ª coluna é mais larga: o número principal costuma ser o mais longo. Há folga de
      ~15% em cada coluna para uma fonte corporativa mais larga que a Georgia. */
-  var LARG = { 4: [29, 19, 18, 18], 3: [32, 26, 26], 2: [44, 40], 1: [84] };
+  /* GRADE do e-mail (computador): 600 px de conteúdo = 3 colunas de 184 px + 2 espaços de 24 px.
+     Todas as seções usam essas linhas, para tudo ficar alinhado de cima a baixo. */
+  var COL = 184, ESP = 24, LARGURA = 600;
+  /* Divide "total" em n colunas com espaços de 24 px entre elas (a soma fecha exata). */
+  function colunas(total, n) {
+    var base = Math.floor((total - ESP * (n - 1)) / n), sobra = total - ESP * (n - 1) - base * n, r = [];
+    for (var i = 0; i < n; i++) r.push(base + (i < sobra ? 1 : 0));
+    return r;
+  }
 
   function lerNumero(s) { var m = String(s || "").replace(/\s/g, "").match(/^(-?\d+(?:[.,]\d+)?)%?$/); return m ? parseFloat(m[1].replace(",", ".")) : null; }
   function fmtPP(n) { var r = Math.round(n * 10) / 10; return (r > 0 ? "+" : r < 0 ? "-" : "") + String(Math.abs(r)).replace(".", ",") + " p.p."; }
@@ -335,10 +343,10 @@
       op = op || {};
       var med = medidas[caminho];
       if (!h && med) h = Math.round(w * med.h / med.w);
-      var chave = caminho + "|" + w + "|" + (h || "") + "|" + (op.play ? 1 : 0);
+      var chave = caminho + "|" + w + "|" + (h || "") + "|" + (op.play ? 1 : 0) + "|" + (op.ancora || "");
       var reg = porCaminho[chave];
       if (!reg) {
-        reg = { id: imagens.length + 1, caminho: caminho, w: w, h: h || 0, recorte: !!op.recorte, play: !!op.play, papel: op.papel || "", fluida: !!op.fluida };
+        reg = { id: imagens.length + 1, caminho: caminho, w: w, h: h || 0, recorte: !!op.recorte, play: !!op.play, papel: op.papel || "", fluida: !!op.fluida, ancora: op.ancora || "centro" };
         reg.token = "@@IMG" + reg.id + "@@";
         imagens.push(reg); porCaminho[chave] = reg;
       }
@@ -373,7 +381,9 @@
         var cam = caminhoImagem(nome);
         if (!existe(cam)) problema(prob, "erro", arqD, v._linhas.imagem, "[" + nomeBloco + "] imagem não encontrada: " + cam + ". Confira o nome do arquivo (maiúsculas, acentos, extensão .jpg/.png).");
         var alt = (tipo === "video" ? "Vídeo: " : "") + desc + (href ? " (" + CTA[tipo].alt.toLowerCase() + ")" : "");
-        r.img = imagem(cam, w, h, { recorte: !!h, play: tipo === "video", alt: alt, papel: nomeBloco, fluida: !!(op && op.fluida) });
+        var anc = chaveCampo(v.enquadramento || "centro");
+        if (["centro", "topo", "baixo"].indexOf(anc) < 0) { problema(prob, "aviso", arqD, v._linhas.enquadramento, "[" + nomeBloco + "] enquadramento deve ser centro, topo ou baixo. Usei centro."); anc = "centro"; }
+        r.img = imagem(cam, w, h, { recorte: !!h, play: tipo === "video", alt: alt, papel: nomeBloco, fluida: !!(op && op.fluida), ancora: anc });
         r.img.link = href;
       }
       return r;
@@ -436,19 +446,20 @@
     function proxSecao() { secoes++; return (secoes < 10 ? "0" : "") + secoes; }
 
     /* 01 · Abertura */
-    var pp = peca(P, "PROJETO PRINCIPAL", 190, 190, 14, { dica: "380 x 380 px", fluida: true, corCta: "#FFFFFF" });
-    var nums = (L.NUMERO || []), larg = LARG[nums.length] || LARG[4];
+    var pp = peca(P, "PROJETO PRINCIPAL", COL, COL, 14, { dica: "368 x 368 px", fluida: true, corCta: "#FFFFFF" });
+    var nums = (L.NUMERO || []);
+    /* Nº 1 na coluna 1 (184 px); os outros dividem o espaço até a formiguinha (80 px). */
+    var larg = nums.length <= 1 ? [LARGURA - 80] : [COL].concat(colunas(LARGURA - 80 - COL - ESP, nums.length - 1));
     var abertura = {
       n: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
-      nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp, peca_largura: 190,
+      nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp,
       numeros: nums.map(function (v, i) {
         curto(v, "valor", 11, "NUMERO " + (i + 1));
-        var ult = i === nums.length - 1;
         return {
           valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "NUMERO " + (i + 1)),
-          largura: larg[i] + "%", principal: i === 0,
+          largura: larg[i], principal: i === 0, primeiro: i === 0,
           cor_valor: i === 0 ? cor.marca : cor.texto,
-          estilo: i === 0 ? "padding:0 12px 20px 0;" : "padding:0 " + (ult && nums.length === 4 ? 6 : 10) + "px 20px 14px;border-left:1px solid " + cor.abertura_linha.s + ";"
+          estilo: "padding:0 0 20px 0;"
         };
       }),
       formiga: formiga(P.formiguinha, "", 76, "formiguinha", P._linhas.formiguinha)
@@ -458,25 +469,26 @@
     var DS = D.simples.DESTAQUE, lanc = L.LANCAMENTO || [], res = L.RESULTADO || [];
     var lancamos = null;
     if (DS || lanc.length) {
-      var dsp = DS ? peca(DS, "DESTAQUE", 140, 0, 14, { dica: "280 px de largura" }) : null;
-      var lr = { 3: [34, 33, 33], 2: [50, 50], 1: [100] }[res.length];
-      var lc = { 3: [33, 34, 33], 2: [50, 50], 1: [100] }[lanc.length];
+      /* Destaque: peça na coluna 1 (184 x 300, recortada) e texto nas colunas 2 e 3 (392 px). */
+      var dsp = DS ? peca(DS, "DESTAQUE", COL, 300, 14, { dica: "368 x 600 px" }) : null;
+      var textoDestaque = dsp && (dsp.img || dsp.placeholder) ? LARGURA - COL - ESP : LARGURA;
+      var lr = res.length ? colunas(textoDestaque, res.length) : [];
+      var lc = lanc.length ? colunas(LARGURA, lanc.length) : [];
       lancamos = {
-        n: proxSecao(), titulo: texto((D.simples.LANCAMOS || {}).titulo || ""), tem_compactos: lanc.length > 0,
+        n: proxSecao(), titulo: texto((D.simples.LANCAMOS || {}).titulo || ""), tem_compactos: lanc.length > 0, colunas_compactos: lanc.length * 2 - 1,
         destaque: DS ? {
           categoria: categoria(DS.categoria), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
+          largura_texto: textoDestaque, colunas: res.length * 3 - 2,
           resultados: res.map(function (v, i) {
-            var ult = i === res.length - 1;
             return {
-              valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)), largura: lr[i] + "%",
-              estilo: "padding:14px " + (ult ? 0 : 10) + "px 0 " + (i ? 14 : 0) + "px;" + (i ? "border-left:1px solid " + cor.linha.s + ";" : "")
+              valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)),
+              largura: lr[i], primeiro: i === 0, estilo: "padding:14px 0 0 0;"
             };
           })
         } : null,
         compactos: lanc.map(function (v, i) {
-          var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, 184, 72, 8, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
-          var pad = lanc.length === 1 ? "" : i === 0 ? "padding-right:12px;" : ult ? "padding-left:12px;" : "padding:0 6px;";
-          return { status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lc[i] + "%", estilo: pad, classe: ult ? "col" : "col gap" };
+          var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, COL, 72, 8, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
+          return { status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lc[i], primeiro: i === 0, classe: ult ? "col" : "col gap" };
         })
       };
     }
@@ -527,15 +539,13 @@
     /* 05 · O que aprendemos */
     var ap = L.APRENDIZADO || [], aprendizados = null;
     if (ap.length) {
-      var la = { 3: [33, 34, 33], 2: [50, 50], 1: [100] }[ap.length];
+      var la = colunas(LARGURA, ap.length);
       aprendizados = {
         n: proxSecao(),
         itens: ap.map(function (v, i) {
           var ult = i === ap.length - 1;
-          var pad = ap.length === 1 ? "" : i === 0 ? "padding-right:16px;" : ult ? "padding-left:16px;" : "padding:0 16px;";
           return {
-            numero: i + 1, titulo: texto(v.titulo), texto: texto(v.texto), levamos: texto(v.levamos), largura: la[i] + "%", classe: ult ? "col" : "col gap",
-            estilo: pad + (i ? "border-left:1px solid " + cor.linha.s + ";" : "")
+            numero: i + 1, titulo: texto(v.titulo), texto: texto(v.texto), levamos: texto(v.levamos), largura: la[i], primeiro: i === 0, classe: ult ? "col" : "col gap"
           };
         })
       };
@@ -556,11 +566,10 @@
           var m = String(v.data || "").trim().match(/^(\d{1,2})\s+(\S.*)$/);
           return {
             dia: m ? m[1] : "", mes: m ? maiusculas(m[2]) : "", rotulo: m ? "" : maiusculas(v.data || ""),
-            titulo: texto(v.titulo), detalhe: texto(v.detalhe), vazio: false,
-            largura: [33, 34, 33][j] + "%", estilo: ["padding:12px 12px 12px 0;", "padding:12px 12px;", "padding:12px 0 12px 12px;"][j]
+            titulo: texto(v.titulo), detalhe: texto(v.detalhe), vazio: false, primeiro: j === 0
           };
         });
-        while (celulas.length < 3) celulas.push({ vazio: true, largura: [33, 34, 33][celulas.length] + "%", estilo: "" });
+        while (celulas.length < 3) celulas.push({ vazio: true, primeiro: false });
         linhas.push({ celulas: celulas, filete: i === 0 ? cor.texto : cor.linha });
       }
       agenda = { n: proxSecao(), linhas: linhas };

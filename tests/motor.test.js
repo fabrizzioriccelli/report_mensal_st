@@ -73,6 +73,18 @@ teste("logo: arquivo faltando vira pendência e espaço tracejado; sem logo, nad
   assert.ok(r.ok && r.html.indexOf(">LOGO</p>") < 0 && !r.imagens.some(function (i) { return i.papel === "logo"; }));
 });
 
+teste("enquadramento do recorte: topo/centro/baixo; valor inválido vira aviso", function () {
+  var r = montar(MINIMO.replace("tipo: peca", "enquadramento: baixo\ntipo: peca"));
+  assert.ok(r.imagens.some(function (i) { return i.ancora === "baixo"; }));
+  r = montar(MINIMO.replace("tipo: peca", "enquadramento: lado\ntipo: peca"));
+  assert.ok(r.ok && niveis(r, "aviso").some(function (p) { return /enquadramento/.test(p.msg); }));
+});
+
+teste("grade: colunas de 184 px nas seções de 3 colunas", function () {
+  var r = montar(ler("dados/2026-09.txt"));
+  assert.ok((r.html.match(/width="184"/g) || []).length >= 9, "esperava colunas de 184 px");
+});
+
 teste("bloco desconhecido e linha sem dois-pontos viram erro com número da linha", function () {
   var r = montar(MINIMO + "\n[NUMEROS 2]\nvalor: 1\nlinha solta");
   assert.ok(!r.ok);

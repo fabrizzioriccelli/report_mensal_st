@@ -296,7 +296,9 @@
     var sx = 0, sy = 0, sw = nw, sh = nh, W, H;
     if (reg.recorte && reg.h) {
       var r = reg.w / reg.h;
-      if (nw / nh > r) { sw = Math.round(nh * r); sx = Math.round((nw - sw) / 2); } else { sh = Math.round(nw / r); sy = Math.round((nh - sh) / 2); }
+      /* Recorte no formato do espaço. "enquadramento" escolhe qual parte fica: centro, topo ou baixo. */
+      if (nw / nh > r) { sw = Math.round(nh * r); sx = Math.round((nw - sw) / 2); }
+      else { sh = Math.round(nw / r); sy = reg.ancora === "topo" ? 0 : reg.ancora === "baixo" ? nh - sh : Math.round((nh - sh) / 2); }
       W = Math.min(alvo, sw); H = Math.round(W / r);
     } else { W = Math.min(alvo, nw); H = Math.round(W * nh / nw); }
     var corta = sw !== nw || sh !== nh;

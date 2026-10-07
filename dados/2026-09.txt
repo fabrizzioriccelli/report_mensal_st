@@ -107,14 +107,16 @@ variacao:
 [LANCAMOS]
 titulo: Contexto certo, mídia mais eficiente.
 
-# Projeto em destaque. A imagem é vertical (aparece com 140 px de
-# largura) e some no celular; o "Ver peça" continua.
+# Projeto em destaque. A imagem é vertical e é recortada em 184 x 300 px
+# (some no celular; o "Ver peça" continua). enquadramento: qual parte
+# da imagem fica no recorte: centro, topo ou baixo.
 [DESTAQUE]
 categoria: Aquisição PF · Copa do Mundo
 titulo: Conversas contextualizadas dão resultado?
 texto: Conectamos o contexto da Copa do Mundo à operação de Aquisição PF e ganhamos eficiência na atração de tráfego qualificado, em topo e meio de funil.
 imagem: copa-do-mundo.jpg
 descricao_imagem: Peça da Copa do Mundo com a formiguinha e uma bola
+enquadramento: baixo
 tipo: peca
 link: [COLE O LINK DA PEÇA NO SHAREPOINT]
 nota: Comparativo entre grupos de anúncios. Etiqueta verde = resultado positivo; custo menor também é bom.

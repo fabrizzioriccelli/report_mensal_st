@@ -51,7 +51,8 @@ A automação só foi criada porque **reduz** o trabalho mensal e os erros poss�
 
 - Cada texto tem uma classe `ft` (títulos) ou `fx` (texto). Num bloco que só o Outlook para Windows lê (`<!--[if mso]>`), essas classes recebem a fonte configurada para ele.
 - O Outlook para Windows lê só a 1ª fonte da lista e cai para Times New Roman se ela não existir. Por isso ele tem uma configuração própria, com uma fonte só.
-- Os números da abertura não quebram linha (`nowrap`). Para tolerar uma fonte corporativa mais larga, as colunas foram redistribuídas (29/19/18/18%), com folga de ~15% em cada uma.
+- **Grade única:** a área de conteúdo tem 600 px, dividida em 3 colunas de 184 px com espaços de 24 px. Capa, números, destaque, lançamentos, Creative X, aprendizados e agenda usam as mesmas linhas, e as divisórias ficam no meio dos espaços. As larguras são fixas em px, que o Outlook para Windows respeita melhor que porcentagens. No celular, os espaços somem e as colunas empilham, todas na mesma margem. Entre seções, o espaço é sempre de 40 px.
+- Os números da abertura não quebram linha (`nowrap`). O número principal ocupa a coluna 1 inteira (184 px) e os demais têm folga para uma fonte corporativa mais larga (testado com uma fonte bem mais larga que a Georgia).
 
 **Limitações:**
 - No Outlook para Windows, os cantos aparecem retos e o layout é sempre o de 680 px.
@@ -169,7 +170,7 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 
 | Teste | Status |
 |---|---|
-| Motor: 20 testes automáticos (`node tests/motor.test.js`) | Passam |
+| Motor: 22 testes automáticos (`node tests/motor.test.js`) | Passam |
 | Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`) e e-mail sem vazar para o lado em 760 px e 390 px | Passa (`tests/ferramenta.e2e.js`) |
 | Fonte mais larga que a Georgia/Arial simulada (DejaVu Sans) | Nada vaza; números continuam numa linha |
 | Todas as imagens bloqueadas | Mesma altura de página; cada espaço mostra a descrição (`alt`) |

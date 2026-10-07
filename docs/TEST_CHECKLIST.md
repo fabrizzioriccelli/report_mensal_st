@@ -55,7 +55,7 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 
 | Verificação | Status |
 |---|---|
-| Motor: 20 testes automáticos | Passam |
+| Motor: 22 testes automáticos | Passam |
 | Página de geração de ponta a ponta no Chromium, sem vazar para o lado em 760 px e 390 px | Passa |
 | Fonte corporativa mais larga simulada (DejaVu Sans) e imagens bloqueadas | Layout se mantém |
 | E-mail gerado igual ao layout aprovado, em 760 px e 390 px | Conferido |
