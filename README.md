@@ -1,27 +1,40 @@
 # Report Mensal · Creative Strategy PF
 
-Template do report mensal da Creative Strategy PF (Marketing PF), construído como um e-mail HTML de uma única página e distribuído pelo Outlook em formato `.eml`.
+Template do report mensal da Creative Strategy PF (Marketing PF), construído como uma newsletter executiva em HTML de uma única página, distribuída pelo Outlook em formato `.eml`.
 
 ## Prévia do report
 
-<img src="docs/preview-2026-09.jpg" width="320" alt="Prévia do report de setembro de 2026">
+<img src="docs/preview-2026-09.jpg" width="340" alt="Prévia do report de setembro de 2026">
 
 - **[Report de setembro 2026](reports/2026-09.html)**: arquivo editável do mês.
 - **[Exemplo de .eml](examples/report-2026-09.eml)**: mensagem pronta para abrir no Outlook, gerada pela ferramenta do projeto.
+- **[Modelo em branco](template/report-template.html)**: a mesma estrutura, só com placeholders.
 
-O report apresenta, em uma leitura curta e executiva, a visão geral do mês, os resultados, o Creative X, os destaques, as peças e vídeos, os aprendizados e os próximos passos, mantendo a identidade da área: vermelho, seções numeradas e a formiguinha, que ganha uma versão temática para cada projeto.
+## A história do report
+
+O report é lido de cima para baixo como uma narrativa curta. **Cada projeto aparece uma vez só**, com contexto, resultado e peça juntos:
+
+| | Seção | Pergunta que responde |
+|---|---|---|
+| 01 | **O mês em uma frase** | Qual foi o mês? A frase do mês e o projeto principal, com a peça e os números |
+| 02 | **O que lançamos** | O que mais foi para o ar? 1 projeto em destaque com resultados + projetos compactos |
+| 03 | **Creative X** | Como está a qualidade criativa? Score anterior → atual, em 3 segundos |
+| 04 | **Creative Transformation** | O que estamos mudando na forma de criar? Projetos de IA e inovação |
+| 05 | **O que aprendemos** | O que levamos do mês? Até 3 aprendizados com a ação |
+| 06 | **Foco do próximo mês** | O que vem agora? A prioridade, em destaque |
+| 07 | **Também vem aí** | O que está na agenda? Datas e projetos |
+
+Os números, textos e imagens de setembro vêm do esboço original da área; as peças são recortes do esboço, em resolução baixa, e devem ser trocadas pelos arquivos originais. O que ainda não existe (score anterior do Creative X, aprendizados, foco, links dos vídeos, datas) aparece como placeholder identificado entre colchetes. Nenhum número foi inventado; as duas variações calculadas (`2,5x` e `+81%`) saem dos próprios números do esboço.
 
 ## Por que este projeto existe
 
-O report da área era montado em formato de slide. O desafio foi transformá-lo em uma experiência única, vertical e legível no canal em que ele é realmente lido: o Outlook. A solução precisava:
+O report da área era montado em formato de slide. O desafio foi transformá-lo em uma leitura única, vertical e editorial no canal em que ele é realmente lido: o Outlook. A solução precisava:
 
-- caber em uma página contínua, sem abas, menus ou várias telas;
+- caber em uma página contínua e curta, sem abas, menus ou repetição de informação;
 - abrir da mesma forma no Outlook para Windows, no novo Outlook, no Outlook na Web e no celular;
 - funcionar sem JavaScript, já que nenhum cliente de e-mail executa scripts;
-- ser atualizada todo mês por uma pessoa com conhecimento básico de HTML;
-- reservar espaços para peças, imagens e vídeos do mês.
-
-Os números, textos e imagens de setembro vêm do esboço original da área; as imagens das peças são recortes do esboço, em baixa resolução, e devem ser trocadas pelos arquivos originais. Informações que ainda não existem (score anterior do Creative X, aprendizados, links e acessos dos vídeos, datas dos próximos projetos) aparecem como placeholders identificados.
+- ser atualizada todo mês por uma pessoa com conhecimento básico de HTML, só com Bloco de Notas e navegador;
+- reservar espaços para peças, imagens e vídeos de cada projeto.
 
 ## Base técnica
 
@@ -29,30 +42,39 @@ Os números, textos e imagens de setembro vêm do esboço original da área; as 
 
 O report está em `reports/AAAA-MM.html`, um arquivo por mês. O layout usa tabelas e estilos inline, porque o Outlook para Windows desenha e-mails com o motor do Word e ignora CSS moderno como flexbox, grid e `position`.
 
-Todo o conteúdo fica escrito diretamente no HTML. Comentários `EDITAR AQUI` marcam cada ponto que muda no mês, numerados de 01 a 11:
+Todo o conteúdo fica escrito diretamente no HTML. Comentários `EDITAR AQUI` marcam cada ponto que muda no mês, numerados de 01 a 12:
 
 ```text
-01 MÊS · 02 TÍTULO · 03 RESUMO · 04 MÉTRICAS · 05 CREATIVE X · 06 SCORES
-07 IMAGENS · 08 VÍDEOS · 09 APRENDIZADOS · 10 LINKS · 11 FORMIGUINHA
+01 MÊS · 02 FRASE DO MÊS · 03 PROJETO PRINCIPAL · 04 O QUE LANÇAMOS
+05 CREATIVE X · 06 TRANSFORMATION · 07 IMAGENS · 08 VÍDEOS E LINKS
+09 APRENDIZADOS · 10 FOCO · 11 AGENDA · 12 FORMIGUINHA
 ```
 
-Blocos que se repetem (case, destaque, conteúdo secundário, projeto em destaque) são delimitados por `INÍCIO BLOCO` e `FIM BLOCO` e podem ser duplicados ou removidos inteiros.
+Blocos que se repetem (projeto em destaque, projeto compacto, projeto de Transformation) são delimitados por `INÍCIO BLOCO` e `FIM BLOCO` e podem ser duplicados ou removidos inteiros.
 
 ### Sistema visual
 
 | Elemento | Regra |
 |---|---|
-| Cantos | 6 px miniaturas · 12 px cartões e imagens · 16 px blocos grandes · etiquetas em pílula |
-| Vermelho `#9E1218` | Marca, números principais e numeração das seções |
-| Verde | Resultado positivo, só em etiquetas (`▲ +89%`, e `▼ −12%` quando cair é bom) |
+| Tipografia | Georgia para frase do mês, títulos e números; Arial para rótulos e texto. As duas existem em qualquer computador |
+| Hierarquia | rótulo (10 px, caixa alta) → título (Georgia) → número → etiqueta de variação → texto → legenda |
+| Cantos | 8 px miniaturas · 14 px imagens e cartões · 20 px blocos grandes · pílula nas etiquetas |
+| Vermelho `#9E1218` | Marca, numeração das seções, número principal e o bloco do Foco |
+| Verde | Resultado positivo (`▲ +89%`, e `▼ −12%` quando cair é bom) e "implementado" |
 | Âmbar | Previsto, pendente ou atenção |
-| Grafite | Assinatura exclusiva do Creative X |
+| Grafite | Assinatura do Creative X (filetes e score, sem caixa pesada) |
+| Petróleo | Assinatura do Creative Transformation |
+| Creme | Superfície da abertura |
 
-No Outlook para Windows os cantos aparecem retos; o layout continua o mesmo.
+No Outlook para Windows os cantos aparecem retos; o layout e as cores continuam os mesmos.
 
 ### Formiguinha
 
-A personagem tem uma versão base e variações temáticas (viagem, música, proteção, futebol, conversa, creator, cartão, prancheta e lupa). Cada projeto do report usa a sua. As versões estão em `assets/formiguinha/`, com o catálogo e as regras em [assets/formiguinha/README.md](assets/formiguinha/README.md).
+A personagem da área tem uma versão base e variações com **um** elemento cada: proteção (seguros), viagem (Milheiros), música (S Music), tecnologia (Creative Transformation) e foco. Ela aparece no máximo 3 vezes por edição, em pontos fixos: no projeto principal, no Creative Transformation e no Foco do próximo mês.
+
+<img src="docs/formiguinha-catalogo.png" width="720" alt="As 6 versões da formiguinha">
+
+As versões estão em `assets/formiguinha/`, com as regras de uso e de criação em [assets/formiguinha/README.md](assets/formiguinha/README.md).
 
 ### Ferramenta de .eml
 
@@ -67,7 +89,7 @@ As imagens vão dentro do e-mail porque imagens hospedadas no SharePoint não ap
 
 ### Vídeos
 
-Nenhuma versão do Outlook reproduz vídeo dentro do e-mail. O report usa miniatura, título, acessos, duração e um botão **ASSISTIR**, que abre o vídeo no Microsoft Stream.
+Nenhuma versão do Outlook reproduz vídeo dentro do e-mail. O vídeo entra no projeto a que pertence, como miniatura clicável e um link **▶ Assistir**, que abre o Microsoft Stream.
 
 ## Estrutura do repositório
 
@@ -78,9 +100,9 @@ report_mensal_st/
 ├── template/
 │   └── report-template.html      # modelo em branco, só com placeholders
 ├── assets/                       # imagens usadas pelos reports
-│   ├── formiguinha/              # personagem: versão base + variações por projeto
+│   ├── formiguinha/              # personagem: base + 5 variações (PNG)
 │   │   └── svg/                  # fonte vetorial de cada versão
-│   ├── icones/                   # ícones em vetor, exportados em PNG
+│   ├── icones/                   # ícones do Creative Transformation
 │   └── 2026-09/                  # peças e miniaturas do mês
 ├── tools/
 │   └── gerar-eml.html            # conferência e geração do .eml
@@ -91,7 +113,7 @@ report_mensal_st/
     ├── HOW_TO_EXPORT_EML.md      # o que é o .eml, como gerar e enviar
     ├── OUTLOOK_COMPATIBILITY.md  # o que funciona e o que evitar
     ├── TEST_CHECKLIST.md         # checklist antes de cada envio
-    ├── ANALISE_E_DECISOES.md     # análise do esboço, auditoria e decisões de UX/UI
+    ├── ANALISE_E_DECISOES.md     # análise, auditorias e decisões de UX/UI
     ├── apresentacao-report-mensal.pptx / .pdf  # apresentação das mudanças
     ├── formiguinha-catalogo.png  # as versões da formiguinha
     └── preview-2026-09.jpg       # prévia usada neste README
@@ -112,7 +134,7 @@ Abra `reports/2026-09.html` no navegador. A página mostra o e-mail como ele ser
 3. Pesquise `EDITAR AQUI` e atualize textos, números, imagens e links.
 4. Revise no navegador.
 
-O passo a passo completo, com exemplos de troca de imagem, vídeo, Creative X e aprendizados, está em [docs/HOW_TO_EDIT.md](docs/HOW_TO_EDIT.md).
+O passo a passo completo, com exemplos de etiquetas, imagens, Creative X, Transformation e formiguinha, está em [docs/HOW_TO_EDIT.md](docs/HOW_TO_EDIT.md).
 
 ### Gerar e enviar o .eml
 
@@ -130,7 +152,7 @@ Detalhes, alternativas para o novo Outlook e soluções de problemas: [docs/HOW_
 - No celular, as colunas empilham onde o cliente aceita CSS de tela pequena. No Outlook para Windows, o layout é sempre o de 680 px.
 - O HTML foi verificado no Chromium (computador e celular) e a estrutura do `.eml` foi validada, mas o envio ainda não foi testado em um Outlook real. Antes do primeiro envio, siga o [checklist de testes](docs/TEST_CHECKLIST.md).
 - No novo Outlook e no Outlook para Mac, o `.eml` pode abrir como mensagem recebida; nesse caso, use **Encaminhar**.
-- As imagens das peças de setembro foram recortadas do esboço e continuam em resolução baixa. Substitua pelos arquivos originais mantendo os mesmos nomes.
+- As peças de setembro foram recortadas do esboço e continuam em resolução baixa. Substitua pelos arquivos originais mantendo os mesmos nomes.
 - A formiguinha foi redesenhada em vetor a partir da imagem de referência. É uma releitura em ilustração, não o arquivo original de marca.
 
 A análise por recurso (imagens, fundos, fontes, GIF, SVG, vídeo, modo escuro) está em [docs/OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md).
@@ -140,8 +162,8 @@ A análise por recurso (imagens, fundos, fontes, GIF, SVG, vídeo, modo escuro) 
 O projeto utiliza GitHub para versionamento. Cada mês entra como um commit próprio, mantendo separados os reports, os assets, a ferramenta e a documentação:
 
 ```text
-report: setembro 2026
-assets: peças de setembro 2026
+report: outubro 2026
+assets: peças de outubro 2026
 docs: atualizar guia de edição
 tools: ajustar conferência do .eml
 ```

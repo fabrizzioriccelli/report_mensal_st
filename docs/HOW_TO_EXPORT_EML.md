@@ -22,9 +22,9 @@ Content-Transfer-Encoding: base64
 (o HTML do report, sem os comentários de edição)
 
 --boundary
-Content-Type: image/jpeg; name="img01-formiga.jpg"
-Content-ID: <img01-formiga.jpg@report>
-Content-Disposition: inline; filename="img01-formiga.jpg"
+Content-Type: image/jpeg; name="img01-visual-principal.jpg"
+Content-ID: <img01-visual-principal.jpg@report>
+Content-Disposition: inline; filename="img01-visual-principal.jpg"
 (a imagem)
 
 --boundary--
@@ -98,7 +98,7 @@ O Outlook não tem campo para colar código HTML. Copiar a página aberta no nav
 
 [`examples/report-2026-09.eml`](../examples/report-2026-09.eml) foi gerado pela ferramenta a partir de `reports/2026-09.html`. A estrutura foi validada com um leitor de e-mail padrão (Python `email`):
 
-- 1 parte HTML (UTF-8) + 17 imagens inline: 5 JPG e 12 PNG (cerca de 280 KB no total);
+- 1 parte HTML (UTF-8) + 10 imagens inline: 5 JPG (peças) e 5 PNG (3 formiguinhas e 2 ícones), cerca de 216 KB no total;
 - todas as referências `cid:` do HTML têm a imagem correspondente, e nenhuma imagem sobra;
 - nenhum comentário de edição e nenhum caminho local no HTML final.
 

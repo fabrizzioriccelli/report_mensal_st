@@ -2,6 +2,8 @@
 
 Este documento explica como o esboço do report (formato de slide, setembro 2026) virou um template de e-mail de uma página, e por quê.
 
+Ele registra as rodadas em ordem. **A estrutura atual é a da seção 8** (reestruturação editorial); as seções 3, 4 e 7 descrevem versões anteriores e ficam como histórico das decisões.
+
 ## 1. O que o esboço tem de bom
 
 | Elemento | Por que funciona | O que foi mantido |
@@ -26,7 +28,7 @@ Este documento explica como o esboço do report (formato de slide, setembro 2026
 | Peças e vídeos como imagens soltas | Vídeo não toca em e-mail; leitor não sabe que pode clicar | Seção **Peças e vídeos em destaque** com miniatura, acessos e botão ASSISTIR |
 | Linha do tempo horizontal com 6 colunas | Ilegível no celular | Lista vertical "Vem aí", uma linha por item |
 
-## 3. Arquitetura da informação
+## 3. Arquitetura da informação (1ª versão)
 
 A ordem responde às perguntas que o leitor faz, nesta sequência:
 
@@ -67,17 +69,20 @@ Quem lê só a visão geral já sabe como foi o mês. Quem lê até 02 sabe os n
 
 ## 6. Conteúdo de setembro
 
-O report de setembro usa **somente** os números, títulos, textos e imagens que estão no esboço. As imagens são recortes do esboço, em baixa resolução; o visual central da visão geral é uma composição das duas peças dos cases. Ficaram como placeholder, por não existirem no esboço:
+O report de setembro usa **somente** os números, títulos, textos e imagens que estão no esboço. As imagens são recortes do esboço, em baixa resolução; a peça do projeto principal é o recorte da peça de Seguro, sobre fundo vermelho. Ficaram como placeholder, por não existirem no esboço:
 
-- score CreativeX do período anterior e a variação;
+- score Creative X do período anterior e a variação;
+- o que o score significa;
+- resultado (indicador) do Briefing Agent e Creative Checker e o segundo projeto de Transformation;
 - aprendizados e foco do próximo mês;
-- acessos, duração e links dos vídeos;
-- o segundo vídeo e a peça em destaque da seção 04;
-- datas marcadas como `[dd/mm]` e as datas e descrições de Milheiros e S Music (projetos do próximo mês informados pela área).
+- link do vídeo Creator em Reneg e contato do time;
+- datas marcadas como `[dd/mm]` e o detalhe da Black Friday.
+
+Milheiros e S Music (projetos de outubro informados pela área) saíram do report de setembro: sem data, peça nem resultado, viravam cartões soltos no fim. As versões da formiguinha para eles (viagem e música) estão prontas para o report de outubro.
 
 As etiquetas **2,5x** (produção) e **+81%** (ticket médio) não estão escritas no esboço: foram calculadas a partir dos números dele (262 → 651,9 e R$ 16 → R$ 29). As demais variações (+89%, −12%, −29%, 3,6x, 3,0x) são do esboço.
 
-A manchete ("Escala e eficiência no mesmo mês.") e a síntese da visão geral resumem textos do próprio esboço ("ampliação de volume e valor", "ganhos de eficiência"). Valide com a área antes do envio.
+A frase do mês ("Escala e eficiência no mesmo mês.") e o título de "O que lançamos" ("Contexto certo, mídia mais eficiente.") resumem textos do próprio esboço ("ampliação de volume e valor", "ganhos de eficiência"). Valide com a área antes do envio.
 
 ## 7. Rodada de refinamento (versão aprovada → versão executiva)
 
@@ -122,3 +127,67 @@ Nenhuma informação do esboço saiu do report: o que foi removido era repetiç�
 ### Formiguinha como sistema
 
 A personagem foi redesenhada em vetor a partir da imagem de referência (boneco de madeira articulado, luvas, botas e pontas das antenas em vermelho). Existe uma versão base e variações que mudam só pose e um acessório, uma por universo de projeto. Ela aparece onde identifica um projeto: no cabeçalho (base), em cada case, no Creative X, em cada destaque e nos projetos do próximo mês, sempre dentro de um componente existente, sem criar seção nova. Regras e catálogo em `assets/formiguinha/README.md`.
+
+## 8. Reestruturação editorial (versão executiva → newsletter editorial)
+
+Feedback: mesmo mais curto, o report ainda parecia **template cru**, com projetos repetidos em várias seções (o mesmo case aparecia nos números, nos resultados e nos destaques), Creative X pesado, uma seção de "peças e vídeos" desconectada dos projetos, cartões soltos de Milheiros e S Music no fim e uma formiguinha fina, sem volume, com um joinha que podia ser lido como gesto ofensivo.
+
+A rodada repensou a arquitetura e a narrativa, não só o acabamento.
+
+### Auditoria da versão anterior
+
+| Elemento | Problema | Decisão |
+|---|---|---|
+| Visão geral + Resultados do mês | O mesmo projeto aparecia nos 4 números e de novo no cartão do case | **01 O mês em uma frase**: a frase do mês + o projeto principal com a peça e os números dele. Ele não volta depois |
+| Resultados + Destaques do mês | Projetos divididos entre "resultado" e "destaque" sem critério claro | **02 O que lançamos**: 1 projeto em destaque (peça + contexto + 3 resultados) e projetos compactos. Cada projeto aparece uma vez |
+| Peças e vídeos (seção isolada) | Peças sem o contexto do projeto | **Removida.** Cada peça e cada vídeo vão para o projeto a que pertencem |
+| Creative X em caixa grafite | Bloco escuro e pesado para uma informação secundária | Faixa entre dois filetes, sem caixa: anterior → **atual** grande → variação, uma barra e uma frase (−42% de altura) |
+| Briefing Agent e Creative Checker | Perdidos entre os destaques | **04 Creative Transformation**, frente própria com superfície petróleo, status, evidência e resultado |
+| Aprendizados em cartões | Caixas iguais, peso visual alto | 3 colunas sem caixa, numeral grande em Georgia, "→ Levamos" |
+| Foco do mês dentro de "Próximos passos" | A conclusão do report não tinha destaque | **06 Foco do próximo mês**: bloco vermelho, a única área de cor cheia do report, com a formiguinha em pé sobre ele |
+| Milheiros e S Music no fim | Cartões sem data, peça nem resultado | Removidos de setembro; entram em outubro com a sua formiguinha |
+| Formiguinha em 10+ lugares | Virou decoração | 3 aparições fixas (projeto principal, Transformation, Foco) |
+
+### Narrativa
+
+| | Seção | Pergunta |
+|---|---|---|
+| 01 | O mês em uma frase | Qual foi o mês? |
+| 02 | O que lançamos | O que mais foi para o ar e como foi? |
+| 03 | Creative X | Como está a qualidade criativa? |
+| 04 | Creative Transformation | O que estamos mudando na forma de criar? |
+| 05 | O que aprendemos | O que levamos do mês? |
+| 06 | Foco do próximo mês | O que vem agora? |
+| 07 | Também vem aí | O que está na agenda? |
+
+Quem lê só a abertura sabe o mês. Quem lê até 02 sabe o que foi entregue. Quem chega ao 06 sabe a prioridade.
+
+### Resultado
+
+| Medida (desktop, 760 px) | 1ª versão | Versão executiva | Editorial (atual) |
+|---|---|---|---|
+| Altura total | 4.541 px | 2.997 px | **2.813 px** |
+| Abertura (frase + projeto principal) | — | — | ~440 px |
+| O que lançamos | — | — | ~670 px (absorve resultados, destaques e peças) |
+| Creative X | 429 px | 363 px | **~210 px** |
+| Creative Transformation | — | — | ~510 px |
+| Aprendizados | — | — | ~310 px |
+| Foco + agenda | — | — | ~520 px |
+
+Com mais conteúdo (uma frente nova, Creative Transformation), o report ficou ~6% mais curto que a versão executiva e 38% mais curto que a primeira.
+
+### Sistema visual
+
+- **Tipografia editorial:** Georgia para a frase do mês, títulos e números; Arial para rótulos e texto. Hierarquia: rótulo (10 px, caixa alta, espaçado) → título (Georgia 21 a 38 px) → número (Georgia 28 a 54 px) → etiqueta → texto (12 a 13 px) → legenda (10 a 11 px).
+- **Cabeçalho de publicação:** nome em Georgia, edição em caixa alta e filete duplo, como uma newsletter.
+- **Cor com função:** vermelho = marca e conclusão (Foco); verde = positivo; âmbar = previsto/atenção; grafite = Creative X; petróleo = Creative Transformation; creme = superfície da abertura. O resto é branco e neutro.
+- **Superfícies em vez de cartões:** creme na abertura, petróleo claro no Transformation, vermelho no Foco. O resto usa filetes e espaço, não caixas.
+- **Cantos:** 8 / 14 / 20 px e pílula. No Outlook para Windows aparecem retos, sem mudar o layout.
+
+### Formiguinha
+
+Redesenhada do zero a partir da imagem de referência:
+
+- **volume:** gradientes em cada peça de madeira (luz no alto à esquerda), juntas esféricas, veios na cabeça, brilho nos olhos e sombra no chão;
+- **mãos:** o joinha virou um punho fechado e largo, com o polegar curto e curvo para cima, conferido em tamanho real; a outra mão fica na cintura, como na referência;
+- **sistema:** uma base e 5 variações, cada uma com **um** elemento (escudo, mala, fones, tablet, alvo). Biblioteca em `assets/formiguinha/`, com SVG de origem e regras de uso.

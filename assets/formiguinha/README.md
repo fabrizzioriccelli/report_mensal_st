@@ -1,46 +1,64 @@
-# Formiguinha · sistema de personagem
+# Formiguinha · biblioteca da personagem
 
-A formiguinha é a personagem da Creative Strategy PF. Ela acompanha os projetos do report: existe uma **versão base** e **variações temáticas** da mesma personagem.
+A formiguinha é a personagem da Creative Strategy PF: um boneco de madeira articulado, com luvas, botas e pontas das antenas em vermelho. No report ela aparece **poucas vezes e em pontos estratégicos**, integrada à composição. Ela não decora a página.
 
-<img src="../../docs/formiguinha-catalogo.png" width="600" alt="As 10 versões da formiguinha">
+<img src="../../docs/formiguinha-catalogo.png" width="720" alt="As 6 versões da formiguinha">
+
+## As versões
+
+| Arquivo | Elemento | Use para | Onde aparece hoje |
+|---|---|---|---|
+| `formiga-base.png` | joinha + mão na cintura (pose da referência) | uso geral; projeto sem versão própria | modelo em branco |
+| `formiga-protecao.png` | escudo com check | seguros, proteção | 01 · projeto principal de setembro (Seguro) |
+| `formiga-viagem.png` | mala de rodinhas | viagem, milhas (**Milheiros**) | pronta para outubro |
+| `formiga-musica.png` | fones de ouvido + nota | música (**S Music**) | pronta para outubro |
+| `formiga-transformacao.png` | tablet com brilho | IA, tecnologia, inovação | 04 · Creative Transformation (fixa) |
+| `formiga-foco.png` | alvo | prioridade, meta | 06 · Foco do próximo mês (fixa) |
+
+**Regra de uso no report:** no máximo 3 aparições por edição.
+
+1. Projeto principal (abertura): a versão do tema do projeto.
+2. Creative Transformation: sempre `formiga-transformacao`.
+3. Foco do próximo mês: sempre `formiga-foco`.
+
+Os projetos de "O que lançamos" **não** levam formiguinha. Cada projeto já tem a sua peça, e a personagem repetida em todos os cartões vira ruído.
 
 ## O que nunca muda
 
-Todas as versões foram desenhadas a partir do mesmo arquivo e mantêm:
+Todas as versões saem do mesmo desenho e mantêm:
 
-- corpo de madeira articulado, na mesma proporção (cabeça grande, tronco e quadril segmentados);
-- olhos grandes castanhos com cílios, nariz pequeno e sorriso aberto;
-- antenas de madeira com pontas vermelhas;
-- luvas e botas vermelhas;
-- paleta: madeira dourada, vermelho da marca e grafite.
+- corpo de madeira dourada articulado, com volume, luz no alto à esquerda e sombra no chão;
+- cabeça grande, olhos castanhos grandes com cílios, sobrancelhas, nariz pequeno e sorriso aberto;
+- antenas com pontas vermelhas, luvas e botas vermelhas;
+- mão do joinha desenhada como **punho fechado com o polegar para cima**: nunca dedo esticado isolado, para não ser lida como gesto ofensivo.
 
-## O que muda por projeto
+## O que muda em cada versão
 
-Só **pose e um acessório**, sempre com poucos elementos:
-
-| Arquivo | Acessório | Universo |
-|---|---|---|
-| `formiga-base.png` | joinha (pose da referência) | abertura, uso geral |
-| `formiga-viagem.png` | mala de rodinhas + aviãozinho de papel | viagem, milhas (Milheiros) |
-| `formiga-musica.png` | fones de ouvido + nota musical | música (S Music) |
-| `formiga-protecao.png` | escudo com check | seguros, proteção |
-| `formiga-futebol.png` | bola de futebol | esporte (Copa do Mundo) |
-| `formiga-conversa.png` | balão de conversa | mídia conversacional, IA |
-| `formiga-creator.png` | celular gravando | creators, vídeo |
-| `formiga-cartao.png` | cartão | cartões, pagamentos |
-| `formiga-prancheta.png` | prancheta com check | processos, briefing |
-| `formiga-lupa.png` | lupa | Creative X, análise |
+Só **uma** coisa: a pose de um braço e **um** elemento ligado ao tema. Nada de cenário, roupa ou texto.
 
 ## Arquivos
 
-- `*.png`: usados no e-mail. Fundo transparente, 160 px de largura (nítidos até 80 px na tela), ~8 KB cada.
-- `svg/*.svg`: fonte vetorial de cada versão, para um designer ajustar ou criar novas variações.
+- `*.png`: usados no e-mail. Fundo transparente, 240 x 336 px, ~15 KB cada. Nítidos até ~120 px na tela; no report aparecem entre 74 e 86 px.
+- `svg/*.svg`: fonte vetorial de cada versão, para um designer ajustar ou criar variações novas. Não use SVG no e-mail: o Outlook para Windows não mostra.
+
+## Como trocar a versão no report
+
+Pesquise `12 FORMIGUINHA` e troque só o nome do arquivo:
+
+```html
+<img src="../assets/formiguinha/formiga-viagem.png" width="86" alt="Formiguinha com uma mala de viagem" ...>
+```
+
+Atualize também o `alt` (o texto que aparece com imagens bloqueadas).
 
 ## Como criar uma variação nova
 
-1. Parta do `svg/formiga-base.svg` (ou da variação mais parecida).
-2. Mude só a pose de um braço e acrescente **um** acessório ligado ao projeto, em vermelho, grafite ou branco.
-3. Exporte em PNG transparente, 160 px de largura, e salve como `formiga-<tema>.png` (tema, não nome de campanha: `formiga-viagem`, não `formiga-milheiros`, para reaproveitar em outros meses).
-4. Atualize a tabela acima e a tabela do passo 8 de `docs/HOW_TO_EDIT.md`.
+1. Parta de `svg/formiga-base.svg`.
+2. Mude a pose de **um** braço e acrescente **um** elemento do tema, em vermelho, grafite, branco ou petróleo.
+3. Confira a mão em tamanho real (80 px): o gesto precisa ser lido sem ambiguidade.
+4. Exporte em PNG transparente, 240 px de largura, e salve como `formiga-<tema>.png`. Use o tema, não o nome da campanha (`formiga-viagem`, não `formiga-milheiros`), para reaproveitar em outros meses.
+5. Acrescente a versão na tabela acima e no passo 10 de [docs/HOW_TO_EDIT.md](../../docs/HOW_TO_EDIT.md).
 
-As versões atuais foram desenhadas em vetor a partir da imagem de referência da formiguinha. É uma releitura em ilustração plana com volume, não o arquivo 3D original. Se a área tiver o arquivo original de marca, as variações podem ser refeitas a partir dele, mantendo os mesmos nomes de arquivo.
+## Origem
+
+As versões foram desenhadas em vetor a partir da imagem de referência da formiguinha (boneco 3D de madeira). São uma releitura em ilustração, com gradientes e sombras para dar volume, e não o arquivo original de marca. Se a área tiver o arquivo original, as variações podem ser refeitas a partir dele mantendo os mesmos nomes de arquivo; o report não precisa mudar.
