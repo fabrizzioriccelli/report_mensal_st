@@ -3,16 +3,21 @@
 Thumbs.db
 desktop.ini
 
-# Editores
+# Editores (PyCharm, VS Code)
+.idea/
 .vscode/
 *.swp
 
-# .eml gerados no dia a dia (o exemplo versionado fica em examples/)
-*.eml
-!examples/*.eml
-
 # Arquivos temporários do Office
 ~$*
+
+# .eml gerados no dia a dia
+*.eml
+
+# Fotografias do banco de imagens (licença de uso do banco, não do GitHub pessoal).
+# Ficam só no computador ou no repositório corporativo. Veja assets/fotos/README.md.
+assets/fotos/*
+!assets/fotos/README.md
 
 # Saídas de teste e dependências técnicas (opcionais)
 tests/saida/

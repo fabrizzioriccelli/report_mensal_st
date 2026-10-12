@@ -1,7 +1,8 @@
 /*
  * Teste de ponta a ponta da página gerar-report.html (uso técnico, opcional).
  * Abre a página num navegador de verdade, escolhe a pasta do projeto, lê a
- * conferência e baixa o .eml e o .html, como uma pessoa faria.
+ * conferência e baixa o .eml e o .html, como uma pessoa faria. Sem nenhum mês
+ * em dados/, ela usa o MODELO (estado vazio): serve também de teste do template sem dados.
  *   Requer Node.js + Playwright:  node tests/ferramenta.e2e.js [pasta-de-saida]
  */
 "use strict";
@@ -14,6 +15,7 @@ var RAIZ = path.join(__dirname, ".."), SAIDA = path.resolve(process.argv[2] || p
   var page = await browser.newPage({ acceptDownloads: true, viewport: { width: 1200, height: 900 } });
   var erros = [];
   page.on("pageerror", function (e) { erros.push(e.message); });
+  page.on("console", function (m) { if (m.type() === "error") erros.push("console: " + m.text()); });
   await page.goto("file://" + path.join(RAIZ, "gerar-report.html"));
   await page.setInputFiles("#pasta", RAIZ);
   await page.waitForSelector("#secConf:not([hidden])", { timeout: 20000 });
@@ -31,9 +33,9 @@ var RAIZ = path.join(__dirname, ".."), SAIDA = path.resolve(process.argv[2] || p
   await d[0].saveAs(path.join(SAIDA, d[0].suggestedFilename()));
   console.log("HTML:", d[0].suggestedFilename());
   await page.screenshot({ path: path.join(SAIDA, "ferramenta.png"), fullPage: true });
-  /* O e-mail gerado não pode vazar para o lado: nem no computador (760 px) nem no celular (390 px). */
+  /* O e-mail gerado não pode vazar para o lado: computador, notebook, tablet e celulares (grande, médio, pequeno). */
   var arquivoHtml = path.join(SAIDA, d[0].suggestedFilename());
-  for (var largura of [760, 390]) {
+  for (var largura of [1440, 1024, 768, 430, 390, 360, 320]) {
     var p2 = await browser.newPage({ viewport: { width: largura, height: 900 } });
     await p2.goto("file://" + arquivoHtml);
     var sw = await p2.evaluate(function () { return document.documentElement.scrollWidth; });

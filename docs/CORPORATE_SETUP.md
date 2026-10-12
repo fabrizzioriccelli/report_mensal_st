@@ -1,6 +1,6 @@
 # Primeiro uso no banco
 
-Configuração feita **uma vez**, no ambiente corporativo, antes do primeiro envio real. Depois disso, o mês a mês segue o [guia de atualização](HOW_TO_EDIT.md).
+Configuração feita **uma vez**, no ambiente corporativo, antes do primeiro envio real. Depois disso, o mês a mês segue o [guia de atualização](COMO_ATUALIZAR_O_MES.md).
 
 Os itens marcados com **VALIDAR COM TI** dependem de políticas internas que este projeto não conhece. Não presuma a resposta: pergunte.
 
@@ -13,32 +13,30 @@ Os itens marcados com **VALIDAR COM TI** dependem de políticas internas que est
 
 **Atenção à política de segurança:**
 - **E-mail de fora para dentro:** muitos bancos bloqueiam anexos `.zip` ou arquivos `.html` e `.js`, que fazem parte do projeto. Não tente contornar o bloqueio (renomear extensão, compactar com senha etc.). Pergunte à TI qual é o caminho aprovado: OneDrive corporativo, Teams, um repositório interno ou a própria TI copiar.
-- **Dados internos:** os dados reais do banco (números, peças, vídeos) devem ficar **só** no ambiente corporativo: na máquina do trabalho e no SharePoint. Não leve esses dados para o computador pessoal, para o GitHub pessoal nem para ferramentas externas. O repositório guarda só o modelo e o exemplo de setembro.
+- **Dados internos:** os dados reais do banco (números, peças, vídeos) devem ficar **só** no ambiente corporativo: na máquina do trabalho e no SharePoint. Não leve esses dados para o computador pessoal, para o GitHub pessoal nem para ferramentas externas. O repositório guarda só o modelo em branco.
 
-**VALIDAR COM TI:** como trazer o projeto (código-fonte e ferramenta HTML local) para a máquina corporativa, e se é permitido abrir um arquivo `.html` local no Edge.
+**Caminho indicado pela TI:** criar o repositório no ambiente corporativo e levar para lá **só os arquivos atuais** (sem o histórico do repositório pessoal). Depois, editar e versionar por lá, com o PyCharm ([GUIA_PYCHARM.md](GUIA_PYCHARM.md)).
 
-## 1. Logo do Santander
+**VALIDAR COM TI:** o passo a passo do repositório corporativo e se é permitido abrir um arquivo `.html` local no Edge.
 
-O logo já está no projeto: `assets/marca/logo-santander-branco.png`, gerado a partir do arquivo vetorial oficial. Ele aparece em branco, no topo da capa vermelha.
+## 1. Chama do Santander
 
-- Para trocar, salve o novo PNG (versão branca, fundo transparente) em `assets/marca/` com o mesmo nome. Ou ajuste o nome e a largura em `config/marca.txt`, bloco `[LOGO]`.
-- **VALIDAR COM MARCA:** se a versão branca sobre o vermelho, o tamanho (104 px) e o espaço ao redor seguem o manual da marca.
+A chama (só o símbolo) já está no projeto: `assets/marca/chama-santander-branca.png`, tirada do arquivo vetorial oficial. Ela aparece em branco na capa e no rodapé, sobre o vermelho. Regras e paleta: [assets/marca/README.md](../assets/marca/README.md).
 
-## 2. Fonte oficial
+- Para trocar, salve o novo PNG (versão branca, fundo transparente) em `assets/marca/` com o mesmo nome, ou ajuste o nome e a largura em `config/marca.txt`, bloco `[LOGO]`.
+- **VALIDAR COM MARCA:** uso do símbolo no cabeçalho de um e-mail interno, tamanho (32 px) e espaço ao redor.
 
-1. Pergunte a Marca/TI o **nome exato** da fonte oficial instalada nos computadores (o nome que aparece na lista de fontes do Word).
-2. Abra `config/marca.txt` no Bloco de Notas e procure **EDITAR AQUI — FONTE OFICIAL DO BANCO**.
-3. Coloque o nome no começo das listas, entre aspas simples, mantendo as fontes de reserva:
-   ```text
-   titulos: 'Nome Exato da Fonte', Georgia, 'Times New Roman', serif
-   texto: 'Nome Exato da Fonte', Arial, Helvetica, sans-serif
-   ```
-4. **Outlook para Windows:** ele usa só uma fonte e troca por Times New Roman se ela não existir no computador. Só coloque a fonte oficial em `titulos_outlook_windows` e `texto_outlook_windows` se a TI confirmar que ela está instalada em **todos** os computadores que recebem o report.
-5. Gere o e-mail e confira se os **números da abertura** continuam numa linha só. Se uma fonte mais larga empurrar o layout, encurte os valores (ex.: `R$ 100 mil` em vez de `~R$ 100 mil`).
+## 2. Fontes Santander
 
-Como funciona: e-mail não carrega arquivo de fonte. O Outlook não aceita fontes baixadas (`@font-face`), então cada pessoa vê a fonte instalada no próprio aparelho. Quem não tem a oficial (celular pessoal, por exemplo) vê a fonte de reserva. O layout foi feito para aguentar essa troca.
+O report já pede as famílias do Brand Guide (Headline, Micro Text, Condensed). Falta:
 
-**VALIDAR COM TI / MARCA:** nome da fonte, se está instalada em todos os computadores e se o uso em e-mail é permitido.
+1. **Arquivos `.otf`** (para a prévia e a página do mês): copie para `assets/fonts/` e confira os nomes em `assets/fonts/fontes-santander.css` ([assets/fonts/README.md](../assets/fonts/README.md)).
+2. **Fonte instalada** (para o e-mail): pergunte à TI se as fontes Santander estão instaladas nos computadores e com qual nome exato (o nome da lista de fontes do Word). Se o nome for diferente, ajuste `config/marca.txt`, bloco `[FONTES]`.
+3. **Outlook para Windows:** ele usa uma fonte só e troca por Times New Roman se ela faltar. Só troque Arial pela fonte Santander em `titulos_outlook_windows` e `texto_outlook_windows` se a TI confirmar que ela está instalada em **todos** os computadores que recebem o report.
+
+Detalhes e alternativa (Arial, que não é a fonte oficial): [GUIA_TIPOGRAFIA.md](GUIA_TIPOGRAFIA.md).
+
+**VALIDAR COM TI / MARCA:** licença dos `.otf` para documentos internos, nome das fontes instaladas e se estão em todos os computadores.
 
 ## 3. Onde colocar os assets
 
@@ -46,6 +44,8 @@ Como funciona: e-mail não carrega arquivo de fonte. O Outlook não aceita fonte
 |---|---|---|
 | Imagens que aparecem **dentro** do e-mail (miniaturas, peça principal) | `assets/AAAA-MM/` dentro da pasta do projeto, na máquina do trabalho | A página lê daqui e embute no `.eml` |
 | Formiguinha e ícones | `assets/formiguinha/` e `assets/icones/` (já prontos) | Embutidos no `.eml` |
+| Fotos do banco de imagens | `assets/fotos/` ([README](../assets/fotos/README.md)) | Licença do banco: só no ambiente corporativo |
+| Fontes `.otf` | `assets/fonts/` | Só na prévia e na página do mês |
 | Peça em tamanho grande e vídeos (o que abre **ao clicar**) | Biblioteca do SharePoint do time, uma pasta por mês | Abre com login e permissões da empresa |
 
 Pode colocar em `assets/AAAA-MM/` a imagem original, em alta: a página reduz e recorta sozinha. A original não é alterada.
@@ -98,9 +98,9 @@ Testar só na sua conta não basta: você é dono dos arquivos e tem todos os ac
 | ✓ | Item | Computador (Outlook) | Outlook na Web (se usado) | Celular |
 |---|---|---|---|---|
 | [ ] | Layout inteiro, sem cortes e sem rolagem para o lado | | | |
-| [ ] | Fontes legíveis (sem Times New Roman inesperada) | | | |
-| [ ] | Logo do Santander aparece no topo, nítido | | | |
-| [ ] | Formiguinha aparece (3 vezes no computador) | | | |
+| [ ] | Fontes legíveis: fonte Santander ou Arial, sem Times New Roman | | | |
+| [ ] | Chama do Santander aparece no topo e no rodapé, nítida | | | |
+| [ ] | Formiguinha aparece na abertura (computador) e no rodapé | | | |
 | [ ] | Imagens e miniaturas aparecem sem clicar em "Baixar imagens" | | | |
 | [ ] | "Ver peça →" abre a peça grande | | | |
 | [ ] | Miniatura da peça também abre | | | |
@@ -121,4 +121,4 @@ No computador **e** no celular: abra o "▶ Assistir", dê play, confira o som, 
 
 ---
 
-Depois do piloto aprovado, o fluxo mensal é o do [HOW_TO_EDIT.md](HOW_TO_EDIT.md), com o [checklist antes de enviar](TEST_CHECKLIST.md).
+Depois do piloto aprovado, o fluxo mensal é o do [COMO_ATUALIZAR_O_MES.md](COMO_ATUALIZAR_O_MES.md), com o [checklist antes de enviar](TEST_CHECKLIST.md).

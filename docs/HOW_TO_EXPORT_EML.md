@@ -76,21 +76,21 @@ Content-Type: multipart/alternative
 | **O Outlook reescreve o HTML ao enviar.** Ao clicar em Enviar, o Outlook para Windows passa o corpo pelo editor do Word | Pode simplificar parte do CSS (por exemplo, regras de celular e cantos arredondados) no e-mail que os outros recebem | **Sempre confira o e-mail recebido**, não só o rascunho. Por isso o teste é "enviar para você e abrir no celular" |
 | Não edite o texto no Outlook | Qualquer edição passa pelo Word e pode desalinhar o layout | Corrija no arquivo de dados e gere de novo |
 | **Safe Links** | O Microsoft 365 pode reescrever os links para verificação | Normal. O destino continua o mesmo |
-| Tamanho | Mensagens grandes demoram e podem ser barradas | O report fica em ~200–400 KB. A página avisa acima de 3 MB. VALIDAR COM TI o limite interno |
+| Tamanho | Mensagens grandes demoram e podem ser barradas | O report fica em ~200–600 KB. A página avisa acima de 3 MB. VALIDAR COM TI o limite interno |
 | Imagens aparecem também como anexo | Alguns clientes listam imagens embutidas como anexos | O corpo continua certo |
 | Encaminhamento | O destinatário pode encaminhar | Encaminhar mantém imagens e links. Quem receber precisa ter permissão no SharePoint |
 | Destinatários externos | Links "Pessoas em [empresa]" não abrem para quem é de fora | O report é interno; não envie para fora |
 
-## Exemplo
+## O que foi verificado
 
-[`examples/report-2026-09-RASCUNHO.eml`](../examples/report-2026-09-RASCUNHO.eml) foi gerado pela página a partir de `dados/2026-09.txt`. Como setembro ainda tem pendências (aprendizados, foco, links), ele é um **rascunho**. A estrutura foi validada com um leitor de e-mail padrão (Python `email`):
+O repositório não guarda `.eml` (eles saem do ambiente do banco com dados reais). Na construção da versão 3.0, o `.eml` do modelo em branco e um `.eml` de teste com fotos e dados fictícios foram validados com um leitor de e-mail padrão (Python `email`):
 
-- texto puro + HTML (UTF-8) + 12 imagens embutidas: 5 JPG (peças) e 7 PNG (logo da capa e do rodapé, 3 formiguinhas, 2 ícones), cerca de 235 KB;
+- texto puro + HTML (UTF-8) + imagens embutidas (chama, formiguinha, ícones e fotos), de ~200 KB (modelo) a ~520 KB (11 imagens);
 - todas as referências `cid:` do HTML têm a imagem correspondente;
-- nenhum comentário interno, nenhum caminho local, nenhuma requisição externa;
-- linhas com no máximo 76 caracteres, como pede o padrão.
+- nenhum comentário interno, nenhum caminho local, nenhuma requisição externa, nenhum `@font-face`;
+- nenhuma linha com mais de 78 caracteres, como pede o padrão.
 
-Esse exemplo **não foi aberto num Outlook real** (este ambiente não tem Outlook). Faça o teste do passo 3 antes do primeiro envio.
+Esses arquivos **não foram abertos num Outlook real** (este ambiente não tem Outlook). Faça o teste do passo 3 antes do primeiro envio.
 
 ## Possíveis problemas
 

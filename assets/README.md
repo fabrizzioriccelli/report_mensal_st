@@ -1,27 +1,30 @@
 # Assets
 
-| Pasta | Conteúdo | Muda todo mês? |
-|---|---|---|
-| `AAAA-MM/` | Imagens do mês: peça do projeto principal, peça do destaque, miniaturas dos lançamentos, capas de vídeo | Sim |
-| `formiguinha/` | A personagem: base + 5 variações (PNG transparente e fonte SVG). Regras em [formiguinha/README.md](formiguinha/README.md) | Só quando surge um tema novo |
-| `icones/` | Ícones do Creative Transformation (PNG em petróleo) | Não |
-| `marca/` | Logo do Santander (versão branca usada na capa, vermelha e vetores). Regras em [marca/README.md](marca/README.md) | Não |
+| Pasta | Conteúdo | Vai para o GitHub? | Muda todo mês? |
+|---|---|---|---|
+| `AAAA-MM/` | Imagens do mês (peças, capas de vídeo) | **Não** no GitHub pessoal (material interno). Sim no repositório corporativo | Sim |
+| `fotos/` | Fotos do banco de imagens aprovado. [README](fotos/README.md) | **Não** (licença do banco) | Não |
+| `fonts/` | Arquivos `.otf` das fontes Santander e o CSS que os declara. [README](fonts/README.md) | Só o CSS e o README. Os `.otf`, só no corporativo | Não |
+| `marca/` | Chama do Santander e paleta. [README](marca/README.md) | Sim | Não |
+| `formiguinha/` | A personagem (arquivo original). [README](formiguinha/README.md) | Sim | Não |
+| `icones/` | Ícones do Creative Transformation (traço vermelho) | Sim | Não |
 
 ## Imagens do mês
 
-- Coloque a imagem **original** (JPG ou PNG). A página `gerar-report.html` reduz para o tamanho do e-mail, recorta no formato do espaço e desenha o ▶ nos vídeos. O arquivo original não é alterado.
-- Nomes simples, sem espaço nem acento, de preferência com o nome do projeto: `milheiros.jpg`, `s-music-capa.jpg`.
-- No arquivo de dados, escreva só o nome: `imagem: milheiros.jpg`.
+- Coloque a imagem **original** (JPG ou PNG) em `assets/AAAA-MM/`. A página `gerar-report.html` reduz para o tamanho do e-mail, recorta no formato do espaço e desenha o ▶ nos vídeos. O original não é alterado.
+- Nomes simples, sem espaço nem acento: `campanha-x.jpg`.
+- No arquivo de dados: `imagem: campanha-x.jpg`.
 - Capa de vídeo: uma imagem do vídeo **sem** ▶ desenhado.
 
 | Espaço no e-mail | Formato (o recorte é automático) |
 |---|---|
-| Peça do projeto principal | Quadrada (184 x 184 px na tela) |
-| Peça do projeto em destaque | Vertical, recortada em 184 x 300 px. Use `enquadramento: topo`, `centro` ou `baixo` no arquivo de dados para escolher a parte que fica |
-| Miniatura de lançamento | Faixa horizontal (~2,5 : 1). Centralize o que importa: as bordas podem ser cortadas |
+| Peça do projeto principal | Quadrado (184 × 184 na tela; 180 px no celular) |
+| Peça do projeto em destaque | Vertical 184 × 300 no computador; horizontal na largura da tela no celular |
+| Miniatura de lançamento | Faixa horizontal (~2,5 : 1) |
 | Print de Creative Transformation | Horizontal (~4 : 3) |
+
+Se a parte importante for cortada: `enquadramento: topo`, `baixo`, `esquerda`, `direita` ou `centro`.
 
 ## O que não fica aqui
 
 - **Peças em alta e vídeos** que abrem ao clicar: ficam no SharePoint/Stream do time ([docs/LINKS_SHAREPOINT_STREAM.md](../docs/LINKS_SHAREPOINT_STREAM.md)).
-- **Material interno real** não deve ir para o GitHub pessoal. Na máquina do trabalho, as pastas `assets/AAAA-MM/` ficam só no computador ou no SharePoint corporativo.

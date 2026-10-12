@@ -20,6 +20,8 @@
   else root.Motor = factory();
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
+  /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
+  var VERSAO = "3.0 (2026-10-12)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -77,7 +79,7 @@
   var ESQUEMA_DADOS = [
     { bloco: "EDICAO", obrigatorio: true, campos: { mes: 1, ano: 1, proximo_mes: 1, pasta_imagens: 1, contato: 0 } },
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
-    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0, formiguinha: 0 }, PECA) },
+    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
     { bloco: "LANCAMOS", campos: { titulo: 0 } },
     { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0 }, PECA) },
@@ -91,20 +93,20 @@
     { bloco: "AGENDA", max: 6, campos: { data: 0, titulo: 1, detalhe: 0 } }
   ];
 
-  var CORES = ["marca", "texto", "texto_corpo", "texto_apoio", "positivo", "positivo_fundo", "atencao", "atencao_fundo", "fundo_pagina", "fundo_email"];
-  var CORES_APOIO = ["capa_selo", "capa_filete", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
+  var CORES = ["marca", "titulo", "texto", "texto_corpo", "texto_apoio", "positivo", "positivo_fundo", "atencao", "atencao_fundo", "fundo_pagina", "fundo_email"];
+  var CORES_APOIO = ["capa_selo", "capa_filete", "capa_destaque", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
     "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto", "rodape_fundo",
     "placeholder_fundo", "placeholder_borda"];
   function obrig(lista) { var o = {}; lista.forEach(function (k) { o[k] = 1; }); return o; }
 
   var ESQUEMA_MARCA = [
-    { bloco: "FONTES", obrigatorio: true, campos: { titulos: 1, texto: 1, titulos_outlook_windows: 1, texto_outlook_windows: 1 } },
+    { bloco: "FONTES", obrigatorio: true, campos: { titulos: 1, texto: 1, impacto: 0, titulos_outlook_windows: 1, texto_outlook_windows: 1 } },
     { bloco: "LOGO", campos: { arquivo: 0, largura: 0, descricao: 0 } },
     { bloco: "CORES", obrigatorio: true, campos: obrig(CORES) },
     { bloco: "CORES DE APOIO", obrigatorio: true, campos: obrig(CORES_APOIO) },
     { bloco: "IMAGENS", obrigatorio: true, campos: { modo: 1, endereco_base: 0, qualidade_jpg: 0 } },
     { bloco: "LINKS", campos: { dominios_permitidos: 0 } },
-    { bloco: "FORMIGUINHA", obrigatorio: true, campos: { transformation: 1, foco: 1 } }
+    { bloco: "FORMIGUINHA", campos: { arquivo: 0, descricao: 0 } }
   ];
 
   /* Confere blocos e campos contra o esquema. Devolve { simples: {BLOCO: campos}, listas: {BLOCO: [campos…]} } */
@@ -150,9 +152,20 @@
     projeto: { rotulo: "Ver projeto&nbsp;&#8594;", texto: "Ver projeto", alt: "Ver projeto" },
     demo: { rotulo: "Ver demonstração&nbsp;&#8594;", texto: "Ver demonstração", alt: "Ver demonstração" }
   };
-  var LINK_PENDENTE = "#link-pendente";
+  /* Qual parte da imagem fica no recorte. */
+  var ENQUADRAMENTOS = ["centro", "topo", "baixo", "esquerda", "direita"];
 
   function ehPendencia(s) { return /\[[^\]]*\]/.test(s); }
+  /* Conteúdo PROVISÓRIO do modelo: Lorem Ipsum nos textos e "X" nos números (X%, R$ X, +X p.p., XX/XX).
+     Aparece com visual de template, mas conta como pendência: a versão final só sai com dados reais. */
+  var CAMPOS_NUMERICOS = ["valor", "detalhe", "variacao", "anterior", "atual", "data", "status", "resultado", "periodo", "referencia"];
+  function provisorio(s, campo) {
+    s = String(s || "");
+    if (/\blorem\b|\bipsum\b/i.test(s)) return "texto de exemplo (Lorem Ipsum)";
+    if (CAMPOS_NUMERICOS.indexOf(campo) >= 0 && /(^|[^A-Za-zÀ-ÿ])X{1,2}(?![A-Za-zÀ-ÿ])/.test(s)) return "valor de exemplo (X)";
+    if (/AAAA|\bMM\b/.test(s) && campo === "pasta_imagens") return "pasta do mês (AAAA-MM)";
+    return "";
+  }
 
   /* Confere um link. Devolve [] (ok) ou [{nivel, msg}]. */
   function conferirLink(url, tipo, dominios) {
@@ -187,10 +200,10 @@
   function seguro(s) { return new Seguro(s); }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   /* Texto do usuário → HTML. Só <br> é aceito como marcação. */
-  function texto(s) { return seguro(esc(s || "").replace(/&lt;br\s*\/?&gt;/gi, "<br>")); }
+  function textoSeguro(s) { return seguro(esc(s || "").replace(/&lt;br\s*\/?&gt;/gi, "<br>")); }
   function semBr(s) { return String(s || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim(); }
   /* Números: "R$ 29" não quebra entre R$ e 29; "-12%" usa o sinal de menos tipográfico. */
-  function numero(s) { return seguro(esc(s || "").replace(/^-\s*/, "&minus;").replace(/R\$ /g, function () { return "R$&nbsp;"; })); }
+  function numeroSeguro(s) { return seguro(esc(s || "").replace(/^-\s*/, "&minus;").replace(/R\$ /g, function () { return "R$&nbsp;"; })); }
   function maiusculas(s) { return String(s || "").toLocaleUpperCase("pt-BR"); }
   function categoria(s) { return seguro(esc(maiusculas(s)).replace(/\s+·\s+/g, "&nbsp;&nbsp;·&nbsp;&nbsp;")); }
 
@@ -260,13 +273,6 @@
   /* 6. MODELO DO E-MAIL                                                  */
   /* =================================================================== */
 
-  var FORMIGA_ALT = {
-    base: "Formiguinha fazendo joinha", protecao: "Formiguinha segurando um escudo", viagem: "Formiguinha com uma mala de viagem",
-    musica: "Formiguinha com fones de ouvido", transformacao: "Formiguinha segurando um tablet", foco: "Formiguinha segurando um alvo"
-  };
-  /* Larguras das colunas de números da abertura (a formiguinha ocupa os 16% restantes).
-     A 1ª coluna é mais larga: o número principal costuma ser o mais longo. Há folga de
-     ~15% em cada coluna para uma fonte corporativa mais larga que a Georgia. */
   /* GRADE do e-mail (computador): 600 px de conteúdo = 3 colunas de 184 px + 2 espaços de 24 px.
      Todas as seções usam essas linhas, para tudo ficar alinhado de cima a baixo. */
   var COL = 184, ESP = 24, LARGURA = 600;
@@ -303,8 +309,20 @@
       if (!/^#[0-9a-f]{6}$/i.test(v)) problema(prob, "erro", arqM, todas._linhas[k], "Cor \"" + k + "\" inválida (" + v + "). Use # e 6 dígitos hexadecimais, ex.: #9E1218.");
       cor[k] = seguro(String(v).toUpperCase());
     });
+    /* ---- Campos ainda não preenchidos ([INSERIR …]) ----
+       No rascunho eles aparecem marcados em âmbar, para ninguém confundir com conteúdo.
+       Números, scores e variações viram uma etiqueta pequena (não um número falso).
+       A versão final nunca tem pendências: a ferramenta não deixa gerar. */
+    var PEND = "background:" + cor.atencao_fundo + ";color:" + cor.atencao + ";border-radius:3px;";
+    function marcarPendencias(html) { return html.replace(/\[[^\]<]*\]/g, function (m) { return '<span style="' + PEND + '">' + m + "</span>"; }); }
+    function texto(s) { return seguro(marcarPendencias(textoSeguro(s).s)); }
+    function chip(s) {
+      return seguro('<span style="display:inline-block;' + PEND + "font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:15px;font-weight:bold;font-style:normal;letter-spacing:0;white-space:normal;vertical-align:middle;padding:3px 6px;border:1px dashed " + cor.placeholder_borda + ';">' + esc(s) + "</span>");
+    }
+    function numero(s) { return ehPendencia(s) ? chip(s) : numeroSeguro(s); }
     var F = M.simples.FONTES, fonte = {};
-    ["titulos", "texto", "titulos_outlook_windows", "texto_outlook_windows"].forEach(function (k) {
+    if (!F.impacto) F.impacto = F.titulos;
+    ["titulos", "texto", "impacto", "titulos_outlook_windows", "texto_outlook_windows"].forEach(function (k) {
       var v = F[k];
       if (/["<>;{}]/.test(v)) problema(prob, "erro", arqM, F._linhas[k], "Fonte \"" + k + "\": não use aspas duplas, ponto e vírgula nem < >. Para nomes com espaço use aspas simples: 'Nome da Fonte'.");
       if (/outlook/.test(k)) {
@@ -321,14 +339,14 @@
     var qualidade = I.qualidade_jpg ? parseInt(I.qualidade_jpg, 10) : 82;
     if (!(qualidade >= 60 && qualidade <= 95)) { problema(prob, "aviso", arqM, I._linhas.qualidade_jpg, "qualidade_jpg deve ficar entre 60 e 95. Usei 82."); qualidade = 82; }
     var dominios = ((M.simples.LINKS || {}).dominios_permitidos || "").split(",").map(function (d) { return d.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, ""); }).filter(Boolean);
-    var FM = M.simples.FORMIGUINHA;
 
     /* ---- Pendências: qualquer [texto entre colchetes] nos dados ---- */
     lidoD.ordem.forEach(function (k) {
       var b = lidoD.blocos[k];
       Object.keys(b.campos).forEach(function (c) {
-        var v = b.campos[c].valor, m = v.match(/\[[^\]]*\]/g);
+        var v = b.campos[c].valor, m = v.match(/\[[^\]]*\]/g), pv = provisorio(v, c);
         if (m && c !== "link" && c !== "imagem") problema(prob, "pendencia", arqD, b.campos[c].linha, "[" + b.nome + "] " + c + ": " + m.join(" "));
+        else if (pv) problema(prob, "pendencia", arqD, b.campos[c].linha, "[" + b.nome + "] " + c + ": " + pv + ". Troque pelo conteúdo do mês.");
         if (/<(?!br\s*\/?>)[a-z\/!]/i.test(v)) problema(prob, "aviso", arqD, b.campos[c].linha, "[" + b.nome + "] " + c + ": o texto tem uma marcação HTML. Só <br> é aceito; o resto aparece como texto.");
       });
     });
@@ -352,22 +370,26 @@
       }
       return { src: seguro(reg.token), w: w, h: h || "", alt: op.alt || "" };
     }
+    /* Espaço da imagem ainda não escolhida: superfície Lisboa com a indicação do formato (só no rascunho). */
     function placeholder(w, h, rotulo, raio, video) {
-      var bg = video ? "#2B2523" : cor.placeholder_fundo.s, bd = video ? "#6B5F5B" : cor.placeholder_borda.s, fg = video ? "#FFFFFF" : cor.marca.s;
-      return seguro('<table role="presentation" width="' + w + '" cellpadding="0" cellspacing="0" border="0" style="width:' + w + 'px;"><tr>' +
-        '<td height="' + h + '" align="center" valign="middle" bgcolor="' + bg + '" style="height:' + h + "px;background:" + bg + ";border:2px dashed " + bd + ";border-radius:" + raio + 'px;">' +
-        '<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:' + fg + ';letter-spacing:1.5px;">' + (video ? "&#9654; VÍDEO" : "IMAGEM") + "</p>" +
-        '<p style="margin:3px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:12px;color:#8C827C;">' + esc(rotulo) + "</p></td></tr></table>");
+      var bg = cor.placeholder_fundo.s, bd = cor.placeholder_borda.s, larg = typeof w === "number" ? w + "px" : w;
+      return seguro('<table role="presentation" width="' + w + '" cellpadding="0" cellspacing="0" border="0" style="width:' + larg + ';"><tr>' +
+        '<td height="' + h + '" align="center" valign="middle" bgcolor="' + bg + '" style="height:' + h + "px;background:" + bg + ";border:1px solid " + bd + ";border-radius:" + raio + 'px;">' +
+        '<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:' + cor.marca.s + ';letter-spacing:1.5px;">' + (video ? "&#9654; VÍDEO" : "IMAGEM") + "</p>" +
+        '<p style="margin:3px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:12px;color:' + cor.texto_apoio.s + ';">' + esc(rotulo) + "</p></td></tr></table>");
     }
 
     /* Peça (imagem + link + CTA) de um item */
     function peca(v, nomeBloco, w, h, raio, op, tipoPadrao) {
       var tipo = chaveCampo(v.tipo || tipoPadrao || "peca");
       if (!CTA[tipo]) { problema(prob, "erro", arqD, v._linhas.tipo, "[" + nomeBloco + "] tipo \"" + v.tipo + "\" não existe. Use: peca, video, projeto ou demo."); tipo = "peca"; }
-      var link = v.link || "", r = { tipo: tipo, img: null, placeholder: null, cta: seguro(""), link: "" };
+      var link = v.link || "", r = { tipo: tipo, img: null, img_m: null, placeholder: null, placeholder_m: null, cta: seguro(""), link: "" };
       conferirLink(link, tipo, dominios).forEach(function (x) { problema(prob, x.nivel, arqD, v._linhas.link, "[" + nomeBloco + "] link: " + x.msg); });
-      var href = !link ? "" : ehPendencia(link) || /^(javascript|data|vbscript|file):/i.test(link) || /^\\\\|^[a-z]:\\/i.test(link) ? LINK_PENDENTE : link;
-      if (href) {
+      var href = !link || ehPendencia(link) || /^(javascript|data|vbscript|file):/i.test(link) || /^\\\\|^[a-z]:\\/i.test(link) ? "" : link;
+      if (link && !href) {
+        /* Link ainda não preenchido (só no rascunho): mostra onde o botão vai ficar, sem ser clicável. */
+        r.cta = seguro('<span title="Link ainda não definido" style="color:' + ((op && op.corCtaPendente) || cor.texto_apoio) + ';font-weight:bold;white-space:nowrap;">' + CTA[tipo].rotulo + "</span>");
+      } else if (href) {
         r.link = href;
         r.cta = seguro('<a href="' + esc(href) + '" target="_blank" class="cta" style="color:' + ((op && op.corCta) || cor.marca.s) + ';font-weight:bold;text-decoration:none;white-space:nowrap;">' + CTA[tipo].rotulo + "</a>");
       } else if (link === "" && v.tipo !== undefined) {
@@ -376,15 +398,18 @@
       var nome = v.imagem || "", desc = v.descricao_imagem || semBr(v.nome || v.titulo || "");
       if (nome && ehPendencia(nome)) {
         r.placeholder = placeholder(w, h || Math.round(w * 1.6), (op && op.dica) || (w * 2) + " px de largura", raio, tipo === "video");
+        if (op && op.celular) r.placeholder_m = placeholder("100%", op.celular.h, "horizontal no celular", raio, tipo === "video");
         problema(prob, "pendencia", arqD, v._linhas.imagem, "[" + nomeBloco + "] imagem: " + nome);
       } else if (nome) {
         var cam = caminhoImagem(nome);
         if (!existe(cam)) problema(prob, "erro", arqD, v._linhas.imagem, "[" + nomeBloco + "] imagem não encontrada: " + cam + ". Confira o nome do arquivo (maiúsculas, acentos, extensão .jpg/.png).");
         var alt = (tipo === "video" ? "Vídeo: " : "") + desc + (href ? " (" + CTA[tipo].alt.toLowerCase() + ")" : "");
         var anc = chaveCampo(v.enquadramento || "centro");
-        if (["centro", "topo", "baixo"].indexOf(anc) < 0) { problema(prob, "aviso", arqD, v._linhas.enquadramento, "[" + nomeBloco + "] enquadramento deve ser centro, topo ou baixo. Usei centro."); anc = "centro"; }
+        if (ENQUADRAMENTOS.indexOf(anc) < 0) { problema(prob, "aviso", arqD, v._linhas.enquadramento, "[" + nomeBloco + "] enquadramento deve ser " + ENQUADRAMENTOS.join(", ") + ". Usei centro."); anc = "centro"; }
         r.img = imagem(cam, w, h, { recorte: !!h, play: tipo === "video", alt: alt, papel: nomeBloco, fluida: !!(op && op.fluida), ancora: anc });
         r.img.link = href;
+        /* Versão para celular (outro formato, ex.: horizontal no lugar da vertical) */
+        if (op && op.celular) { r.img_m = imagem(cam, op.celular.w, op.celular.h, { recorte: true, play: tipo === "video", alt: alt, papel: nomeBloco + " (celular)", fluida: true, ancora: op.celular.ancora || anc }); r.img_m.link = href; }
       }
       return r;
     }
@@ -394,11 +419,13 @@
     }
     function etiqueta(texto_, corNome, simbolo) {
       var verde = chaveCampo(corNome || "verde") !== "ambar";
-      return seguro('<span style="display:inline-block;background:' + (verde ? cor.positivo_fundo : cor.atencao_fundo) + ";color:" + (verde ? cor.positivo : cor.atencao) +
-        ';font-weight:bold;padding:0 7px;border-radius:999px;white-space:nowrap;">' + simbolo + " " + texto(texto_).s + "</span>");
+      /* Etiqueta: não quebra no computador; no celular pode quebrar (classe wrap-m) para nunca vazar da tela. */
+      return seguro('<span class="wrap-m" style="display:inline-block;background:' + (verde ? cor.positivo_fundo : cor.atencao_fundo) + ";color:" + (verde ? cor.positivo : cor.atencao) +
+        ';font-weight:bold;padding:0 7px;border-radius:999px;white-space:' + (ehPendencia(texto_) ? "normal" : "nowrap") + ';">' + simbolo + " " + texto(texto_).s + "</span>");
     }
     function variacao(v, nomeBloco) {
       if (!v.variacao) return seguro("");
+      if (ehPendencia(v.variacao)) return chip(v.variacao);
       if (v.variacao_cor && ["verde", "ambar"].indexOf(chaveCampo(v.variacao_cor)) < 0) problema(prob, "aviso", arqD, v._linhas.variacao_cor, "[" + nomeBloco + "] variacao_cor deve ser verde ou ambar.");
       var desce = /^[-−]/.test(v.variacao);
       var t = v.variacao.replace(/^[-−]\s*/, "");
@@ -408,6 +435,7 @@
     }
     function status(v, nomeBloco) {
       if (!v.status) return seguro("");
+      curto(v, "status", 30, nomeBloco);
       var c = chaveCampo(v.status_cor || "ambar");
       if (["verde", "ambar"].indexOf(c) < 0) problema(prob, "aviso", arqD, v._linhas.status_cor, "[" + nomeBloco + "] status_cor deve ser verde ou ambar.");
       return etiqueta(v.status, c, c === "verde" ? "&#9679;" : "&#9675;");
@@ -416,21 +444,20 @@
       var s = semBr(v[campo]);
       if (s.length > max && !ehPendencia(s)) problema(prob, "aviso", arqD, v._linhas[campo], "[" + nomeBloco + "] " + campo + " com " + s.length + " caracteres (recomendado até " + max + "). Pode quebrar em mais linhas.");
     }
-    function formiga(nome, alt, w, papel, linha) {
-      var n = chaveCampo(nome || "base"), cam = "assets/formiguinha/formiga-" + n + ".png";
-      if (!existe(cam)) { problema(prob, "erro", linha ? arqD : arqM, linha || 0, "Formiguinha \"" + nome + "\" não encontrada (" + cam + "). Versões: base, protecao, viagem, musica, transformacao, foco."); }
-      return imagem(cam, w, 0, { alt: FORMIGA_ALT[n] || "Formiguinha", papel: papel });
-    }
+    /* Formiguinha (config/marca.txt, bloco [FORMIGUINHA]): o arquivo original, só na abertura e no rodapé. */
+    var FM = M.simples.FORMIGUINHA || {}, camFormiga = (FM.arquivo || "").replace(/\\/g, "/").replace(/^\.?\/+/, "");
+    if (camFormiga && !existe(camFormiga)) { problema(prob, "erro", arqM, FM._linhas.arquivo, "Formiguinha não encontrada: " + camFormiga + ". Confira o nome do arquivo em config/marca.txt."); camFormiga = ""; }
+    function formiga(w, papel) { return camFormiga ? imagem(camFormiga, w, 0, { alt: FM.descricao || "Formiguinha", papel: papel }) : null; }
 
     /* Logo (config/marca.txt, bloco [LOGO]) */
     var LG = M.simples.LOGO || {}, logo = null, rodapeLogo = null;
     if (LG.arquivo) {
-      var lw = parseInt(LG.largura || "100", 10);
-      if (!(lw >= 40 && lw <= 200)) { problema(prob, "aviso", arqM, LG._linhas.largura, "Logo: largura deve ficar entre 40 e 200 px. Usei 100."); lw = 100; }
+      var lw = parseInt(LG.largura || "32", 10);
+      if (!(lw >= 20 && lw <= 200)) { problema(prob, "aviso", arqM, LG._linhas.largura, "Logo: largura deve ficar entre 20 e 200 px. Usei 32."); lw = 32; }
       var lc = LG.arquivo.replace(/\\/g, "/").replace(/^\.?\/+/, "");
       if (existe(lc)) {
         logo = { img: imagem(lc, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" }), placeholder: null };
-        rodapeLogo = imagem(lc, Math.round(lw * 0.85), 0, { alt: LG.descricao || "Santander", papel: "logo" });
+        rodapeLogo = imagem(lc, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" });
       }
       else {
         problema(prob, "pendencia", arqM, LG._linhas.arquivo, "Logo não encontrado: " + lc + ". Salve o logo oficial (versão branca, PNG) nesse caminho ou ajuste o nome em config/marca.txt.");
@@ -441,15 +468,20 @@
 
     var A = D.simples.ABERTURA, P = D.simples["PROJETO PRINCIPAL"], L = D.listas;
     var mes = E.mes.trim(), ano = E.ano.trim(), prox = E.proximo_mes.trim();
+    var periodoOk = mesNumero(mes) > 0 && /^\d{4}$/.test(ano);
+    if (!ehPendencia(mes) && !mesNumero(mes)) problema(prob, "pendencia", arqD, E._linhas.mes, "[EDICAO] mes: escreva o nome do mês (ex.: Outubro).");
+    if (!ehPendencia(ano) && !/^\d{4}$/.test(ano)) problema(prob, "pendencia", arqD, E._linhas.ano, "[EDICAO] ano: escreva o ano com 4 dígitos (ex.: 2026).");
+    if (!ehPendencia(prox) && !mesNumero(prox)) problema(prob, "pendencia", arqD, E._linhas.proximo_mes, "[EDICAO] proximo_mes: escreva o nome do mês seguinte (ex.: Novembro).");
     curto(A, "frase", 28, "ABERTURA");
     var secoes = 0;
     function proxSecao() { secoes++; return (secoes < 10 ? "0" : "") + secoes; }
 
     /* 01 · Abertura */
-    var pp = peca(P, "PROJETO PRINCIPAL", COL, COL, 14, { dica: "368 x 368 px", fluida: true, corCta: "#FFFFFF" });
+    var pp = peca(P, "PROJETO PRINCIPAL", COL, COL, 20, { dica: "368 x 368 px", fluida: true, corCta: "#FFFFFF", corCtaPendente: "#F5DECF" });
     var nums = (L.NUMERO || []);
-    /* Nº 1 na coluna 1 (184 px); os outros dividem o espaço até a formiguinha (80 px). */
-    var larg = nums.length <= 1 ? [LARGURA - 80] : [COL].concat(colunas(LARGURA - 80 - COL - ESP, nums.length - 1));
+    /* Nº 1 na coluna 1 (184 px); os outros dividem o espaço até a formiguinha (80 px, se houver). */
+    var fw = camFormiga ? 80 : 0;
+    var larg = nums.length <= 1 ? [LARGURA - fw] : [COL].concat(colunas(LARGURA - fw - COL - ESP, nums.length - 1));
     var abertura = {
       n: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
       nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp,
@@ -462,7 +494,7 @@
           estilo: "padding:0 0 20px 0;"
         };
       }),
-      formiga: formiga(P.formiguinha, "", 76, "formiguinha", P._linhas.formiguinha)
+      formiga: formiga(76, "formiguinha")
     };
 
     /* 02 · O que lançamos */
@@ -470,14 +502,15 @@
     var lancamos = null;
     if (DS || lanc.length) {
       /* Destaque: peça na coluna 1 (184 x 300, recortada) e texto nas colunas 2 e 3 (392 px). */
-      var dsp = DS ? peca(DS, "DESTAQUE", COL, 300, 14, { dica: "368 x 600 px" }) : null;
+      /* No celular a coluna da peça some; a mesma imagem entra em formato horizontal, na largura da tela, acima do texto. */
+      var dsp = DS ? peca(DS, "DESTAQUE", COL, 300, 20, { dica: "368 x 600 px", celular: { w: 350, h: 200 } }) : null;
       var textoDestaque = dsp && (dsp.img || dsp.placeholder) ? LARGURA - COL - ESP : LARGURA;
       var lr = res.length ? colunas(textoDestaque, res.length) : [];
       var lc = lanc.length ? colunas(LARGURA, lanc.length) : [];
       lancamos = {
         n: proxSecao(), titulo: texto((D.simples.LANCAMOS || {}).titulo || ""), tem_compactos: lanc.length > 0, colunas_compactos: lanc.length * 2 - 1,
         destaque: DS ? {
-          categoria: categoria(DS.categoria), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
+          categoria: seguro(marcarPendencias(categoria(DS.categoria).s)), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
           largura_texto: textoDestaque, colunas: res.length * 3 - 2,
           resultados: res.map(function (v, i) {
             return {
@@ -487,7 +520,7 @@
           })
         } : null,
         compactos: lanc.map(function (v, i) {
-          var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, COL, 72, 8, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
+          var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, COL, 72, 20, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
           return { status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lc[i], primeiro: i === 0, classe: ult ? "col" : "col gap" };
         })
       };
@@ -497,18 +530,19 @@
     var CX = D.simples["CREATIVE X"], cx = null;
     if (CX) {
       var at = lerNumero(CX.atual), an = lerNumero(CX.anterior);
-      if (at === null) problema(prob, "aviso", arqD, CX._linhas.atual, "[CREATIVE X] atual \"" + CX.atual + "\" não é um número em %: a barra fica vazia.");
+      if (at === null && !provisorio(CX.atual, "atual") && !ehPendencia(CX.atual)) problema(prob, "aviso", arqD, CX._linhas.atual, "[CREATIVE X] atual \"" + CX.atual + "\" não é um número em %: a barra fica vazia.");
       var vari = CX.variacao, dif = at !== null && an !== null ? at - an : null;
-      if (!vari && dif === null && !ehPendencia(CX.anterior)) problema(prob, "pendencia", arqD, CX._linhas.variacao, "[CREATIVE X] variacao: preencha \"anterior\" com um número em % (ou escreva a variação).");
-      if (!vari) vari = dif !== null ? fmtPP(dif) : "[+00 p.p.]";
-      var queda = /^[-−]/.test(vari);
-      var barra = at === null ? 1 : Math.max(1, Math.min(99, Math.round(at)));
+      if (!vari && dif === null && !ehPendencia(CX.anterior) && !ehPendencia(CX.atual)) problema(prob, "pendencia", arqD, CX._linhas.variacao, "[CREATIVE X] variacao: preencha \"anterior\" com um número em % (ou escreva a variação).");
+      /* Sem os dois números, nada é calculado: aparece a etiqueta [INSERIR EVOLUÇÃO], nunca um valor inventado. */
+      if (!vari) vari = dif !== null ? fmtPP(dif) : "[INSERIR EVOLUÇÃO]";
+      var queda = /^[-−]/.test(vari), pend = ehPendencia(vari);
+      var barra = at === null ? 0 : Math.max(1, Math.min(99, Math.round(at)));
       cx = {
-        n: proxSecao(), subtitulo: texto(CX.subtitulo), anterior: texto(CX.anterior), atual: texto(CX.atual),
-        variacao: seguro(esc(vari).replace(/^[-−]\s*/, "&minus;")),
+        n: proxSecao(), subtitulo: texto(CX.subtitulo), anterior: numero(CX.anterior), atual: numero(CX.atual),
+        variacao: pend ? chip(vari) : seguro(esc(vari).replace(/^[-−]\s*/, "&minus;")), variacao_pendente: pend,
         variacao_cor: queda ? cor.atencao : cor.positivo, variacao_fundo: queda ? cor.atencao_fundo : cor.positivo_fundo,
         periodo: texto(CX.periodo), referencia: texto(CX.referencia), significado: texto(CX.significado),
-        barra: barra + "%", resto: (100 - barra) + "%"
+        tem_barra: barra > 0, barra: barra + "%", resto: (100 - barra) + "%"
       };
     }
 
@@ -517,7 +551,6 @@
     if (tr.length) {
       transformation = {
         n: proxSecao(), titulo: texto((D.simples.TRANSFORMATION || {}).titulo || ""),
-        formiga: formiga(FM.transformation, "", 70, "formiguinha"),
         projetos: tr.map(function (v, i) {
           var nb = "TRANSFORMATION " + (i + 1), p = peca(v, nb, 68, 52, 8, { dica: "136 x 104 px" }, "projeto");
           var icones = (v.icones || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean).map(function (ic, j) {
@@ -553,8 +586,7 @@
 
     /* 06 · Foco */
     var FO = D.simples.FOCO, foco = FO ? {
-      n: proxSecao(), mes: maiusculas(prox), prioridade: texto(FO.prioridade), texto: texto(FO.texto),
-      formiga: formiga(FM.foco, "", 74, "formiguinha")
+      n: proxSecao(), mes: texto(maiusculas(prox)), prioridade: texto(FO.prioridade), texto: texto(FO.texto)
     } : null;
 
     /* 07 · Também vem aí */
@@ -563,9 +595,9 @@
       var linhas = [];
       for (var i = 0; i < ag.length; i += 3) {
         var celulas = ag.slice(i, i + 3).map(function (v, j) {
-          var m = String(v.data || "").trim().match(/^(\d{1,2})\s+(\S.*)$/);
+          var m = String(v.data || "").trim().match(/^(\d{1,2}|XX?)\s+(\S.*)$/);
           return {
-            dia: m ? m[1] : "", mes: m ? maiusculas(m[2]) : "", rotulo: m ? "" : maiusculas(v.data || ""),
+            dia: m ? m[1] : "", mes: m ? maiusculas(m[2]) : "", rotulo: m ? "" : texto(maiusculas(v.data || "")),
             titulo: texto(v.titulo), detalhe: texto(v.detalhe), vazio: false, primeiro: j === 0
           };
         });
@@ -578,7 +610,7 @@
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
       assunto: assunto, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
-      logo: logo, rodape_logo: rodapeLogo, edicao: maiusculas(mes + " " + ano), proximo_mes: prox, proximo_mes_minusculo: prox.toLocaleLowerCase("pt-BR"), contato: texto(E.contato),
+      logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(56, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
     };
@@ -599,7 +631,8 @@
     }
     if (transformation) tr.forEach(function (v, i) { regLink("Transformation " + (i + 1) + " · " + semBr(v.nome), transformation.projetos[i].peca); });
 
-    var slug = ano + "-" + String(mesNumero(mes) || "00").padStart(2, "0");
+    /* Nome do arquivo: report-AAAA-MM (no modelo em branco, report-MODELO). */
+    var slug = periodoOk ? ano + "-" + String(mesNumero(mes)).padStart(2, "0") : "MODELO";
     return {
       ok: true, problemas: prob, modelo: modelo, imagens: imagens, html: html, links: links,
       texto: textoPuro(D, links), assunto: assunto, nomeArquivo: ("report-" + slug).replace(/[^\w-]/g, ""),
@@ -744,8 +777,9 @@
       quebra76(base64(utf8(o.html)))
     ];
     (o.imagens || []).forEach(function (im) {
-      L.push("--" + b2, "Content-Type: " + tipoMime(im.nome) + '; name="' + im.nome + '"', "Content-Transfer-Encoding: base64",
-        "Content-ID: <" + im.cid + ">", 'Content-Disposition: inline; filename="' + im.nome + '"', "", quebra76(base64(im.bytes)));
+      /* Cabeçalhos dobrados (linha seguinte começa com espaço) para nenhuma linha passar de 78 caracteres. */
+      L.push("--" + b2, "Content-Type: " + tipoMime(im.nome) + ";", ' name="' + im.nome + '"', "Content-Transfer-Encoding: base64",
+        "Content-ID: <" + im.cid + ">", "Content-Disposition: inline;", ' filename="' + im.nome + '"', "", quebra76(base64(im.bytes)));
     });
     L.push("--" + b2 + "--", "", "--" + b1 + "--", "");
     return L.join("\r\n");
@@ -779,9 +813,9 @@
   }
 
   return {
-    ler: ler, montar: montar, aplicar: aplicar, conferirLink: conferirLink, conferirHtml: conferirHtml,
+    VERSAO: VERSAO, ler: ler, montar: montar, aplicar: aplicar, conferirLink: conferirLink, conferirHtml: conferirHtml,
     gerarEml: gerarEml, trocarImagens: trocarImagens, semComentarios: semComentarios,
     base64: base64, utf8: utf8, zip: zip, crc32: crc32, assuntoMime: assuntoMime, tipoMime: tipoMime,
-    CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: texto
+    CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

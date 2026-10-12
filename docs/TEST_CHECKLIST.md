@@ -7,7 +7,8 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 **Conteúdo** (no arquivo `dados/AAAA-MM.txt`)
 
 - [ ] Mês correto (`mes`, `ano`, `proximo_mes`, `pasta_imagens`)
-- [ ] Projeto principal correto (nome, resumo, peça, formiguinha)
+- [ ] Projeto principal correto (nome, resumo, peça)
+- [ ] Nenhum conteúdo de exemplo restante: Lorem Ipsum, `X`, "Mês", "AAAA"
 - [ ] Métricas atualizadas e conferidas com a fonte (painel ou planilha)
 - [ ] Creative X atualizado (anterior, atual, período)
 - [ ] Creative Transformation atualizado (status, resultado)
@@ -22,7 +23,8 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 - [ ] Todas as imagens abrem: "Ver peça" de cada uma abre a peça grande
 - [ ] Todos os vídeos abrem: "▶ Assistir" toca **com som**
 - [ ] Todos os links funcionam (seção "Teste os links" → **Abrir** em cada linha)
-- [ ] Nenhum placeholder restante (`[...]`)
+- [ ] Nenhum placeholder restante (`[...]`, Lorem Ipsum, `X`)
+- [ ] Prévia no **Celular**: a peça do destaque aparece (na horizontal) e nada sai da tela
 
 **Envio de teste (só para você)**
 
@@ -55,10 +57,10 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 
 | Verificação | Status |
 |---|---|
-| Motor: 22 testes automáticos | Passam |
-| Página de geração de ponta a ponta no Chromium, sem vazar para o lado em 760 px e 390 px | Passa |
-| Fonte corporativa mais larga simulada (DejaVu Sans) e imagens bloqueadas | Layout se mantém |
-| E-mail gerado igual ao layout aprovado, em 760 px e 390 px | Conferido |
+| Motor: 28 testes automáticos (inclui estado vazio e paleta do Brand Guide) | Passam |
+| Página de geração de ponta a ponta no Chromium, sem vazar para o lado de 320 a 1440 px | Passa |
+| Fonte `.otf` de teste em `assets/fonts/` | Carrega na prévia e no `.html`; fora do `.eml` |
+| E-mail gerado com o layout aprovado e os ajustes do Brand Guide | Conferido |
 | Estrutura do `.eml` (texto + HTML, imagens embutidas) | Conferida |
 | Imagens grandes reduzidas e recortadas com boa qualidade | Conferido |
 | Outlook Desktop, Outlook Web, novo Outlook, celular | **Não testado** (sem Outlook neste ambiente) |

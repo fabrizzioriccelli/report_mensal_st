@@ -13,12 +13,14 @@ var MARCA = ler("config/marca.txt"), TEMPLATE = ler("template/report.html");
 function montar(dados, extra) {
   return M.montar(Object.assign({ dados: dados, arquivoDados: "teste.txt", marca: MARCA, template: TEMPLATE, existe: existe }, extra || {}));
 }
+/* Dados SINTÉTICOS de teste (não são resultados reais). A imagem é um ícone do próprio projeto. */
 var MINIMO = [
-  "[EDICAO]", "mes: Outubro", "ano: 2026", "proximo_mes: Novembro", "pasta_imagens: assets/2026-09",
+  "[EDICAO]", "mes: Outubro", "ano: 2026", "proximo_mes: Novembro", "pasta_imagens: assets/icones",
   "[ABERTURA]", "frase: Um mês", "frase_final: de teste.",
-  "[PROJETO PRINCIPAL]", "nome: Projeto", "imagem: openai-ads.jpg", "tipo: peca", "link: https://empresa.sharepoint.com/:i:/s/site/abc",
+  "[PROJETO PRINCIPAL]", "nome: Projeto", "imagem: icone-prancheta.png", "tipo: peca", "link: https://empresa.sharepoint.com/:i:/s/site/abc",
   "[NUMERO 1]", "valor: 10%", "titulo: CTR", "detalhe: era 5%", "variacao: +100%"
 ].join("\n");
+var MODELO = ler("dados/MODELO.txt");
 
 var testes = 0, falhas = 0;
 function teste(nome, fn) {
@@ -29,18 +31,72 @@ function niveis(r, n) { return r.problemas.filter(function (p) { return p.nivel 
 
 console.log("Motor do report");
 
-teste("o report de setembro monta sem erros", function () {
-  var r = montar(ler("dados/2026-09.txt"));
+teste("o modelo em branco monta sem erros, só com pendências", function () {
+  var r = montar(MODELO);
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
-  assert.strictEqual(r.imagens.length, 12); /* logo (capa e rodapé) + 5 peças + 3 formiguinhas + 2 ícones */
+  assert.ok(niveis(r, "pendencia").length > 30, "o modelo deve listar os campos de exemplo (Lorem, X, [INSERIR …])");
   assert.ok(!/\{\{|\}\}/.test(r.html), "sobrou {{campo}} no HTML");
-  assert.ok(niveis(r, "pendencia").length > 0, "setembro tem pendências de propósito");
-  assert.strictEqual(r.nomeArquivo, "report-2026-09");
+  assert.strictEqual(r.nomeArquivo, "report-MODELO");
 });
 
-teste("o modelo em branco monta (com pendências, sem erros)", function () {
-  var r = montar(ler("dados/MODELO.txt"), { existe: function () { return true; } });
+teste("estado vazio: nenhum NaN/undefined/null e nenhum número inventado", function () {
+  var r = montar(MODELO), visivel = r.html.replace(/<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, " ");
+  assert.ok(!/\b(NaN|undefined|null|Infinity)\b/.test(visivel), "valor técnico aparecendo no e-mail");
+  assert.ok(!/\d+(,\d+)?\s?(%|p\.p\.)/.test(visivel), "nenhum número inventado: só X%, X p.p., R$ X");
+  assert.ok(visivel.indexOf("+X p.p.") > 0 && visivel.indexOf("X%") > 0 && visivel.indexOf("R$&nbsp;X") > 0, "indicadores como X%");
+  assert.ok(r.html.indexOf('width="100%" height="8"') > 0, "barra do Creative X vazia (cinza inteira), sem cálculo com X");
+  assert.ok(!/href="#/.test(r.html), "link pendente não pode virar link clicável");
+  assert.ok(r.html.indexOf(">IMAGEM</p>") > 0, "espaço de imagem identificado");
+  assert.ok(/Lorem ipsum/.test(visivel), "textos de exemplo em Lorem Ipsum");
+});
+
+teste("provisórios: Lorem Ipsum e X contam como pendência (não liberam a versão final)", function () {
+  var r = montar(MINIMO.replace("frase: Um mês", "frase: Lorem ipsum").replace("valor: 10%", "valor: X%"));
+  var p = niveis(r, "pendencia").map(function (x) { return x.msg; }).join(" | ");
+  assert.ok(/frase: texto de exemplo/.test(p) && /valor: valor de exemplo/.test(p), p);
+  r = montar(MINIMO.replace("mes: Outubro", "mes: Mês").replace("ano: 2026", "ano: AAAA"));
+  assert.ok(niveis(r, "pendencia").length === 2 && r.nomeArquivo === "report-MODELO");
+  r = montar(MINIMO.replace("titulo: CTR", "titulo: Creative X"));
+  assert.strictEqual(niveis(r, "pendencia").length, 0, "X em nome (Creative X) não é placeholder");
+});
+
+teste("Brand Guide: títulos em vermelho, fontes Santander primeiro, sem itálico, sem fundo fora da paleta", function () {
+  var r = montar(MODELO);
+  assert.ok(r.html.indexOf("font-family:'Santander Headline', Arial") > 0);
+  assert.ok(r.html.indexOf("font-family:'Santander Micro Text', Arial") > 0);
+  assert.ok(r.html.indexOf("font-family:'Santander Condensed', 'Santander Headline', Arial") > 0);
+  assert.ok(!/font-style:italic|<i[ >]/.test(r.html), "as famílias Santander do guia não têm itálico");
+  var fundos = (r.html.match(/(?:bgcolor="|background:)(#[0-9A-F]{6})/gi) || []).map(function (x) { return x.slice(-7).toUpperCase(); });
+  var permitidos = ["#FFFFFF", "#FBF1EA", "#F5DECF", "#EC0000", "#A3E0CE", "#FFE1B9", "#E2E2E2"]; /* principais + apoio só em dados (etiquetas, barra) */
+  fundos.forEach(function (f) { assert.ok(permitidos.indexOf(f) >= 0, "fundo fora da paleta: " + f); });
+});
+
+teste("formiguinha: só na abertura e no rodapé, com o arquivo original", function () {
+  var r = montar(MODELO);
+  var f = r.imagens.filter(function (i) { return i.papel === "formiguinha"; });
+  assert.strictEqual(f.length, 2);
+  f.forEach(function (i) { assert.strictEqual(i.caminho, "assets/formiguinha/formiguinha.png"); });
+  var semFormiga = M.montar({ dados: MODELO, marca: MARCA.replace("arquivo: assets/formiguinha/formiguinha.png", "arquivo:"), template: TEMPLATE, existe: existe });
+  assert.ok(semFormiga.ok && !semFormiga.imagens.some(function (i) { return i.papel === "formiguinha"; }));
+});
+
+teste("chama: logo da capa e do rodapé é a chama branca", function () {
+  var r = montar(MINIMO);
+  var l = r.imagens.filter(function (i) { return i.papel === "logo"; });
+  assert.strictEqual(l.length, 1, "capa e rodapé usam a mesma imagem (vai uma vez só no .eml)");
+  assert.strictEqual(l[0].caminho, "assets/marca/chama-santander-branca.png");
+  assert.strictEqual((r.html.match(new RegExp(l[0].token, "g")) || []).length, 2, "chama na capa e no rodapé");
+});
+
+teste("Parte 2 no celular: o destaque ganha versão horizontal (show-m)", function () {
+  var d = MINIMO + "\n[DESTAQUE]\ntitulo: Destaque de teste\nimagem: icone-lupa.png\nenquadramento: direita\ntipo: peca\nlink: https://empresa.sharepoint.com/:i:/s/x/y";
+  var r = montar(d);
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  var m = r.imagens.filter(function (i) { return /celular/.test(i.papel); });
+  assert.strictEqual(m.length, 1);
+  assert.ok(m[0].fluida && m[0].recorte && m[0].w === 350 && m[0].h === 200 && m[0].ancora === "direita");
+  assert.ok(r.html.indexOf('class="show-m"') > 0);
+  assert.ok(r.html.indexOf('class="hide-m" width="184"') > 0, "no computador a peça vertical continua");
 });
 
 teste("dados mínimos: sem pendências e com CTA da peça", function () {
@@ -62,26 +118,28 @@ teste("sem link: sem CTA e imagem sem <a>", function () {
 teste("vídeo: CTA Assistir e play desenhado na miniatura", function () {
   var r = montar(MINIMO.replace("tipo: peca", "tipo: video"));
   assert.ok(r.html.indexOf("&#9654;&nbsp;Assistir") > 0);
-  assert.ok(r.imagens.some(function (i) { return i.play && /openai-ads/.test(i.caminho); }));
+  assert.ok(r.imagens.some(function (i) { return i.play && /icone-prancheta/.test(i.caminho); }));
 });
 
 teste("logo: arquivo faltando vira pendência e espaço tracejado; sem logo, nada aparece", function () {
-  var r = M.montar({ dados: MINIMO, marca: MARCA.replace("arquivo: assets/marca/logo-santander-branco.png", "arquivo: assets/marca/nao-existe.png"), template: TEMPLATE, existe: existe });
+  var r = M.montar({ dados: MINIMO, marca: MARCA.replace("arquivo: assets/marca/chama-santander-branca.png", "arquivo: assets/marca/nao-existe.png"), template: TEMPLATE, existe: existe });
   assert.ok(r.ok && niveis(r, "pendencia").some(function (p) { return /Logo não encontrado/.test(p.msg); }));
   assert.ok(r.html.indexOf(">LOGO</p>") > 0);
-  r = M.montar({ dados: MINIMO, marca: MARCA.replace("arquivo: assets/marca/logo-santander-branco.png", "arquivo:"), template: TEMPLATE, existe: existe });
+  r = M.montar({ dados: MINIMO, marca: MARCA.replace("arquivo: assets/marca/chama-santander-branca.png", "arquivo:"), template: TEMPLATE, existe: existe });
   assert.ok(r.ok && r.html.indexOf(">LOGO</p>") < 0 && !r.imagens.some(function (i) { return i.papel === "logo"; }));
 });
 
-teste("enquadramento do recorte: topo/centro/baixo; valor inválido vira aviso", function () {
+teste("enquadramento do recorte: centro/topo/baixo/esquerda/direita; valor inválido vira aviso", function () {
   var r = montar(MINIMO.replace("tipo: peca", "enquadramento: baixo\ntipo: peca"));
   assert.ok(r.imagens.some(function (i) { return i.ancora === "baixo"; }));
+  r = montar(MINIMO.replace("tipo: peca", "enquadramento: esquerda\ntipo: peca"));
+  assert.ok(r.imagens.some(function (i) { return i.ancora === "esquerda"; }));
   r = montar(MINIMO.replace("tipo: peca", "enquadramento: lado\ntipo: peca"));
   assert.ok(r.ok && niveis(r, "aviso").some(function (p) { return /enquadramento/.test(p.msg); }));
 });
 
 teste("grade: colunas de 184 px nas seções de 3 colunas", function () {
-  var r = montar(ler("dados/2026-09.txt"));
+  var r = montar(MODELO);
   assert.ok((r.html.match(/width="184"/g) || []).length >= 9, "esperava colunas de 184 px");
 });
 
@@ -104,7 +162,7 @@ teste("campo obrigatório vazio vira erro", function () {
 });
 
 teste("imagem que não existe vira erro", function () {
-  var r = montar(MINIMO.replace("openai-ads.jpg", "nao-existe.jpg"));
+  var r = montar(MINIMO.replace("icone-prancheta.png", "nao-existe.jpg"));
   assert.ok(!r.ok && niveis(r, "erro").some(function (p) { return /não encontrada/.test(p.msg); }));
 });
 
@@ -124,10 +182,20 @@ teste("links: placeholder é pendência; https interno passa; domínio fora da l
   assert.strictEqual(M.conferirLink("https://empresa.sharepoint.com/a.mp4", "video", [])[0].nivel, "aviso");
 });
 
-teste("pendência em link do placeholder gera CTA com #link-pendente (só rascunho)", function () {
-  var r = montar(MINIMO.replace(/link: .*/, "link: [COLE O LINK]"));
-  assert.ok(r.html.indexOf('href="#link-pendente"') > 0);
+teste("link pendente: botão aparece em cinza, sem ser clicável (só rascunho)", function () {
+  var r = montar(MINIMO.replace(/link: .*/, "link: [INSERIR LINK]"));
+  /* na capa vermelha, em Rio (contraste); nas outras seções, em cinza */
+  assert.ok(/<span title="Link ainda não definido" style="color:#F5DECF;[^"]*">Ver peça&nbsp;&#8594;<\/span>/.test(r.html));
+  var m = montar(MODELO);
+  assert.ok(/<span title="Link ainda não definido" style="color:#767676;[^"]*">Ver peça&nbsp;&#8594;<\/span>/.test(m.html));
+  assert.ok(!/<a [^>]*>\s*<img/.test(r.html) && !/href="#/.test(r.html));
   assert.ok(niveis(r, "pendencia").length === 1);
+});
+
+teste("número pendente vira etiqueta pequena (não estoura a coluna)", function () {
+  var r = montar(MINIMO.replace("valor: 10%", "valor: [INSERIR RESULTADO]").replace("variacao: +100%", "variacao: [INSERIR VARIAÇÃO]"));
+  assert.ok(/<span style="display:inline-block;[^"]*font-size:11px[^"]*">\[INSERIR RESULTADO\]<\/span>/.test(r.html));
+  assert.ok(r.html.indexOf("&#9650; [INSERIR") < 0, "variação pendente sem seta");
 });
 
 teste("texto do usuário é escapado (só <br> é aceito)", function () {
@@ -142,12 +210,12 @@ teste("Creative X: variação e barra calculadas", function () {
 });
 
 teste("marca: cor inválida vira erro", function () {
-  var r = M.montar({ dados: MINIMO, marca: MARCA.replace("marca: #9E1218", "marca: vermelho"), template: TEMPLATE, existe: existe });
+  var r = M.montar({ dados: MINIMO, marca: MARCA.replace("marca: #EC0000", "marca: vermelho"), template: TEMPLATE, existe: existe });
   assert.ok(!r.ok && r.problemas.some(function (p) { return /Cor "marca"/.test(p.msg); }));
 });
 
 teste("marca: fonte do Outlook vira uma fonte só, com aspas se tiver espaço", function () {
-  var r = M.montar({ dados: MINIMO, marca: MARCA.replace("titulos_outlook_windows: Georgia", "titulos_outlook_windows: Fonte Oficial, Georgia"), template: TEMPLATE, existe: existe });
+  var r = M.montar({ dados: MINIMO, marca: MARCA.replace("titulos_outlook_windows: Arial", "titulos_outlook_windows: Fonte Oficial, Georgia"), template: TEMPLATE, existe: existe });
   assert.ok(r.html.indexOf(".ft{font-family:'Fonte Oficial',serif !important;}") > 0);
 });
 
