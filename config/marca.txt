@@ -108,6 +108,18 @@ fundo_email: #FFFFFF
 # (como o Botão de Início sobre vermelho) e filete fino.
 capa_selo: #FFFFFF
 capa_filete: #FFFFFF
+# Grupos da história, com cores de APOIO do guia (uso pontual: etiqueta
+# do número da seção, rótulo e barra do Creative X). Títulos continuam
+# em vermelho. Contraste de cada par: 4,5:1 ou mais.
+#   resultados  (02 · O que lançamos e números da capa) -> turquesa
+#   evolucao    (03 · Creative X e 04 · Transformation)  -> roxo
+#   aprendizado (05 · O que aprendemos e 07 · Vem aí)     -> rosa
+grupo_resultados: #127277
+grupo_resultados_fundo: #CDECEE
+grupo_evolucao: #803262
+grupo_evolucao_fundo: #F0CAE1
+grupo_aprendizado: #A6112F
+grupo_aprendizado_fundo: #FFC3CF
 # Faixa dos números (Rio) e divisórias entre eles (Cidade do México).
 abertura_fundo: #F5DECF
 abertura_linha: #F0B998
@@ -115,8 +127,8 @@ abertura_linha: #F0B998
 capa_destaque: #FFFFFF
 # Divisórias finas e trilho da barra do Creative X.
 linha: #E2E2E2
-# 03 · Creative X: barra e score atual (vermelho); score anterior (cinza).
-creative_x: #EC0000
+# 03 · Creative X: barra (roxo do grupo); score anterior (cinza).
+creative_x: #803262
 creative_x_anterior: #767676
 # 04 · Creative Transformation: rótulo e citação, títulos, fundo (Lisboa)
 # e divisórias.
@@ -129,7 +141,10 @@ transformation_placeholder_borda: #F0B998
 # Textos sobre o vermelho (capa, Foco e rodapé): branco.
 foco_rotulo: #FFFFFF
 foco_texto: #FFFFFF
-# Rodapé: faixa de encerramento em Vermelho Santander.
+# Rodapé: faixa clara em Rio (a mesma da faixa dos números: o report fecha
+# como abre) com a despedida e a formiguinha, e faixa de assinatura em
+# Vermelho Santander.
+rodape_claro: #F5DECF
 rodape_fundo: #EC0000
 # Espaços de imagem ainda não definida (só no rascunho).
 placeholder_fundo: #FBF1EA

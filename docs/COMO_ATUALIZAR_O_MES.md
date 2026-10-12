@@ -110,10 +110,10 @@ Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt
 
 | Bloco no arquivo | Onde aparece no e-mail |
 |---|---|
-| `[EDICAO]` | Selo do mês na capa, "Foco de…", assunto, "Até [próximo mês]." e contato no rodapé |
+| `[EDICAO]` | Selo do mês na capa, "Foco de…", assunto e o rodapé ("Até [próximo mês].", "Dúvidas e sugestões" = `contato`, "Próxima edição" = `proximo_mes`, assinatura com o mês) |
 | `[ABERTURA]` | **01** · frase do mês na capa (`frase` + `frase_final` em itálico) e o texto da caixa de entrada (`previa`) |
 | `[PROJETO PRINCIPAL]` | **01** · nome, resumo e peça na capa |
-| `[NUMERO 1]` a `[NUMERO 4]` | **01** · faixa de números abaixo da capa (o 1º em vermelho) |
+| `[NUMERO 1]` a `[NUMERO 3]` (até 4) | **01** · faixa "Projeto principal em números", um por coluna da grade (o 1º em vermelho). Use 3; com 4, as colunas ficam iguais e saem da grade |
 | `[LANCAMOS]` | **02** · título da seção "O que lançamos" |
 | `[DESTAQUE]` | **02** · projeto em destaque (peça vertical no computador, horizontal no celular) |
 | `[RESULTADO 1]` a `[RESULTADO 3]` | **02** · números do destaque |
@@ -144,7 +144,7 @@ Os textos **não** são editados no HTML: eles ficam no arquivo do mês, e a pá
 |---|---|
 | Tirar um item (número, lançamento, aprendizado) | Apago o bloco inteiro, do `[NOME]` até antes do próximo bloco |
 | Tirar uma seção inteira | Apago todos os blocos dela. A numeração das seções se ajusta |
-| Acrescentar um item | Copio um bloco igual, colo embaixo e troco o número. Limites: 4 números, 3 resultados, 3 lançamentos, 3 Transformation, 3 aprendizados, 6 agenda |
+| Acrescentar um item | Copio um bloco igual, colo embaixo e troco o número. Limites: 4 números (recomendado 3), 3 resultados, 3 lançamentos, 3 Transformation, 3 aprendizados, 6 agenda |
 | Trocar o texto do botão | `tipo: peca` (Ver peça →), `video` (▶ Assistir), `projeto` (Ver projeto →), `demo` (Ver demonstração →) |
 | Tirar o botão | Deixo `link:` vazio |
 | Status de um lançamento | `status: Resultado em 28/10` e `status_cor: ambar` (previsto) ou `verde` (no ar) |

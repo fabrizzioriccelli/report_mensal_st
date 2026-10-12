@@ -11,8 +11,10 @@ A personagem do Creative Strategy, no **arquivo original** recebido da área.
 
 Só **duas vezes**, sempre o mesmo arquivo:
 
-1. **Abertura:** em pé, à direita dos números da capa (76 px). No celular fica escondida, para a faixa dos números caber na tela.
-2. **Encerramento:** no rodapé, ao lado da despedida (56 px), no computador e no celular.
+1. **Abertura:** pequena (44 px), em pé sobre o filete da faixa de números, à direita do rótulo "Projeto principal em números". Aparece também no celular.
+2. **Encerramento:** no rodapé (64 px), na faixa clara, em pé sobre a faixa vermelha da assinatura.
+
+Sempre sobre **fundo claro** (Rio): sobre o vermelho, as luvas e os sapatos vermelhos da personagem somem.
 
 Não há formiguinha nas seções do meio. As variações desenhadas na versão 2 (escudo, mala, fones etc.) foram **retiradas**: eram releituras, não o arquivo original.
 

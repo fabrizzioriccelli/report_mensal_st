@@ -57,7 +57,7 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 
 | Verificação | Status |
 |---|---|
-| Motor: 28 testes automáticos (inclui estado vazio e paleta do Brand Guide) | Passam |
+| Motor: 29 testes automáticos (inclui estado vazio e paleta do Brand Guide) | Passam |
 | Página de geração de ponta a ponta no Chromium, sem vazar para o lado de 320 a 1440 px | Passa |
 | Fonte `.otf` de teste em `assets/fonts/` | Carrega na prévia e no `.html`; fora do `.eml` |
 | E-mail gerado com o layout aprovado e os ajustes do Brand Guide | Conferido |
