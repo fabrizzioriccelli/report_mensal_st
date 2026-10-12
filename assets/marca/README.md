@@ -27,10 +27,10 @@ Referência: **Brand Guide Santander Brasil (maio/2026)**, seções 3.1 Logotipo
 |---|---|---|---|
 | Branco | `#FFFFFF` | Sim | Cartão do e-mail; textos, chama e selo sobre vermelho |
 | Lisboa | `#FBF1EA` | Sim | Fundo atrás do e-mail; superfície do Creative Transformation; espaços de imagem do modelo |
-| Rio | `#F5DECF` | Sim | Faixa dos números; divisórias do Transformation |
+| Rio | `#F5DECF` | Sim | Faixa dos números e faixa clara do rodapé; divisórias do Transformation |
 | Cidade do México | `#F0B998` | Não | Divisórias da faixa dos números; borda dos espaços de imagem |
 | Madri | `#EA6F5D` | Não | Não usada |
-| **Vermelho Santander** | `#EC0000` | Sim | Capa, Foco, rodapé, títulos sobre branco, número principal, links |
+| **Vermelho Santander** | `#EC0000` | Sim | Capa, Foco, faixa de assinatura do rodapé, títulos sobre branco, número principal, links |
 | Boston | `#CC0000` | Não | Não usada |
 | Londres | `#990000` | Não | Não usada (era o rodapé na versão 2; o guia não permite como fundo) |
 | Preto | `#000000` | — | Números e textos de apoio sobre branco |
@@ -41,9 +41,19 @@ Regras aplicadas (p. 37 e 38):
 - Sobre branco: **títulos em vermelho, textos de apoio em preto**.
 - Sobre vermelho: textos, chama e ícones em **branco**.
 
-### Paleta de apoio (p. 39): só em dados
+### Paleta de apoio (p. 39): uso pontual
 
-O guia pede uso **pontual**, preferencialmente em gráficos e visualizações de dados. No report, aparecem só em indicadores:
+O guia pede uso **pontual**, preferencialmente em gráficos e visualizações de dados. No report, elas aparecem em elementos pequenos, nunca como fundo de área grande.
+
+**Grupos da história** (etiqueta com o número da seção, rótulos e detalhes):
+
+| Grupo | Seções | Texto / etiqueta | Contraste |
+|---|---|---|---|
+| Resultados | Números da capa, 02 · O que lançamos | Turquesa `#127277` sobre `#CDECEE` | 4,6:1 |
+| Qualidade e transformação | 03 · Creative X (inclui a barra), 04 · Creative Transformation | Roxo `#803262` sobre `#F0CAE1` | 5,6:1 |
+| Aprendizado e próximos passos | 05 · O que aprendemos, 07 · Também vem aí, rótulos do rodapé | Rosa `#A6112F` sobre `#FFC3CF` | 5,1:1 |
+
+**Indicadores:**
 
 | Cor | HEX | Uso no report |
 |---|---|---|

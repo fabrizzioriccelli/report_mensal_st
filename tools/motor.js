@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.0 (2026-10-12)";
+  var VERSAO = "3.1 (2026-10-12)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -94,8 +94,9 @@
   ];
 
   var CORES = ["marca", "titulo", "texto", "texto_corpo", "texto_apoio", "positivo", "positivo_fundo", "atencao", "atencao_fundo", "fundo_pagina", "fundo_email"];
-  var CORES_APOIO = ["capa_selo", "capa_filete", "capa_destaque", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
-    "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto", "rodape_fundo",
+  var CORES_APOIO = ["grupo_resultados", "grupo_resultados_fundo", "grupo_evolucao", "grupo_evolucao_fundo", "grupo_aprendizado", "grupo_aprendizado_fundo",
+    "capa_selo", "capa_filete", "capa_destaque", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
+    "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto", "rodape_claro", "rodape_fundo",
     "placeholder_fundo", "placeholder_borda"];
   function obrig(lista) { var o = {}; lista.forEach(function (k) { o[k] = 1; }); return o; }
 
@@ -479,9 +480,9 @@
     /* 01 · Abertura */
     var pp = peca(P, "PROJETO PRINCIPAL", COL, COL, 20, { dica: "368 x 368 px", fluida: true, corCta: "#FFFFFF", corCtaPendente: "#F5DECF" });
     var nums = (L.NUMERO || []);
-    /* Nº 1 na coluna 1 (184 px); os outros dividem o espaço até a formiguinha (80 px, se houver). */
-    var fw = camFormiga ? 80 : 0;
-    var larg = nums.length <= 1 ? [LARGURA - fw] : [COL].concat(colunas(LARGURA - fw - COL - ESP, nums.length - 1));
+    /* Grade: até 3 números, um por coluna de 184 px (alinhados com as seções de baixo); 4 números, 4 colunas iguais. */
+    var larg = nums.length <= 3 ? nums.map(function () { return COL; }) : colunas(LARGURA, nums.length);
+    var sobra = nums.length && nums.length < 3 ? LARGURA - nums.length * COL - (nums.length - 1) * ESP : 0;
     var abertura = {
       n: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
       nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp,
@@ -494,7 +495,7 @@
           estilo: "padding:0 0 20px 0;"
         };
       }),
-      formiga: formiga(76, "formiguinha")
+      formiga: formiga(44, "formiguinha"), sobra: sobra
     };
 
     /* 02 · O que lançamos */
@@ -610,7 +611,7 @@
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
       assunto: assunto, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
-      logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(56, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
+      logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
     };

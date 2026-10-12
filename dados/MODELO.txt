@@ -81,7 +81,9 @@ enquadramento: centro
 tipo: peca
 link: [INSERIR LINK]
 
-# EDITAR AQUI: INDICADORES DO PROJETO PRINCIPAL (até 4)
+# EDITAR AQUI: INDICADORES DO PROJETO PRINCIPAL
+# Recomendado: 3 números, um em cada coluna da grade (alinhados com as
+# seções de baixo). Cabe um 4º ([NUMERO 4]): aí são 4 colunas iguais.
 # O 1º é o principal e aparece em vermelho: use o resultado mais relevante.
 #  valor: o número (até ~10 caracteres). Formatos: X,X%  ·  R$ X mi  ·  Xx  ·  X p.p.
 #  titulo: o que é (negrito)        detalhe: base de comparação
@@ -106,12 +108,6 @@ valor: X
 titulo: Lorem ipsum
 detalhe: era X
 variacao: +X%
-
-[NUMERO 4]
-valor: X p.p.
-titulo: Lorem ipsum
-detalhe: vs. X p.p.
-variacao: 
 
 
 # ----------------------------------------------------------------------

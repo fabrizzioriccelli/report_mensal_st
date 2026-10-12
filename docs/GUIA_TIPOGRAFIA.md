@@ -119,7 +119,7 @@ Cole no bloco `[FONTES]` de `config/marca.txt`:
 
 | Versão | Valores |
 |---|---|
-| **3.0 (atual, Brand Guide)** | `titulos: 'Santander Headline', Arial, Helvetica, sans-serif` · `texto: 'Santander Micro Text', Arial, Helvetica, sans-serif` · `impacto: 'Santander Condensed', 'Santander Headline', Arial, Helvetica, sans-serif` · `titulos_outlook_windows: Arial` · `texto_outlook_windows: Arial` |
+| **3.x (atual, Brand Guide)** | `titulos: 'Santander Headline', Arial, Helvetica, sans-serif` · `texto: 'Santander Micro Text', Arial, Helvetica, sans-serif` · `impacto: 'Santander Condensed', 'Santander Headline', Arial, Helvetica, sans-serif` · `titulos_outlook_windows: Arial` · `texto_outlook_windows: Arial` |
 | **2.x (anterior)** | `titulos: Georgia, 'Times New Roman', serif` · `texto: Arial, Helvetica, sans-serif` · `titulos_outlook_windows: Georgia` · `texto_outlook_windows: Arial` (a versão 2 também tinha itálicos e títulos em preto no template) |
 
 Ou recupere os arquivos pelo Git ([BACKUP.md](BACKUP.md#restaurar)).

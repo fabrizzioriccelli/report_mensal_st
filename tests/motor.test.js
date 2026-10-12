@@ -67,8 +67,19 @@ teste("Brand Guide: títulos em vermelho, fontes Santander primeiro, sem itálic
   assert.ok(r.html.indexOf("font-family:'Santander Condensed', 'Santander Headline', Arial") > 0);
   assert.ok(!/font-style:italic|<i[ >]/.test(r.html), "as famílias Santander do guia não têm itálico");
   var fundos = (r.html.match(/(?:bgcolor="|background:)(#[0-9A-F]{6})/gi) || []).map(function (x) { return x.slice(-7).toUpperCase(); });
-  var permitidos = ["#FFFFFF", "#FBF1EA", "#F5DECF", "#EC0000", "#A3E0CE", "#FFE1B9", "#E2E2E2"]; /* principais + apoio só em dados (etiquetas, barra) */
+  /* principais + apoio só em elementos pontuais: etiquetas de variação, barra, etiqueta do número da seção */
+  var permitidos = ["#FFFFFF", "#FBF1EA", "#F5DECF", "#EC0000", "#A3E0CE", "#FFE1B9", "#E2E2E2", "#CDECEE", "#F0CAE1", "#FFC3CF", "#803262"];
   fundos.forEach(function (f) { assert.ok(permitidos.indexOf(f) >= 0, "fundo fora da paleta: " + f); });
+});
+
+teste("grade da abertura: 3 números em colunas de 184 px; 4 números em 4 colunas iguais", function () {
+  var r = montar(MODELO);
+  assert.deepStrictEqual(r.modelo.abertura.numeros.map(function (n) { return n.largura; }), [184, 184, 184]);
+  var quatro = MODELO.replace("[LANCAMOS]", "[NUMERO 4]\nvalor: X\ntitulo: Lorem ipsum\n\n[LANCAMOS]");
+  r = montar(quatro);
+  assert.deepStrictEqual(r.modelo.abertura.numeros.map(function (n) { return n.largura; }), [132, 132, 132, 132]);
+  r = montar(MINIMO);
+  assert.strictEqual(r.modelo.abertura.numeros[0].largura + r.modelo.abertura.sobra, 600, "1 número: coluna 1 e o resto vazio");
 });
 
 teste("formiguinha: só na abertura e no rodapé, com o arquivo original", function () {
