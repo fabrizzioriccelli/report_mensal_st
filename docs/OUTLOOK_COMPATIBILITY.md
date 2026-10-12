@@ -38,11 +38,11 @@ Legenda: ✓ funciona · △ parcial ou depende da versão · ✕ não funciona.
 | Recurso | Como o report usa |
 |---|---|
 | ✓ Tabelas para layout, estilo inline | Toda a grade |
-| ✓ Cor de fundo em células | Capa vermelha, faixa creme dos números, petróleo (Transformation), vermelho (Foco), rodapé vermelho-escuro, selo do mês, etiquetas |
+| ✓ Cor de fundo em células | Capa, Foco e rodapé em Vermelho Santander; faixa dos números (Rio); Transformation (Lisboa); selo do mês; etiquetas |
 | ✓ Bordas em células | Filetes, divisórias, caixas tracejadas (só no rascunho) |
 | ✓ `margin` em parágrafos e `padding` em células | Espaçamentos (o Word ignora `margin` em tabelas) |
-| ✓ Imagens JPG/PNG com `width`, `height` e `alt` | Peças em JPG; formiguinha e ícones em PNG transparente; tudo **embutido** no `.eml` (`cid:`) |
-| ✓ Fontes instaladas no sistema | Georgia (títulos) + Arial (texto), configuráveis em `config/marca.txt` |
+| ✓ Imagens JPG/PNG com `width`, `height` e `alt` | Peças e fotos em JPG; chama, formiguinha e ícones em PNG transparente; tudo **embutido** no `.eml` (`cid:`) |
+| ✓ Fontes instaladas no sistema | Santander Headline / Micro Text / Condensed, se instaladas; senão Arial. Configuráveis em `config/marca.txt` |
 | ✓ Caracteres especiais (▶ → ● ○ ▲ ▼) | Play, setas e status, sem imagem |
 | ✓ Texto de pré-visualização escondido | O que aparece ao lado do assunto na caixa de entrada |
 
@@ -50,9 +50,9 @@ Legenda: ✓ funciona · △ parcial ou depende da versão · ✕ não funciona.
 
 | Situação | O que acontece |
 |---|---|
-| Fonte instalada no computador (Georgia, Arial, fonte corporativa instalada pela TI) | Aparece em todos os Outlooks daquele computador |
+| Fonte instalada no computador (Arial, fonte Santander instalada pela TI) | Aparece em todos os Outlooks daquele computador |
 | Fonte **não** instalada | O navegador usa a próxima da lista. O Outlook para Windows usa a fonte definida em `titulos_outlook_windows`/`texto_outlook_windows` (se ela também faltar, troca por Times New Roman) |
-| Fonte baixada da internet ou da rede (`@font-face`, Google Fonts) | **Não funciona no Outlook para Windows** e é bloqueada no ambiente corporativo. Não usada; a ferramenta recusa |
+| Fonte de arquivo (`@font-face`: `.otf` do projeto, Google Fonts) | **Não funciona no Outlook para Windows** e é bloqueada no ambiente corporativo. Não vai no `.eml` (a ferramenta recusa). Os `.otf` de `assets/fonts/` entram só na prévia e na página `.html` |
 
 Por isso a fonte é uma **lista**, configurada num lugar só ([CORPORATE_SETUP.md › Fonte oficial](CORPORATE_SETUP.md#2-fonte-oficial)). O Outlook para Windows recebe a dele por um bloco que só ele lê (`<!--[if mso]>`) e pelas classes `ft`/`fx` de cada texto.
 
@@ -85,7 +85,9 @@ Uma regra `@media (max-width:620px)`:
 - empilha as colunas (`col`);
 - coloca os números em pares (`half`);
 - na capa, o selo do mês desce para baixo do logo (`selo`) e a peça principal fica com 180 px, centralizada (`himg`); no rodapé, o logo e a assinatura passam para baixo da despedida, alinhados à esquerda (`al-m`);
-- esconde a formiguinha da faixa dos números e a do Foco, e a peça vertical do projeto em destaque, que não cabem (`hide-m`). O botão "Ver peça →" continua visível;
+- esconde a formiguinha da faixa dos números, que não cabe (`hide-m`); a do rodapé continua;
+- troca a peça vertical do projeto em destaque por uma versão **horizontal**, na largura da tela, acima do texto (`show-m`);
+- deixa etiquetas e textos longos quebrarem linha em vez de vazar (`wrap-m`);
 - aumenta as miniaturas para a largura da tela (`fluid`). Elas são exportadas com até 700 px para ficarem nítidas;
 - ajusta os tamanhos de títulos e números (`h1`, `h2`, `num`, `brand`).
 
@@ -93,7 +95,7 @@ Uma regra `@media (max-width:620px)`:
 
 | Verificação | Status |
 |---|---|
-| Renderização no Chromium a 760 px (computador) e 390 px (celular) | Testado, capturas conferidas |
+| Renderização no Chromium em 1440, 1024, 768, 430, 390, 360 e 320 px | Testado, sem vazamento lateral; capturas conferidas |
 | Ausência de recursos incompatíveis (script, flex, grid, position, fundo, rgba, base64, fonte externa, caminho local) | Testado automaticamente a cada geração |
 | Estrutura do `.eml` (MIME, UTF-8, texto + HTML, `cid:`) | Testado com o leitor de e-mail do Python |
 | Outlook clássico, novo Outlook, Outlook na Web, Outlook iOS/Android, Mac | **Não testado** (sem Outlook neste ambiente) |

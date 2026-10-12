@@ -1,0 +1,154 @@
+/*
+ * ======================================================================
+ *  FONTES OFICIAIS SANTANDER · @font-face
+ * ======================================================================
+ *  Famílias e pesos conforme o Brand Guide Santander (Brasil, maio/2026),
+ *  seção 3.3 Tipografia. O guia não lista estilos itálicos: nenhum foi
+ *  declarado.
+ *
+ *  COMO USAR (passo a passo em assets/fonts/README.md):
+ *    1. Baixe os .otf no Portal da Marca (link no Brand Guide).
+ *    2. Copie os arquivos para ESTA pasta (assets/fonts/).
+ *    3. Se o nome do arquivo for diferente do que está em url("…"),
+ *       troque SÓ o nome dentro de url("…"). Não mexa no resto.
+ *    4. Abra gerar-report.html e selecione a pasta de novo.
+ *
+ *  NOMES DE ARQUIVO: todos são PROVISÓRIOS (ainda não confirmados com
+ *  os arquivos oficiais). Os nomes das FAMÍLIAS (font-family) e os PESOS
+ *  (font-weight) seguem o Brand Guide e não devem ser alterados.
+ *
+ *  ONDE ISTO FUNCIONA:
+ *    ✓ prévia da página gerar-report.html
+ *    ✓ página do mês (.html) e report_backup.html (as fontes vão dentro)
+ *    ✗ e-mail (.eml): o Outlook não carrega fontes de arquivo. No e-mail,
+ *      cada pessoa vê a fonte INSTALADA no computador dela; sem ela, Arial.
+ *  Arquivo que não existir é ignorado: o report funciona sem nenhum .otf.
+ * ======================================================================
+ */
+
+/* ---------------------------------------------------------------------
+   SANTANDER HEADLINE · títulos (Bold no report)
+   Pesos no guia: Light, Regular, Bold
+   --------------------------------------------------------------------- */
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Headline";
+  src: url("SantanderHeadline-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Headline";
+  src: url("SantanderHeadline-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) · USADA NO REPORT */
+@font-face {
+  font-family: "Santander Headline";
+  src: url("SantanderHeadline-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------
+   SANTANDER MICRO TEXT · textos de apoio (Regular e Bold no report)
+   Pesos no guia: Light, Regular, SemiBold, Bold, ExtraBold
+   --------------------------------------------------------------------- */
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Micro Text";
+  src: url("SantanderMicroText-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) · USADA NO REPORT */
+@font-face {
+  font-family: "Santander Micro Text";
+  src: url("SantanderMicroText-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Micro Text";
+  src: url("SantanderMicroText-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) · USADA NO REPORT */
+@font-face {
+  font-family: "Santander Micro Text";
+  src: url("SantanderMicroText-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Micro Text";
+  src: url("SantanderMicroText-ExtraBold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------
+   SANTANDER CONDENSED · mensagens de impacto na voz do banco
+   (frase do mês, na capa; Bold no report)
+   Pesos no guia: Regular, Bold, Black
+   --------------------------------------------------------------------- */
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Condensed";
+  src: url("SantanderCondensed-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) · USADA NO REPORT */
+@font-face {
+  font-family: "Santander Condensed";
+  src: url("SantanderCondensed-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Condensed";
+  src: url("SantanderCondensed-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------
+   SANTANDER SCRIPT · voz do cliente (títulos em 1ª pessoa, caixa alta,
+   até 4 palavras). NÃO usada no report hoje: o report fala na voz do
+   banco. Declarada para uso futuro.
+   Pesos no guia: Regular, Bold
+   --------------------------------------------------------------------- */
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Script";
+  src: url("SantanderScript-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) */
+@font-face {
+  font-family: "Santander Script";
+  src: url("SantanderScript-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

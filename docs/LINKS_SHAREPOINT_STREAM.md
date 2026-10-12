@@ -17,11 +17,11 @@ Sugestão de organização no SharePoint, espelhando o projeto:
 
 ```text
 Report mensal/
-├── 2026-09/
-│   ├── seguro-conta-cartao.jpg      (peça em alta)
-│   ├── copa-do-mundo.jpg
-│   └── creator-reneg.mp4            (vídeo: abre no Stream)
-└── 2026-10/
+├── 2026-10/
+│   ├── campanha-x.jpg               (peça em alta)
+│   ├── campanha-y.jpg
+│   └── video-campanha-z.mp4         (vídeo: abre no Stream)
+└── 2026-11/
 ```
 
 ## Qual link usar
@@ -69,8 +69,8 @@ No celular, o link pode abrir no app do SharePoint/Stream ou no navegador. Polí
 
 ```text
 [LANCAMENTO 2]
-nome: Creator em Reneg
-imagem: creator-reneg.jpg
+nome: Lorem ipsum
+imagem: video-campanha-z.jpg
 tipo: video
 link: https://empresa.sharepoint.com/:v:/s/creative/EaBcD123...
 ```

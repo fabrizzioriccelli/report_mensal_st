@@ -24,7 +24,7 @@
   Precisa do arquivo tools/motor.js na mesma estrutura de pastas.
 -->
 <style>
-  :root{--red:#9E1218;--ink:#1C1614;--gray:#5F5752;--rule:#E3DFDC;--bg:#F5F3F1;--ok:#1D7A4C;--okbg:#E4F2EA;--warn:#9A5B00;--warnbg:#FBF0DC;--errbg:#FBE7E8}
+  :root{--red:#EC0000;--ink:#222222;--gray:#5F5F5F;--rule:#E3DFDC;--bg:#F5F3F1;--ok:#21634F;--okbg:#E3F5EF;--warn:#945400;--warnbg:#FFF1DE;--errbg:#FBE7E8}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Arial,sans-serif}
   header{background:#fff;border-top:6px solid var(--red);border-bottom:1px solid var(--rule)}
@@ -45,12 +45,12 @@
   select{font:inherit;font-size:14px;padding:9px 10px;border:1px solid #CFC9C4;border-radius:8px;min-width:240px;background:#fff}
   .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px}
   .banner{border-radius:10px;padding:12px 16px;font-weight:600;margin:0}
-  .banner.ok{background:var(--okbg);color:var(--ok)}.banner.warn{background:var(--warnbg);color:var(--warn)}.banner.err{background:var(--errbg);color:var(--red)}
+  .banner.ok{background:var(--okbg);color:var(--ok)}.banner.warn{background:var(--warnbg);color:var(--warn)}.banner.err{background:var(--errbg);color:#990000}
   ul.list{margin:0;padding:0;list-style:none;font-size:14px}
   ul.list li{padding:7px 0;border-bottom:1px solid #F0ECE9;display:flex;gap:10px;align-items:baseline}
   ul.list li:last-child{border-bottom:0}
   .tag{flex:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
-  .tag.erro{background:var(--errbg);color:var(--red)}.tag.pendencia{background:var(--warnbg);color:var(--warn)}.tag.aviso{background:#EEF0F3;color:#3D4A5C}.tag.info{background:#F3F1EF;color:var(--gray)}.tag.ok{background:var(--okbg);color:var(--ok)}
+  .tag.erro{background:var(--errbg);color:#990000}.tag.pendencia{background:var(--warnbg);color:var(--warn)}.tag.aviso{background:#EEF0F3;color:#3D4A5C}.tag.info{background:#F3F1EF;color:var(--gray)}.tag.ok{background:var(--okbg);color:var(--ok)}
   .where{color:var(--gray);font-size:12px;white-space:nowrap}
   table.t{width:100%;border-collapse:collapse;font-size:14px}
   table.t th,table.t td{text-align:left;padding:8px 6px;border-bottom:1px solid #F0ECE9;vertical-align:top}
@@ -68,7 +68,7 @@
 <body>
 <header><div>
   <h1>Gerar o e-mail do report</h1>
-  <p>Lê o arquivo de dados do mês, confere tudo, prepara as imagens e gera o arquivo <b>.eml</b> que o Outlook abre como mensagem nova.</p>
+  <p>Lê o arquivo de dados do mês, confere tudo, prepara as imagens e gera o arquivo <b>.eml</b> que o Outlook abre como mensagem nova. <span id="versao"></span></p>
 </div></header>
 
 <main>
@@ -145,11 +145,14 @@
     document.querySelector("main").innerHTML = '<section><p class="banner err">Não encontrei o arquivo tools/motor.js. Abra este arquivo de dentro da pasta do projeto, sem mover nem renomear as pastas.</p></section>';
     return;
   }
+  $("#versao").textContent = "Versão " + Motor.VERSAO + ".";
   var ARQ = {};          /* caminho relativo à pasta do projeto → File */
   var atual = null;      /* resultado da última montagem */
   var prontas = [];      /* imagens processadas, na ordem do motor */
   var urls = [];
   var abertas = {};      /* caminho → imagem já aberta (para medir e redimensionar) */
+  var cssFontes = "";    /* @font-face das fontes Santander que existem em assets/fonts/ (com o arquivo dentro) */
+  var CSS_FONTES = "assets/fonts/fontes-santander.css";
 
   /* ---------- utilidades ---------- */
   function el(tag, attrs, filhos) {
@@ -174,13 +177,16 @@
     var meses = [];
     Array.prototype.forEach.call(e.target.files, function (f) {
       var rel = f.webkitRelativePath.split("/").slice(1).join("/");
+      if (/^(\.git|\.idea|node_modules)\//.test(rel)) return; /* pastas técnicas: o report não usa */
       ARQ[rel] = f;
-      if (/^dados\/[^/]+\.txt$/i.test(rel) && !/modelo/i.test(rel)) meses.push(rel);
+      if (/^dados\/[^/]+\.txt$/i.test(rel)) meses.push(rel);
     });
-    meses.sort();
+    /* Meses em ordem; o MODELO (em branco) fica por último e só é escolhido sozinho se não houver nenhum mês. */
+    meses.sort(function (a, b) { var ma = /modelo/i.test(a), mb = /modelo/i.test(b); return ma !== mb ? (ma ? 1 : -1) : a < b ? -1 : a > b ? 1 : 0; });
+    var reais = meses.filter(function (m) { return !/modelo/i.test(m); });
     var aviso = !ARQ["template/report.html"] || !ARQ["config/marca.txt"]
       ? "Essa não parece ser a pasta principal do projeto (faltam config/ ou template/). Escolha a pasta que contém este arquivo, gerar-report.html."
-      : !meses.length ? "Não há nenhum mês em dados/. Copie dados/MODELO.txt (ou o mês anterior) para dados/AAAA-MM.txt, por exemplo dados/2026-10.txt." : "";
+      : !meses.length ? "Não há nenhum arquivo em dados/. Copie dados/MODELO.txt para dados/AAAA-MM.txt, por exemplo dados/2026-10.txt." : "";
     if (aviso) {
       $("#pastaInfo").replaceChildren(el("span", { style: "color:var(--red);font-weight:600", text: aviso }));
       $("#mesRow").hidden = true;
@@ -189,8 +195,8 @@
     }
     $("#pastaInfo").textContent = Object.keys(ARQ).length + " arquivos lidos.";
     var sel = $("#mes"), anterior = sel.value;
-    sel.replaceChildren.apply(sel, meses.map(function (m) { return el("option", { value: m, text: m.replace(/^dados\//, "") }); }));
-    sel.value = meses.indexOf(anterior) >= 0 ? anterior : meses[meses.length - 1];
+    sel.replaceChildren.apply(sel, meses.map(function (m) { return el("option", { value: m, text: m.replace(/^dados\//, "") + (/modelo/i.test(m) ? " (modelo em branco)" : "") }); }));
+    sel.value = meses.indexOf(anterior) >= 0 ? anterior : reais.length ? reais[reais.length - 1] : meses[0];
     $("#mesRow").hidden = false;
     conferir(sel.value);
   });
@@ -206,6 +212,29 @@
     });
   }
 
+  /* ---------- fontes Santander (.otf em assets/fonts/) ----------
+     Lê assets/fonts/fontes-santander.css e mantém só os @font-face cujo arquivo existe, com o
+     arquivo embutido (data:). Vai na prévia e na página do mês (.html); NÃO vai no .eml
+     (o Outlook não carrega fontes de arquivo: no e-mail vale a fonte instalada ou a Arial). */
+  function prepararFontes() {
+    cssFontes = "";
+    if (!ARQ[CSS_FONTES]) return Promise.resolve({ achadas: 0, total: 0 });
+    return ARQ[CSS_FONTES].text().then(function (css) {
+      var blocos = css.replace(/\/\*[\s\S]*?\*\//g, "").match(/@font-face\s*\{[^}]*\}/g) || [];
+      var achadas = 0;
+      return Promise.all(blocos.map(function (b) {
+        var m = b.match(/url\(\s*["']?([^"')]+)["']?\s*\)/), cam = m ? "assets/fonts/" + m[1].replace(/^\.\//, "") : "";
+        if (!cam || !ARQ[cam]) return "";
+        achadas++;
+        var tipo = /\.woff2$/i.test(cam) ? "font/woff2" : /\.woff$/i.test(cam) ? "font/woff" : /\.ttf$/i.test(cam) ? "font/ttf" : "font/otf";
+        return ARQ[cam].arrayBuffer().then(function (buf) {
+          return b.replace(m[0], 'url("data:' + tipo + ";base64," + Motor.base64(new Uint8Array(buf)) + '")');
+        });
+      })).then(function (lista) { cssFontes = lista.join("\n"); return { achadas: achadas, total: blocos.length }; });
+    });
+  }
+  function comFontes(html) { return cssFontes ? html.replace("</head>", "<style>\n/* Fontes Santander (assets/fonts/) */\n" + cssFontes + "\n</style>\n</head>") : html; }
+
   /* ---------- 2. conferência ---------- */
   function conferir(caminhoDados) {
     abertas = {};
@@ -219,7 +248,13 @@
       })).then(function () {
         var r = Motor.montar(entrada);
         if (!r.ok) return mostrar(r);
-        return prepararImagens(r).then(function () { mostrar(r); });
+        return Promise.all([prepararImagens(r), prepararFontes()]).then(function (x) {
+          var f = x[1];
+          r.problemas.push({ nivel: "info", arquivo: CSS_FONTES, linha: 0, msg: f.achadas
+            ? "Fontes Santander: " + f.achadas + " de " + f.total + " arquivos encontrados em assets/fonts/. Eles entram na prévia e na página do mês (.html). No e-mail (.eml), vale a fonte instalada no computador de quem lê."
+            : "Fontes Santander: nenhum arquivo .otf em assets/fonts/. A prévia e o e-mail usam a fonte instalada no computador ou, sem ela, Arial (alternativa, não é a fonte oficial). Como colocar os arquivos: assets/fonts/README.md." });
+          mostrar(r);
+        });
       });
     }).catch(function (e) { mostrar({ ok: false, problemas: [{ nivel: "erro", arquivo: "", linha: 0, msg: e.message }] }); });
   }
@@ -287,6 +322,7 @@
       return p.then(function () { return preparar(im, ARQ[im.caminho], r.config).then(function (x) { prontas[i] = x; }); });
     }, Promise.resolve());
   }
+  function nomeCurto(n) { var ext = (n.match(/\.[^.]+$/) || [""])[0], base = n.slice(0, n.length - ext.length).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w-]+/g, "_"); return base.slice(0, 40) + ext.toLowerCase(); }
   function canvas(w, h) { var c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
   function preparar(reg, file, cfg) {
     var img = abertas[reg.caminho], nw = img.naturalWidth, nh = img.naturalHeight;
@@ -296,13 +332,14 @@
     var sx = 0, sy = 0, sw = nw, sh = nh, W, H;
     if (reg.recorte && reg.h) {
       var r = reg.w / reg.h;
-      /* Recorte no formato do espaço. "enquadramento" escolhe qual parte fica: centro, topo ou baixo. */
-      if (nw / nh > r) { sw = Math.round(nh * r); sx = Math.round((nw - sw) / 2); }
+      /* Recorte no formato do espaço. "enquadramento" escolhe qual parte fica: centro, topo, baixo, esquerda ou direita. */
+      if (nw / nh > r) { sw = Math.round(nh * r); sx = reg.ancora === "esquerda" ? 0 : reg.ancora === "direita" ? nw - sw : Math.round((nw - sw) / 2); }
       else { sh = Math.round(nw / r); sy = reg.ancora === "topo" ? 0 : reg.ancora === "baixo" ? nh - sh : Math.round((nh - sh) / 2); }
       W = Math.min(alvo, sw); H = Math.round(W / r);
     } else { W = Math.min(alvo, nw); H = Math.round(W * nh / nw); }
     var corta = sw !== nw || sh !== nh;
-    var nome = String(reg.id).padStart(2, "0") + "-" + file.name.replace(/[^\w.-]+/g, "_");
+    /* Nome curto e sem acentos/espaços (vai no .eml e no cid das imagens). */
+    var nome = String(reg.id).padStart(2, "0") + "-" + nomeCurto(file.name);
     /* Já está no tamanho certo e leve? Usa o arquivo como está (sem perder qualidade). */
     if ((png || jpg) && !corta && !reg.play && nw <= alvo * 1.2 && file.size <= 200 * 1024) {
       return file.arrayBuffer().then(function (b) { return { bytes: new Uint8Array(b), nome: nome, w: nw, h: nh, ow: nw, oh: nh, mantida: true }; });
@@ -324,7 +361,7 @@
     return new Promise(function (res) { fim.toBlob(res, tipo, cfg.qualidade); }).then(function (blob) { return blob.arrayBuffer(); })
       .then(function (b) {
         /* PNG reduzido pelo navegador pode ficar MAIS pesado que o original (que já vem otimizado). Nesse caso, mantém o original. */
-        if (!corta && !reg.play && b.byteLength >= file.size && (png || jpg)) return file.arrayBuffer().then(function (o) { return { bytes: new Uint8Array(o), nome: String(reg.id).padStart(2, "0") + "-" + file.name.replace(/[^\w.-]+/g, "_"), w: nw, h: nh, ow: nw, oh: nh, mantida: true }; });
+        if (!corta && !reg.play && b.byteLength >= file.size && (png || jpg)) return file.arrayBuffer().then(function (o) { return { bytes: new Uint8Array(o), nome: String(reg.id).padStart(2, "0") + "-" + nomeCurto(file.name), w: nw, h: nh, ow: nw, oh: nh, mantida: true }; });
         return { bytes: new Uint8Array(b), nome: nome, w: W, h: H, ow: nw, oh: nh, mantida: false };
       });
   }
@@ -347,7 +384,7 @@
     var html = Motor.trocarImagens(atual.html, function (id) {
       var p = prontas[id - 1], u = URL.createObjectURL(new Blob([p.bytes], { type: Motor.tipoMime(p.nome) })); urls.push(u); return u;
     });
-    $("#pv").srcdoc = html;
+    $("#pv").srcdoc = comFontes(html);
   }
   document.querySelectorAll("[data-w]").forEach(function (b) {
     b.addEventListener("click", function () {
@@ -376,8 +413,8 @@
   });
   $("#bHtml").addEventListener("click", function () {
     /* Página do mês para guardar: as imagens vão dentro do arquivo, então ela abre em qualquer computador. */
-    var html = Motor.trocarImagens(atual.html, function (id) { var p = prontas[id - 1]; return "data:" + Motor.tipoMime(p.nome) + ";base64," + Motor.base64(p.bytes); });
-    html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Não edite: edite o arquivo de dados e gere de novo. -->");
+    var html = comFontes(Motor.trocarImagens(atual.html, function (id) { var p = prontas[id - 1]; return "data:" + Motor.tipoMime(p.nome) + ";base64," + Motor.base64(p.bytes); }));
+    html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html (versão " + Motor.VERSAO + ") a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Não edite: edite o arquivo de dados e gere de novo. -->");
     var nome = atual.nomeArquivo.replace(/^report-/, "") + ".html";
     baixar(nome, html, "text/html");
     $("#gerarInfo").textContent = "Baixado: " + nome + ". Guarde na pasta reports/ do projeto.";

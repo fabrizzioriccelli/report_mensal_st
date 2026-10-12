@@ -8,85 +8,95 @@
 #  Como editar:
 #    - Cada linha é "campo: valor". Troque só o que vem depois dos ":".
 #    - Linhas que começam com # são explicações e não fazem nada.
-#    - Depois de salvar, gere o report de novo (tools/gerar-report.html).
+#    - Depois de salvar, gere o report de novo (gerar-report.html).
 #      A ferramenta aplica estas escolhas em todo o e-mail.
 # ======================================================================
 
 
 # ======================================================================
-#  EDITAR AQUI — FONTE OFICIAL DO BANCO
+#  EDITAR AQUI — FONTES (Brand Guide Santander, seção 3.3 Tipografia)
 # ======================================================================
-#  O e-mail não "leva" a fonte junto: cada pessoa vê a fonte que está
-#  INSTALADA no computador ou celular dela. Por isso cada campo é uma
-#  lista: a 1ª fonte da lista que existir no aparelho é usada.
+#  Famílias oficiais e uso no report:
+#    Santander Headline   títulos (Bold)            -> titulos
+#    Santander Micro Text textos de apoio            -> texto
+#    Santander Condensed  mensagem de impacto (capa) -> impacto
+#    Santander Script     voz do cliente: não usada no report
 #
-#  Para usar a fonte oficial:
-#    1. Confirme com Marca/TI o NOME EXATO da fonte instalada nas
-#       máquinas (o nome que aparece no Word, na lista de fontes).
-#    2. Coloque esse nome no COMEÇO da lista, entre aspas simples:
-#         titulos: 'Nome Exato da Fonte', Georgia, 'Times New Roman', serif
-#    3. Mantenha as fontes seguintes: são o plano B de quem não tem a
-#       fonte oficial (celular pessoal, por exemplo).
+#  Cada campo é uma LISTA: o aparelho usa a 1ª fonte que encontrar.
+#    1º  a família Santander (arquivo .otf em assets/fonts/ ou fonte
+#        instalada no computador);
+#    2º  Arial: alternativa do sistema, parecida e disponível em
+#        qualquer computador. NÃO é a fonte oficial.
+#  Como colocar os arquivos .otf: assets/fonts/README.md
+#  Guia completo: docs/GUIA_TIPOGRAFIA.md
 #
 #  OUTLOOK PARA WINDOWS lê só UMA fonte e, se ela não existir no
 #  computador, troca por Times New Roman. Por isso ele tem campos
-#  próprios, com uma fonte só. Coloque a fonte oficial aqui SOMENTE se
-#  a TI confirmar que ela está instalada em TODOS os computadores que
-#  recebem o report. Na dúvida, deixe Georgia e Arial.
-#  -> VALIDAR COM TI / MARCA.
+#  próprios, com uma fonte só. Coloque a fonte Santander aqui SOMENTE se
+#  a TI confirmar que ela está INSTALADA em todos os computadores que
+#  recebem o report. -> VALIDAR COM TI.
 # ======================================================================
 [FONTES]
-titulos: Georgia, 'Times New Roman', serif
-texto: Arial, Helvetica, sans-serif
-titulos_outlook_windows: Georgia
+titulos: 'Santander Headline', Arial, Helvetica, sans-serif
+texto: 'Santander Micro Text', Arial, Helvetica, sans-serif
+impacto: 'Santander Condensed', 'Santander Headline', Arial, Helvetica, sans-serif
+titulos_outlook_windows: Arial
 texto_outlook_windows: Arial
 
 
 # ======================================================================
-#  EDITAR AQUI — LOGO DO SANTANDER
+#  EDITAR AQUI — CHAMA DO SANTANDER (só o símbolo, sem o nome)
 # ======================================================================
-#  O logo aparece no topo do e-mail, sobre o vermelho da capa. Use a
-#  versão OFICIAL em BRANCO (negativa), em PNG com fundo transparente,
-#  fornecida pela área de Marca. Não redesenhe nem baixe da internet.
-#
-#  O logo já está no projeto (assets/marca/logo-santander-branco.png,
-#  gerado a partir do SVG oficial em assets/marca/svg/). Para trocar:
-#  1. Salve o novo arquivo em assets/marca/.
+#  A chama aparece no topo do e-mail e no rodapé, sobre o vermelho.
+#  Sobre vermelho, use a versão BRANCA (negativa), em PNG transparente.
+#  Os arquivos saíram do vetor oficial (assets/marca/svg/). Não redesenhe
+#  nem baixe da internet.
+#  1. Para trocar, salve o novo arquivo em assets/marca/.
 #  2. Confira se o nome abaixo é igual ao do arquivo.
-#  3. largura: largura do logo no e-mail, em px (entre 70 e 140).
+#  3. largura: largura da chama no e-mail, em px (entre 20 e 60).
 #  Enquanto o arquivo não existir, o rascunho mostra um espaço tracejado
 #  "LOGO" e a ferramenta não libera a versão final.
-#  Para não usar logo, deixe "arquivo:" vazio.
+#  Para não usar a chama, deixe "arquivo:" vazio.
 # ======================================================================
 [LOGO]
-arquivo: assets/marca/logo-santander-branco.png
-largura: 104
+arquivo: assets/marca/chama-santander-branca.png
+largura: 32
 descricao: Santander
 
 
 # ======================================================================
-#  CORES PRINCIPAIS
+#  CORES · Brand Guide Santander (seção 3.2 Cores)
 # ======================================================================
-#  Use sempre o código hexadecimal com # e 6 dígitos (ex.: #9E1218).
+#  Use sempre o código hexadecimal com # e 6 dígitos (ex.: #EC0000).
 #  O Outlook para Windows não entende rgb(), nomes de cor nem transparência.
+#  Regras do guia aplicadas aqui:
+#   - FUNDO só pode ser: Branco #FFFFFF, Lisboa #FBF1EA, Rio #F5DECF ou
+#     Vermelho Santander #EC0000.
+#   - Sobre branco: títulos em vermelho, textos de apoio em preto.
+#   - Sobre vermelho: textos, chama e ícones em branco.
+#   - Cores de apoio (verdes, âmbar, cinzas): só pontualmente, em dados
+#     (etiquetas de variação, barra do Creative X).
+#  Paleta completa e onde cada cor é usada: assets/marca/README.md
 [CORES]
-# Marca: nome do report, numeração das seções, número principal,
-# links ("Ver peça", "Assistir") e o bloco do Foco.
-marca: #9E1218
-# Texto principal (títulos, números) e filetes pretos.
-texto: #1C1614
-# Texto de leitura (resumos e descrições).
-texto_corpo: #4A423E
-# Texto de apoio (rótulos, legendas, "era ...").
-texto_apoio: #8C827C
-# Resultado positivo: etiquetas verdes (texto e fundo).
-positivo: #1D7A4C
-positivo_fundo: #E4F2EA
-# Previsto / pendente / atenção: etiquetas âmbar (texto e fundo).
-atencao: #9A5B00
-atencao_fundo: #FBF0DC
-# Fundo atrás do e-mail e fundo do cartão do e-mail.
-fundo_pagina: #EAE4DE
+# Vermelho Santander: capa, Foco, rodapé, numeração das seções,
+# número principal e links ("Ver peça", "Assistir").
+marca: #EC0000
+# Títulos sobre fundo branco.
+titulo: #EC0000
+# Números e textos fortes (preto).
+texto: #000000
+# Textos de apoio (preto).
+texto_corpo: #000000
+# Legendas e rótulos pequenos (cinza de apoio).
+texto_apoio: #767676
+# Indicador positivo: etiquetas verdes (texto e fundo).
+positivo: #21634F
+positivo_fundo: #A3E0CE
+# Indicador de atenção / previsto: etiquetas âmbar (texto e fundo).
+atencao: #945400
+atencao_fundo: #FFE1B9
+# Fundo atrás do e-mail (Lisboa) e fundo do cartão do e-mail (Branco).
+fundo_pagina: #FBF1EA
 fundo_email: #FFFFFF
 
 
@@ -94,32 +104,36 @@ fundo_email: #FFFFFF
 #  CORES DE APOIO (assinaturas das seções)
 # ======================================================================
 [CORES DE APOIO]
-# 01 · Abertura: a capa é vermelha (cor "marca"). Selo do mês e filete
-# sobre o vermelho; faixa creme dos números e divisórias entre eles.
-capa_selo: #7A0D12
-capa_filete: #B8424A
-abertura_fundo: #F7F2EC
-abertura_linha: #E3D9CF
+# 01 · Capa vermelha: selo do mês em pílula BRANCA com texto vermelho
+# (como o Botão de Início sobre vermelho) e filete fino.
+capa_selo: #FFFFFF
+capa_filete: #FFFFFF
+# Faixa dos números (Rio) e divisórias entre eles (Cidade do México).
+abertura_fundo: #F5DECF
+abertura_linha: #F0B998
+# Final da frase do mês, sobre o vermelho (branco).
+capa_destaque: #FFFFFF
 # Divisórias finas e trilho da barra do Creative X.
-linha: #E8E1DA
-# 03 · Creative X: barra e score; score anterior em cinza.
-creative_x: #2B2422
-creative_x_anterior: #A79C96
-# 04 · Creative Transformation: rótulo, títulos, superfície e divisórias.
-transformation: #1D6470
-transformation_titulo: #123E45
-transformation_fundo: #E8F1F1
-transformation_linha: #DCE8E9
-transformation_placeholder_fundo: #F2F7F7
-transformation_placeholder_borda: #A9C9CC
-# Textos claros sobre o vermelho (capa da abertura e bloco do Foco).
-foco_rotulo: #F4C9CB
-foco_texto: #FBE3E4
-# Rodapé: faixa de encerramento (vermelho mais escuro que o da capa).
-rodape_fundo: #7A0D12
-# Caixas tracejadas de imagem ainda não definida (só no rascunho).
-placeholder_fundo: #F7F2EC
-placeholder_borda: #D9C8BC
+linha: #E2E2E2
+# 03 · Creative X: barra e score atual (vermelho); score anterior (cinza).
+creative_x: #EC0000
+creative_x_anterior: #767676
+# 04 · Creative Transformation: rótulo e citação, títulos, fundo (Lisboa)
+# e divisórias.
+transformation: #EC0000
+transformation_titulo: #EC0000
+transformation_fundo: #FBF1EA
+transformation_linha: #F5DECF
+transformation_placeholder_fundo: #FBF1EA
+transformation_placeholder_borda: #F0B998
+# Textos sobre o vermelho (capa, Foco e rodapé): branco.
+foco_rotulo: #FFFFFF
+foco_texto: #FFFFFF
+# Rodapé: faixa de encerramento em Vermelho Santander.
+rodape_fundo: #EC0000
+# Espaços de imagem ainda não definida (só no rascunho).
+placeholder_fundo: #FBF1EA
+placeholder_borda: #F0B998
 
 
 # ======================================================================
@@ -160,10 +174,11 @@ dominios_permitidos:
 
 
 # ======================================================================
-#  FORMIGUINHA · versões fixas
+#  FORMIGUINHA · arquivo original
 # ======================================================================
-#  A versão do projeto principal muda todo mês e fica no arquivo de
-#  dados. Estas duas são fixas. Nomes disponíveis em assets/formiguinha/.
+#  Aparece só duas vezes: na abertura (ao lado dos números) e no
+#  encerramento (rodapé). É sempre o mesmo arquivo original.
+#  Para não usar a formiguinha, deixe "arquivo:" vazio.
 [FORMIGUINHA]
-transformation: transformacao
-foco: foco
+arquivo: assets/formiguinha/formiguinha.png
+descricao: Formiguinha, personagem do Creative Strategy, fazendo joinha

@@ -52,7 +52,7 @@ A automação só foi criada porque **reduz** o trabalho mensal e os erros poss�
 - Cada texto tem uma classe `ft` (títulos) ou `fx` (texto). Num bloco que só o Outlook para Windows lê (`<!--[if mso]>`), essas classes recebem a fonte configurada para ele.
 - O Outlook para Windows lê só a 1ª fonte da lista e cai para Times New Roman se ela não existir. Por isso ele tem uma configuração própria, com uma fonte só.
 - **Grade única:** a área de conteúdo tem 600 px, dividida em 3 colunas de 184 px com espaços de 24 px. Capa, números, destaque, lançamentos, Creative X, aprendizados e agenda usam as mesmas linhas, e as divisórias ficam no meio dos espaços. As larguras são fixas em px, que o Outlook para Windows respeita melhor que porcentagens. No celular, os espaços somem e as colunas empilham, todas na mesma margem. Entre seções, o espaço é sempre de 40 px.
-- Os números da abertura não quebram linha (`nowrap`). O número principal ocupa a coluna 1 inteira (184 px) e os demais têm folga para uma fonte corporativa mais larga (testado com uma fonte bem mais larga que a Georgia).
+- Os números da abertura não quebram linha (`nowrap`). O número principal ocupa a coluna 1 inteira (184 px) e os demais têm folga para uma fonte corporativa mais larga (testado com fontes mais largas que a alternativa).
 
 **Limitações:**
 - No Outlook para Windows, os cantos aparecem retos e o layout é sempre o de 680 px.
@@ -71,7 +71,7 @@ A automação só foi criada porque **reduz** o trabalho mensal e os erros poss�
 | Caminho de rede (`\\servidor\...`) ou `file://` | Não aparece para o destinatário; é um risco de segurança conhecido e costuma ser bloqueado | Não funciona | — | **Bloqueada pela ferramenta** |
 | Base64 no HTML (`data:`) | Não aparece | Varia | — | Descartada |
 
-**Peso:** cada imagem é reduzida para o dobro do tamanho em que aparece. As que ocupam a tela inteira no celular vão com até 700 px. A peça de setembro com 4,8 MB virou 16 KB, e o `.eml` inteiro tem ~220 KB. Um PNG já otimizado (formiguinha) é mantido como está.
+**Peso:** cada imagem é reduzida para o dobro do tamanho em que aparece. As que ocupam a tela inteira no celular vão com até 700 px. Nos testes, fotos de 3 a 8 MB viraram 27 a 64 KB cada, e o `.eml` com 11 imagens ficou com ~520 KB (o modelo em branco, ~200 KB). Um PNG já otimizado é mantido como está.
 
 ### 3. Conteúdo ampliado (peça em tamanho grande)
 
@@ -111,7 +111,7 @@ O ▶ faz parte da imagem: aparece em qualquer cliente, inclusive no Outlook par
 O conteúdo nunca depende da camada de melhoria.
 
 **Imagens bloqueadas ou que não carregam:**
-- toda imagem tem `width`, `height` e um `alt` descritivo ("Vídeo: Creator falando sobre renegociação (assistir ao vídeo)"), então o layout não desmonta;
+- toda imagem tem `width`, `height` e um `alt` descritivo ("Vídeo: Lorem ipsum dolor sit amet (assistir ao vídeo)"), então o layout não desmonta;
 - o texto principal de cada bloco está em HTML, nunca dentro de imagem;
 - o botão do link é texto, não imagem: continua clicável mesmo sem imagens.
 
@@ -139,6 +139,7 @@ Quatro tipos, cada um com um texto fixo. A pessoa sempre sabe o que vai acontece
 |---|---|
 | Bloco ou campo com nome errado, linha sem `:`, campo obrigatório vazio | Erro, com arquivo e linha |
 | Imagem, ícone ou formiguinha que não existe | Erro |
+| Conteúdo de exemplo: Lorem Ipsum, `X` nos números (`X%`, `R$ X`, `XX/XX`), "Mês", "AAAA" | Pendência: só gera RASCUNHO |
 | Texto `[entre colchetes]` em qualquer campo | Pendência: só gera RASCUNHO, com "[RASCUNHO]" no assunto |
 | Link com `\\servidor`, `C:\`, `file:`, `javascript:` ou espaço | Erro |
 | Link `http://`, fora dos domínios aprovados, de incorporação (embed), de download, do Stream Clássico ou direto para `.mp4` | Aviso |
@@ -153,7 +154,7 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 | Item | Resultado |
 |---|---|
 | E-mail final | Nenhuma requisição externa. Imagens só por `cid:`; nenhuma fonte, CSS ou script externo. A única URL é o identificador padrão `xmlns` do HTML, que não é carregado |
-| Fontes | Fontes do sistema (Georgia, Arial), configuráveis. Nenhuma fonte baixada |
+| Fontes | No e-mail, só fontes instaladas (Santander, se houver; senão Arial), configuráveis. Os `.otf` de `assets/fonts/` entram só na prévia e na página `.html`, embutidos; nunca no `.eml` |
 | `gerar-report.html` | Carrega apenas `tools/motor.js`, local. Sem CDN, sem bibliotecas, sem chamadas de rede |
 | `tools/motor.js` | JavaScript puro, sem dependências |
 | Testes (`tests/`) | Opcionais, para desenvolvimento. `motor.test.js` usa só o Node.js; `ferramenta.e2e.js` usa o Playwright. Nenhum deles é necessário para gerar o report |
@@ -170,15 +171,36 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 
 | Teste | Status |
 |---|---|
-| Motor: 22 testes automáticos (`node tests/motor.test.js`) | Passam |
-| Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`) e e-mail sem vazar para o lado em 760 px e 390 px | Passa (`tests/ferramenta.e2e.js`) |
-| Fonte mais larga que a Georgia/Arial simulada (DejaVu Sans) | Nada vaza; números continuam numa linha |
+| Motor: 28 testes automáticos (`node tests/motor.test.js`), inclusive estado vazio, provisórios (Lorem/X), formiguinha só 2 vezes e paleta do Brand Guide | Passam |
+| Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`), sem erro no console, e e-mail sem vazar para o lado em 1440, 1024, 768, 430, 390, 360 e 320 px | Passa (`tests/ferramenta.e2e.js`) |
+| Fonte `.otf` colocada em `assets/fonts/` (arquivo de teste no lugar da oficial) | Entra na prévia e no `.html` e carrega; fora do `.eml` |
+| Fotos do banco de imagens nos espaços do modelo (teste local, fora do repositório) | Nada vaza de 320 a 1440 px; a peça do destaque aparece no celular |
 | Todas as imagens bloqueadas | Mesma altura de página; cada espaço mostra a descrição (`alt`) |
 | Imagem original de 3000 px e de 4,8 MB reduzida e recortada | Conferido visualmente |
 | Versão final (sem pendências, com links): botão liberado, links nos CTAs, assunto sem [RASCUNHO] | Conferido |
 | Estrutura do `.eml` (MIME, texto + HTML, `cid:`, linhas ≤ 76) | Conferido com o leitor de e-mail do Python |
-| Layout gerado = layout aprovado, no computador (760 px) e no celular (390 px) | Comparado por captura de tela |
+| Layout gerado = layout aprovado (estrutura, grade e seções), com os ajustes do Brand Guide | Comparado por captura de tela |
 | **Outlook para Windows, novo Outlook, Outlook na Web, Outlook iOS/Android** | **Não testado**: não há Outlook neste ambiente |
 | **Links reais do SharePoint/Stream, permissões, vídeo com som** | **Não testado**: depende do ambiente do banco |
 
 Por isso, o primeiro envio precisa passar pelo **teste piloto com outra pessoa** descrito em [CORPORATE_SETUP.md](CORPORATE_SETUP.md).
+
+## Brand Guide: como foi aplicado num e-mail
+
+O Brand Guide Santander Brasil (maio/2026) foi escrito para peças (posts, banners, telas). O e-mail tem limites próprios (Outlook, largura de 600 px, fontes instaladas). Regra seguida: **aplicar o guia sem quebrar o layout aprovado nem o Outlook**.
+
+| Regra do guia | No report |
+|---|---|
+| Fundo só em Branco, Lisboa, Rio e Vermelho Santander (3.2) | Aplicado em todo o e-mail; teste automático confere |
+| Sobre branco: títulos em vermelho, textos em preto (3.2) | Aplicado |
+| Tons de apoio só pontuais, em dados (3.2) | Só nas etiquetas de variação e na barra do Creative X |
+| Headline (títulos), Micro Text (apoio), Condensed (impacto), Script (voz do cliente) (3.3) | Headline Bold, Micro Text Regular/Bold, Condensed Bold na capa; Script não usada. Sem itálico |
+| Símbolo como assinatura em canais internos; branco sobre vermelho; assinatura no canto inferior direito (3.1, 3.10) | Chama branca na capa e no rodapé, à direita |
+| Imagem enquadrada com raio = metade da margem (3.10) | Margem do e-mail: 40 px → raio 20 px |
+| Retângulos com raio = 5% do lado menor; sem retângulo quadrado (3.6) | Foco 8 px, Creative Transformation 16 px, cartão interno 12 px |
+| Margem = 8% do lado menor (3.10) | **Adaptado:** a margem de 40 px foi mantida. 8% de 680 px seria 54 px e quebraria a grade de 3 colunas aprovada |
+| Fundo vermelho pede foto com pouco vermelho (3.10) | Orientação de fotos em `assets/fotos/README.md` |
+| Ícones com traço Vermelho Santander, da biblioteca oficial (3.8) | Os 2 ícones recoloridos para o vermelho; ícones novos devem vir do Portal da Marca |
+| Botão de Início ("Começa agora") como encerramento (3.4) | **Não aplicado:** é um arquivo oficial do Portal da Marca, que não foi recebido. Os botões do report são links de texto ("Ver peça →"), que funcionam em qualquer Outlook |
+| Balões de fala para a resposta do banco, nunca como rótulo genérico (3.5) | **Não usados:** o report não tem diálogo cliente/banco, e o guia proíbe usar balões só para destacar texto |
+| Voz simples, pessoal e justa; tom "papo reto"; frases até 80 caracteres; sem justificado (2.1, 2.2) | Textos fixos curtos e diretos; limites e dicas no guia mensal e nos prompts do Copilot |
