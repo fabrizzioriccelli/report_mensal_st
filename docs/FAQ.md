@@ -99,8 +99,8 @@ O e-mail usa a fonte **instalada** no computador de quem lê. Sem a fonte Santan
 ### Posso usar outra cor?
 Só as da paleta do Brand Guide, conforme [assets/marca/README.md](../assets/marca/README.md). Fundo, só Branco, Lisboa, Rio ou Vermelho Santander.
 
-### Por que a formiguinha só aparece duas vezes?
-É um elemento de identidade, não decoração: abre (capa) e fecha (rodapé) o report. Sempre o arquivo original.
+### Por que a formiguinha só aparece no rodapé?
+É um elemento de identidade, não decoração: ela fecha o report, sobre fundo claro (no vermelho, ela perde contraste). Na abertura, a capa já cumpre esse papel. Sempre o arquivo original.
 
 ## Testar e conferir
 

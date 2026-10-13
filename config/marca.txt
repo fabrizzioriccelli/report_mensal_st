@@ -191,8 +191,8 @@ dominios_permitidos:
 # ======================================================================
 #  FORMIGUINHA · arquivo original
 # ======================================================================
-#  Aparece só duas vezes: na abertura (ao lado dos números) e no
-#  encerramento (rodapé). É sempre o mesmo arquivo original.
+#  Aparece uma vez, no encerramento: no painel claro do rodapé, em pé
+#  sobre a faixa vermelha da assinatura. É sempre o arquivo original.
 #  Para não usar a formiguinha, deixe "arquivo:" vazio.
 [FORMIGUINHA]
 arquivo: assets/formiguinha/formiguinha.png

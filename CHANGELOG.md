@@ -2,6 +2,11 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.3 · 2026-10-13 · Abertura direto na capa
+
+- Saiu a faixa "Olá! Chegou o report mensal" com a formiguinha, acima da capa: abria espaço sem necessidade. O e-mail começa direto na capa vermelha.
+- A formiguinha fica só no encerramento, no rodapé, sobre fundo claro.
+
 ## 3.2 · 2026-10-13 · Cantos do Brand Guide e formiguinha integrada
 
 - **Cantos conforme o guia (3.6):** raio de 5% do lado menor do **formato** (e-mail de 680 px = 34 px; no celular, 20 px) em todos os retângulos: cartão do e-mail, capa, faixa de números, Creative Transformation, Foco e rodapé. Antes o raio era calculado pela caixa (8 a 20 px) e o e-mail parecia quadrado.

@@ -100,7 +100,7 @@ Testar só na sua conta não basta: você é dono dos arquivos e tem todos os ac
 | [ ] | Layout inteiro, sem cortes e sem rolagem para o lado | | | |
 | [ ] | Fontes legíveis: fonte Santander ou Arial, sem Times New Roman | | | |
 | [ ] | Chama do Santander aparece no topo e no rodapé, nítida | | | |
-| [ ] | Formiguinha aparece na abertura (computador) e no rodapé | | | |
+| [ ] | Formiguinha aparece no rodapé, nítida | | | |
 | [ ] | Imagens e miniaturas aparecem sem clicar em "Baixar imagens" | | | |
 | [ ] | "Ver peça →" abre a peça grande | | | |
 | [ ] | Miniatura da peça também abre | | | |

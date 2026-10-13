@@ -171,7 +171,7 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 
 | Teste | Status |
 |---|---|
-| Motor: 30 testes automáticos (`node tests/motor.test.js`), inclusive estado vazio, provisórios (Lorem/X), formiguinha só 2 vezes e paleta do Brand Guide | Passam |
+| Motor: 30 testes automáticos (`node tests/motor.test.js`), inclusive estado vazio, provisórios (Lorem/X), formiguinha só no rodapé e paleta do Brand Guide | Passam |
 | Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`), sem erro no console, e e-mail sem vazar para o lado em 1440, 1024, 768, 430, 390, 360 e 320 px | Passa (`tests/ferramenta.e2e.js`) |
 | Fonte `.otf` colocada em `assets/fonts/` (arquivo de teste no lugar da oficial) | Entra na prévia e no `.html` e carrega; fora do `.eml` |
 | Fotos do banco de imagens nos espaços do modelo (teste local, fora do repositório) | Nada vaza de 320 a 1440 px; a peça do destaque aparece no celular |
