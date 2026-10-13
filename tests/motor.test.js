@@ -89,6 +89,17 @@ teste("Brand Guide: cantos de 34 px (5% do formato de 680 px) e 20 px no celular
   assert.ok(r.html.indexOf("Olá!") < 0, "sem faixa de saudação antes da capa");
 });
 
+teste("celular: 3 números em terços, selo vira linha sob o nome, formiguinha ao lado do texto, textos maiores", function () {
+  var r = montar(MODELO);
+  assert.ok(r.modelo.abertura.numeros.every(function (n) { return n.classe_m === "third"; }));
+  assert.ok(r.modelo.lancamos.destaque.resultados.every(function (n) { return n.classe_m === "third"; }));
+  var quatro = montar(MODELO.replace("[LANCAMOS]", "[NUMERO 4]\nvalor: X\ntitulo: Lorem ipsum\n\n[LANCAMOS]"));
+  assert.ok(quatro.modelo.abertura.numeros.every(function (n) { return n.classe_m === "half"; }), "4 números: 2 por linha");
+  assert.ok(/\.third\{display:inline-block !important;width:32% !important;/.test(r.html));
+  assert.ok(r.html.indexOf('<td class="fant"') > 0 && r.html.indexOf('<td class="fw"') > 0);
+  assert.ok((r.html.match(/class="fx tm/g) || []).length >= 10, "textos de leitura com 14 px no celular");
+});
+
 teste("formiguinha: só no encerramento (rodapé), com o arquivo original", function () {
   var r = montar(MODELO);
   var f = r.imagens.filter(function (i) { return i.papel === "formiguinha"; });
