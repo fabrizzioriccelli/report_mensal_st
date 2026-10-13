@@ -82,6 +82,14 @@ teste("grade da abertura: 3 números em colunas de 184 px; 4 números em 4 colun
   assert.strictEqual(r.modelo.abertura.numeros[0].largura + r.modelo.abertura.sobra, 600, "1 número: coluna 1 e o resto vazio");
 });
 
+teste("Brand Guide: cantos de 34 px (5% do formato de 680 px) e 20 px no celular; formiguinha dentro do cartão", function () {
+  var r = montar(MODELO);
+  assert.ok((r.html.match(/border-radius:34px/g) || []).length >= 6, "retângulos com 34 px");
+  assert.ok(/\.ra\{border-radius:20px !important;\}/.test(r.html), "20 px no celular");
+  var cartao = r.html.indexOf('class="container ra"'), topo = r.html.indexOf("Olá!");
+  assert.ok(cartao > 0 && topo > cartao, "a saudação com a formiguinha fica dentro do cartão do e-mail");
+});
+
 teste("formiguinha: só na abertura e no rodapé, com o arquivo original", function () {
   var r = montar(MODELO);
   var f = r.imagens.filter(function (i) { return i.papel === "formiguinha"; });

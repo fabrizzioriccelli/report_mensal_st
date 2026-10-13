@@ -11,8 +11,10 @@ A personagem do Creative Strategy, no **arquivo original** recebido da área.
 
 Só **duas vezes**, sempre o mesmo arquivo:
 
-1. **Abertura:** pequena (44 px), em pé sobre o filete da faixa de números, à direita do rótulo "Projeto principal em números". Aparece também no celular.
-2. **Encerramento:** no rodapé (64 px), na faixa clara, em pé sobre a faixa vermelha da assinatura.
+1. **Abertura:** no painel claro do topo do e-mail (48 px), ao lado do "Olá!", em pé sobre a capa vermelha.
+2. **Encerramento:** no painel claro do rodapé (64 px), em pé sobre a faixa vermelha da assinatura.
+
+As duas ficam alinhadas à direita da grade, no mesmo eixo do selo do mês, da peça da capa e da chama: o report abre e fecha do mesmo jeito. Aparecem também no celular.
 
 Sempre sobre **fundo claro** (Rio): sobre o vermelho, as luvas e os sapatos vermelhos da personagem somem.
 

@@ -171,7 +171,7 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 
 | Teste | Status |
 |---|---|
-| Motor: 29 testes automáticos (`node tests/motor.test.js`), inclusive estado vazio, provisórios (Lorem/X), formiguinha só 2 vezes e paleta do Brand Guide | Passam |
+| Motor: 30 testes automáticos (`node tests/motor.test.js`), inclusive estado vazio, provisórios (Lorem/X), formiguinha só 2 vezes e paleta do Brand Guide | Passam |
 | Página de geração, de ponta a ponta no Chromium (escolher pasta, conferir, baixar `.eml` e `.html`), sem erro no console, e e-mail sem vazar para o lado em 1440, 1024, 768, 430, 390, 360 e 320 px | Passa (`tests/ferramenta.e2e.js`) |
 | Fonte `.otf` colocada em `assets/fonts/` (arquivo de teste no lugar da oficial) | Entra na prévia e no `.html` e carrega; fora do `.eml` |
 | Fotos do banco de imagens nos espaços do modelo (teste local, fora do repositório) | Nada vaza de 320 a 1440 px; a peça do destaque aparece no celular |
@@ -197,7 +197,7 @@ O Brand Guide Santander Brasil (maio/2026) foi escrito para peças (posts, banne
 | Headline (títulos), Micro Text (apoio), Condensed (impacto), Script (voz do cliente) (3.3) | Headline Bold, Micro Text Regular/Bold, Condensed Bold na capa; Script não usada. Sem itálico |
 | Símbolo como assinatura em canais internos; branco sobre vermelho; assinatura no canto inferior direito (3.1, 3.10) | Chama branca na capa e no rodapé, à direita |
 | Imagem enquadrada com raio = metade da margem (3.10) | Margem do e-mail: 40 px → raio 20 px |
-| Retângulos com raio = 5% do lado menor; sem retângulo quadrado (3.6) | Foco 8 px, Creative Transformation 16 px, cartão interno 12 px |
+| Retângulos com raio = 5% do lado menor **do formato**; sem retângulo quadrado (3.6) | Formato do e-mail: 680 px → **34 px** (cartão, capa, faixa de números, Transformation, Foco, rodapé); no celular (~390 px) → **20 px** (classes `ra`, `rt`, `rb`). Cartões internos: 20 px |
 | Margem = 8% do lado menor (3.10) | **Adaptado:** a margem de 40 px foi mantida. 8% de 680 px seria 54 px e quebraria a grade de 3 colunas aprovada |
 | Fundo vermelho pede foto com pouco vermelho (3.10) | Orientação de fotos em `assets/fotos/README.md` |
 | Ícones com traço Vermelho Santander, da biblioteca oficial (3.8) | Os 2 ícones recoloridos para o vermelho; ícones novos devem vir do Portal da Marca |

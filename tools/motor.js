@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.1 (2026-10-12)";
+  var VERSAO = "3.2 (2026-10-13)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -491,11 +491,11 @@
         return {
           valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "NUMERO " + (i + 1)),
           largura: larg[i], principal: i === 0, primeiro: i === 0,
-          cor_valor: i === 0 ? cor.marca : cor.texto,
+          cor_valor: i === 0 ? cor.marca : cor.texto, cor_filete: i === 0 ? cor.marca : cor.texto,
           estilo: "padding:0 0 20px 0;"
         };
       }),
-      formiga: formiga(44, "formiguinha"), sobra: sobra
+      sobra: sobra
     };
 
     /* 02 · O que lançamos */
@@ -611,7 +611,7 @@
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
       assunto: assunto, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
-      logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
+      logo: logo, rodape_logo: rodapeLogo, topo_formiga: formiga(48, "formiguinha"), rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
     };
