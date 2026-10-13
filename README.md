@@ -2,7 +2,7 @@
 
 Modelo do report mensal da Creative Strategy PF (Customer Interactions): um e-mail executivo de uma página, enviado pelo Outlook, com peças e vídeos clicáveis. Ele é gerado a partir de **um arquivo de texto por mês**. Ninguém precisa editar HTML.
 
-**Versão 3.2 (2026-10-13).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 3.3 (2026-10-13).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -134,7 +134,7 @@ Os textos não ficam no HTML: a página monta o HTML a cada geração, para o la
 - Siga o **Brand Guide Santander Brasil (maio/2026)**. Ele é interno e **não** fica no repositório; peça a Marca.
 - Fundo só em Branco, Lisboa, Rio ou Vermelho Santander. Sobre branco, títulos em vermelho e textos em preto. Paleta e regras: [assets/marca/README.md](assets/marca/README.md).
 - Use só a **chama** oficial (sem o nome escrito), em branco sobre o vermelho.
-- A formiguinha aparece **só duas vezes**: abertura e rodapé. Use sempre o arquivo original.
+- A formiguinha aparece **uma vez**, no rodapé, fechando o report. Use sempre o arquivo original.
 - Não use peças, logos ou fotos baixadas da internet.
 
 ## 13. Como utilizar a tipografia

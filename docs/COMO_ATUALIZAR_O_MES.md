@@ -124,7 +124,7 @@ Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt
 | `[FOCO]` | **06** · bloco vermelho do foco do próximo mês |
 | `[AGENDA 1]` a `[AGENDA 6]` | **07** · Também vem aí (linhas de 3) |
 
-A formiguinha aparece sozinha na abertura e no rodapé. Não há campo para ela no arquivo do mês.
+A formiguinha aparece sozinha no rodapé. Não há campo para ela no arquivo do mês.
 
 **Regra do report:** cada projeto aparece **uma vez**. O projeto principal não se repete em "O que lançamos".
 

@@ -9,16 +9,11 @@ A personagem do Creative Strategy, no **arquivo original** recebido da área.
 
 ## Onde aparece
 
-Só **duas vezes**, sempre o mesmo arquivo:
-
-1. **Abertura:** no painel claro do topo do e-mail (48 px), ao lado do "Olá!", em pé sobre a capa vermelha.
-2. **Encerramento:** no painel claro do rodapé (64 px), em pé sobre a faixa vermelha da assinatura.
-
-As duas ficam alinhadas à direita da grade, no mesmo eixo do selo do mês, da peça da capa e da chama: o report abre e fecha do mesmo jeito. Aparecem também no celular.
+**Uma vez, no encerramento**, sempre o mesmo arquivo: no painel claro do rodapé (64 px), em pé sobre a faixa vermelha da assinatura, alinhada à direita da grade, sobre a chama. Aparece também no celular.
 
 Sempre sobre **fundo claro** (Rio): sobre o vermelho, as luvas e os sapatos vermelhos da personagem somem.
 
-Não há formiguinha nas seções do meio. As variações desenhadas na versão 2 (escudo, mala, fones etc.) foram **retiradas**: eram releituras, não o arquivo original.
+Histórico: na abertura ela já ficou ao lado dos números e numa faixa de saudação no topo. As duas posições abriam espaço extra ou ficavam soltas no layout, então a abertura ficou só com a capa (versão 3.3). Não há formiguinha nas seções do meio. As variações desenhadas na versão 2 (escudo, mala, fones etc.) foram **retiradas**: eram releituras, não o arquivo original.
 
 ## Regras
 
