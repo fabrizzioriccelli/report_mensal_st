@@ -28,6 +28,10 @@
   NÃO ALTERAR A ESTRUTURA (tabelas, larguras, classes) sem testar no
   computador e no celular (docs/ARQUITETURA.md).
 
+  CANTOS (Brand Guide 3.6 e 3.10): retângulos com raio de 5% do lado menor
+  do formato (e-mail de 680 px = 34 px; celular ~390 px = 20 px, classes
+  ra/rt/rb); imagens com metade da margem (40 px / 2 = 20 px).
+
   TIPOGRAFIA (Brand Guide Santander): títulos em Santander Headline Bold,
   textos em Santander Micro Text, frase da capa em Santander Condensed.
   As listas de fontes ficam em config/marca.txt; os arquivos .otf, em
@@ -86,6 +90,9 @@
     .selo{float:none !important;margin-top:14px !important;}
     .al-m{text-align:left !important;}
     .wrap-m{white-space:normal !important;}
+    .ra{border-radius:20px !important;}
+    .rt{border-radius:20px 20px 0 0 !important;}
+    .rb{border-radius:0 0 20px 20px !important;}
     .al-m img{margin-left:0 !important;}
     .himg{width:180px !important;max-width:100% !important;margin:0 auto !important;}
   }
@@ -104,13 +111,34 @@
 <tr>
 <td align="center" style="padding:24px 0;">
 <!--[if mso]><table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-<table role="presentation" class="container" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="width:680px;max-width:680px;background:{{cor.fundo_email}};border-radius:20px;">
+<table role="presentation" class="container ra" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="width:680px;max-width:680px;background:{{cor.fundo_email}};border-radius:34px;">
 
   {{#abertura}}
   <!-- 01 · CAPA · faixa vermelha de ponta a ponta: logo, nome da área, selo do mês,
        frase do mês e projeto principal com a peça. Logo abaixo, a faixa creme dos números. -->
   <tr>
-    <td class="px" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:20px 20px 0 0;padding:24px 40px 30px 40px;">
+    <td class="rt" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:34px 34px 0 0;">
+    {{#topo_formiga}}
+    <!-- ABERTURA · dentro do cartão, no painel claro (Rio): saudação à esquerda e a formiguinha em pé
+         sobre a capa vermelha, alinhada à direita da grade (mesmo eixo do selo, da peça e da chama).
+         Espelha o rodapé, onde ela se despede em pé sobre a faixa vermelha. -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td class="px" valign="bottom" style="padding:18px 40px 0 40px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td valign="bottom" style="padding-bottom:14px;">
+              <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:13px;line-height:18px;color:{{cor.texto_corpo}};"><b style="color:{{cor.titulo}};">Olá!</b> Chegou o report mensal da Creative Strategy PF.</p>
+            </td>
+            <td width="{{w}}" valign="bottom" align="right" style="width:{{w}}px;">
+              <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr></table>
+    {{/topo_formiga}}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td class="px ra" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:34px;padding:24px 40px 32px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td class="col" valign="middle">
@@ -162,32 +190,26 @@
         </tr>
       </table>
     </td>
+    </tr></table>
+    </td>
   </tr>
   <tr>
-    <td class="px" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};padding:20px 40px 24px 40px;">
-      <!-- Faixa dos números do projeto principal, na grade de 3 colunas (184 + 24 + 184 + 24 + 184).
-           A formiguinha (abertura) fica pequena, em pé sobre o filete, à direita do rótulo. -->
+    <td class="px rb" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:0 0 34px 34px;padding:24px 40px 28px 40px;">
+      <!-- Faixa dos números do projeto principal, na grade de 3 colunas (184 + 24 + 184 + 24 + 184):
+           cada número tem o seu filete no topo, como a agenda. A coluna 3 alinha com a peça da capa. -->
+      <!-- EDITAR AQUI: INDICADORES → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 3] (até 4) valor, titulo, detalhe, variacao -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td valign="bottom" style="padding-bottom:10px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;">PROJETO PRINCIPAL EM NÚMEROS</p>
-          </td>
-          {{#formiga}}
-          <td width="{{w}}" valign="bottom" align="right" style="width:{{w}}px;">
-            <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">
-          </td>
-          {{/formiga}}
-        </tr>
-      </table>
-      <!-- EDITAR AQUI: INDICADORES → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 4] valor, titulo, detalhe, variacao -->
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid {{cor.abertura_linha}};">
-        <tr>
           {{#numeros}}
-          {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.abertura_linha}};">&nbsp;</td>{{/primeiro}}
-          <td class="half" width="{{largura}}" valign="top" style="width:{{largura}}px;padding-top:16px;">
-            <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>
-            <p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><b style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br>{{detalhe}}{{/detalhe}}</p>
-            {{#variacao}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
+          {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
+          <td class="half" width="{{largura}}" valign="top" style="width:{{largura}}px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="border-top:2px solid {{cor_filete}};padding-top:12px;">
+                <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>
+                <p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><b style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br>{{detalhe}}{{/detalhe}}</p>
+                {{#variacao}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
+              </td></tr>
+            </table>
           </td>
           {{/numeros}}
           {{#sobra}}<td class="hide-m" width="{{sobra}}" style="width:{{sobra}}px;font-size:0;line-height:0;">&nbsp;</td>{{/sobra}}
@@ -325,7 +347,7 @@
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.transformation_fundo}}" style="background:{{cor.transformation_fundo}};border-radius:16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.transformation_fundo}}" class="ra" style="background:{{cor.transformation_fundo}};border-radius:34px;">
         <tr>
           <td class="px" style="padding:24px 28px 0 28px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -340,7 +362,7 @@
         </tr>
         <tr>
           <td class="px" style="padding:0 28px 26px 28px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="background:{{cor.fundo_email}};border-radius:12px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="background:{{cor.fundo_email}};border-radius:20px;">
               {{#projetos}}
               <tr>
                 <td style="padding:18px 20px;{{borda}}">
@@ -401,7 +423,7 @@
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOCO] prioridade, texto -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:8px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.marca}}" class="ra" style="background:{{cor.marca}};border-radius:34px;">
         <tr>
           <td class="px" valign="middle" style="padding:26px 28px 28px 28px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;FOCO DE {{mes}}</p>
@@ -444,13 +466,13 @@
   {{/agenda}}
 
   <!-- RODAPÉ · encerramento em duas faixas, na grade de 3 colunas:
-       1. faixa clara (Lisboa): despedida e informações (colunas 1 e 2) e a formiguinha
-          em pé sobre a faixa vermelha (coluna 3). Fundo claro = contraste para a personagem;
+       1. faixa clara (Rio): despedida e informações (colunas 1 e 2) e a formiguinha
+          em pé sobre a faixa vermelha, alinhada à direita, sobre a chama (coluna 3);
        2. faixa vermelha: assinatura da área e a chama no canto inferior direito (Brand Guide 3.10). -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [EDICAO] proximo_mes, contato. A assinatura é fixa (NÃO ALTERAR). -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px" bgcolor="{{cor.rodape_claro}}" style="background:{{cor.rodape_claro}};padding:32px 40px 0 40px;">
+    <td class="px rt" bgcolor="{{cor.rodape_claro}}" style="background:{{cor.rodape_claro}};border-radius:34px 34px 0 0;padding:32px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td class="col" width="392" valign="top" style="width:392px;padding-bottom:28px;">
@@ -474,15 +496,17 @@
             </table>
           </td>
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-          <td class="col" width="184" valign="bottom" align="center" style="width:184px;">
-            {{#rodape_formiga}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/rodape_formiga}}
+          <td class="col" width="184" valign="bottom" align="right" style="width:184px;">
+            {{#rodape_formiga}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/rodape_formiga}}
           </td>
         </tr>
       </table>
     </td>
   </tr>
   <tr>
-    <td class="px" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:0 0 20px 20px;padding:22px 40px 24px 40px;">
+    <td class="rb" bgcolor="{{cor.rodape_claro}}" style="background:{{cor.rodape_claro}};border-radius:0 0 34px 34px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td class="px ra" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:34px;padding:26px 40px 28px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td valign="bottom" style="padding-right:16px;">
@@ -494,6 +518,8 @@
           </td>
         </tr>
       </table>
+    </td>
+    </tr></table>
     </td>
   </tr>
 
