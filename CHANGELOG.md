@@ -2,6 +2,13 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.4 · 2026-10-13 · Celular mais confortável
+
+- Topo: no celular, o mês aparece numa linha discreta abaixo de "Creative Strategy PF" (antes o selo branco caía para uma linha própria).
+- Números da capa e resultados do destaque: 3 lado a lado, em terços (antes 2 + 1, com o terceiro sozinho). Com 4, ficam 2 por linha.
+- Rodapé: a formiguinha fica ao lado do texto, sem ocupar uma linha inteira.
+- Textos de leitura com 14 px e legendas com 12 px no celular; mais respiro entre blocos empilhados. O computador não muda.
+
 ## 3.3 · 2026-10-13 · Abertura direto na capa
 
 - Saiu a faixa "Olá! Chegou o report mensal" com a formiguinha, acima da capa: abria espaço sem necessidade. O e-mail começa direto na capa vermelha.

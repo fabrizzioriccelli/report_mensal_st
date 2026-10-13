@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.3 (2026-10-13)";
+  var VERSAO = "3.4 (2026-10-13)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -492,6 +492,7 @@
           valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "NUMERO " + (i + 1)),
           largura: larg[i], principal: i === 0, primeiro: i === 0,
           cor_valor: i === 0 ? cor.marca : cor.texto, cor_filete: i === 0 ? cor.marca : cor.texto,
+          classe_m: nums.length === 3 ? "third" : "half",
           estilo: "padding:0 0 20px 0;"
         };
       }),
@@ -516,7 +517,7 @@
           resultados: res.map(function (v, i) {
             return {
               valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)),
-              largura: lr[i], primeiro: i === 0, estilo: "padding:14px 0 0 0;"
+              largura: lr[i], primeiro: i === 0, estilo: "padding:14px 0 0 0;", classe_m: res.length === 3 ? "third" : "half"
             };
           })
         } : null,

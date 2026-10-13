@@ -6,4 +6,4 @@
 
 Ele é carregado pela página **`gerar-report.html`**, na pasta principal, que é o que você usa no dia a dia. Você não precisa abrir este arquivo.
 
-Testes: `node tests/motor.test.js` (30 testes) e `node tests/ferramenta.e2e.js` (página de ponta a ponta, 7 larguras de tela). Decisões técnicas: [docs/ARQUITETURA.md](../docs/ARQUITETURA.md).
+Testes: `node tests/motor.test.js` (31 testes) e `node tests/ferramenta.e2e.js` (página de ponta a ponta, 7 larguras de tela). Decisões técnicas: [docs/ARQUITETURA.md](../docs/ARQUITETURA.md).

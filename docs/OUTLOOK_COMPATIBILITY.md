@@ -83,11 +83,14 @@ Por isso a fonte é uma **lista**, configurada num lugar só ([CORPORATE_SETUP.m
 Uma regra `@media (max-width:620px)`:
 
 - empilha as colunas (`col`);
-- coloca os números em pares (`half`);
+- coloca 3 números lado a lado, em terços (`third`), ou 4 em pares (`half`);
 - na capa, o selo do mês desce para baixo do logo (`selo`) e a peça principal fica com 180 px, centralizada (`himg`); no rodapé, o logo e a assinatura passam para baixo da despedida, alinhados à esquerda (`al-m`);
 - esconde a formiguinha da faixa dos números, que não cabe (`hide-m`); a do rodapé continua;
 - troca a peça vertical do projeto em destaque por uma versão **horizontal**, na largura da tela, acima do texto (`show-m`);
 - deixa etiquetas e textos longos quebrarem linha em vez de vazar (`wrap-m`);
+- mostra o mês numa linha abaixo do nome, no lugar do selo (`show-m`/`hide-m`);
+- deixa a formiguinha do rodapé ao lado do texto (`fw`, `fant`);
+- aumenta os textos de leitura para 14 px e as legendas para 12 px (`tm`, `ts`);
 - aumenta as miniaturas para a largura da tela (`fluid`). Elas são exportadas com até 700 px para ficarem nítidas;
 - ajusta os tamanhos de títulos e números (`h1`, `h2`, `num`, `brand`).
 
