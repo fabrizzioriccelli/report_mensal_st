@@ -306,7 +306,7 @@
     var ti = $("#imgs"); ti.replaceChildren();
     r.imagens.forEach(function (im, i) {
       var pr = prontas[i];
-      ti.appendChild(el("tr", {}, [el("td", { text: im.caminho }), el("td", { text: im.w + " × " + im.h + " px" + (im.play ? " · com ▶" : "") + (im.ampliada ? " · ampliada, só na página do navegador" : "") }),
+      ti.appendChild(el("tr", {}, [el("td", { text: im.caminho }), el("td", { text: im.w + " × " + im.h + " px" + (im.play ? " · com ▶" : "") + (im.ampliada ? " · ampliada, só na página do navegador" : "") + (im.soPagina ? " · sem ▶, só na página (para o e-mail resumido)" : "") }),
         el("td", { text: kb(ARQ[im.caminho].size) + " · " + pr.ow + "×" + pr.oh }), el("td", { text: kb(pr.bytes.length) + " · " + pr.w + "×" + pr.h + (pr.mantida ? " (sem alteração)" : "") })]));
     });
     previa();
@@ -400,8 +400,9 @@
   });
 
   /* ---------- 4. gerar ---------- */
-  /* Imagens que vão no e-mail: todas menos as versões ampliadas (essas só servem à página do navegador). */
-  function doEmail() { return prontas.filter(function (p, i) { return !atual.imagens[i].ampliada; }); }
+  /* Imagens que vão no e-mail: todas menos as que só servem à página do navegador
+     (versões ampliadas e miniaturas de vídeo sem ▶, usadas pelo e-mail resumido). */
+  function doEmail() { return prontas.filter(function (p, i) { return !atual.imagens[i].ampliada && !atual.imagens[i].soPagina; }); }
   function cidDe(p) { return "img" + p.nome + "@report"; }
   function endereco(p) { return atual.config.modo === "hospedadas" ? atual.config.base.replace(/\/?$/, "/") + p.nome : "cid:" + cidDe(p); }
   $("#bEml").addEventListener("click", function () {

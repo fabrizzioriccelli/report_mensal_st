@@ -455,5 +455,67 @@ teste("paginaInterativa: tira o que o navegador acrescentou e mantém script e a
   assert.ok(!/id="amp"| tabindex="0"| aria-label="Ampliar| title="Clique|saved from/.test(r.html), "sobrou algo do navegador");
 });
 
+/* ---------- 4.0: Transformation Hub com prints, miniatura de vídeo sem ▶, botão "Assistir ao vídeo" ---------- */
+var COM_PRINTS = MINIMO + "\n" + [
+  "[TRANSFORMATION]", "titulo: Hub",
+  "[TRANSFORMATION 1]", "nome: Agente", "texto: Em testes.", "prints: icone-prancheta.png, icone-lupa.png", "descricao_prints: Tela do agente | Resultado do teste",
+  "[TRANSFORMATION 2]", "nome: Outro", "prints: [INSERIR PRINT]"
+].join("\n");
+
+teste("Transformation Hub: rótulo novo e prints na largura do cartão (2 × 240), ampliáveis só na página", function () {
+  var r = montar(COM_PRINTS);
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  assert.ok(/TRANSFORMATION HUB/.test(r.html) && !/CREATIVE TRANSFORMATION/.test(r.html));
+  assert.ok(/data-bloco="transformation-1"/.test(r.html) && /data-bloco="transformation-2"/.test(r.html));
+  var prints = r.html.match(/<img\b[^>]*alt="(Tela do agente|Resultado do teste)"[^>]*>/g) || [];
+  assert.strictEqual(prints.length, 2);
+  prints.forEach(function (t) { assert.ok(/ width="240"/.test(t) && / data-ampliar="@@IMG\d+@@"/.test(t) && /class="fluid"/.test(t), t); });
+  assert.strictEqual(niveis(r, "pendencia").filter(function (x) { return /\[TRANSFORMATION 2\] prints/.test(x.msg); }).length, 1, "print pendente vira uma pendência");
+  assert.ok(/print · 1008 px/.test(r.html), "espaço do print pendente aparece no rascunho (1 print = 504 px)");
+  assert.ok(prints.every(function (t) { var id = / data-ampliar="@@IMG(\d+)@@"/.exec(t)[1]; return r.imagens[id - 1].ampliada; }), "o clique abre a versão ampliada");
+  assert.ok(!/data-ampliar/.test(M.paraEmail(r.html)));
+});
+
+teste("prints: mais de 3 gera aviso e usa os 3 primeiros (3 × 152)", function () {
+  var r = montar(COM_PRINTS.replace("prints: icone-prancheta.png, icone-lupa.png", "prints: icone-prancheta.png, icone-lupa.png, icone-prancheta.png, icone-lupa.png"));
+  assert.ok(niveis(r, "aviso").some(function (x) { return /até 3/.test(x.msg); }));
+  assert.strictEqual((r.html.match(/<img\b[^>]*alt="(Tela do agente|Resultado do teste|Print: Agente)"[^>]*width="152"|<img\b[^>]*width="152"[^>]*alt="(Tela do agente|Resultado do teste|Print: Agente)"/g) || []).length, 3);
+});
+
+teste("vídeo: miniatura sem ▶ só na página (data-thumb, soPagina) e fora do e-mail", function () {
+  var r = montar(MINIMO.replace("tipo: peca", "tipo: video").replace("link: https://empresa.sharepoint.com/:i:/s/site/abc", "link: https://empresa.sharepoint.com/:v:/s/site/abc"));
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  var thumb = r.imagens.filter(function (i) { return i.soPagina; });
+  assert.strictEqual(thumb.length, 1); assert.ok(!thumb[0].play);
+  assert.ok(r.imagens.some(function (i) { return i.play && !i.soPagina && i.caminho === thumb[0].caminho; }), "a do e-mail continua com ▶");
+  assert.ok(new RegExp('data-thumb="' + thumb[0].token + '"').test(r.html));
+  assert.ok(!/data-thumb/.test(M.paraEmail(r.html)));
+});
+
+teste("miniaturasSemPlay: troca pela versão sem ▶, tira o link e o \"Vídeo:\"; conta as antigas", function () {
+  var h = '<a href="https://v"><img src="COM" alt="Vídeo: Capa (assistir ao vídeo)" data-video="v" data-thumb="SEM"></a><img src="X" alt="Vídeo: antiga">';
+  var r = M.miniaturasSemPlay(h);
+  assert.strictEqual(r.trocadas, 1); assert.strictEqual(r.comPlay, 1);
+  assert.strictEqual(r.html, '<img src="SEM" alt="Capa" data-video="v" data-thumb="SEM"><img src="X" alt="Vídeo: antiga">');
+});
+
+teste("botão \"Assistir ao vídeo\": existe só na página; limpar e paginaInterativa tiram o que o navegador montou", function () {
+  var nav = M.paraNavegador('<html><head></head><body><img src="data:image/png;base64,AA" data-video="data:video/mp4;base64,AA" alt="v"></body></html>');
+  assert.ok(/vidpill/.test(nav) && /Assistir ao v/.test(nav));
+  var salvo = nav.replace("</body>", '<button type="button" class="vidpill" tabindex="-1">▶&nbsp; Assistir ao vídeo</button></body>');
+  assert.ok(!/class="vidpill"/.test(M.limparHtmlEditado(salvo).html));
+  var pg = M.paginaInterativa(salvo);
+  assert.ok(!/<button[^>]*class="vidpill"/.test(pg.html) && /<script>/.test(pg.html));
+});
+
+teste("emailResumido não liga vídeos ao link (só o completo com botão, ligar: true)", function () {
+  var html = M.emailResumido(M.montar({ dados: MODELO, arquivoDados: "MODELO.txt", marca: MARCA, template: TEMPLATE, existe: existe }).html, { link: "https://a.b/c" }).html;
+  var r = M.emailResumido('<!--secao:capa--><img src="a" alt="Vídeo: x"><!--secao:fim-->', { link: "https://a.b/c" });
+  assert.ok(!/<a href="https:\/\/a\.b\/c" target="_blank" style="text-decoration:none;"><img/.test(r.html));
+  var l = M.emailResumido('<!--secao:capa--><img src="a" alt="Vídeo: x"><!--secao:fim-->', { link: "https://a.b/c", ligar: true, manter: ["capa"] });
+  assert.strictEqual(l.videos, 1);
+  assert.ok(html.length > 0);
+});
+
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");
 process.exit(falhas ? 1 : 0);

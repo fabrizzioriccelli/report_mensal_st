@@ -9,9 +9,11 @@
   CONVERTER HTML EDITADO EM E-MAIL (.eml)
   ----------------------------------------------------------------------
   Para quando você editou a página do mês direto no navegador (Chrome ou
-  Edge) e quer mandar essa versão por e-mail. Gera:
-    · e-mail RESUMIDO (só as seções escolhidas) com o botão "Ver o
-      report completo", que abre a versão interativa; ou o e-mail COMPLETO;
+  Edge, inclusive pelo Inspecionar) e quer mandar por e-mail. Gera, de uma vez:
+    · o e-mail COMPLETO (.eml);
+    · o e-mail RESUMIDO (.eml): só as seções escolhidas e o botão "Ver o
+      report completo", que abre a versão interativa. A miniatura de vídeo
+      aparece sem ▶ e sem link (o vídeo só toca na versão interativa);
     · a VERSÃO INTERATIVA (.html, com vídeos e peças ampliáveis) para
       subir no SharePoint e usar como destino do botão.
 
@@ -25,12 +27,13 @@
     2. reconhece o report (versão e mês);
     3. tira o que o e-mail não aceita (script, ampliação, vídeo,
        marcas da edição);
-       3b. no resumido, corta as seções (marcas "secao:" do template),
-           põe o botão e liga as miniaturas de vídeo à versão interativa;
+       3b. no resumido, corta as seções (marcas "secao:" do template)
+           e põe o botão para a versão interativa;
     4. coloca as imagens dentro do e-mail (anexos embutidos, cid:);
     5. confere o HTML para o Outlook;
-    6. monta o .eml (mensagem nova no Outlook, pronta para enviar);
-    7. prepara a versão interativa (.html).
+    6. monta os dois .eml (mensagem nova no Outlook, pronta para enviar);
+    7. prepara a versão interativa (.html), com os prints colocados à mão
+       já embutidos.
   Com "Acompanhar o arquivo" ligado, ela converte de novo sozinha toda
   vez que você salvar o .html.
 
@@ -104,50 +107,62 @@
 <body>
 <header><div>
   <h1>Converter HTML em e-mail (.eml)</h1>
-  <p>Lê a página do mês (.html, editada ou não no navegador) e gera o <b>.eml</b>: <b>resumido</b>, com um botão para a <b>versão interativa</b> (vídeos e peças ampliáveis), ou completo. <span id="versao"></span></p>
+  <p>Lê a página do mês (.html, editada ou não no navegador) e gera, de uma vez, o <b>e-mail completo</b>, o <b>e-mail resumido</b> (com o botão "Ver o report completo") e a <b>versão interativa</b> (vídeos e peças ampliáveis) para o SharePoint. <span id="versao"></span></p>
 </div></header>
 
 <main>
   <section aria-labelledby="s1">
-    <h2 id="s1"><b>1</b>Escolha o arquivo .html editado</h2>
+    <h2 id="s1"><b>1</b>Escolha o arquivo .html do mês</h2>
     <p class="muted">No Chrome ou no Edge, salve a página editada com <b>Ctrl+S</b> e escolha <b>"Página da Web, completa"</b> (a opção "somente HTML" perde as edições). Depois escolha esse arquivo aqui.</p>
     <div class="row">
       <label class="btn pri" id="escolher">Escolher o arquivo .html<input type="file" id="arquivo" accept=".html,.htm,text/html"></label>
       <label class="check"><input type="checkbox" id="acompanhar" checked> Acompanhar o arquivo: converter de novo sempre que eu salvar</label>
     </div>
     <div class="drop" id="drop">ou arraste o arquivo .html para cá</div>
-    <div class="row" id="pastaRow" hidden>
+    <div class="row" id="pastaRow">
       <label class="btn">Escolher a pasta das imagens<input type="file" id="pasta" webkitdirectory multiple></label>
-      <span class="muted">O Chrome salvou algumas imagens numa pasta ao lado do .html (o nome termina em <code>_files</code> ou <code>_arquivos</code>). Escolha essa pasta.</span>
+      <span class="muted">Só se houver imagens em arquivo ao lado do .html: prints colocados pelo Inspecionar (escolha a pasta do .html) ou a pasta que o Chrome cria ao salvar (termina em <code>_files</code> ou <code>_arquivos</code>). <span id="pastaInfo"></span></span>
     </div>
   </section>
 
   <section aria-labelledby="s5">
-    <h2 id="s5"><b>2</b>O que gerar</h2>
-    <fieldset>
-      <legend class="muted">Escolha o tipo de e-mail. A conversão se refaz sozinha quando você muda alguma opção.</legend>
-      <div class="modos">
-        <label class="modo"><input type="radio" name="modo" value="resumido" checked><div><b>E-mail resumido + versão interativa</b><span>Só o essencial no e-mail e um botão "Ver o report completo", que abre a página com vídeos e peças ampliáveis.</span></div></label>
-        <label class="modo"><input type="radio" name="modo" value="completo"><div><b>E-mail completo</b><span>O report inteiro no e-mail (sem vídeo nem ampliação: o e-mail não roda script).</span></div></label>
-      </div>
-    </fieldset>
+    <h2 id="s5"><b>2</b>E-mail resumido e versão interativa</h2>
+    <p class="muted">A página sempre gera os <b>dois e-mails</b>: o <b>completo</b> e o <b>resumido</b> (só o essencial e um botão "Ver o report completo", que abre a versão interativa, com vídeos e peças ampliáveis). Mudou alguma opção? A conversão se refaz sozinha.</p>
     <div class="campo" id="campoSecoes">
       <label>Seções que vão no e-mail resumido</label>
-      <div class="secoes" id="secoes"></div>
+      <div class="secoes" id="secoes"><span class="muted">Escolha o arquivo para ver as seções.</span></div>
     </div>
     <div class="campo">
-      <label for="link">Link da versão interativa <span class="muted" id="linkObrig">(obrigatório no resumido)</span></label>
+      <label for="link">Link da versão interativa <span class="muted">(o resumido só sai com ele)</span></label>
       <input type="text" id="link" inputmode="url" placeholder="https://empresa.sharepoint.com/…/report-outubro.html" autocomplete="off">
       <ol class="passos">
         <li>Baixe a versão interativa: <button type="button" id="bInterativa" disabled>Baixar versão interativa (.html)</button> <span id="interInfo" class="muted"></span></li>
         <li>Suba esse arquivo numa pasta do SharePoint (ou OneDrive) que o público do e-mail consiga abrir. Em muitos SharePoint, o .html baixa em vez de abrir direto: quem clicar abre o arquivo baixado e ele funciona igual. Teste o link com alguém de outra equipe.</li>
         <li>Copie o link de compartilhamento e cole aqui em cima.</li>
       </ol>
+      <label class="check" style="margin-top:8px;font-weight:normal"><input type="checkbox" id="botaoNoCompleto"> Pôr o botão "Ver o report completo" também no e-mail completo</label>
     </div>
     <div class="campo">
       <label for="botao">Texto do botão</label>
       <input type="text" id="botao" value="Ver o report completo (interativo)">
     </div>
+    <details>
+      <summary>Como colocar prints no HTML (Inspecionar do Chrome)</summary>
+      <ol class="passos">
+        <li>Coloque os prints (<code>.png</code> ou <code>.jpg</code>) na <b>mesma pasta</b> do .html do mês. Use nomes sem espaço, ex.: <code>print-copy-agent.png</code>.</li>
+        <li>Abra o .html no Chrome, clique com o botão direito no projeto do <b>Transformation Hub</b> → <b>Inspecionar</b>. No painel, aperte <b>Ctrl+F</b> e procure <code>transformation-1</code> (ou <code>-2</code>, <code>-3</code>): é o projeto 1, 2 ou 3.</li>
+        <li>Dentro dele, ache o último parágrafo do texto (<code>&lt;p …&gt;</code>), clique com o botão direito nele → <b>Edit as HTML</b>, vá até o fim e cole o bloco abaixo. Troque o nome do arquivo e a descrição.</li>
+        <li>Salve a página (<b>Ctrl+S</b>, "Página da Web, completa") e escolha aqui o .html e, no passo 1, <b>a pasta das imagens</b> (a pasta onde estão os prints).</li>
+      </ol>
+      <div class="row">
+        <label for="qtdPrints"><b>Quantos prints:</b></label>
+        <select id="qtdPrints"><option>1</option><option>2</option><option>3</option></select>
+        <button type="button" id="bCopiar">Copiar o bloco</button>
+        <span id="copiado" class="muted"></span>
+      </div>
+      <textarea id="snippet" readonly rows="9" style="width:100%;margin-top:10px;font:12px/1.5 Consolas,Menlo,monospace;border:1px solid var(--rule);border-radius:8px;padding:10px"></textarea>
+      <p class="muted">No e-mail, os prints aparecem lado a lado (um embaixo do outro no celular). Na versão interativa, abrem inteiros e maiores no clique. Prints grandes são reduzidos sozinhos (até 1200 px de largura).</p>
+    </details>
   </section>
 
   <section aria-labelledby="s2">
@@ -164,18 +179,22 @@
   </section>
 
   <section aria-labelledby="s3" id="secBaixar" hidden>
-    <h2 id="s3"><b>4</b>Baixe o e-mail</h2>
+    <h2 id="s3"><b>4</b>Baixe os e-mails</h2>
     <p class="muted" style="margin-bottom:6px"><label for="assunto"><b>Assunto</b></label> (vem do título da página; pode mudar aqui):</p>
     <input type="text" id="assunto">
     <div class="row">
-      <button type="button" class="pri" id="bEml" disabled>Baixar e-mail (.eml)</button>
+      <button type="button" class="pri" id="bEml" disabled>Baixar e-mail completo (.eml)</button>
       <span id="emlInfo" class="muted"></span>
+    </div>
+    <div class="row">
+      <button type="button" class="pri" id="bEmlRes" disabled>Baixar e-mail resumido (.eml)</button>
+      <span id="emlResInfo" class="muted"></span>
     </div>
     <details>
       <summary>Depois de baixar: como abrir e enviar</summary>
       <ol class="muted">
         <li>Na pasta Downloads, dê dois cliques no <code>.eml</code>. O Outlook abre uma <b>mensagem nova</b> com o report e o assunto.</li>
-        <li>Envie primeiro <b>só para você</b> e confira no computador e no celular.</li>
+        <li>Envie primeiro <b>só para você</b> e confira no computador e no celular (e o botão do resumido).</li>
         <li>Tudo certo? Abra o <code>.eml</code> de novo, coloque os destinatários e envie.</li>
       </ol>
       <p class="muted">As edições feitas no navegador não voltam para o arquivo de dados. Para não perdê-las no próximo mês, passe as mesmas mudanças para <code>dados/AAAA-MM.txt</code>.</p>
@@ -183,8 +202,12 @@
   </section>
 
   <section aria-labelledby="s4" id="secPrev" hidden>
-    <h2 id="s4">Prévia do e-mail</h2>
+    <h2 id="s4">Prévia dos e-mails</h2>
     <p class="muted">É o que vai dentro do .eml: sem ampliação nem vídeo (o e-mail não roda script).</p>
+    <div class="row tabs" role="group" aria-label="Qual e-mail">
+      <button type="button" data-qual="completo" aria-pressed="true">E-mail completo</button>
+      <button type="button" data-qual="resumido" aria-pressed="false">E-mail resumido</button>
+    </div>
     <div class="row tabs" role="group" aria-label="Tamanho da prévia">
       <button type="button" data-w="100%" aria-pressed="true">Computador</button>
       <button type="button" data-w="390px" aria-pressed="false">Celular</button>
@@ -204,17 +227,17 @@
     { id: "ler", nome: "Ler o arquivo" },
     { id: "origem", nome: "Reconhecer o report" },
     { id: "limpar", nome: "Tirar o que o e-mail não aceita" },
-    { id: "resumir", nome: "Montar a versão do e-mail" },
-    { id: "imagens", nome: "Colocar as imagens dentro do e-mail" },
-    { id: "conferir", nome: "Conferir para o Outlook" },
-    { id: "montar", nome: "Montar o .eml" },
+    { id: "resumir", nome: "Escolher as seções do resumido" },
+    { id: "imagens", nome: "Colocar as imagens dentro dos e-mails" },
+    { id: "completo", nome: "Montar o e-mail completo (.eml)" },
+    { id: "resumido", nome: "Montar o e-mail resumido (.eml)" },
     { id: "interativa", nome: "Preparar a versão interativa (.html)" }
   ];
   /* Na prévia, imagem que falta aparece como um bloco cinza (em vez de um link quebrado). */
   var FALTA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120"><rect width="100%" height="100%" fill="#E3DFDC"/><text x="50%" y="54%" font-family="Arial" font-size="13" fill="#5F5F5F" text-anchor="middle">imagem faltando</text></svg>');
   var ICONE = { espera: "", rodando: "", ok: "✓", aviso: "!", erro: "✕" };
   var pastaArquivos = {};      /* imagens da pasta "_files", por nome */
-  var interativa = null, handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, urls = [];
+  var interativa = null, handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, resumido = null, previas = {}, qualPrev = "completo", urls = [];
   var inicio = 0, relogioTimer = null;
 
   /* ---------- status em tempo real ---------- */
@@ -272,6 +295,30 @@
     });
   }
   function nomeDoSrc(src) { try { src = decodeURIComponent(src); } catch (e) {} return src.split(/[?#]/)[0].split(/[\\/]/).pop(); }
+  /* Print grande colocado à mão (arquivo ao lado do .html): reduz para até 1200 px de largura. */
+  var MAX_PRINT = 1200;
+  function reduzir(bytes, ext) {
+    return new Promise(function (ok) {
+      var u = URL.createObjectURL(new Blob([bytes], { type: Motor.tipoMime("x." + ext) })), im = new Image();
+      im.onload = function () {
+        URL.revokeObjectURL(u);
+        if (im.naturalWidth <= MAX_PRINT) return ok({ bytes: bytes, ext: ext, reduzida: false });
+        var c = document.createElement("canvas"); c.width = MAX_PRINT; c.height = Math.round(im.naturalHeight * MAX_PRINT / im.naturalWidth);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        var tipo = ext === "png" ? "image/png" : "image/jpeg";
+        c.toBlob(function (b) {
+          lerBytes(b).then(function (nb) {
+            if (tipo === "image/png" && nb.length > 900 * 1024) c.toBlob(function (j) { lerBytes(j).then(function (jb) { ok({ bytes: jb, ext: "jpg", reduzida: true }); }); }, "image/jpeg", 0.9);
+            else ok({ bytes: nb, ext: ext === "png" ? "png" : "jpg", reduzida: true });
+          });
+        }, tipo, 0.9);
+      };
+      im.onerror = function () { URL.revokeObjectURL(u); ok({ bytes: bytes, ext: ext, reduzida: false }); };
+      im.src = u;
+    });
+  }
+  function dataUri(bytes, ext) { return "data:" + Motor.tipoMime("x." + ext) + ";base64," + Motor.base64(bytes); }
+  function nomes(ids) { return ids.map(function (i) { return Motor.SECOES[i] || i; }).join(", "); }
 
   /* ---------- conversão ---------- */
   async function converter(file) {
@@ -279,7 +326,8 @@
     var anterior = ultimoArquivo; ultimoArquivo = file;
     function parou() { return minha !== execucao; }
     var erros = [], avisos = [];
-    resultado = null; $("#bEml").disabled = true; $("#emlInfo").textContent = "";
+    resultado = null; resumido = null; previas = {};
+    $("#bEml").disabled = true; $("#bEmlRes").disabled = true; $("#emlInfo").textContent = ""; $("#emlResInfo").textContent = "";
     if (!anterior || anterior.name !== file.name) { interativa = null; $("#bInterativa").disabled = true; $("#interInfo").textContent = ""; }
     urls.forEach(URL.revokeObjectURL); urls = [];
     montarEtapas(); progresso(0); relogio(true);
@@ -293,56 +341,62 @@
     catch (e) { etapa("ler", "erro", "Não deu para ler o arquivo. Se ele foi salvo de novo, escolha-o outra vez."); return fim(["leitura"], []); }
     if (parou()) return;
     if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) { etapa("ler", "erro", "Este arquivo não parece uma página HTML."); return fim(["formato"], []); }
-    etapa("ler", "ok", file.name + " · " + kb(file.size)); progresso(12); log("Arquivo lido."); await respira();
+    etapa("ler", "ok", file.name + " · " + kb(file.size)); progresso(10); log("Arquivo lido."); await respira();
 
     /* 2. origem */
     etapa("origem", "rodando", "Procurando a marca da ferramenta…"); await respira();
     var org = Motor.origemDoHtml(html), titulo = Motor.assuntoDoHtml(html);
     if (org) { etapa("origem", "ok", "Report gerado pela versão " + org.versao + " a partir de " + org.dados + "."); log("Report: versão " + org.versao + ", " + org.dados + "."); }
     else { etapa("origem", "aviso", "Não achei a marca da ferramenta. A conversão segue: confira a prévia antes de enviar."); avisos.push("origem"); log("Sem a marca da ferramenta."); }
-    progresso(22); await respira();
-    /* Versão interativa sai do arquivo original (antes de limpar): fica disponível já, para subir no SharePoint e pegar o link. */
+    /* Versão interativa já disponível (para subir no SharePoint e pegar o link); os prints colocados à mão entram no fim. */
     var pg = Motor.paginaInterativa(html);
     interativa = { html: pg.html, nome: file.name.replace(/\.(html?|htm)$/i, "") + "-interativo.html", ok: pg.interativa };
     $("#bInterativa").disabled = false; $("#interInfo").textContent = interativa.nome + " · " + kb(Motor.utf8(pg.html).length);
     atualizarSecoes(html);
+    progresso(18); await respira();
 
     /* 3. limpar */
     etapa("limpar", "rodando", "Tirando script, ampliação, vídeo e marcas da edição…"); await respira();
     var limpo = Motor.limparHtmlEditado(html);
+    var semPlay = Motor.miniaturasSemPlay(html), limpoRes = Motor.limparHtmlEditado(semPlay.html);
     var saiu = limpo.saiu.map(function (s) { return s.item + (s.n > 1 ? " (" + s.n + ")" : ""); });
-    etapa("limpar", "ok", saiu.length ? "Saiu do e-mail:" : "Nada para tirar: o HTML já estava pronto para e-mail.", saiu);
+    etapa("limpar", "ok", saiu.length ? "Saiu dos e-mails:" : "Nada para tirar: o HTML já estava pronto para e-mail.", saiu);
     log(saiu.length ? "Removido: " + saiu.join(", ") + "." : "Nada para remover.");
-    progresso(30); await respira(); if (parou()) return;
+    progresso(26); await respira(); if (parou()) return;
 
-    /* 3b. resumir */
-    var modo = modoAtual(), link = $("#link").value.trim(), email = { html: limpo.html };
-    etapa("resumir", "rodando", modo === "resumido" ? "Escolhendo as seções e colocando o botão…" : "Conferindo o link…"); await respira();
-    if (link && !/^https:\/\/[^\s]+$/i.test(link)) {
-      etapa("resumir", "erro", "O link precisa começar com https:// (copie o link de compartilhamento do SharePoint)."); return fim(["link"], avisos);
+    /* 4. seções do resumido */
+    var link = $("#link").value.trim(), botao = $("#botao").value.trim(), linkOk = /^https:\/\/[^\s]+$/i.test(link), resErro = "";
+    etapa("resumir", "rodando", "Escolhendo as seções…"); await respira();
+    var manter = Array.prototype.filter.call(document.querySelectorAll("#secoes input"), function (c) { return c.checked; }).map(function (c) { return c.value; });
+    var res = Motor.emailResumido(limpoRes.html, { manter: manter, link: linkOk ? link : "", botao: botao });
+    var itens = [];
+    if (res.erro) { resErro = res.erro; etapa("resumir", "aviso", res.erro); avisos.push("secoes"); }
+    else {
+      itens.push("Ficam no resumido: " + nomes(res.mantidas), "Só no completo e na versão interativa: " + (res.fora.length ? nomes(res.fora) : "nada (todas marcadas)"));
+      if (semPlay.trocadas) itens.push(semPlay.trocadas + " miniatura(s) de vídeo sem ▶ e sem link no resumido (o vídeo só toca na versão interativa)");
+      if (semPlay.comPlay) itens.push(semPlay.comPlay + " miniatura(s) de vídeo continuam com ▶: a página é de antes da versão 4.0; gere de novo pelo gerar-report.html");
+      if (!link) resErro = "Falta o link da versão interativa (passo 2).";
+      else if (!linkOk) resErro = "O link precisa começar com https:// (copie o link de compartilhamento do SharePoint).";
+      etapa("resumir", resErro || semPlay.comPlay ? "aviso" : "ok", resErro ? resErro + " A prévia do resumido já aparece; o botão entra quando o link estiver certo." : "Botão \"" + (botao || "Ver o report completo") + "\" levando para " + hostDe(link) + ".", itens);
+      if (semPlay.comPlay) avisos.push("thumb");
+      log("Resumido: ficam " + res.mantidas.join(", ") + "; saem " + (res.fora.join(", ") || "nenhuma") + ".");
     }
-    if (modo === "resumido") {
-      if (!link) { etapa("resumir", "erro", "Cole o link da versão interativa (passo 2). Sem ele, o botão \"Ver o report completo\" não teria para onde ir."); return fim(["link"], avisos); }
-      var manter = Array.prototype.filter.call(document.querySelectorAll("#secoes input"), function (c) { return c.checked; }).map(function (c) { return c.value; });
-      email = Motor.emailResumido(limpo.html, { manter: manter, link: link, botao: $("#botao").value.trim() });
-      if (email.erro) { etapa("resumir", "erro", email.erro); return fim(["secoes"], avisos); }
-      var nomes = function (ids) { return ids.map(function (i) { return Motor.SECOES[i] || i; }).join(", "); };
-      etapa("resumir", "ok", "E-mail resumido com o botão para " + hostDe(link) + ".", ["Ficam: " + nomes(email.mantidas), "Só na versão interativa: " + (email.fora.length ? nomes(email.fora) : "nada (todas as seções marcadas)")]
-        .concat(email.videos ? [email.videos + " miniatura(s) de vídeo agora abrem a versão interativa"] : []));
-      log("Resumido: ficam " + email.mantidas.join(", ") + "; saem " + (email.fora.join(", ") || "nenhuma") + ".");
-    } else if (link) {
+    /* E-mail completo: o report inteiro; com o link e a opção marcada, ganha o botão e as miniaturas de vídeo levam à versão interativa. */
+    var completo = { html: limpo.html };
+    if (linkOk && $("#botaoNoCompleto").checked) {
       var todas = Motor.secoesDoHtml(limpo.html).map(function (x) { return x.id; });
-      email = todas.length ? Motor.emailResumido(limpo.html, { manter: todas, link: link, botao: $("#botao").value.trim() }) : Motor.ligarVideos(limpo.html, link);
-      etapa("resumir", "ok", "E-mail completo, com o botão para a versão interativa em " + hostDe(link) + (email.videos || email.n ? " e as miniaturas de vídeo ligadas a ela." : "."));
-    } else etapa("resumir", "ok", "E-mail completo: todas as seções, sem botão para a versão interativa.");
-    progresso(36); await respira(); if (parou()) return;
+      completo = todas.length ? Motor.emailResumido(limpo.html, { manter: todas, link: link, botao: botao, ligar: true }) : Motor.ligarVideos(limpo.html, link);
+    }
+    progresso(32); await respira(); if (parou()) return;
 
-    /* 4. imagens */
-    var lista = Motor.imagensDoHtml(email.html), mapa = {}, mapaPrev = {}, anexos = [], total = 0, faltam = [], probs = [];
+    /* 5. imagens (uma vez só, para os dois e-mails) */
+    var lista = Motor.imagensDoHtml(completo.html);
+    if (!res.erro) Motor.imagensDoHtml(res.html).forEach(function (x) { if (lista.indexOf(x) < 0) lista.push(x); });
+    var mapa = {}, mapaPrev = {}, porSrc = {}, total = 0, faltam = [], probs = [], deArquivo = {};
     etapa("imagens", "rodando", lista.length ? "Imagem 0 de " + lista.length + "…" : "Procurando imagens…"); await respira();
     for (var i = 0; i < lista.length; i++) {
       if (parou()) return;
-      var src = lista[i], tipo = Motor.origemImagem(src), n = anexos.length + 1, bytes = null, ext = "", rot = "Imagem " + (i + 1);
+      var src = lista[i], tipo = Motor.origemImagem(src), n = Object.keys(porSrc).length + 1, bytes = null, ext = "", rot = "Imagem " + (i + 1);
       try {
         if (tipo === "embutida") { var d = Motor.imagemDeDataUri(src); bytes = d.bytes; ext = d.ext; mapaPrev[src] = src; }
         else if (tipo === "embutida-incompativel") { bytes = await paraPng(src); ext = "png"; probs.push(rot + ": formato que o Outlook não mostra; convertida para PNG."); }
@@ -351,76 +405,103 @@
           if (!f) { faltam.push(nome); mapaPrev[src] = FALTA; continue; }
           if (/\.(png|jpe?g|gif)$/i.test(nome)) { bytes = await lerBytes(f); ext = nome.split(".").pop().toLowerCase().replace("jpeg", "jpg"); }
           else { var u = URL.createObjectURL(f); urls.push(u); bytes = await paraPng(u); ext = "png"; probs.push(nome + ": convertida para PNG."); }
+          if (ext !== "gif") { var red = await reduzir(bytes, ext); if (red.reduzida) probs.push(nome + ": reduzida para " + MAX_PRINT + " px de largura (" + kb(bytes.length) + " → " + kb(red.bytes.length) + ")."); bytes = red.bytes; ext = red.ext; }
+          deArquivo[src] = dataUri(bytes, ext);
         }
         else if (tipo === "internet") { probs.push(rot + " vem da internet (" + src.slice(0, 60) + "…): fica como link. O Outlook pode pedir para baixar as imagens."); continue; }
         else if (tipo === "blob") { erros.push("blob"); probs.push(rot + ": endereço temporário da prévia (blob:). Salve a página baixada pelo botão \"Baixar página do mês\", não a prévia."); continue; }
         else { erros.push("cid"); probs.push(rot + ": aponta para um anexo (cid:) que não está neste arquivo."); continue; }
       } catch (e) { erros.push("img"); probs.push(rot + ": " + e.message + "."); continue; }
       var cid = "img" + String(n).padStart(2, "0") + "@report", arq = String(n).padStart(2, "0") + "-imagem." + ext;
-      anexos.push({ cid: cid, nome: arq, bytes: bytes }); mapa[src] = "cid:" + cid; total += bytes.length;
+      porSrc[src] = { cid: cid, nome: arq, bytes: bytes }; mapa[src] = "cid:" + cid; total += bytes.length;
       if (!mapaPrev[src]) { var b = URL.createObjectURL(new Blob([bytes], { type: Motor.tipoMime(arq) })); urls.push(b); mapaPrev[src] = b; }
       if (bytes.length > 1048576) probs.push(rot + " tem " + kb(bytes.length) + ": deixa o e-mail pesado.");
       etapa("imagens", "rodando", "Imagem " + (i + 1) + " de " + lista.length + " · " + kb(bytes.length) + " · total " + kb(total));
-      progresso(34 + 36 * (i + 1) / lista.length); await respira();
+      progresso(32 + 38 * (i + 1) / lista.length); await respira();
     }
     if (faltam.length) {
       erros.push("faltam"); $("#pastaRow").hidden = false;
-      probs.unshift("Faltam " + faltam.length + " imagem(ns) que o Chrome salvou numa pasta ao lado: " + faltam.slice(0, 4).join(", ") + (faltam.length > 4 ? "…" : "") + ". Use \"Escolher a pasta das imagens\".");
+      probs.unshift("Faltam " + faltam.length + " imagem(ns) que estão em arquivo ao lado do .html: " + faltam.slice(0, 4).join(", ") + (faltam.length > 4 ? "…" : "") + ". Use \"Escolher a pasta das imagens\" (passo 1).");
     }
     var estImg = erros.length ? "erro" : probs.length ? "aviso" : "ok";
     if (estImg === "aviso") avisos.push("imagens");
-    etapa("imagens", estImg, anexos.length + " imagem(ns) dentro do e-mail · " + kb(total) + (lista.length > anexos.length ? " · " + (lista.length - anexos.length) + " com problema" : ""), probs);
-    log(anexos.length + " imagens embutidas (" + kb(total) + ")" + (probs.length ? "; " + probs.length + " observação(ões)" : "") + ".");
+    etapa("imagens", estImg, Object.keys(porSrc).length + " imagem(ns) preparada(s) · " + kb(total), probs);
+    log(Object.keys(porSrc).length + " imagens preparadas (" + kb(total) + ")" + (probs.length ? "; " + probs.length + " observação(ões)" : "") + ".");
     progresso(72); await respira(); if (parou()) return;
-
-    /* 5. conferir */
-    etapa("conferir", "rodando", "Conferindo regras do Outlook…"); await respira();
-    var final = Motor.trocarSrc(email.html, mapa);
-    var conf = Motor.conferirHtml(final).filter(function (c) { return c.nivel !== "info"; });
-    if (/url\(\s*['"]?data:/i.test(final)) conf.push({ nivel: "aviso", msg: "Há imagem de fundo embutida no CSS: o Outlook não mostra." });
-    etapa("conferir", conf.length ? "aviso" : "ok", conf.length ? conf.length + " ponto(s) para olhar:" : "Nenhum problema encontrado.", conf.map(function (c) { return c.msg; }));
-    if (conf.length) avisos.push("conferir");
-    log(conf.length ? "Conferência: " + conf.map(function (c) { return c.msg; }).join(" | ") : "Conferência sem problemas.");
-    progresso(84); await respira(); if (parou()) return;
-
-    /* 6. montar */
-    etapa("montar", "rodando", "Montando a mensagem…"); await respira();
     if (!$("#assunto").dataset.editado || $("#assunto").dataset.arquivo !== file.name) { $("#assunto").value = titulo || "Report mensal"; $("#assunto").dataset.arquivo = file.name; }
-    resultado = { html: final, texto: Motor.textoDoHtml(final), imagens: anexos, nome: file.name.replace(/\.(html?|htm)$/i, "") + ".eml" };
-    var tam = Motor.gerarEml({ assunto: $("#assunto").value, html: resultado.html, texto: resultado.texto, imagens: anexos }).length;
-    if (tam > 10 * 1048576) { avisos.push("tamanho"); etapa("montar", "aviso", "E-mail com " + kb(tam) + ": acima de 10 MB alguns servidores recusam."); }
-    else etapa("montar", erros.length ? "aviso" : "ok", "Mensagem de " + kb(tam) + (erros.length ? ", mas há imagens com problema (veja acima)." : ", pronta para o Outlook."));
-    log(".eml montado: " + kb(tam) + ".");
+    var base = file.name.replace(/\.(html?|htm)$/i, "");
 
-    /* 7. versão interativa */
-    etapa("interativa", interativa.ok ? "ok" : "aviso", interativa.ok ? interativa.nome + " · " + $("#interInfo").textContent.split(" · ").pop() + ": vídeos tocam e peças abrem maiores no clique. Suba no SharePoint (passo 2)." :
+    /* 6 e 7. montar os dois .eml (mesmas regras: conferência do Outlook, tamanho) */
+    function montar(id, origem, nomeEml) {
+      var final = Motor.trocarSrc(origem, mapa), anexos = Motor.imagensDoHtml(final).filter(function (x) { return /^cid:/.test(x); })
+        .map(function (x) { var c = x.slice(4); return Object.keys(porSrc).map(function (k) { return porSrc[k]; }).filter(function (p) { return p.cid === c; })[0]; }).filter(Boolean);
+      var conf = Motor.conferirHtml(final).filter(function (c) { return c.nivel !== "info"; });
+      if (/url\(\s*['"]?data:/i.test(final)) conf.push({ nivel: "aviso", msg: "Há imagem de fundo embutida no CSS: o Outlook não mostra." });
+      var r = { html: final, texto: Motor.textoDoHtml(final), imagens: anexos, nome: nomeEml };
+      r.tam = Motor.gerarEml({ assunto: $("#assunto").value, html: r.html, texto: r.texto, imagens: anexos }).length;
+      var notas = conf.map(function (c) { return c.msg; });
+      if (r.tam > 10 * 1048576) notas.push("Acima de 10 MB alguns servidores recusam.");
+      r.notas = notas;
+      return r;
+    }
+    etapa("completo", "rodando", "Montando o e-mail completo…"); await respira();
+    resultado = montar("completo", completo.html, base + ".eml");
+    previas.completo = Motor.trocarSrc(completo.html, mapaPrev);
+    etapa("completo", erros.length ? "erro" : resultado.notas.length ? "aviso" : "ok", erros.length ? "Não montei: há imagens com problema (veja acima)." :
+      "Mensagem de " + kb(resultado.tam) + " · " + resultado.imagens.length + " imagens" + (completo.html !== limpo.html ? " · com o botão para a versão interativa" : ""), resultado.notas);
+    if (resultado.notas.length) avisos.push("completo");
+    log("E-mail completo: " + kb(resultado.tam) + ".");
+    progresso(82); await respira(); if (parou()) return;
+
+    etapa("resumido", "rodando", "Montando o e-mail resumido…"); await respira();
+    if (res.erro) etapa("resumido", "aviso", "Sem o resumido: " + res.erro);
+    else {
+      previas.resumido = Motor.trocarSrc(res.html, mapaPrev);
+      var rr = montar("resumido", res.html, base + "-resumido.eml");
+      if (erros.length) etapa("resumido", "erro", "Não montei: há imagens com problema (veja acima).");
+      else if (resErro) etapa("resumido", "aviso", resErro + " (prévia pronta: " + kb(rr.tam) + ").");
+      else { resumido = rr; etapa("resumido", rr.notas.length ? "aviso" : "ok", "Mensagem de " + kb(rr.tam) + " · " + rr.imagens.length + " imagens · " + Math.round(100 * rr.tam / resultado.tam) + "% do tamanho do completo", rr.notas); if (rr.notas.length) avisos.push("resumido"); }
+      log("E-mail resumido: " + kb(rr.tam) + (resErro ? " (sem link)" : "") + ".");
+    }
+    progresso(90); await respira(); if (parou()) return;
+
+    /* 8. versão interativa: prints colocados à mão entram embutidos (o arquivo vai sozinho para o SharePoint) */
+    etapa("interativa", "rodando", "Preparando a versão interativa…"); await respira();
+    var ih = interativa.html;
+    Object.keys(deArquivo).forEach(function (src) {
+      var m = {}; m[src] = deArquivo[src]; ih = Motor.trocarSrc(ih, m);
+      ih = ih.split('data-ampliar="' + src + '"').join('data-ampliar="' + deArquivo[src] + '"');
+    });
+    interativa.html = ih; $("#interInfo").textContent = interativa.nome + " · " + kb(Motor.utf8(ih).length);
+    var nArq = Object.keys(deArquivo).length;
+    etapa("interativa", interativa.ok ? "ok" : "aviso", interativa.ok ? interativa.nome + " · " + kb(Motor.utf8(ih).length) + ": vídeos com o botão \"Assistir ao vídeo\" e peças que abrem maiores no clique" + (nArq ? "; " + nArq + " print(s) embutido(s)" : "") + ". Suba no SharePoint (passo 2)." :
       "A página não tem peças ampliáveis nem vídeos: a versão interativa fica igual ao e-mail completo.");
     if (!interativa.ok) avisos.push("interativa");
 
-    /* prévia */
-    $("#prev").srcdoc = Motor.trocarSrc(email.html, mapaPrev);
     $("#secPrev").hidden = false; $("#secBaixar").hidden = false;
-    fim(erros, avisos, performance.now() - t0, tam);
+    mostrarPrevia();
+    fim(erros, avisos, performance.now() - t0);
   }
 
-  function fim(erros, avisos, ms, tam) {
+  function fim(erros, avisos, ms) {
     relogio(false); if (ms) $("#relogio").textContent = "Tempo: " + seg(ms);
     if (erros.length) {
       progresso(100); $("#barra").classList.remove("fim");
-      if (erros.length === 1 && erros[0] === "link" && !$("#link").value.trim()) banner("warn", "Falta só o link da versão interativa: baixe a versão interativa (passo 2), suba no SharePoint e cole o link. O e-mail se monta sozinho em seguida.");
-      else banner("err", "Não deu para converter tudo. Veja a etapa marcada com ✕.");
-      $("#bEml").disabled = true; log("Fim com problema.");
+      banner("err", "Não deu para converter tudo. Veja a etapa marcada com ✕.");
+      $("#bEml").disabled = true; $("#bEmlRes").disabled = true; log("Fim com problema.");
       return;
     }
     progresso(100, true);
-    banner(avisos.length ? "warn" : "ok", (avisos.length ? "Pronto, com pontos para olhar (marcados com !). " : "Pronto. ") + "Clique em \"Baixar e-mail (.eml)\"." + (handle && $("#acompanhar").checked ? " Se salvar o .html de novo, a conversão se repete sozinha." : ""));
-    $("#bEml").disabled = !resultado;
-    $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(tam) + " · " + resultado.imagens.length + " imagens dentro" : "";
+    var r = !!resumido;
+    banner(r && !avisos.length ? "ok" : "warn", (r ? "Pronto: e-mail completo e e-mail resumido." : "Pronto: e-mail completo. Para o resumido, falta o link da versão interativa (passo 2).") +
+      (avisos.length && r ? " Há pontos para olhar (marcados com !)." : "") + (handle && $("#acompanhar").checked ? " Se salvar o .html de novo, a conversão se repete sozinha." : ""));
+    $("#bEml").disabled = !resultado; $("#bEmlRes").disabled = !resumido;
+    $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(resultado.tam) + " · " + resultado.imagens.length + " imagens" : "";
+    $("#emlResInfo").textContent = resumido ? resumido.nome + " · " + kb(resumido.tam) + " · " + resumido.imagens.length + " imagens" : "Precisa do link da versão interativa (passo 2).";
     log("Fim: pronto.");
   }
 
-  /* ---------- opções (modo, seções, link): mudou, converte de novo ---------- */
-  function modoAtual() { return document.querySelector('input[name=modo]:checked').value; }
+  /* ---------- opções: mudou, converte de novo ---------- */
   function hostDe(u) { try { return new URL(u).host; } catch (e) { return u; } }
   function atualizarSecoes(html) {
     var achadas = Motor.secoesDoHtml(html), box = $("#secoes"), marcadas = {};
@@ -428,7 +509,7 @@
     var ids = achadas.map(function (x) { return x.id; }).join(",");
     if (box.dataset.ids === ids) return;
     box.dataset.ids = ids; box.textContent = "";
-    if (!achadas.length) { box.innerHTML = '<span class="muted">Este arquivo não tem as marcas de seção (gerado antes da versão 3.9). Gere a página de novo pelo <code>gerar-report.html</code> para usar o e-mail resumido.</span>'; return; }
+    if (!achadas.length) { box.innerHTML = '<span class="muted">Este arquivo não tem as marcas de seção (gerado antes da versão 3.9). Gere a página de novo pelo <code>gerar-report.html</code> para ter o e-mail resumido.</span>'; return; }
     achadas.forEach(function (x) {
       var l = document.createElement("label"), c = document.createElement("input");
       l.className = "check"; c.type = "checkbox"; c.value = x.id;
@@ -436,21 +517,33 @@
       l.appendChild(c); l.appendChild(document.createTextNode(" " + x.nome)); box.appendChild(l);
     });
   }
-  function mostrarModo() {
-    var r = modoAtual() === "resumido";
-    $("#campoSecoes").hidden = !r; $("#linkObrig").textContent = r ? "(obrigatório no resumido)" : "(opcional: com ele, o e-mail completo também ganha o botão)";
-  }
   var adiar = null;
   function reconverter() {
-    mostrarModo();
     clearTimeout(adiar);
     adiar = setTimeout(function () { if (ultimoArquivo) { log("Opções mudaram: convertendo de novo."); (handle ? handle.getFile() : Promise.resolve(ultimoArquivo)).then(converter); } }, 500);
   }
-  document.querySelectorAll("input[name=modo]").forEach(function (r) { r.addEventListener("change", reconverter); });
   $("#secoes").addEventListener("change", reconverter);
   $("#link").addEventListener("input", reconverter);
   $("#botao").addEventListener("input", reconverter);
-  mostrarModo();
+  $("#botaoNoCompleto").addEventListener("change", reconverter);
+
+  /* ---------- bloco de print para colar no Inspecionar ---------- */
+  function blocoPrint(n) {
+    var w = [0, 420, 198, 124][n], tds = [];
+    for (var k = 1; k <= n; k++) {
+      if (k > 1) tds.push('  <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>');
+      tds.push('  <td class="col' + (k < n ? " gap" : "") + '" width="' + w + '" valign="top" style="width:' + w + 'px;"><img src="NOME-DO-PRINT-' + k + '.png" width="' + w + '" alt="DESCREVA O PRINT ' + k + '" data-ampliar="" data-legenda="DESCREVA O PRINT ' + k + '" class="fluid" style="display:block;border:1px solid #F5DECF;width:' + w + 'px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#5F5F5F;"></td>');
+    }
+    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>\n' + tds.join("\n") + '\n</tr></table>';
+  }
+  function mostrarBloco() { $("#snippet").value = blocoPrint(+$("#qtdPrints").value); $("#copiado").textContent = ""; }
+  $("#qtdPrints").addEventListener("change", mostrarBloco);
+  $("#bCopiar").addEventListener("click", function () {
+    var t = $("#snippet"); t.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(function () { $("#copiado").textContent = "Copiado. Cole no Inspecionar (Edit as HTML)."; },
+      function () { document.execCommand("copy"); $("#copiado").textContent = "Copiado."; });
+  });
+  mostrarBloco();
 
   $("#bInterativa").addEventListener("click", function () {
     if (!interativa) return;
@@ -462,14 +555,28 @@
 
   /* ---------- baixar ---------- */
   $("#assunto").addEventListener("input", function () { this.dataset.editado = "1"; });
-  $("#bEml").addEventListener("click", function () {
-    if (!resultado) return;
-    var eml = Motor.gerarEml({ assunto: $("#assunto").value, html: resultado.html, texto: resultado.texto, imagens: resultado.imagens });
+  function baixarEml(r, info) {
+    if (!r) return;
+    var eml = Motor.gerarEml({ assunto: $("#assunto").value, html: r.html, texto: r.texto, imagens: r.imagens });
     var a = document.createElement("a"), u = URL.createObjectURL(new Blob([eml], { type: "message/rfc822" }));
-    a.href = u; a.download = resultado.nome; document.body.appendChild(a); a.click(); a.remove();
+    a.href = u; a.download = r.nome; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
-    $("#emlInfo").textContent = "Baixado: " + resultado.nome + ". Abra na pasta Downloads.";
-    log("Baixado: " + resultado.nome + ".");
+    $(info).textContent = "Baixado: " + r.nome + ". Abra na pasta Downloads.";
+    log("Baixado: " + r.nome + ".");
+  }
+  $("#bEml").addEventListener("click", function () { baixarEml(resultado, "#emlInfo"); });
+  $("#bEmlRes").addEventListener("click", function () { baixarEml(resumido, "#emlResInfo"); });
+
+  /* ---------- prévia ---------- */
+  function mostrarPrevia() {
+    var h = previas[qualPrev];
+    $("#prev").srcdoc = h || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">O e-mail resumido aparece aqui quando a página tiver as marcas de seção (versão 3.9 ou mais nova).</p>';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (b) {
+    b.addEventListener("click", function () {
+      Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (x) { x.setAttribute("aria-pressed", x === b); });
+      qualPrev = b.dataset.qual; mostrarPrevia();
+    });
   });
 
   /* ---------- escolher o arquivo ---------- */
@@ -503,6 +610,7 @@
     pastaArquivos = {};
     Array.prototype.forEach.call(this.files, function (f) { pastaArquivos[f.name] = f; });
     log("Pasta das imagens: " + this.files.length + " arquivo(s).");
+    $("#pastaInfo").textContent = "Pasta escolhida: " + this.files.length + " arquivo(s).";
     if (handle) handle.getFile().then(converter); else if (ultimoArquivo) converter(ultimoArquivo);
   });
 
@@ -527,9 +635,9 @@
   }, 1500);
 
   /* ---------- prévia ---------- */
-  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) {
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (b) {
     b.addEventListener("click", function () {
-      Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (x) { x.setAttribute("aria-pressed", x === b); });
+      Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (x) { x.setAttribute("aria-pressed", x === b); });
       $("#prev").style.width = b.dataset.w;
     });
   });

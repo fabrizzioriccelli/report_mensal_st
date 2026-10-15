@@ -216,7 +216,7 @@ significado: Lorem ipsum dolor sit amet, consectetur adipiscing.
 
 # ----------------------------------------------------------------------
 #  EDITAR AQUI: RESUMO DAS CAMPANHAS (depois do Creative X, antes do
-#  Creative Transformation; sem número de seção)
+#  Transformation Hub; sem número de seção)
 #  Até 4 frases em cada lado. Uma frase curta por bloco (até ~90 caracteres).
 #  FOI BEM aparece em verde; A MELHORAR, em âmbar. Para tirar, apague os blocos.
 # ----------------------------------------------------------------------
@@ -234,12 +234,18 @@ texto: Lorem ipsum dolor sit amet.
 
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: 04 · CREATIVE TRANSFORMATION (até 3 projetos)
+#  EDITAR AQUI: 04 · TRANSFORMATION HUB (até 3 projetos)
 #  icones: nomes de assets/icones/ separados por vírgula
 #          (icone-prancheta, icone-lupa), OU
 #  imagem: um print da ferramenta (na pasta do mês).
 #  Sem os dois, o texto ocupa a linha inteira.
 #  citacao e resultado são opcionais.
+#  prints: até 3 prints (telas) do projeto, na pasta do mês, separados
+#          por vírgula. Aparecem abaixo do texto, na largura do cartão:
+#          1 print = 504 px; 2 = 240 px cada; 3 = 152 px cada (no celular,
+#          um embaixo do outro). Na página do mês, abrem maiores no clique.
+#  descricao_prints: o que cada print mostra, separados por "|", na
+#          mesma ordem (ex.: Tela do agente | Resultado do teste).
 # ----------------------------------------------------------------------
 [TRANSFORMATION]
 titulo: Como estamos transformando<br>a forma de criar.
@@ -254,6 +260,8 @@ resultado: Lorem ipsum: X%
 icones: icone-prancheta, icone-lupa
 imagem:
 descricao_imagem:
+prints: [INSERIR PRINT]
+descricao_prints: Lorem ipsum dolor sit amet
 tipo: demo
 link:
 

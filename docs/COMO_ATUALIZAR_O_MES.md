@@ -119,8 +119,8 @@ Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt
 | `[RESULTADO 1]` a `[RESULTADO 3]` | **02** · números do destaque |
 | `[LANCAMENTO 1]` a `[LANCAMENTO 6]` | **02** · "Também neste mês", com miniatura (linhas de 3) |
 | `[CREATIVE X]` | **03** · score anterior → atual, barra e frase |
-| `[FOI BEM 1]` a `[4]`, `[A MELHORAR 1]` a `[4]` | Resumo das campanhas, depois do Creative X e antes do Creative Transformation: o que foi bem (verde) e o que precisa melhorar (âmbar) |
-| `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Creative Transformation |
+| `[FOI BEM 1]` a `[4]`, `[A MELHORAR 1]` a `[4]` | Resumo das campanhas, depois do Creative X e antes do Transformation Hub: o que foi bem (verde) e o que precisa melhorar (âmbar) |
+| `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Transformation Hub (até 3 prints por projeto: `prints:` e `descricao_prints:`) |
 | `[APRENDIZADO 1]` a `[3]` | **05** · O que aprendemos |
 | `[FOCO]` | **06** · bloco vermelho do foco do próximo mês; `selo:` opcional (PNG original do selo da campanha, versão para fundo vermelho) |
 | `[AGENDA 1]` a `[AGENDA 6]` | **07** · Também vem aí (linhas de 3) |
@@ -152,7 +152,8 @@ Os textos **não** são editados no HTML: eles ficam no arquivo do mês, e a pá
 | Tirar o botão | Deixo `link:` vazio |
 | Status de um lançamento | `status: Resultado em 28/10` e `status_cor: ambar` (previsto) ou `verde` (no ar) |
 | Data na agenda | `data: 12 OUT` aparece grande e vermelha; `data: A DEFINIR` aparece em cinza |
-| Ícones no Transformation | `icones: icone-prancheta, icone-lupa` (arquivos de `assets/icones/`) |
+| Ícones no Transformation Hub | `icones: icone-prancheta, icone-lupa` (arquivos de `assets/icones/`) |
+| Prints no Transformation Hub | `prints: print-1.png, print-2.png` (até 3, na pasta do mês) e `descricao_prints: Tela do agente \| Resultado` (separados por `\|`) |
 | Quebrar a linha de um título | Escrevo `<br>` no ponto da quebra |
 
 ## Erros comuns
