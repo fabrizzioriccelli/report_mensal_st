@@ -308,5 +308,13 @@ teste("foco: selo da campanha ao lado do título (computador) e acima (celular)"
   assert.ok(!r.ok && niveis(r, "erro").some(function (p) { return /selo não encontrado/.test(p.msg); }));
 });
 
+teste("destaque: número longo em 3 resultados gera aviso (não cabe no celular)", function () {
+  var base = MINIMO + "\n[DESTAQUE]\ntitulo: T\n[RESULTADO 1]\nvalor: R$ 1.234,56\n[RESULTADO 2]\nvalor: 2\n[RESULTADO 3]\nvalor: 3";
+  var r = montar(base);
+  assert.ok(niveis(r, "aviso").some(function (p) { return /RESULTADO 1\] valor/.test(p.msg); }));
+  r = montar(base.replace("R$ 1.234,56", "2x"));
+  assert.ok(!niveis(r, "aviso").some(function (p) { return /RESULTADO/.test(p.msg); }));
+});
+
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");
 process.exit(falhas ? 1 : 0);
