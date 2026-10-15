@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Converter HTML em e-mail (.eml) · Creative Strategy PF</title>
+<!--
+  CONVERTER HTML EDITADO EM E-MAIL (.eml)
+  ----------------------------------------------------------------------
+  Para quando você editou a página do mês direto no navegador (Chrome ou
+  Edge) e quer mandar essa versão por e-mail.
+
+  Abra este arquivo no Edge ou no Chrome (dois cliques) ou pelo endereço
+  local (ex.: http://localhost:8000/converter-html-eml.html). Não precisa
+  instalar nada e nada é enviado para a internet: a página só lê o
+  arquivo que você escolher.
+
+  O que ela faz, com o status de cada etapa na tela em tempo real:
+    1. lê o .html salvo pelo navegador;
+    2. reconhece o report (versão e mês);
+    3. tira o que o e-mail não aceita (script, ampliação, vídeo,
+       marcas da edição);
+    4. coloca as imagens dentro do e-mail (anexos embutidos, cid:);
+    5. confere o HTML para o Outlook;
+    6. monta o .eml (mensagem nova no Outlook, pronta para enviar).
+  Com "Acompanhar o arquivo" ligado, ela converte de novo sozinha toda
+  vez que você salvar o .html.
+
+  Precisa do arquivo tools/motor.js na mesma estrutura de pastas.
+-->
+<style>
+  :root{--red:#EC0000;--ink:#222222;--gray:#5F5F5F;--rule:#E3DFDC;--bg:#F5F3F1;--ok:#21634F;--okbg:#E3F5EF;--warn:#945400;--warnbg:#FFF1DE;--errbg:#FBE7E8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Arial,sans-serif}
+  header{background:#fff;border-top:6px solid var(--red);border-bottom:1px solid var(--rule)}
+  header div{max-width:1100px;margin:0 auto;padding:18px 24px}
+  h1{margin:0;font:bold 22px Georgia,serif;color:var(--red)}
+  header p{margin:4px 0 0;color:var(--gray);font-size:14px}
+  main{max-width:1100px;margin:0 auto;padding:24px;display:grid;gap:18px}
+  section{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:18px 20px}
+  h2{margin:0 0 10px;font-size:16px;display:flex;gap:10px;align-items:center}
+  h2 b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:14px;flex:none}
+  .muted{color:var(--gray);font-size:14px;margin:0}
+  label.btn,button{font:inherit;font-size:14px;font-weight:600;border:1px solid #CFC9C4;background:#fff;color:var(--ink);border-radius:8px;padding:10px 16px;cursor:pointer;display:inline-block;position:relative}
+  label.btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+  .pri{background:var(--red)!important;border-color:var(--red)!important;color:#fff!important}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  label.btn:focus-within,button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px}
+  .drop{margin-top:12px;border:2px dashed #CFC9C4;border-radius:10px;padding:18px;text-align:center;color:var(--gray);font-size:14px}
+  .drop.over{border-color:var(--red);background:#FFF5F5;color:var(--ink)}
+  .banner{border-radius:10px;padding:12px 16px;font-weight:600;margin:0;background:#F3F1EF;color:var(--gray)}
+  .banner.ok{background:var(--okbg);color:var(--ok)}.banner.warn{background:var(--warnbg);color:var(--warn)}.banner.err{background:var(--errbg);color:#990000}.banner.run{background:#EEF0F3;color:#3D4A5C}
+  .barra{height:8px;border-radius:8px;background:#F0ECE9;overflow:hidden;margin:12px 0 4px}
+  .barra i{display:block;height:100%;width:0;background:var(--red);transition:width .25s}
+  .barra.fim i{background:var(--ok)}
+  .medidor{display:flex;justify-content:space-between;font-size:12px;color:var(--gray)}
+  ol.etapas{list-style:none;margin:14px 0 0;padding:0}
+  ol.etapas>li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start;padding:9px 0;border-bottom:1px solid #F0ECE9}
+  ol.etapas>li:last-child{border-bottom:0}
+  .ic{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:12px;font-weight:700;background:#F3F1EF;color:var(--gray);margin-top:1px}
+  li[data-estado=rodando] .ic{background:#fff;border:3px solid #F3D1D1;border-top-color:var(--red);animation:gira .8s linear infinite}
+  li[data-estado=ok] .ic{background:var(--okbg);color:var(--ok)}
+  li[data-estado=aviso] .ic{background:var(--warnbg);color:var(--warn)}
+  li[data-estado=erro] .ic{background:var(--errbg);color:#990000}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){li[data-estado=rodando] .ic{animation:none;border-top-color:#F3D1D1;background:var(--red)}}
+  .et b{display:block;font-size:14px}.et span{display:block;font-size:13px;color:var(--gray)}
+  .et ul{margin:4px 0 0;padding-left:18px;font-size:13px}
+  .tempo{font-size:12px;color:var(--gray);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .vigia{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--gray);margin-top:10px;min-height:20px}
+  .ponto{width:9px;height:9px;border-radius:50%;background:#CFC9C4;flex:none}
+  .ponto.on{background:var(--ok);box-shadow:0 0 0 0 rgba(33,99,79,.5);animation:pulsa 1.6s infinite}
+  @keyframes pulsa{70%{box-shadow:0 0 0 7px rgba(33,99,79,0)}100%{box-shadow:0 0 0 0 rgba(33,99,79,0)}}
+  @media (prefers-reduced-motion:reduce){.ponto.on{animation:none}}
+  pre.log{margin:8px 0 0;max-height:220px;overflow:auto;background:#FAF8F6;border:1px solid #F0ECE9;border-radius:8px;padding:10px;font:12px/1.6 Consolas,Menlo,monospace;white-space:pre-wrap}
+  details summary{cursor:pointer;font-weight:600;font-size:14px;margin-top:12px}
+  input[type=text]{font:inherit;font-size:14px;padding:9px 10px;border:1px solid #CFC9C4;border-radius:8px;width:min(620px,100%)}
+  .check{display:flex;gap:8px;align-items:center;font-size:14px}
+  iframe{width:100%;height:760px;border:1px solid var(--rule);border-radius:8px;background:#EAE4DE;transition:width .2s}
+  .tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .frame{display:flex;justify-content:center}
+  code{background:#F3F1EF;padding:1px 5px;border-radius:4px;font-size:13px}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Converter HTML em e-mail (.eml)</h1>
+  <p>Para quando você editou a página do mês no navegador: lê o <b>.html</b>, tira o que o e-mail não aceita, coloca as imagens dentro e gera o <b>.eml</b> que o Outlook abre como mensagem nova. <span id="versao"></span></p>
+</div></header>
+
+<main>
+  <section aria-labelledby="s1">
+    <h2 id="s1"><b>1</b>Escolha o arquivo .html editado</h2>
+    <p class="muted">No Chrome ou no Edge, salve a página editada com <b>Ctrl+S</b> e escolha <b>"Página da Web, completa"</b> (a opção "somente HTML" perde as edições). Depois escolha esse arquivo aqui.</p>
+    <div class="row">
+      <label class="btn pri" id="escolher">Escolher o arquivo .html<input type="file" id="arquivo" accept=".html,.htm,text/html"></label>
+      <label class="check"><input type="checkbox" id="acompanhar" checked> Acompanhar o arquivo: converter de novo sempre que eu salvar</label>
+    </div>
+    <div class="drop" id="drop">ou arraste o arquivo .html para cá</div>
+    <div class="row" id="pastaRow" hidden>
+      <label class="btn">Escolher a pasta das imagens<input type="file" id="pasta" webkitdirectory multiple></label>
+      <span class="muted">O Chrome salvou algumas imagens numa pasta ao lado do .html (o nome termina em <code>_files</code> ou <code>_arquivos</code>). Escolha essa pasta.</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="s2">
+    <h2 id="s2"><b>2</b>Status</h2>
+    <p id="banner" class="banner" role="status" aria-live="polite">Aguardando o arquivo.</p>
+    <div class="barra" id="barra" role="progressbar" aria-label="Andamento da conversão" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
+    <div class="medidor"><span id="pct">0%</span><span id="relogio">—</span></div>
+    <ol class="etapas" id="etapas"></ol>
+    <div class="vigia"><span class="ponto" id="ponto"></span><span id="vigiaTxt">Sem arquivo acompanhado.</span></div>
+    <details>
+      <summary>Registro (o que aconteceu, com horário)</summary>
+      <pre class="log" id="log" aria-live="off"></pre>
+    </details>
+  </section>
+
+  <section aria-labelledby="s3" id="secBaixar" hidden>
+    <h2 id="s3"><b>3</b>Baixe o e-mail</h2>
+    <p class="muted" style="margin-bottom:6px"><label for="assunto"><b>Assunto</b></label> (vem do título da página; pode mudar aqui):</p>
+    <input type="text" id="assunto">
+    <div class="row">
+      <button type="button" class="pri" id="bEml" disabled>Baixar e-mail (.eml)</button>
+      <span id="emlInfo" class="muted"></span>
+    </div>
+    <details>
+      <summary>Depois de baixar: como abrir e enviar</summary>
+      <ol class="muted">
+        <li>Na pasta Downloads, dê dois cliques no <code>.eml</code>. O Outlook abre uma <b>mensagem nova</b> com o report e o assunto.</li>
+        <li>Envie primeiro <b>só para você</b> e confira no computador e no celular.</li>
+        <li>Tudo certo? Abra o <code>.eml</code> de novo, coloque os destinatários e envie.</li>
+      </ol>
+      <p class="muted">As edições feitas no navegador não voltam para o arquivo de dados. Para não perdê-las no próximo mês, passe as mesmas mudanças para <code>dados/AAAA-MM.txt</code>.</p>
+    </details>
+  </section>
+
+  <section aria-labelledby="s4" id="secPrev" hidden>
+    <h2 id="s4">Prévia do e-mail</h2>
+    <p class="muted">É o que vai dentro do .eml: sem ampliação nem vídeo (o e-mail não roda script).</p>
+    <div class="row tabs" role="group" aria-label="Tamanho da prévia">
+      <button type="button" data-w="100%" aria-pressed="true">Computador</button>
+      <button type="button" data-w="390px" aria-pressed="false">Celular</button>
+    </div>
+    <div class="frame" style="margin-top:12px"><iframe id="prev" title="Prévia do e-mail convertido"></iframe></div>
+  </section>
+</main>
+
+<script src="tools/motor.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  $("#versao").textContent = "Versão " + Motor.VERSAO + ".";
+
+  var ETAPAS = [
+    { id: "ler", nome: "Ler o arquivo" },
+    { id: "origem", nome: "Reconhecer o report" },
+    { id: "limpar", nome: "Tirar o que o e-mail não aceita" },
+    { id: "imagens", nome: "Colocar as imagens dentro do e-mail" },
+    { id: "conferir", nome: "Conferir para o Outlook" },
+    { id: "montar", nome: "Montar o .eml" }
+  ];
+  /* Na prévia, imagem que falta aparece como um bloco cinza (em vez de um link quebrado). */
+  var FALTA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120"><rect width="100%" height="100%" fill="#E3DFDC"/><text x="50%" y="54%" font-family="Arial" font-size="13" fill="#5F5F5F" text-anchor="middle">imagem faltando</text></svg>');
+  var ICONE = { espera: "", rodando: "", ok: "✓", aviso: "!", erro: "✕" };
+  var pastaArquivos = {};      /* imagens da pasta "_files", por nome */
+  var handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, urls = [];
+  var inicio = 0, relogioTimer = null;
+
+  /* ---------- status em tempo real ---------- */
+  function hora() { return new Date().toLocaleTimeString("pt-BR"); }
+  function log(msg) { var l = $("#log"); l.textContent += "[" + hora() + "] " + msg + "\n"; l.scrollTop = l.scrollHeight; }
+  function kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
+  function seg(ms) { return (ms / 1000).toFixed(1).replace(".", ",") + " s"; }
+  function banner(cls, txt) { var b = $("#banner"); b.className = "banner " + cls; b.textContent = txt; }
+  function progresso(p, fim) {
+    p = Math.max(0, Math.min(100, Math.round(p)));
+    $("#barra i").style.width = p + "%"; $("#barra").setAttribute("aria-valuenow", p); $("#pct").textContent = p + "%";
+    $("#barra").classList.toggle("fim", !!fim);
+  }
+  function montarEtapas() {
+    var ol = $("#etapas"); ol.textContent = "";
+    ETAPAS.forEach(function (e) {
+      var li = document.createElement("li"); li.id = "et-" + e.id; li.dataset.estado = "espera";
+      li.innerHTML = '<span class="ic" aria-hidden="true"></span><div class="et"><b></b><span>Aguardando.</span></div><span class="tempo"></span>';
+      li.querySelector("b").textContent = e.nome; ol.appendChild(li);
+    });
+  }
+  function etapa(id, estado, detalhe, itens) {
+    var li = $("#et-" + id); li.dataset.estado = estado;
+    li.querySelector(".ic").textContent = ICONE[estado];
+    li.querySelector(".et span").textContent = detalhe || "";
+    var ul = li.querySelector("ul"); if (ul) ul.remove();
+    if (itens && itens.length) {
+      ul = document.createElement("ul");
+      itens.forEach(function (t) { var x = document.createElement("li"); x.textContent = t; ul.appendChild(x); });
+      li.querySelector(".et").appendChild(ul);
+    }
+    if (estado === "rodando") li.dataset.t0 = performance.now();
+    else if (li.dataset.t0) li.querySelector(".tempo").textContent = seg(performance.now() - li.dataset.t0);
+  }
+  function relogio(ligar) {
+    clearInterval(relogioTimer);
+    if (ligar) { inicio = performance.now(); relogioTimer = setInterval(function () { $("#relogio").textContent = "Tempo: " + seg(performance.now() - inicio); }, 100); }
+  }
+  /* Devolve o controle ao navegador para a tela atualizar entre as etapas. */
+  function respira() { return new Promise(function (r) { setTimeout(r, 16); }); }
+
+  /* ---------- imagens ---------- */
+  function lerBytes(blob) { return blob.arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
+  /* Formato que o Outlook não mostra (webp, svg...): desenha num canvas e salva em PNG. */
+  function paraPng(url) {
+    return new Promise(function (ok, falha) {
+      var im = new Image();
+      im.onload = function () {
+        var c = document.createElement("canvas"); c.width = im.naturalWidth || 600; c.height = im.naturalHeight || 400;
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        c.toBlob(function (b) { b ? lerBytes(b).then(ok) : falha(new Error("não deu para converter")); }, "image/png");
+      };
+      im.onerror = function () { falha(new Error("a imagem não abriu")); };
+      im.src = url;
+    });
+  }
+  function nomeDoSrc(src) { try { src = decodeURIComponent(src); } catch (e) {} return src.split(/[?#]/)[0].split(/[\\/]/).pop(); }
+
+  /* ---------- conversão ---------- */
+  async function converter(file) {
+    var minha = ++execucao, t0 = performance.now();
+    ultimoArquivo = file;
+    function parou() { return minha !== execucao; }
+    var erros = [], avisos = [];
+    resultado = null; $("#bEml").disabled = true; $("#emlInfo").textContent = "";
+    urls.forEach(URL.revokeObjectURL); urls = [];
+    montarEtapas(); progresso(0); relogio(true);
+    banner("run", "Convertendo " + file.name + "…");
+    log("Início: " + file.name + " (" + kb(file.size) + ").");
+
+    /* 1. ler */
+    etapa("ler", "rodando", "Lendo " + file.name + "…"); await respira();
+    var html;
+    try { html = await file.text(); }
+    catch (e) { etapa("ler", "erro", "Não deu para ler o arquivo. Se ele foi salvo de novo, escolha-o outra vez."); return fim(["leitura"], []); }
+    if (parou()) return;
+    if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) { etapa("ler", "erro", "Este arquivo não parece uma página HTML."); return fim(["formato"], []); }
+    etapa("ler", "ok", file.name + " · " + kb(file.size)); progresso(12); log("Arquivo lido."); await respira();
+
+    /* 2. origem */
+    etapa("origem", "rodando", "Procurando a marca da ferramenta…"); await respira();
+    var org = Motor.origemDoHtml(html), titulo = Motor.assuntoDoHtml(html);
+    if (org) { etapa("origem", "ok", "Report gerado pela versão " + org.versao + " a partir de " + org.dados + "."); log("Report: versão " + org.versao + ", " + org.dados + "."); }
+    else { etapa("origem", "aviso", "Não achei a marca da ferramenta. A conversão segue: confira a prévia antes de enviar."); avisos.push("origem"); log("Sem a marca da ferramenta."); }
+    progresso(22); await respira();
+
+    /* 3. limpar */
+    etapa("limpar", "rodando", "Tirando script, ampliação, vídeo e marcas da edição…"); await respira();
+    var limpo = Motor.limparHtmlEditado(html);
+    var saiu = limpo.saiu.map(function (s) { return s.item + (s.n > 1 ? " (" + s.n + ")" : ""); });
+    etapa("limpar", "ok", saiu.length ? "Saiu do e-mail:" : "Nada para tirar: o HTML já estava pronto para e-mail.", saiu);
+    log(saiu.length ? "Removido: " + saiu.join(", ") + "." : "Nada para remover.");
+    progresso(34); await respira(); if (parou()) return;
+
+    /* 4. imagens */
+    var lista = Motor.imagensDoHtml(limpo.html), mapa = {}, mapaPrev = {}, anexos = [], total = 0, faltam = [], probs = [];
+    etapa("imagens", "rodando", lista.length ? "Imagem 0 de " + lista.length + "…" : "Procurando imagens…"); await respira();
+    for (var i = 0; i < lista.length; i++) {
+      if (parou()) return;
+      var src = lista[i], tipo = Motor.origemImagem(src), n = anexos.length + 1, bytes = null, ext = "", rot = "Imagem " + (i + 1);
+      try {
+        if (tipo === "embutida") { var d = Motor.imagemDeDataUri(src); bytes = d.bytes; ext = d.ext; mapaPrev[src] = src; }
+        else if (tipo === "embutida-incompativel") { bytes = await paraPng(src); ext = "png"; probs.push(rot + ": formato que o Outlook não mostra; convertida para PNG."); }
+        else if (tipo === "arquivo") {
+          var nome = nomeDoSrc(src), f = pastaArquivos[nome];
+          if (!f) { faltam.push(nome); mapaPrev[src] = FALTA; continue; }
+          if (/\.(png|jpe?g|gif)$/i.test(nome)) { bytes = await lerBytes(f); ext = nome.split(".").pop().toLowerCase().replace("jpeg", "jpg"); }
+          else { var u = URL.createObjectURL(f); urls.push(u); bytes = await paraPng(u); ext = "png"; probs.push(nome + ": convertida para PNG."); }
+        }
+        else if (tipo === "internet") { probs.push(rot + " vem da internet (" + src.slice(0, 60) + "…): fica como link. O Outlook pode pedir para baixar as imagens."); continue; }
+        else if (tipo === "blob") { erros.push("blob"); probs.push(rot + ": endereço temporário da prévia (blob:). Salve a página baixada pelo botão \"Baixar página do mês\", não a prévia."); continue; }
+        else { erros.push("cid"); probs.push(rot + ": aponta para um anexo (cid:) que não está neste arquivo."); continue; }
+      } catch (e) { erros.push("img"); probs.push(rot + ": " + e.message + "."); continue; }
+      var cid = "img" + String(n).padStart(2, "0") + "@report", arq = String(n).padStart(2, "0") + "-imagem." + ext;
+      anexos.push({ cid: cid, nome: arq, bytes: bytes }); mapa[src] = "cid:" + cid; total += bytes.length;
+      if (!mapaPrev[src]) { var b = URL.createObjectURL(new Blob([bytes], { type: Motor.tipoMime(arq) })); urls.push(b); mapaPrev[src] = b; }
+      if (bytes.length > 1048576) probs.push(rot + " tem " + kb(bytes.length) + ": deixa o e-mail pesado.");
+      etapa("imagens", "rodando", "Imagem " + (i + 1) + " de " + lista.length + " · " + kb(bytes.length) + " · total " + kb(total));
+      progresso(34 + 36 * (i + 1) / lista.length); await respira();
+    }
+    if (faltam.length) {
+      erros.push("faltam"); $("#pastaRow").hidden = false;
+      probs.unshift("Faltam " + faltam.length + " imagem(ns) que o Chrome salvou numa pasta ao lado: " + faltam.slice(0, 4).join(", ") + (faltam.length > 4 ? "…" : "") + ". Use \"Escolher a pasta das imagens\".");
+    }
+    var estImg = erros.length ? "erro" : probs.length ? "aviso" : "ok";
+    if (estImg === "aviso") avisos.push("imagens");
+    etapa("imagens", estImg, anexos.length + " imagem(ns) dentro do e-mail · " + kb(total) + (lista.length > anexos.length ? " · " + (lista.length - anexos.length) + " com problema" : ""), probs);
+    log(anexos.length + " imagens embutidas (" + kb(total) + ")" + (probs.length ? "; " + probs.length + " observação(ões)" : "") + ".");
+    progresso(72); await respira(); if (parou()) return;
+
+    /* 5. conferir */
+    etapa("conferir", "rodando", "Conferindo regras do Outlook…"); await respira();
+    var final = Motor.trocarSrc(limpo.html, mapa);
+    var conf = Motor.conferirHtml(final).filter(function (c) { return c.nivel !== "info"; });
+    if (/url\(\s*['"]?data:/i.test(final)) conf.push({ nivel: "aviso", msg: "Há imagem de fundo embutida no CSS: o Outlook não mostra." });
+    etapa("conferir", conf.length ? "aviso" : "ok", conf.length ? conf.length + " ponto(s) para olhar:" : "Nenhum problema encontrado.", conf.map(function (c) { return c.msg; }));
+    if (conf.length) avisos.push("conferir");
+    log(conf.length ? "Conferência: " + conf.map(function (c) { return c.msg; }).join(" | ") : "Conferência sem problemas.");
+    progresso(84); await respira(); if (parou()) return;
+
+    /* 6. montar */
+    etapa("montar", "rodando", "Montando a mensagem…"); await respira();
+    if (!$("#assunto").dataset.editado || $("#assunto").dataset.arquivo !== file.name) { $("#assunto").value = titulo || "Report mensal"; $("#assunto").dataset.arquivo = file.name; }
+    resultado = { html: final, texto: Motor.textoDoHtml(final), imagens: anexos, nome: file.name.replace(/\.(html?|htm)$/i, "") + ".eml" };
+    var tam = Motor.gerarEml({ assunto: $("#assunto").value, html: resultado.html, texto: resultado.texto, imagens: anexos }).length;
+    if (tam > 10 * 1048576) { avisos.push("tamanho"); etapa("montar", "aviso", "E-mail com " + kb(tam) + ": acima de 10 MB alguns servidores recusam."); }
+    else etapa("montar", erros.length ? "aviso" : "ok", "Mensagem de " + kb(tam) + (erros.length ? ", mas há imagens com problema (veja acima)." : ", pronta para o Outlook."));
+    log(".eml montado: " + kb(tam) + ".");
+
+    /* prévia */
+    $("#prev").srcdoc = Motor.trocarSrc(limpo.html, mapaPrev);
+    $("#secPrev").hidden = false; $("#secBaixar").hidden = false;
+    fim(erros, avisos, performance.now() - t0, tam);
+  }
+
+  function fim(erros, avisos, ms, tam) {
+    relogio(false); if (ms) $("#relogio").textContent = "Tempo: " + seg(ms);
+    if (erros.length) {
+      progresso(100); $("#barra").classList.remove("fim");
+      banner("err", "Não deu para converter tudo. Veja a etapa marcada com ✕.");
+      $("#bEml").disabled = true; log("Fim com problema.");
+      return;
+    }
+    progresso(100, true);
+    banner(avisos.length ? "warn" : "ok", (avisos.length ? "Pronto, com pontos para olhar (marcados com !). " : "Pronto. ") + "Clique em \"Baixar e-mail (.eml)\"." + (handle && $("#acompanhar").checked ? " Se salvar o .html de novo, a conversão se repete sozinha." : ""));
+    $("#bEml").disabled = !resultado;
+    $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(tam) + " · " + resultado.imagens.length + " imagens dentro" : "";
+    log("Fim: pronto.");
+  }
+
+  /* ---------- baixar ---------- */
+  $("#assunto").addEventListener("input", function () { this.dataset.editado = "1"; });
+  $("#bEml").addEventListener("click", function () {
+    if (!resultado) return;
+    var eml = Motor.gerarEml({ assunto: $("#assunto").value, html: resultado.html, texto: resultado.texto, imagens: resultado.imagens });
+    var a = document.createElement("a"), u = URL.createObjectURL(new Blob([eml], { type: "message/rfc822" }));
+    a.href = u; a.download = resultado.nome; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    $("#emlInfo").textContent = "Baixado: " + resultado.nome + ". Abra na pasta Downloads.";
+    log("Baixado: " + resultado.nome + ".");
+  });
+
+  /* ---------- escolher o arquivo ---------- */
+  function comecar(file, h) {
+    handle = h || null; nomeArquivo = file.name; ultimaVersao = file.lastModified;
+    vigiaTexto();
+    converter(file);
+  }
+  $("#arquivo").addEventListener("change", function () { if (this.files[0]) comecar(this.files[0], null); this.value = ""; });
+  /* Com o seletor moderno (Chrome e Edge), a página guarda o "endereço" do arquivo e consegue reler quando você salva. */
+  if (window.showOpenFilePicker) {
+    $("#escolher").addEventListener("click", async function (ev) {
+      ev.preventDefault();
+      try {
+        var hs = await window.showOpenFilePicker({ types: [{ description: "Página HTML", accept: { "text/html": [".html", ".htm"] } }] });
+        comecar(await hs[0].getFile(), hs[0]);
+      } catch (e) { if (e.name !== "AbortError") $("#arquivo").click(); }
+    });
+  }
+  var drop = $("#drop");
+  ["dragenter", "dragover"].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function (t) { drop.addEventListener(t, function () { drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", async function (e) {
+    e.preventDefault();
+    var it = e.dataTransfer.items && e.dataTransfer.items[0], h = null;
+    if (it && it.getAsFileSystemHandle) { try { h = await it.getAsFileSystemHandle(); } catch (x) { h = null; } }
+    var f = h && h.kind === "file" ? await h.getFile() : e.dataTransfer.files[0];
+    if (f) comecar(f, h && h.kind === "file" ? h : null);
+  });
+  $("#pasta").addEventListener("change", function () {
+    pastaArquivos = {};
+    Array.prototype.forEach.call(this.files, function (f) { pastaArquivos[f.name] = f; });
+    log("Pasta das imagens: " + this.files.length + " arquivo(s).");
+    if (handle) handle.getFile().then(converter); else if (ultimoArquivo) converter(ultimoArquivo);
+  });
+
+  /* ---------- acompanhar o arquivo (tempo real) ---------- */
+  function vigiaTexto(extra) {
+    var on = !!handle && $("#acompanhar").checked;
+    $("#ponto").classList.toggle("on", on);
+    $("#vigiaTxt").textContent = !nomeArquivo ? "Sem arquivo acompanhado." :
+      on ? "Acompanhando " + nomeArquivo + " · última versão salva às " + new Date(ultimaVersao).toLocaleTimeString("pt-BR") + (extra ? " · " + extra : "") :
+      handle ? "Acompanhamento desligado." : "Para acompanhar o arquivo, escolha-o pelo botão ou arraste-o (Chrome ou Edge).";
+  }
+  $("#acompanhar").addEventListener("change", function () { vigiaTexto(); });
+  setInterval(async function () {
+    if (!handle || !$("#acompanhar").checked) return;
+    try {
+      var f = await handle.getFile();
+      if (f.lastModified !== ultimaVersao) {
+        ultimaVersao = f.lastModified; log("O arquivo foi salvo de novo: convertendo a nova versão.");
+        vigiaTexto(); converter(f);
+      } else vigiaTexto("conferido às " + hora());
+    } catch (e) { vigiaTexto("sem acesso ao arquivo; escolha-o de novo"); }
+  }, 1500);
+
+  /* ---------- prévia ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (b) {
+    b.addEventListener("click", function () {
+      Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function (x) { x.setAttribute("aria-pressed", x === b); });
+      $("#prev").style.width = b.dataset.w;
+    });
+  });
+
+  montarEtapas();
+})();
+</script>
+</body>
+</html>

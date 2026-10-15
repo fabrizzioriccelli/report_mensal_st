@@ -363,5 +363,51 @@ teste("foto do banco de imagens (assets/fotos/) não abre ampliada", function ()
   assert.ok(r.ok && !r.imagens.some(function (i) { return i.ampliada; }));
 });
 
+/* ---------- HTML editado no navegador → e-mail (converter-html-eml.html) ---------- */
+teste("limparHtmlEditado tira script, janela de ampliação, vídeo e marcas do clique e da edição", function () {
+  var h = '<!-- saved from url=(0014)about:internet -->\n<html><head><!--[if mso]><noscript><xml></xml></noscript><![endif]--><style>\n/* Ampliar peças (só na página do navegador) */\n#amp{display:flex}</style></head>' +
+    '<body contenteditable="true"><p spellcheck="false">Oi</p><img src="data:image/png;base64,AAAA" data-ampliar="x" data-legenda="y" tabindex="0" role="button" aria-label="Ampliar: y" title="Clique para ampliar" alt="a">' +
+    '<table role="presentation"><tr><td>x</td></tr></table><div id="amp" role="dialog"><button>×</button><img><video controls></video><p></p></div><script>alert(1)</script></body></html>';
+  var r = M.limparHtmlEditado(h);
+  assert.ok(!/<script|id="amp"|<video|data-ampliar|data-legenda|tabindex|role="button"|aria-label|title="Clique|contenteditable|spellcheck|saved from|Ampliar peças/.test(r.html), r.html);
+  assert.ok(/<noscript>/.test(r.html) && /role="presentation"/.test(r.html) && /alt="a"/.test(r.html), "mantém o que é do e-mail");
+  assert.ok(r.saiu.length >= 6);
+});
+
+teste("imagensDoHtml lista sem repetir; origemImagem classifica", function () {
+  var h = '<img src="data:image/png;base64,AA"><img alt="x" src="data:image/png;base64,AA"><img src="https://x.com/a.png"><img src="p_files/b.png">';
+  assert.deepStrictEqual(M.imagensDoHtml(h), ["data:image/png;base64,AA", "https://x.com/a.png", "p_files/b.png"]);
+  assert.deepStrictEqual(["data:image/jpeg;base64,A", "data:image/webp;base64,A", "cid:x", "https://a", "blob:file:///x", "a.png"].map(M.origemImagem),
+    ["embutida", "embutida-incompativel", "cid", "internet", "blob", "arquivo"]);
+});
+
+teste("deBase64 desfaz base64 (todas as sobras) e imagemDeDataUri devolve bytes e extensão", function () {
+  [0, 1, 2, 3, 4, 5, 257].forEach(function (n) {
+    var b = new Uint8Array(n); for (var i = 0; i < n; i++) b[i] = (i * 37) & 255;
+    assert.deepStrictEqual(Array.from(M.deBase64(M.base64(b))), Array.from(b));
+  });
+  var d = M.imagemDeDataUri("data:image/jpeg;base64," + M.base64(Uint8Array.from([255, 216, 255])));
+  assert.strictEqual(d.ext, "jpg"); assert.deepStrictEqual(Array.from(d.bytes), [255, 216, 255]);
+  assert.strictEqual(M.imagemDeDataUri("https://x"), null);
+});
+
+teste("trocarSrc, assuntoDoHtml, textoDoHtml e origemDoHtml", function () {
+  assert.strictEqual(M.trocarSrc('<img alt="a" src="X"><img src="Y">', { X: "cid:1" }), '<img alt="a" src="cid:1"><img src="Y">');
+  assert.strictEqual(M.assuntoDoHtml("<title>Report de Outubro &amp; mais</title>"), "Report de Outubro & mais");
+  var t = M.textoDoHtml('<html><head><title>T</title><style>p{}</style></head><body><p>Olá&nbsp;mundo</p><!-- x --><p><a href="https://a.b/c">Ver peça</a></p></body></html>');
+  assert.ok(/Olá mundo/.test(t) && /Ver peça \(https:\/\/a\.b\/c\)/.test(t) && !/p\{\}|T\n/.test(t), t);
+  assert.deepStrictEqual(M.origemDoHtml("<!-- Arquivo gerado por gerar-report.html (versão 3.7 (2026-10-15)) a partir de dados/2026-10.txt em 1 -->"), { versao: "3.7 (2026-10-15)", dados: "dados/2026-10.txt" });
+  assert.strictEqual(M.origemDoHtml("<html>"), null);
+});
+
+teste("o backup convertido vira e-mail sem nenhuma imagem embutida no HTML", function () {
+  var nav = M.paraNavegador(ler("report_backup.html").replace(/<img\b([^>]*?)\ssrc="(data:image\/[^"]+)"/, function (m, a, s) { return m + ' data-ampliar="' + s + '"'; }));
+  var limpo = M.limparHtmlEditado(nav).html, mapa = {};
+  M.imagensDoHtml(limpo).forEach(function (s, i) { assert.ok(M.imagemDeDataUri(s)); mapa[s] = "cid:img" + i; });
+  var final = M.trocarSrc(limpo, mapa);
+  assert.ok(!/src="data:|<script|data-ampliar/.test(final));
+  assert.deepStrictEqual(M.conferirHtml(final).filter(function (x) { return x.nivel === "erro"; }), []);
+});
+
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");
 process.exit(falhas ? 1 : 0);

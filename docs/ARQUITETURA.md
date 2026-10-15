@@ -157,7 +157,7 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 | Fontes | No e-mail, só fontes instaladas (Santander, se houver; senão Arial), configuráveis. Os `.otf` de `assets/fonts/` entram só na prévia e na página `.html`, embutidos; nunca no `.eml` |
 | `gerar-report.html` | Carrega apenas `tools/motor.js`, local. Sem CDN, sem bibliotecas, sem chamadas de rede |
 | `tools/motor.js` | JavaScript puro, sem dependências |
-| Testes (`tests/`) | Opcionais, para desenvolvimento. `motor.test.js` usa só o Node.js; `ferramenta.e2e.js` usa o Playwright. Nenhum deles é necessário para gerar o report |
+| Testes (`tests/`) | Opcionais, para desenvolvimento. `motor.test.js` usa só o Node.js; `ferramenta.e2e.js` e `conversor.e2e.js` usam o Playwright. Nenhum deles é necessário para gerar o report |
 
 ## Modos de operação
 
