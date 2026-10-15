@@ -2,6 +2,10 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.6.1 · 2026-10-15 · "Resumo da campanha"
+
+- O bloco "Resumo do mês" passou a se chamar **"Resumo da campanha"**.
+
 ## 3.6 · 2026-10-15 · Resumo do mês: o que foi bem e o que melhorar
 
 - **Resumo do mês** logo abaixo da capa (blocos `[FOI BEM 1..3]` e `[A MELHORAR 1..3]`): duas colunas na grade (288 + 24 + 288), com o filete no topo em verde do guia (positivo) e em âmbar (atenção). No celular, uma embaixo da outra. Quem lê entende o mês em 10 segundos.
