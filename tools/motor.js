@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.6.1 (2026-10-15)";
+  var VERSAO = "3.7 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -73,7 +73,7 @@
   /* 1 = obrigatório, 0 = opcional. "max" = bloco numerado (NUMERO 1, 2…) */
 
   var NUM = { valor: 1, titulo: 0, detalhe: 0, variacao: 0, variacao_cor: 0 };
-  var PECA = { imagem: 0, descricao_imagem: 0, enquadramento: 0, tipo: 0, link: 0 };
+  var PECA = { imagem: 0, descricao_imagem: 0, enquadramento: 0, tipo: 0, link: 0, video: 0 };
   function junta() { var o = {}; for (var i = 0; i < arguments.length; i++) for (var k in arguments[i]) o[k] = arguments[i][k]; return o; }
 
   var ESQUEMA_DADOS = [
@@ -81,12 +81,12 @@
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
     { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
-    { bloco: "FOI BEM", max: 3, campos: { texto: 1 } },
-    { bloco: "A MELHORAR", max: 3, campos: { texto: 1 } },
+    { bloco: "FOI BEM", max: 4, campos: { texto: 1 } },
+    { bloco: "A MELHORAR", max: 4, campos: { texto: 1 } },
     { bloco: "LANCAMOS", campos: { titulo: 0 } },
     { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0 }, PECA) },
     { bloco: "RESULTADO", max: 3, campos: NUM },
-    { bloco: "LANCAMENTO", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0 }, PECA) },
+    { bloco: "LANCAMENTO", max: 6, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0 }, PECA) },
     { bloco: "CREATIVE X", campos: { subtitulo: 0, anterior: 0, atual: 1, variacao: 0, periodo: 0, referencia: 0, significado: 0 } },
     { bloco: "TRANSFORMATION", campos: { titulo: 0 } },
     { bloco: "TRANSFORMATION", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, citacao: 0, resultado: 0, icones: 0 }, PECA) },
@@ -361,7 +361,7 @@
 
     /* ---- Imagens ---- */
     var E = D.simples.EDICAO, pasta = E.pasta_imagens.replace(/\\/g, "/").replace(/^\.?\/+|\/+$/g, "");
-    var imagens = [], porCaminho = {};
+    var imagens = [], porCaminho = {}, videos = [];
     function caminhoImagem(nome) { return nome.indexOf("/") >= 0 ? nome.replace(/^\.?\/+/, "") : pasta + "/" + nome; }
     /* Registra uma imagem do e-mail. w/h = tamanho na tela (px). recorte = encaixa exatamente em w × h.
        fluida = no celular ocupa a largura da tela, então é exportada com até 700 px. */
@@ -377,7 +377,7 @@
         reg.token = "@@IMG" + reg.id + "@@";
         imagens.push(reg); porCaminho[chave] = reg;
       }
-      return { src: seguro(reg.token), w: w, h: h || "", alt: op.alt || "", zoom: "", legenda: "" };
+      return { src: seguro(reg.token), w: w, h: h || "", alt: op.alt || "", zoom: "", legenda: "", video: "" };
     }
     /* Espaço da imagem ainda não escolhida: superfície Lisboa com a indicação do formato (só no rascunho). */
     function placeholder(w, h, rotulo, raio, video) {
@@ -419,12 +419,19 @@
         r.img.link = href;
         /* Versão ampliada da peça (inteira, sem recorte), para o clique na página do navegador.
            Não vai no e-mail: lá a imagem só clica quando tem link (paraEmail tira o atributo). */
-        if (tipo !== "video" && !(op && op.semAmpliar)) {
+        /* Vídeo da peça (campo "video", arquivo .mp4 na pasta do mês): na página do navegador, o clique toca o vídeo
+           por cima do report. No e-mail não vai (nenhum cliente toca vídeo): a miniatura com ▶ abre o link. */
+        var vid = v.video && !ehPendencia(v.video) ? caminhoImagem(v.video) : "";
+        if (vid && !/\.(mp4|webm)$/i.test(vid)) { problema(prob, "erro", arqD, v._linhas.video, "[" + nomeBloco + "] video: use um arquivo .mp4 (ou .webm)."); vid = ""; }
+        if (vid && !existe(vid)) { problema(prob, "erro", arqD, v._linhas.video, "[" + nomeBloco + "] vídeo não encontrado: " + vid + "."); vid = ""; }
+        if (vid) { videos.push({ id: videos.length + 1, caminho: vid }); r.img.video = seguro("@@VID" + videos.length + "@@"); r.img.legenda = seguro(esc(desc)); }
+        /* Foto do banco de imagens (assets/fotos/) é ilustrativa: não abre ampliada. */
+        if (tipo !== "video" && !vid && !(op && op.semAmpliar) && !/^assets\/fotos\//.test(cam)) {
           var z = imagem(cam, 0, 0, { ampliada: true, alt: desc, papel: nomeBloco + " (ampliada)" });
           r.img.zoom = z.src; r.img.legenda = seguro(esc(desc));
         }
         /* Versão para celular (outro formato, ex.: horizontal no lugar da vertical) */
-        if (op && op.celular) { r.img_m = imagem(cam, op.celular.w, op.celular.h, { recorte: true, play: tipo === "video", alt: alt, papel: nomeBloco + " (celular)", fluida: true, ancora: op.celular.ancora || anc }); r.img_m.link = href; r.img_m.zoom = r.img.zoom; r.img_m.legenda = r.img.legenda; }
+        if (op && op.celular) { r.img_m = imagem(cam, op.celular.w, op.celular.h, { recorte: true, play: tipo === "video", alt: alt, papel: nomeBloco + " (celular)", fluida: true, ancora: op.celular.ancora || anc }); r.img_m.link = href; r.img_m.zoom = r.img.zoom; r.img_m.legenda = r.img.legenda; r.img_m.video = r.img.video; }
       }
       return r;
     }
@@ -513,7 +520,7 @@
       sobra: sobra
     };
 
-    /* Resumo da campanha (sem número de seção): o que foi bem (verde do guia) e o que precisa melhorar (âmbar).
+    /* Resumo das campanhas (sem número de seção, depois do Creative X): o que foi bem (verde do guia) e o que precisa melhorar (âmbar).
        Duas colunas de 288 px no computador; no celular, uma embaixo da outra. */
     var fb = L["FOI BEM"] || [], am = L["A MELHORAR"] || [], balanco = null;
     if (fb.length || am.length) {
@@ -537,7 +544,7 @@
       var lr = res.length ? colunas(textoDestaque, res.length) : [];
       var lc = lanc.length ? colunas(LARGURA, lanc.length) : [];
       lancamos = {
-        n: proxSecao(), titulo: texto((D.simples.LANCAMOS || {}).titulo || ""), tem_compactos: lanc.length > 0, colunas_compactos: lanc.length * 2 - 1,
+        n: proxSecao(), titulo: texto((D.simples.LANCAMOS || {}).titulo || ""), tem_compactos: lanc.length > 0, colunas_compactos: Math.min(lanc.length, 3) * 2 - 1,
         destaque: DS ? {
           categoria: seguro(marcarPendencias(categoria(DS.categoria).s)), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
           largura_texto: textoDestaque, colunas: res.length * 3 - 2,
@@ -550,10 +557,20 @@
             };
           })
         } : null,
-        compactos: lanc.map(function (v, i) {
-          var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, COL, 72, 20, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
-          return { status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lc[i], primeiro: i === 0, classe: ult ? "col" : "col gap" };
-        })
+        /* Até 3: uma linha dividida igualmente. De 4 a 6: linhas de 3 colunas de 184 px (a última completa com espaço vazio). */
+        linhas_compactos: (function () {
+          var itens = lanc.map(function (v, i) {
+            var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, COL, 72, 20, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
+            return { status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lanc.length > 3 ? COL : lc[i], classe: (ult ? "col" : "col gap") + (i >= 3 ? " pt0" : ""), vazio: false, estilo: i >= 3 ? "padding-top:28px;" : "" };
+          }), linhas = [];
+          for (var k = 0; k < itens.length; k += 3) {
+            var linha = itens.slice(k, k + 3);
+            while (lanc.length > 3 && linha.length < 3) linha.push({ vazio: true, largura: COL });
+            linha.forEach(function (c, j) { c.primeiro = j === 0; });
+            linhas.push({ itens: linha });
+          }
+          return linhas;
+        })()
       };
     }
 
@@ -665,14 +682,14 @@
     regLink("Projeto principal · " + semBr(P.nome), pp);
     if (lancamos) {
       if (lancamos.destaque) regLink("Destaque · " + semBr(DS.titulo), lancamos.destaque.peca);
-      lanc.forEach(function (v, i) { regLink("Lançamento " + (i + 1) + " · " + semBr(v.nome), lancamos.compactos[i].peca); });
+      lanc.forEach(function (v, i) { regLink("Lançamento " + (i + 1) + " · " + semBr(v.nome), lancamos.linhas_compactos[Math.floor(i / 3)].itens[i % 3].peca); });
     }
     if (transformation) tr.forEach(function (v, i) { regLink("Transformation " + (i + 1) + " · " + semBr(v.nome), transformation.projetos[i].peca); });
 
     /* Nome do arquivo: report-AAAA-MM (no modelo em branco, report-MODELO). */
     var slug = periodoOk ? ano + "-" + String(mesNumero(mes)).padStart(2, "0") : "MODELO";
     return {
-      ok: true, problemas: prob, modelo: modelo, imagens: imagens, html: html, links: links,
+      ok: true, problemas: prob, modelo: modelo, imagens: imagens, videos: videos, html: html, links: links,
       texto: textoPuro(D, links), assunto: assunto, nomeArquivo: ("report-" + slug).replace(/[^\w-]/g, ""),
       config: { modo: modo, base: base, qualidade: qualidade / 100, dominios: dominios, corMarca: cor.marca.s }
     };
@@ -829,29 +846,36 @@
   function trocarImagens(html, fn) { return html.replace(/@@IMG(\d+)@@/g, function (m, id) { return fn(+id); }); }
 
   /* E-mail: sem ampliação (nenhum cliente de e-mail roda script). A peça só clica quando tem link. */
-  function paraEmail(html) { return html.replace(/ data-(ampliar|legenda)="[^"]*"/g, ""); }
+  function paraEmail(html) { return html.replace(/ data-(ampliar|legenda|video)="[^"]*"/g, ""); }
+  /* Troca os marcadores @@VIDn@@ pelo endereço do vídeo (só na página do navegador). */
+  function trocarVideos(html, fn) { return html.replace(/@@VID(\d+)@@/g, function (m, id) { return fn(+id); }); }
 
   /* Página do navegador: clicar numa peça sem link abre a imagem inteira, maior, por cima do report.
      Teclado: Tab chega na peça, Enter ou Espaço abre, Esc fecha. Peça com link continua indo para o link. */
-  var AMPLIAR_CSS = "img[data-ampliar]{cursor:zoom-in;transition:opacity .15s,box-shadow .15s;}" +
-    "img[data-ampliar]:hover,img[data-ampliar]:focus-visible{opacity:.92;box-shadow:0 0 0 3px #FFFFFF,0 0 0 5px #EC0000;outline:none;}" +
+  var AMPLIAR_CSS = "img[data-ampliar]{cursor:zoom-in;transition:opacity .15s,box-shadow .15s;}img[data-video]{cursor:pointer;transition:opacity .15s,box-shadow .15s;}" +
+    "img[data-video]:hover,img[data-video]:focus-visible,img[data-ampliar]:hover,img[data-ampliar]:focus-visible{opacity:.92;box-shadow:0 0 0 3px #FFFFFF,0 0 0 5px #EC0000;outline:none;}" +
     "a img{transition:opacity .15s;}a:hover img,a:focus-visible img{opacity:.88;}" +
     "#amp{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;background:#000000D9;}" +
+    "#amp video{max-width:min(1100px,100%);max-height:calc(100vh - 120px);border-radius:20px;background:#000000;}" +
     "#amp[open]{display:flex;}#amp img{max-width:min(1100px,100%);max-height:calc(100vh - 120px);width:auto;height:auto;border-radius:20px;background:#FFFFFF;}" +
     "#amp p{margin:12px 0 0;color:#FFFFFF;font:14px/20px Arial,Helvetica,sans-serif;text-align:center;max-width:680px;}" +
     "#amp button{position:absolute;top:16px;right:16px;width:44px;height:44px;border:0;border-radius:999px;background:#FFFFFF;color:#EC0000;font:bold 22px/44px Arial,Helvetica,sans-serif;cursor:pointer;}" +
     "#amp button:focus-visible{outline:3px solid #FFFFFF;outline-offset:3px;}";
   var AMPLIAR_JS = "(function(){var d=document,box=d.createElement('div'),im=d.createElement('img'),tx=d.createElement('p'),bt=d.createElement('button'),volta=null;" +
     "box.id='amp';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label','Peça ampliada');bt.type='button';bt.setAttribute('aria-label','Fechar');bt.textContent='\u00D7';" +
-    "box.appendChild(bt);box.appendChild(im);box.appendChild(tx);d.body.appendChild(box);" +
-    "function fecha(){box.removeAttribute('open');im.removeAttribute('src');if(volta)volta.focus();}" +
-    "function abre(el){volta=el;im.src=el.getAttribute('data-ampliar');im.alt=el.getAttribute('data-legenda')||el.alt||'';tx.textContent=el.getAttribute('data-legenda')||'';box.setAttribute('open','');bt.focus();}" +
+    "var vd=d.createElement('video');vd.controls=true;vd.setAttribute('playsinline','');" +
+    "box.appendChild(bt);box.appendChild(im);box.appendChild(vd);box.appendChild(tx);d.body.appendChild(box);" +
+    "function fecha(){box.removeAttribute('open');im.removeAttribute('src');vd.pause();vd.removeAttribute('src');vd.load();if(volta)volta.focus();}" +
+    "function abre(el){volta=el;var v=el.getAttribute('data-video');im.style.display=v?'none':'';vd.style.display=v?'':'none';" +
+    "if(v){vd.src=v;vd.play().catch(function(){});}else{im.src=el.getAttribute('data-ampliar');im.alt=el.getAttribute('data-legenda')||el.alt||'';}" +
+    "tx.textContent=el.getAttribute('data-legenda')||'';box.setAttribute('open','');bt.focus();}" +
     "bt.onclick=fecha;box.onclick=function(e){if(e.target===box)fecha();};d.addEventListener('keydown',function(e){if(e.key==='Escape'&&box.hasAttribute('open'))fecha();});" +
-    "Array.prototype.forEach.call(d.querySelectorAll('img[data-ampliar]'),function(el){if(el.closest('a')){el.removeAttribute('data-ampliar');return;}" +
-    "el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label','Ampliar: '+(el.getAttribute('data-legenda')||el.alt||'peça'));el.title='Clique para ampliar';" +
+    "Array.prototype.forEach.call(d.querySelectorAll('img[data-ampliar],img[data-video]'),function(el){var v=el.hasAttribute('data-video');if(el.closest('a')&&!v){el.removeAttribute('data-ampliar');return;}" +
+    "var a=el.closest('a');if(a){a.addEventListener('click',function(e){e.preventDefault();});}" +
+    "el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label',(v?'Assistir: ':'Ampliar: ')+(el.getAttribute('data-legenda')||el.alt||'peça'));el.title=v?'Clique para assistir':'Clique para ampliar';" +
     "el.addEventListener('click',function(){abre(el);});el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();abre(el);}});});})();";
   function paraNavegador(html) {
-    if (html.indexOf("data-ampliar=") < 0) return html;
+    if (html.indexOf("data-ampliar=") < 0 && html.indexOf("data-video=") < 0) return html;
     return html.replace("</head>", "<style>\n/* Ampliar peças (só na página do navegador) */\n" + AMPLIAR_CSS + "\n</style>\n</head>")
       .replace(/<\/body>(?![\s\S]*<\/body>)/, "<script>\n" + AMPLIAR_JS + "\n</script>\n</body>");
   }
@@ -882,7 +906,7 @@
 
   return {
     VERSAO: VERSAO, ler: ler, montar: montar, aplicar: aplicar, conferirLink: conferirLink, conferirHtml: conferirHtml,
-    gerarEml: gerarEml, trocarImagens: trocarImagens, semComentarios: semComentarios, paraEmail: paraEmail, paraNavegador: paraNavegador,
+    gerarEml: gerarEml, trocarImagens: trocarImagens, trocarVideos: trocarVideos, semComentarios: semComentarios, paraEmail: paraEmail, paraNavegador: paraNavegador,
     base64: base64, utf8: utf8, zip: zip, crc32: crc32, assuntoMime: assuntoMime, tipoMime: tipoMime,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };

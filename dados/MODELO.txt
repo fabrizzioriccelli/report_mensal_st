@@ -114,26 +114,8 @@ variacao: +X%
 
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: RESUMO DA CAMPANHA (logo abaixo da capa, sem número de seção)
-#  Até 3 frases em cada lado. Uma frase curta por bloco (até ~90 caracteres).
-#  FOI BEM aparece em verde; A MELHORAR, em âmbar. Para tirar, apague os blocos.
-# ----------------------------------------------------------------------
-[FOI BEM 1]
-texto: Lorem ipsum dolor sit amet: X%.
-
-[FOI BEM 2]
-texto: Lorem ipsum dolor sit amet.
-
-[A MELHORAR 1]
-texto: Lorem ipsum dolor sit amet: X%.
-
-[A MELHORAR 2]
-texto: Lorem ipsum dolor sit amet.
-
-
-# ----------------------------------------------------------------------
 #  EDITAR AQUI: 02 · O QUE LANÇAMOS
-#  1 projeto em destaque (com resultados) + até 3 lançamentos compactos.
+#  1 projeto em destaque (com resultados) + até 6 lançamentos compactos.
 # ----------------------------------------------------------------------
 [LANCAMOS]
 titulo: Lorem ipsum dolor sit amet.
@@ -173,11 +155,15 @@ titulo: Lorem ipsum
 detalhe: era X
 variacao: +X%
 
-# Lançamentos compactos ("Também neste mês", até 3).
+# Lançamentos compactos ("Também neste mês", até 6, em linhas de 3).
 #  status: etiqueta curta. status_cor: verde (no ar / implementado)
 #  ou ambar (previsto / aguardando resultado).
 #  A miniatura é recortada em faixa horizontal (368 x 144 px). Em vídeo,
 #  a ferramenta desenha o botão ▶ sobre a miniatura.
+#  video: (opcional) arquivo .mp4 ou .webm na pasta do mês. Na página do
+#  mês (.html), o clique na miniatura toca o vídeo ali mesmo; no e-mail,
+#  a miniatura com ▶ abre o "link". Vale também no projeto principal e no
+#  destaque.
 [LANCAMENTO 1]
 status: Resultado em XX/XX
 status_cor: ambar
@@ -226,6 +212,25 @@ variacao: +X p.p.
 periodo: Lorem ipsum vs. dolor sit
 referencia: Lorem ipsum dolor: X%
 significado: Lorem ipsum dolor sit amet, consectetur adipiscing.
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: RESUMO DAS CAMPANHAS (depois do Creative X, antes do
+#  Creative Transformation; sem número de seção)
+#  Até 4 frases em cada lado. Uma frase curta por bloco (até ~90 caracteres).
+#  FOI BEM aparece em verde; A MELHORAR, em âmbar. Para tirar, apague os blocos.
+# ----------------------------------------------------------------------
+[FOI BEM 1]
+texto: Lorem ipsum dolor sit amet: X%.
+
+[FOI BEM 2]
+texto: Lorem ipsum dolor sit amet.
+
+[A MELHORAR 1]
+texto: Lorem ipsum dolor sit amet: X%.
+
+[A MELHORAR 2]
+texto: Lorem ipsum dolor sit amet.
 
 
 # ----------------------------------------------------------------------

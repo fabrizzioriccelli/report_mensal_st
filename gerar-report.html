@@ -384,6 +384,8 @@
     var html = Motor.trocarImagens(atual.html, function (id) {
       var p = prontas[id - 1], u = URL.createObjectURL(new Blob([p.bytes], { type: Motor.tipoMime(p.nome) })); urls.push(u); return u;
     });
+    /* Vídeos das peças (campo "video"): na prévia, endereço temporário do próprio arquivo. */
+    html = Motor.trocarVideos(html, function (id) { var u = URL.createObjectURL(ARQ[atual.videos[id - 1].caminho]); urls.push(u); return u; });
     $("#pv").srcdoc = comFontes(Motor.paraNavegador(html));
   }
   document.querySelectorAll("[data-w]").forEach(function (b) {
@@ -417,11 +419,17 @@
   $("#bHtml").addEventListener("click", function () {
     /* Página do mês para guardar: as imagens vão dentro do arquivo, então ela abre em qualquer computador. */
     var html = comFontes(Motor.paraNavegador(Motor.trocarImagens(atual.html, function (id) { var p = prontas[id - 1]; return "data:" + Motor.tipoMime(p.nome) + ";base64," + Motor.base64(p.bytes); })));
+    /* Vídeos vão dentro da página (o arquivo abre em qualquer computador, sem a pasta do projeto). */
+    var vids = atual.videos || [];
+    Promise.all(vids.map(function (v) { return ARQ[v.caminho].arrayBuffer().then(function (b) { return "data:" + (/\.webm$/i.test(v.caminho) ? "video/webm" : "video/mp4") + ";base64," + Motor.base64(new Uint8Array(b)); }); }))
+      .then(function (dados) { baixarPagina(Motor.trocarVideos(html, function (id) { return dados[id - 1]; })); });
+  });
+  function baixarPagina(html) {
     html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html (versão " + Motor.VERSAO + ") a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Não edite: edite o arquivo de dados e gere de novo. -->");
     var nome = atual.nomeArquivo.replace(/^report-/, "") + ".html";
     baixar(nome, html, "text/html");
-    $("#gerarInfo").textContent = "Baixado: " + nome + ". Guarde na pasta reports/ do projeto.";
-  });
+    $("#gerarInfo").textContent = "Baixado: " + nome + ". Guarde na pasta reports/ do projeto." + ((atual.videos || []).length ? " Os vídeos tocam ao clicar na peça (só nesta página; no e-mail, a peça abre o link)." : "");
+  }
   $("#bZip").addEventListener("click", function () {
     baixar(atual.nomeArquivo + "-imagens.zip", Motor.zip(doEmail().map(function (p) { return { nome: p.nome, bytes: p.bytes }; })), "application/zip");
     $("#gerarInfo").textContent = "Copie as imagens do .zip para " + atual.config.base + " (modo hospedadas).";
