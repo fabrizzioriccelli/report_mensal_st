@@ -409,5 +409,51 @@ teste("o backup convertido vira e-mail sem nenhuma imagem embutida no HTML", fun
   assert.deepStrictEqual(M.conferirHtml(final).filter(function (x) { return x.nivel === "erro"; }), []);
 });
 
+/* ---------- E-mail resumido + versão interativa ---------- */
+function modeloHtml() {
+  var r = M.montar({ dados: MODELO, arquivoDados: "MODELO.txt", marca: MARCA, template: TEMPLATE, existe: existe });
+  assert.ok(r.html, JSON.stringify(niveis(r, "erro")));
+  return r.html;
+}
+
+teste("o report sai com as marcas de seção, na ordem do template", function () {
+  assert.deepStrictEqual(M.secoesDoHtml(modeloHtml()).map(function (x) { return x.id; }),
+    ["capa", "lancamos", "cx", "resumo", "transformation", "aprendizados", "foco", "agenda", "rodape"]);
+  assert.ok(/<!--secao:fim-->/.test(modeloHtml()));
+  assert.ok(!/<!-- EDITAR AQUI/.test(modeloHtml()), "os outros comentários continuam saindo");
+});
+
+teste("emailResumido: só as seções escolhidas, botão com o link antes do encerramento, seções renumeradas", function () {
+  var link = "https://empresa.sharepoint.com/sites/x/report.html?a=1&b=2";
+  var r = M.emailResumido(modeloHtml(), { link: link });
+  assert.deepStrictEqual(r.mantidas, ["capa", "resumo", "foco", "rodape"]);
+  assert.deepStrictEqual(r.fora, ["lancamos", "cx", "transformation", "aprendizados", "agenda"]);
+  assert.ok(r.html.indexOf('href="https://empresa.sharepoint.com/sites/x/report.html?a=1&amp;b=2"') > 0, "link escapado no href");
+  assert.ok(r.html.indexOf("<!--secao:interativo-->") < r.html.indexOf("<!--secao:rodape-->"), "botão antes do encerramento");
+  assert.ok(!/<!--secao:(lancamos|cx|agenda)-->/.test(r.html) && /Na versão completa estão também: O que lançamos, Creative X/.test(r.html));
+  var nums = (r.html.match(/border-radius:999px;padding:0 7px;letter-spacing:1px;">(\d\d)</g) || []).map(function (x) { return x.slice(-3, -1); });
+  assert.deepStrictEqual(nums, ["01", "02"]);
+  assert.ok(r.html.length < modeloHtml().length * 0.7);
+  assert.ok(M.emailResumido("<html><body>sem marcas</body></html>", { link: link }).erro);
+  var c = M.conferirHtml(r.html).filter(function (x) { return x.nivel === "erro"; });
+  assert.deepStrictEqual(c, []);
+});
+
+teste("ligarVideos: miniatura de vídeo sem link passa a abrir a versão interativa; com link fica como está", function () {
+  var h = '<img src="a" alt="Vídeo: x"><a href="https://y"><img src="b" alt="Vídeo: z"></a><img src="c" alt="Foto">';
+  var r = M.ligarVideos(h, "https://l");
+  assert.strictEqual(r.n, 1);
+  assert.strictEqual(r.html, '<a href="https://l" target="_blank" style="text-decoration:none;"><img src="a" alt="Vídeo: x"></a><a href="https://y"><img src="b" alt="Vídeo: z"></a><img src="c" alt="Foto">');
+});
+
+teste("paginaInterativa: tira o que o navegador acrescentou e mantém script e ampliação", function () {
+  var nav = M.paraNavegador('<html><head></head><body><img src="data:image/png;base64,AA" data-ampliar="data:image/png;base64,AA" alt="x"></body></html>');
+  var salvo = "<!-- saved from url=(0014)about:internet -->\n" + nav.replace('alt="x">', 'alt="x" tabindex="0" role="button" aria-label="Ampliar: x" title="Clique para ampliar">')
+    .replace("</body>", '<div id="amp" role="dialog"><button>×</button><img><video></video><p></p></div></body>');
+  var r = M.paginaInterativa(salvo);
+  assert.ok(r.interativa && /<script>/.test(r.html) && /data-ampliar=/.test(r.html));
+  assert.ok(!/id="amp"| tabindex="0"| aria-label="Ampliar| title="Clique|saved from/.test(r.html), "sobrou algo do navegador");
+});
+
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");
 process.exit(falhas ? 1 : 0);

@@ -60,6 +60,7 @@ function confere(ok, msg) { console.log((ok ? "  ok   " : "  FALHA ") + msg); if
     window.showOpenFilePicker = async function () { return [{ kind: "file", getFile: async function () { return window.__arquivo; } }]; };
   });
   await c.goto("file://" + path.join(RAIZ, "converter-html-eml.html"));
+  await c.check("input[name=modo][value=completo]");
   await c.setInputFiles("#arquivo", arqEd);
   await c.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 30000 });
   console.log("STATUS: " + await c.$eval("#banner", function (e) { return e.textContent; }));
@@ -117,6 +118,34 @@ function confere(ok, msg) { console.log((ok ? "  ok   " : "  FALHA ") + msg); if
   await c.waitForFunction(function () { return /banner err/.test(document.querySelector("#banner").className); }, null, { timeout: 30000 });
   confere(!(await c.$eval("#pastaRow", function (e) { return e.hidden; })), "imagem faltando: pede a pasta das imagens");
   confere(await c.$eval("#bEml", function (b) { return b.disabled; }), "imagem faltando: não deixa baixar");
+
+  /* 7. E-mail resumido + versão interativa. */
+  await trocarArquivo(editado, 4000);
+  await c.check("input[name=modo][value=resumido]");
+  await c.waitForFunction(function () { return /banner warn/.test(document.querySelector("#banner").className) && !document.querySelector("#bInterativa").disabled; }, null, { timeout: 30000 });
+  confere(/Falta só o link/.test(await c.$eval("#banner", function (e) { return e.textContent; })), "resumido sem link: pede o link e libera a versão interativa");
+  confere((await c.$$eval("#secoes input:checked", function (l) { return l.map(function (x) { return x.value; }); })).join(",") === "capa,resumo,foco,rodape", "seções do resumido marcadas por padrão");
+  d = await Promise.all([c.waitForEvent("download"), c.click("#bInterativa")]);
+  var arqInt = path.join(SAIDA, d[0].suggestedFilename());
+  await d[0].saveAs(arqInt);
+  var pi = await browser.newPage();
+  await pi.goto("file://" + arqInt);
+  await pi.click("img[data-ampliar]");
+  confere(await pi.evaluate(function () { return document.querySelectorAll("#amp").length === 1 && document.getElementById("amp").hasAttribute("open"); }), "versão interativa: uma janela de ampliação, abre no clique");
+  await pi.close();
+  var LINK = "https://empresa.sharepoint.com/sites/creative/report.html";
+  await c.fill("#link", LINK);
+  await c.waitForFunction(function () { return /banner (ok|warn)/.test(document.querySelector("#banner").className) && !document.querySelector("#bEml").disabled; }, null, { timeout: 30000 });
+  d = await Promise.all([c.waitForEvent("download"), c.click("#bEml")]);
+  var arqRes = path.join(SAIDA, "resumido.eml");
+  await d[0].saveAs(arqRes);
+  var emlRes = fs.readFileSync(arqRes, "latin1");
+  var htmlRes = Buffer.from(/Content-Type: text\/html; charset="utf-8"\r\nContent-Transfer-Encoding: base64\r\n\r\n([\s\S]*?)\r\n--/.exec(emlRes)[1].replace(/\r\n/g, ""), "base64").toString("utf8");
+  confere(htmlRes.indexOf('href="' + LINK + '"') > 0 && /Ver o report completo \(interativo\)/.test(htmlRes), "resumido: botão com o link da versão interativa");
+  confere(!/secao:(lancamos|cx|transformation|aprendizados|agenda)-->/.test(htmlRes) && /secao:foco-->/.test(htmlRes), "resumido: só as seções escolhidas");
+  confere(htmlRes.indexOf("TEXTO EDITADO NO CHROME") >= 0, "resumido: a edição do navegador continua");
+  confere(emlRes.length < eml.length, "resumido menor que o completo (" + Math.round(emlRes.length / 1024) + " KB vs " + Math.round(eml.length / 1024) + " KB)");
+  await c.screenshot({ path: path.join(SAIDA, "conversor-resumido.png"), fullPage: true });
 
   confere(erros.length === 0, "sem erros no console" + (erros.length ? ": " + erros.join(" | ") : ""));
   await browser.close();

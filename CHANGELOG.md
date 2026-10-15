@@ -2,6 +2,16 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.9 · 2026-10-15 · E-mail resumido + versão interativa
+
+- **E-mail resumido** no `converter-html-eml.html`: o e-mail leva só as seções escolhidas (padrão: capa e números, resumo das campanhas, foco do próximo mês e encerramento) e um bloco **"Ver o report completo (interativo)"**, com botão que funciona no Outlook, antes do encerramento. As seções que ficaram de fora são listadas no bloco, e as etiquetas são renumeradas (01, 02…). No report de exemplo, o e-mail cai para menos da metade do tamanho.
+- **Versão interativa (.html)** para subir no SharePoint: a página do mês com vídeos e peças ampliáveis, limpa do que o navegador acrescenta ao salvar. É o destino do botão.
+- Miniaturas de vídeo sem link passam a abrir a versão interativa, onde o vídeo toca.
+- O e-mail completo também pode ganhar o botão: é só preencher o link.
+- Mudou o tipo de e-mail, as seções, o link ou o texto do botão? A conversão se refaz sozinha, com o status em tempo real.
+- **Marcas de seção no template** (comentários `secao:nome`, mantidos no HTML gerado): é por elas que o resumido sabe onde cortar. Páginas geradas antes da 3.9 precisam ser geradas de novo para usar o resumido.
+- Motor: `secoesDoHtml`, `emailResumido`, `ligarVideos`, `paginaInterativa` (com testes).
+
 ## 3.8 · 2026-10-15 · Converter HTML editado em e-mail, com status em tempo real
 
 - **Nova página `converter-html-eml.html`:** escolha (ou arraste) a página do mês editada no Chrome ou no Edge e baixe o `.eml`. Ela tira o que o e-mail não aceita (script, janela de ampliação, vídeo, marcas do clique e da edição), coloca as imagens dentro do e-mail como anexos embutidos e confere o HTML para o Outlook.
