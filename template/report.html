@@ -100,7 +100,7 @@
     .rt{border-radius:20px 20px 0 0 !important;}
     .rb{border-radius:0 0 20px 20px !important;}
     .al-m img{margin-left:0 !important;}
-    .himg{width:180px !important;max-width:100% !important;margin:0 auto !important;}
+    .himg{width:216px !important;max-width:100% !important;margin:0 auto !important;}
   }
 </style>
 </head>
@@ -160,7 +160,7 @@
           <td colspan="2">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td class="col gap" width="392" valign="middle" style="width:392px;">
+                <td class="col gap" width="356" valign="middle" style="width:356px;">
                   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [ABERTURA] frase, frase_final · [PROJETO PRINCIPAL] nome, resumo, link -->
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O MÊS EM UMA FRASE</p>
                   <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:36px;line-height:40px;color:#FFFFFF;letter-spacing:-1px;">{{frase}}{{#frase_final}}<br><span style="font-weight:normal;color:{{cor.capa_destaque}};">{{frase_final}}</span>{{/frase_final}}</p>
@@ -169,9 +169,11 @@
                   {{#resumo_cta}}<p class="fx tm" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">{{resumo_cta}}</p>{{/resumo_cta}}
                 </td>
 <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-                <!-- SUBSTITUIR IMAGEM AQUI → dados/AAAA-MM.txt › [PROJETO PRINCIPAL] imagem, descricao_imagem -->
-                <td class="col" width="184" valign="middle" align="center" style="width:184px;">
-                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+                <!-- SUBSTITUIR IMAGEM AQUI → dados/AAAA-MM.txt › [PROJETO PRINCIPAL] imagem, descricao_imagem
+                     Foto da capa: 220 x 220 px (20% maior que a coluna de 184 px), quadrada, cantos de 20 px.
+                     No celular: 216 px, centralizada (classe himg). -->
+                <td class="col" width="220" valign="middle" align="center" style="width:220px;">
+                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
                 </td>
               </tr>
             </table>
@@ -185,7 +187,7 @@
   <tr>
     <td class="px rb" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:0 0 34px 34px;padding:24px 40px 28px 40px;">
       <!-- Faixa dos números do projeto principal, na grade de 3 colunas (184 + 24 + 184 + 24 + 184):
-           cada número tem o seu filete no topo, como a agenda. A coluna 3 alinha com a peça da capa. -->
+           cada número tem o seu filete no topo, como a agenda. A foto da capa (220 px) é 36 px mais larga que a coluna 3. -->
       <!-- EDITAR AQUI: INDICADORES → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 3] (até 4) valor, titulo, detalhe, variacao -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -225,7 +227,7 @@
         <tr>
           {{#peca}}{{#img}}
           <td class="hide-m" width="184" valign="top" style="width:184px;">
-            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
           </td>
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
           {{/img}}{{#placeholder}}
@@ -235,7 +237,7 @@
           <td class="col" width="{{largura_texto}}" valign="top" style="width:{{largura_texto}}px;">
             {{#peca}}{{#img_m}}<!-- Só no celular: a mesma peça em formato horizontal, na largura da tela (no computador fica escondida). -->
             <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
               <div style="font-size:16px;line-height:16px;">&nbsp;</div>
             </div>{{/img_m}}{{#placeholder_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{placeholder_m}}<div style="font-size:16px;line-height:16px;">&nbsp;</div></div>{{/placeholder_m}}{{/peca}}
             {{#categoria}}<p class="fx" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
@@ -265,20 +267,20 @@
   {{/destaque}}
 
   {{#tem_compactos}}
-  <!-- Lançamentos compactos ("Também no ar"): até 3 por linha -->
+  <!-- Lançamentos compactos ("Também neste mês"): até 3 por linha -->
   <tr>
     <td class="px" style="padding:30px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td colspan="{{colunas_compactos}}" style="padding:12px 0 14px 0;border-top:1px solid {{cor.texto}};">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">TAMBÉM NO AR</p>
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">TAMBÉM NESTE MÊS</p>
           </td>
         </tr>
         <tr>
           {{#compactos}}
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
           <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
-            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
             {{#status}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
             <p class="ft" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
             {{#texto_cta}}<p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
@@ -409,15 +411,26 @@
 
   {{#foco}}
   <!-- 06 · FOCO DO PRÓXIMO MÊS · bloco vermelho -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOCO] prioridade, texto -->
+  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOCO] prioridade, texto, selo (opcional), descricao_selo
+       Selo da campanha: o PNG original (versão para fundo vermelho). No computador, à direita do título,
+       na coluna 3 (184 px). No celular, acima do título, com 160 px. Sem sobreposição: funciona no Outlook. -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.marca}}" class="ra" style="background:{{cor.marca}};border-radius:34px;">
         <tr>
           <td class="px" valign="middle" style="padding:26px 28px 28px 28px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td class="col" width="{{largura_texto}}" valign="middle" style="width:{{largura_texto}}px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;FOCO DE {{mes}}</p>
+            {{#selo}}{{#img_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></div>{{/img_m}}{{/selo}}
             <p class="ft h2" style="margin:10px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">{{prioridade}}</p>
             {{#texto}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
+          </td>
+          {{#selo}}{{#img}}
+          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+          <td class="hide-m" width="184" valign="middle" align="right" style="width:184px;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></td>
+          {{/img}}{{/selo}}
+          </tr></table>
           </td>
         </tr>
       </table>
