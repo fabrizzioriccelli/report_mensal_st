@@ -89,7 +89,8 @@ link: [INSERIR LINK]
 # O 1º é o principal e aparece em vermelho: use o resultado mais relevante.
 #  valor: o número (até ~10 caracteres). Formatos: X,X%  ·  R$ X mi  ·  Xx  ·  X p.p.
 #  titulo: o que é (negrito)        detalhe: base de comparação
-#  variacao: etiqueta opcional. Começa com "-" → seta para baixo.
+#  variacao: etiqueta opcional. Começa com "-" → seta para baixo
+#  (ex.: "-Menos da metade" para um custo que caiu: seta para baixo, em verde).
 #  variacao_cor: verde (resultado positivo, padrão) ou ambar (atenção).
 #  Atenção: % é variação relativa (+12%); p.p. é diferença entre duas
 #  porcentagens (de 40% para 52% = +12 p.p.). Não troque um pelo outro.
@@ -110,6 +111,24 @@ valor: X
 titulo: Lorem ipsum
 detalhe: era X
 variacao: +X%
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: RESUMO DO MÊS (logo abaixo da capa, sem número de seção)
+#  Até 3 frases em cada lado. Uma frase curta por bloco (até ~90 caracteres).
+#  FOI BEM aparece em verde; A MELHORAR, em âmbar. Para tirar, apague os blocos.
+# ----------------------------------------------------------------------
+[FOI BEM 1]
+texto: Lorem ipsum dolor sit amet: X%.
+
+[FOI BEM 2]
+texto: Lorem ipsum dolor sit amet.
+
+[A MELHORAR 1]
+texto: Lorem ipsum dolor sit amet: X%.
+
+[A MELHORAR 2]
+texto: Lorem ipsum dolor sit amet.
 
 
 # ----------------------------------------------------------------------
