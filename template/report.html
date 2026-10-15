@@ -180,7 +180,7 @@
                      Foto da capa: 220 x 220 px (20% maior que a coluna de 184 px), quadrada, cantos de 20 px.
                      No celular: 216 px, centralizada (classe himg). -->
                 <td class="col" width="220" valign="middle" align="center" style="width:220px;">
-                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
                 </td>
               </tr>
             </table>
@@ -235,7 +235,7 @@
         <tr>
           {{#peca}}{{#img}}
           <td class="hide-m" width="184" valign="top" style="width:184px;">
-            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
           </td>
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
           {{/img}}{{#placeholder}}
@@ -245,7 +245,7 @@
           <td class="col" width="{{largura_texto}}" valign="top" style="width:{{largura_texto}}px;">
             {{#peca}}{{#img_m}}<!-- Só no celular: a mesma peça em formato horizontal, na largura da tela (no computador fica escondida). -->
             <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
               <div style="font-size:16px;line-height:16px;">&nbsp;</div>
             </div>{{/img_m}}{{#placeholder_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{placeholder_m}}<div style="font-size:16px;line-height:16px;">&nbsp;</div></div>{{/placeholder_m}}{{/peca}}
             {{#categoria}}<p class="fx" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
@@ -291,7 +291,7 @@
           {{#vazio}}<td class="hide-m" width="{{largura}}" style="width:{{largura}}px;">&nbsp;</td>{{/vazio}}
           {{^vazio}}
           <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
-            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
             {{#status}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
             <p class="ft" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
             {{#texto_cta}}<p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
@@ -378,8 +378,8 @@
 
   {{#transformation}}
   <!--secao:transformation-->
-  <!-- 04 · CREATIVE TRANSFORMATION · superfície Lisboa com cartão branco -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] -->
+  <!-- 04 · TRANSFORMATION HUB · superfície Lisboa com cartão branco -->
+  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] (prints: até 3 por projeto) -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.transformation_fundo}}" class="ra" style="background:{{cor.transformation_fundo}};border-radius:34px;">
@@ -388,7 +388,7 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td valign="bottom" style="padding-bottom:18px;">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_evolucao}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;CREATIVE TRANSFORMATION</p>
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_evolucao}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;TRANSFORMATION HUB</p>
                   {{#titulo}}<p class="ft h2" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:29px;color:{{cor.transformation_titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
                 </td>
               </tr>
@@ -400,7 +400,7 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="background:{{cor.fundo_email}};border-radius:20px;">
               {{#projetos}}
               <tr>
-                <td style="padding:18px 20px;{{borda}}">
+                <td data-bloco="transformation-{{numero}}" style="padding:18px 20px;{{borda}}">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                       {{#tem_visual}}
@@ -417,6 +417,19 @@
                         {{#resultado}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};"><b style="color:{{cor.texto}};">Resultado:</b> {{resultado}}</p>{{/resultado}}
                       </td>
                     </tr>
+                    {{#tem_prints}}
+                    <!-- PRINTS do projeto (dados › prints, descricao_prints): 1 × 504, 2 × 240 ou 3 × 152 px; no celular, empilhados. -->
+                    <tr>
+                      <td colspan="2" style="padding-top:14px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                          {{#prints}}
+                          {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
+                          <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid" style="display:block;border:1px solid {{cor.transformation_linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td>
+                          {{/prints}}
+                        </tr></table>
+                      </td>
+                    </tr>
+                    {{/tem_prints}}
                   </table>
                 </td>
               </tr>

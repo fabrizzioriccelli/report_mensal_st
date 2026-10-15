@@ -11,7 +11,7 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 - [ ] Nenhum conteúdo de exemplo restante: Lorem Ipsum, `X`, "Mês", "AAAA"
 - [ ] Métricas atualizadas e conferidas com a fonte (painel ou planilha)
 - [ ] Creative X atualizado (anterior, atual, período)
-- [ ] Creative Transformation atualizado (status, resultado)
+- [ ] Transformation Hub atualizado (status, resultado, prints)
 - [ ] Aprendizados e foco do próximo mês escritos
 - [ ] Agenda atualizada
 

@@ -2,6 +2,15 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.0 · 2026-10-15 · Dois e-mails de uma vez, Transformation Hub com prints, vídeo sem ▶ no resumo
+
+- **O conversor gera os dois e-mails de uma vez:** você edita o `.html` (inclusive pelo Inspecionar do Chrome), escolhe o arquivo e saem o **e-mail completo**, o **e-mail resumido** (com o botão "Ver o report completo") e a **versão interativa** para o SharePoint. Sem o link, o completo já sai e o resumido espera o link; a prévia mostra os dois.
+- **Resumido sem promessa de vídeo:** a miniatura do vídeo aparece **sem ▶ e sem link** (versão guardada na página em `data-thumb`), e o texto alternativo perde o "Vídeo:". O vídeo só toca na versão interativa.
+- **Versão interativa:** abaixo de cada miniatura de vídeo, o botão **"▶ Assistir ao vídeo"** (pulsando de leve), que abre o vídeo por cima do report.
+- **Creative Transformation → Transformation Hub.** Cada projeto aceita **até 3 prints** (`prints:` e `descricao_prints:`), na largura do cartão (1 × 504, 2 × 240 ou 3 × 152 px; no celular, empilhados), com borda leve e cantos de 12 px. Na página do mês, abrem maiores no clique.
+- **Prints colados pelo Inspecionar:** o conversor traz o passo a passo e o bloco pronto para copiar (1, 2 ou 3 prints). Com a pasta das imagens escolhida, os prints entram como anexo nos e-mails, embutidos na versão interativa e reduzidos sozinhos a 1200 px de largura. Cada projeto tem a marca `transformation-1..3` para achar no Inspecionar.
+- Motor: `miniaturasSemPlay`; imagens só da página (`soPagina`) fora do `.eml`; `data-ampliar=""` usa a própria imagem; testes novos (56 no motor; o teste do conversor cobre os dois e-mails, o print colado e o vídeo).
+
 ## 3.9 · 2026-10-15 · E-mail resumido + versão interativa
 
 - **E-mail resumido** no `converter-html-eml.html`: o e-mail leva só as seções escolhidas (padrão: capa e números, resumo das campanhas, foco do próximo mês e encerramento) e um bloco **"Ver o report completo (interativo)"**, com botão que funciona no Outlook, antes do encerramento. As seções que ficaram de fora são listadas no bloco, e as etiquetas são renumeradas (01, 02…). No report de exemplo, o e-mail cai para menos da metade do tamanho.

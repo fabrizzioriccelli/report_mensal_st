@@ -2,7 +2,7 @@
 
 Modelo do report mensal da Creative Strategy PF (Customer Interactions): um e-mail executivo de uma página, enviado pelo Outlook, com peças e vídeos clicáveis. Ele é gerado a partir de **um arquivo de texto por mês**. Ninguém precisa editar HTML.
 
-**Versão 3.9 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 4.0 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -33,7 +33,7 @@ Contar o mês da área em uma página, sempre na mesma ordem:
 | 01 | **O mês em uma frase** | O que aconteceu? Qual foi o principal resultado? |
 | 02 | **O que lançamos** | O que foi para o ar e o que evoluiu? |
 | 03 | **Creative X** | Como está a qualidade criativa (antes → agora)? |
-| 04 | **Creative Transformation** | O que estamos mudando na forma de criar? |
+| 04 | **Transformation Hub** | O que estamos mudando na forma de criar? |
 | 05 | **O que aprendemos** | O que os dados ensinaram? |
 | 06 | **Foco do próximo mês** | Qual é a prioridade agora? |
 | 07 | **Também vem aí** | O que está na agenda? |
@@ -56,7 +56,7 @@ Contar o mês da área em uma página, sempre na mesma ordem:
 ```text
 report_mensal_st/
 ├── gerar-report.html        ← ABRA ESTE para gerar o e-mail
-├── converter-html-eml.html  ← e-mail resumido + versão interativa, ou .html editado → .eml
+├── converter-html-eml.html  ← .html (editado ou não) → e-mail completo + resumido + versão interativa
 ├── report_backup.html       ← backup: o layout aprovado num arquivo só (veja docs/BACKUP.md)
 ├── README.md                ← este guia
 ├── CHANGELOG.md             ← histórico de versões
@@ -65,7 +65,7 @@ report_mensal_st/
 ├── assets/                  ← IMAGENS
 │   ├── marca/               chama do Santander (oficial) e paleta de cores
 │   ├── formiguinha/         a personagem (arquivo original)
-│   ├── icones/              ícones do Creative Transformation
+│   ├── icones/              ícones do Transformation Hub
 │   ├── fonts/               fontes Santander: CSS pronto, arquivos .otf entram aqui
 │   └── fotos/               fotos do banco de imagens (só no ambiente do banco)
 ├── config/
@@ -168,7 +168,7 @@ Erros comuns e soluções: [docs/FAQ.md](docs/FAQ.md).
 
 Na página: **Baixar e-mail final (.eml)** (vai para o Outlook) e **Baixar página do mês (.html)** (guarde em `reports/`). Como abrir o `.eml` em cada Outlook: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
 
-Quer um e-mail **curto**, com um botão para a **versão interativa** (vídeos e peças ampliáveis)? Ou editou a página direto no Chrome ou no Edge? Abra **`converter-html-eml.html`**, escolha o `.html` do mês e baixe o `.eml` (resumido ou completo) e a versão interativa para o SharePoint. A página mostra o status de cada etapa em tempo real e converte de novo sozinha quando você salva o arquivo ou muda uma opção. Passo a passo: [docs/CONVERTER_HTML_EML.md](docs/CONVERTER_HTML_EML.md).
+Editou a página no Chrome ou no Edge (até pelo Inspecionar) ou quer um e-mail **curto**? Abra **`converter-html-eml.html`** e escolha o `.html` do mês: ele gera, de uma vez, o **e-mail completo**, o **e-mail resumido** (com o botão "Ver o report completo") e a **versão interativa** (vídeos e peças ampliáveis) para o SharePoint. A página mostra o status de cada etapa em tempo real e converte de novo sozinha quando você salva o arquivo ou muda uma opção. Passo a passo: [docs/CONVERTER_HTML_EML.md](docs/CONVERTER_HTML_EML.md).
 
 ## 17. Como fazer backup
 
