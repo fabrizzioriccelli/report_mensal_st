@@ -52,6 +52,11 @@
   (12 px + filete de 1 px + 11 px). Entre seções, 40 px. No celular, os espaços somem
   (classe hide-m) e as colunas empilham (classe col).
 
+  MARCAS DE SEÇÃO: cada seção começa com um comentário "secao:nome" (e o
+  fim do conteúdo com "secao:fim"). Elas ficam no e-mail e na página, e o
+  converter-html-eml.html usa essas marcas para montar o e-mail resumido.
+  Não apague nem mude de lugar.
+
   Sintaxe:  {{campo}}  ·  {{#lista}}…{{/lista}} repete ou mostra se existe
             {{^campo}}…{{/campo}} mostra se vazio
   ======================================================================
@@ -121,6 +126,7 @@
 <table role="presentation" class="container ra" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="width:680px;max-width:680px;background:{{cor.fundo_email}};border-radius:34px;">
 
   {{#abertura}}
+  <!--secao:capa-->
   <!-- 01 · CAPA · faixa vermelha de ponta a ponta: logo, nome da área, selo do mês,
        frase do mês e projeto principal com a peça. Logo abaixo, a faixa creme dos números. -->
   <tr>
@@ -212,6 +218,7 @@
   {{/abertura}}
 
   {{#lancamos}}
+  <!--secao:lancamos-->
   <!-- 02 · O QUE LANÇAMOS · 1 projeto em destaque + compactos -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [LANCAMOS] titulo · [DESTAQUE] · [RESULTADO 1..3] · [LANCAMENTO 1..3] -->
   <tr>
@@ -300,6 +307,7 @@
   {{/lancamos}}
 
   {{#cx}}
+  <!--secao:cx-->
   <!-- 03 · CREATIVE X · anterior → atual, variação, barra e uma frase -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [CREATIVE X] anterior, atual, variacao, periodo, referencia, significado -->
   <tr>
@@ -340,6 +348,7 @@
   {{/cx}}
 
   {{#balanco}}
+  <!--secao:resumo-->
   <!-- RESUMO DAS CAMPANHAS · o que foi bem (verde do guia) e o que precisa melhorar (âmbar), na grade: 288 + 24 + 288.
        Cada coluna tem o filete no topo, como os números e a agenda. No celular, uma embaixo da outra. -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOI BEM 1..3] e [A MELHORAR 1..3] texto -->
@@ -368,6 +377,7 @@
   {{/balanco}}
 
   {{#transformation}}
+  <!--secao:transformation-->
   <!-- 04 · CREATIVE TRANSFORMATION · superfície Lisboa com cartão branco -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] -->
   <tr>
@@ -420,6 +430,7 @@
   {{/transformation}}
 
   {{#aprendizados}}
+  <!--secao:aprendizados-->
   <!-- 05 · O QUE APRENDEMOS · até 3 colunas, sem caixas -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [APRENDIZADO 1..3] titulo, texto, levamos -->
   <tr>
@@ -444,6 +455,7 @@
   {{/aprendizados}}
 
   {{#foco}}
+  <!--secao:foco-->
   <!-- 06 · FOCO DO PRÓXIMO MÊS · bloco vermelho -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOCO] prioridade, texto, selo (opcional), descricao_selo
        Selo da campanha: o PNG original (versão para fundo vermelho). No computador, à direita do título,
@@ -473,6 +485,7 @@
   {{/foco}}
 
   {{#agenda}}
+  <!--secao:agenda-->
   <!-- 07 · TAMBÉM VEM AÍ · agenda em linhas de 3 -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [AGENDA 1..6] data, titulo, detalhe -->
   <tr>
@@ -501,6 +514,7 @@
   </tr>
   {{/agenda}}
 
+  <!--secao:rodape-->
   <!-- RODAPÉ · encerramento em duas faixas, na grade de 3 colunas:
        1. faixa clara (Rio): despedida e informações (colunas 1 e 2) e a formiguinha
           em pé sobre a faixa vermelha, alinhada à direita, sobre a chama (coluna 3);
@@ -559,6 +573,7 @@
     </td>
   </tr>
 
+  <!--secao:fim-->
 </table>
 <!--[if mso]></td></tr></table><![endif]-->
 </td>

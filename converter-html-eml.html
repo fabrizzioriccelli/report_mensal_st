@@ -9,7 +9,11 @@
   CONVERTER HTML EDITADO EM E-MAIL (.eml)
   ----------------------------------------------------------------------
   Para quando você editou a página do mês direto no navegador (Chrome ou
-  Edge) e quer mandar essa versão por e-mail.
+  Edge) e quer mandar essa versão por e-mail. Gera:
+    · e-mail RESUMIDO (só as seções escolhidas) com o botão "Ver o
+      report completo", que abre a versão interativa; ou o e-mail COMPLETO;
+    · a VERSÃO INTERATIVA (.html, com vídeos e peças ampliáveis) para
+      subir no SharePoint e usar como destino do botão.
 
   Abra este arquivo no Edge ou no Chrome (dois cliques) ou pelo endereço
   local (ex.: http://localhost:8000/converter-html-eml.html). Não precisa
@@ -21,9 +25,12 @@
     2. reconhece o report (versão e mês);
     3. tira o que o e-mail não aceita (script, ampliação, vídeo,
        marcas da edição);
+       3b. no resumido, corta as seções (marcas "secao:" do template),
+           põe o botão e liga as miniaturas de vídeo à versão interativa;
     4. coloca as imagens dentro do e-mail (anexos embutidos, cid:);
     5. confere o HTML para o Outlook;
-    6. monta o .eml (mensagem nova no Outlook, pronta para enviar).
+    6. monta o .eml (mensagem nova no Outlook, pronta para enviar);
+    7. prepara a versão interativa (.html).
   Com "Acompanhar o arquivo" ligado, ela converte de novo sozinha toda
   vez que você salvar o .html.
 
@@ -82,13 +89,22 @@
   .tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
   .frame{display:flex;justify-content:center}
   code{background:#F3F1EF;padding:1px 5px;border-radius:4px;font-size:13px}
+  fieldset{border:0;margin:0;padding:0}
+  .modos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:6px}
+  .modo{display:flex;gap:10px;align-items:flex-start;border:1px solid #CFC9C4;border-radius:10px;padding:12px 14px;cursor:pointer;font-size:14px}
+  .modo:has(input:checked){border-color:var(--red);box-shadow:0 0 0 1px var(--red);background:#FFF9F9}
+  .modo input{margin-top:3px;accent-color:var(--red)}
+  .modo b{display:block}.modo span{color:var(--gray);font-size:13px}
+  .campo{margin-top:14px}.campo label{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
+  .secoes{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:4px}
+  .passos{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--gray)}
   [hidden]{display:none !important}
 </style>
 </head>
 <body>
 <header><div>
   <h1>Converter HTML em e-mail (.eml)</h1>
-  <p>Para quando você editou a página do mês no navegador: lê o <b>.html</b>, tira o que o e-mail não aceita, coloca as imagens dentro e gera o <b>.eml</b> que o Outlook abre como mensagem nova. <span id="versao"></span></p>
+  <p>Lê a página do mês (.html, editada ou não no navegador) e gera o <b>.eml</b>: <b>resumido</b>, com um botão para a <b>versão interativa</b> (vídeos e peças ampliáveis), ou completo. <span id="versao"></span></p>
 </div></header>
 
 <main>
@@ -106,8 +122,36 @@
     </div>
   </section>
 
+  <section aria-labelledby="s5">
+    <h2 id="s5"><b>2</b>O que gerar</h2>
+    <fieldset>
+      <legend class="muted">Escolha o tipo de e-mail. A conversão se refaz sozinha quando você muda alguma opção.</legend>
+      <div class="modos">
+        <label class="modo"><input type="radio" name="modo" value="resumido" checked><div><b>E-mail resumido + versão interativa</b><span>Só o essencial no e-mail e um botão "Ver o report completo", que abre a página com vídeos e peças ampliáveis.</span></div></label>
+        <label class="modo"><input type="radio" name="modo" value="completo"><div><b>E-mail completo</b><span>O report inteiro no e-mail (sem vídeo nem ampliação: o e-mail não roda script).</span></div></label>
+      </div>
+    </fieldset>
+    <div class="campo" id="campoSecoes">
+      <label>Seções que vão no e-mail resumido</label>
+      <div class="secoes" id="secoes"></div>
+    </div>
+    <div class="campo">
+      <label for="link">Link da versão interativa <span class="muted" id="linkObrig">(obrigatório no resumido)</span></label>
+      <input type="text" id="link" inputmode="url" placeholder="https://empresa.sharepoint.com/…/report-outubro.html" autocomplete="off">
+      <ol class="passos">
+        <li>Baixe a versão interativa: <button type="button" id="bInterativa" disabled>Baixar versão interativa (.html)</button> <span id="interInfo" class="muted"></span></li>
+        <li>Suba esse arquivo numa pasta do SharePoint (ou OneDrive) que o público do e-mail consiga abrir. Em muitos SharePoint, o .html baixa em vez de abrir direto: quem clicar abre o arquivo baixado e ele funciona igual. Teste o link com alguém de outra equipe.</li>
+        <li>Copie o link de compartilhamento e cole aqui em cima.</li>
+      </ol>
+    </div>
+    <div class="campo">
+      <label for="botao">Texto do botão</label>
+      <input type="text" id="botao" value="Ver o report completo (interativo)">
+    </div>
+  </section>
+
   <section aria-labelledby="s2">
-    <h2 id="s2"><b>2</b>Status</h2>
+    <h2 id="s2"><b>3</b>Status</h2>
     <p id="banner" class="banner" role="status" aria-live="polite">Aguardando o arquivo.</p>
     <div class="barra" id="barra" role="progressbar" aria-label="Andamento da conversão" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
     <div class="medidor"><span id="pct">0%</span><span id="relogio">—</span></div>
@@ -120,7 +164,7 @@
   </section>
 
   <section aria-labelledby="s3" id="secBaixar" hidden>
-    <h2 id="s3"><b>3</b>Baixe o e-mail</h2>
+    <h2 id="s3"><b>4</b>Baixe o e-mail</h2>
     <p class="muted" style="margin-bottom:6px"><label for="assunto"><b>Assunto</b></label> (vem do título da página; pode mudar aqui):</p>
     <input type="text" id="assunto">
     <div class="row">
@@ -160,15 +204,17 @@
     { id: "ler", nome: "Ler o arquivo" },
     { id: "origem", nome: "Reconhecer o report" },
     { id: "limpar", nome: "Tirar o que o e-mail não aceita" },
+    { id: "resumir", nome: "Montar a versão do e-mail" },
     { id: "imagens", nome: "Colocar as imagens dentro do e-mail" },
     { id: "conferir", nome: "Conferir para o Outlook" },
-    { id: "montar", nome: "Montar o .eml" }
+    { id: "montar", nome: "Montar o .eml" },
+    { id: "interativa", nome: "Preparar a versão interativa (.html)" }
   ];
   /* Na prévia, imagem que falta aparece como um bloco cinza (em vez de um link quebrado). */
   var FALTA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120"><rect width="100%" height="100%" fill="#E3DFDC"/><text x="50%" y="54%" font-family="Arial" font-size="13" fill="#5F5F5F" text-anchor="middle">imagem faltando</text></svg>');
   var ICONE = { espera: "", rodando: "", ok: "✓", aviso: "!", erro: "✕" };
   var pastaArquivos = {};      /* imagens da pasta "_files", por nome */
-  var handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, urls = [];
+  var interativa = null, handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, urls = [];
   var inicio = 0, relogioTimer = null;
 
   /* ---------- status em tempo real ---------- */
@@ -230,10 +276,11 @@
   /* ---------- conversão ---------- */
   async function converter(file) {
     var minha = ++execucao, t0 = performance.now();
-    ultimoArquivo = file;
+    var anterior = ultimoArquivo; ultimoArquivo = file;
     function parou() { return minha !== execucao; }
     var erros = [], avisos = [];
     resultado = null; $("#bEml").disabled = true; $("#emlInfo").textContent = "";
+    if (!anterior || anterior.name !== file.name) { interativa = null; $("#bInterativa").disabled = true; $("#interInfo").textContent = ""; }
     urls.forEach(URL.revokeObjectURL); urls = [];
     montarEtapas(); progresso(0); relogio(true);
     banner("run", "Convertendo " + file.name + "…");
@@ -254,6 +301,11 @@
     if (org) { etapa("origem", "ok", "Report gerado pela versão " + org.versao + " a partir de " + org.dados + "."); log("Report: versão " + org.versao + ", " + org.dados + "."); }
     else { etapa("origem", "aviso", "Não achei a marca da ferramenta. A conversão segue: confira a prévia antes de enviar."); avisos.push("origem"); log("Sem a marca da ferramenta."); }
     progresso(22); await respira();
+    /* Versão interativa sai do arquivo original (antes de limpar): fica disponível já, para subir no SharePoint e pegar o link. */
+    var pg = Motor.paginaInterativa(html);
+    interativa = { html: pg.html, nome: file.name.replace(/\.(html?|htm)$/i, "") + "-interativo.html", ok: pg.interativa };
+    $("#bInterativa").disabled = false; $("#interInfo").textContent = interativa.nome + " · " + kb(Motor.utf8(pg.html).length);
+    atualizarSecoes(html);
 
     /* 3. limpar */
     etapa("limpar", "rodando", "Tirando script, ampliação, vídeo e marcas da edição…"); await respira();
@@ -261,10 +313,32 @@
     var saiu = limpo.saiu.map(function (s) { return s.item + (s.n > 1 ? " (" + s.n + ")" : ""); });
     etapa("limpar", "ok", saiu.length ? "Saiu do e-mail:" : "Nada para tirar: o HTML já estava pronto para e-mail.", saiu);
     log(saiu.length ? "Removido: " + saiu.join(", ") + "." : "Nada para remover.");
-    progresso(34); await respira(); if (parou()) return;
+    progresso(30); await respira(); if (parou()) return;
+
+    /* 3b. resumir */
+    var modo = modoAtual(), link = $("#link").value.trim(), email = { html: limpo.html };
+    etapa("resumir", "rodando", modo === "resumido" ? "Escolhendo as seções e colocando o botão…" : "Conferindo o link…"); await respira();
+    if (link && !/^https:\/\/[^\s]+$/i.test(link)) {
+      etapa("resumir", "erro", "O link precisa começar com https:// (copie o link de compartilhamento do SharePoint)."); return fim(["link"], avisos);
+    }
+    if (modo === "resumido") {
+      if (!link) { etapa("resumir", "erro", "Cole o link da versão interativa (passo 2). Sem ele, o botão \"Ver o report completo\" não teria para onde ir."); return fim(["link"], avisos); }
+      var manter = Array.prototype.filter.call(document.querySelectorAll("#secoes input"), function (c) { return c.checked; }).map(function (c) { return c.value; });
+      email = Motor.emailResumido(limpo.html, { manter: manter, link: link, botao: $("#botao").value.trim() });
+      if (email.erro) { etapa("resumir", "erro", email.erro); return fim(["secoes"], avisos); }
+      var nomes = function (ids) { return ids.map(function (i) { return Motor.SECOES[i] || i; }).join(", "); };
+      etapa("resumir", "ok", "E-mail resumido com o botão para " + hostDe(link) + ".", ["Ficam: " + nomes(email.mantidas), "Só na versão interativa: " + (email.fora.length ? nomes(email.fora) : "nada (todas as seções marcadas)")]
+        .concat(email.videos ? [email.videos + " miniatura(s) de vídeo agora abrem a versão interativa"] : []));
+      log("Resumido: ficam " + email.mantidas.join(", ") + "; saem " + (email.fora.join(", ") || "nenhuma") + ".");
+    } else if (link) {
+      var todas = Motor.secoesDoHtml(limpo.html).map(function (x) { return x.id; });
+      email = todas.length ? Motor.emailResumido(limpo.html, { manter: todas, link: link, botao: $("#botao").value.trim() }) : Motor.ligarVideos(limpo.html, link);
+      etapa("resumir", "ok", "E-mail completo, com o botão para a versão interativa em " + hostDe(link) + (email.videos || email.n ? " e as miniaturas de vídeo ligadas a ela." : "."));
+    } else etapa("resumir", "ok", "E-mail completo: todas as seções, sem botão para a versão interativa.");
+    progresso(36); await respira(); if (parou()) return;
 
     /* 4. imagens */
-    var lista = Motor.imagensDoHtml(limpo.html), mapa = {}, mapaPrev = {}, anexos = [], total = 0, faltam = [], probs = [];
+    var lista = Motor.imagensDoHtml(email.html), mapa = {}, mapaPrev = {}, anexos = [], total = 0, faltam = [], probs = [];
     etapa("imagens", "rodando", lista.length ? "Imagem 0 de " + lista.length + "…" : "Procurando imagens…"); await respira();
     for (var i = 0; i < lista.length; i++) {
       if (parou()) return;
@@ -301,7 +375,7 @@
 
     /* 5. conferir */
     etapa("conferir", "rodando", "Conferindo regras do Outlook…"); await respira();
-    var final = Motor.trocarSrc(limpo.html, mapa);
+    var final = Motor.trocarSrc(email.html, mapa);
     var conf = Motor.conferirHtml(final).filter(function (c) { return c.nivel !== "info"; });
     if (/url\(\s*['"]?data:/i.test(final)) conf.push({ nivel: "aviso", msg: "Há imagem de fundo embutida no CSS: o Outlook não mostra." });
     etapa("conferir", conf.length ? "aviso" : "ok", conf.length ? conf.length + " ponto(s) para olhar:" : "Nenhum problema encontrado.", conf.map(function (c) { return c.msg; }));
@@ -318,8 +392,13 @@
     else etapa("montar", erros.length ? "aviso" : "ok", "Mensagem de " + kb(tam) + (erros.length ? ", mas há imagens com problema (veja acima)." : ", pronta para o Outlook."));
     log(".eml montado: " + kb(tam) + ".");
 
+    /* 7. versão interativa */
+    etapa("interativa", interativa.ok ? "ok" : "aviso", interativa.ok ? interativa.nome + " · " + $("#interInfo").textContent.split(" · ").pop() + ": vídeos tocam e peças abrem maiores no clique. Suba no SharePoint (passo 2)." :
+      "A página não tem peças ampliáveis nem vídeos: a versão interativa fica igual ao e-mail completo.");
+    if (!interativa.ok) avisos.push("interativa");
+
     /* prévia */
-    $("#prev").srcdoc = Motor.trocarSrc(limpo.html, mapaPrev);
+    $("#prev").srcdoc = Motor.trocarSrc(email.html, mapaPrev);
     $("#secPrev").hidden = false; $("#secBaixar").hidden = false;
     fim(erros, avisos, performance.now() - t0, tam);
   }
@@ -328,7 +407,8 @@
     relogio(false); if (ms) $("#relogio").textContent = "Tempo: " + seg(ms);
     if (erros.length) {
       progresso(100); $("#barra").classList.remove("fim");
-      banner("err", "Não deu para converter tudo. Veja a etapa marcada com ✕.");
+      if (erros.length === 1 && erros[0] === "link" && !$("#link").value.trim()) banner("warn", "Falta só o link da versão interativa: baixe a versão interativa (passo 2), suba no SharePoint e cole o link. O e-mail se monta sozinho em seguida.");
+      else banner("err", "Não deu para converter tudo. Veja a etapa marcada com ✕.");
       $("#bEml").disabled = true; log("Fim com problema.");
       return;
     }
@@ -338,6 +418,47 @@
     $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(tam) + " · " + resultado.imagens.length + " imagens dentro" : "";
     log("Fim: pronto.");
   }
+
+  /* ---------- opções (modo, seções, link): mudou, converte de novo ---------- */
+  function modoAtual() { return document.querySelector('input[name=modo]:checked').value; }
+  function hostDe(u) { try { return new URL(u).host; } catch (e) { return u; } }
+  function atualizarSecoes(html) {
+    var achadas = Motor.secoesDoHtml(html), box = $("#secoes"), marcadas = {};
+    Array.prototype.forEach.call(box.querySelectorAll("input"), function (c) { marcadas[c.value] = c.checked; });
+    var ids = achadas.map(function (x) { return x.id; }).join(",");
+    if (box.dataset.ids === ids) return;
+    box.dataset.ids = ids; box.textContent = "";
+    if (!achadas.length) { box.innerHTML = '<span class="muted">Este arquivo não tem as marcas de seção (gerado antes da versão 3.9). Gere a página de novo pelo <code>gerar-report.html</code> para usar o e-mail resumido.</span>'; return; }
+    achadas.forEach(function (x) {
+      var l = document.createElement("label"), c = document.createElement("input");
+      l.className = "check"; c.type = "checkbox"; c.value = x.id;
+      c.checked = x.id in marcadas ? marcadas[x.id] : Motor.SECOES_RESUMO.indexOf(x.id) >= 0;
+      l.appendChild(c); l.appendChild(document.createTextNode(" " + x.nome)); box.appendChild(l);
+    });
+  }
+  function mostrarModo() {
+    var r = modoAtual() === "resumido";
+    $("#campoSecoes").hidden = !r; $("#linkObrig").textContent = r ? "(obrigatório no resumido)" : "(opcional: com ele, o e-mail completo também ganha o botão)";
+  }
+  var adiar = null;
+  function reconverter() {
+    mostrarModo();
+    clearTimeout(adiar);
+    adiar = setTimeout(function () { if (ultimoArquivo) { log("Opções mudaram: convertendo de novo."); (handle ? handle.getFile() : Promise.resolve(ultimoArquivo)).then(converter); } }, 500);
+  }
+  document.querySelectorAll("input[name=modo]").forEach(function (r) { r.addEventListener("change", reconverter); });
+  $("#secoes").addEventListener("change", reconverter);
+  $("#link").addEventListener("input", reconverter);
+  $("#botao").addEventListener("input", reconverter);
+  mostrarModo();
+
+  $("#bInterativa").addEventListener("click", function () {
+    if (!interativa) return;
+    var a = document.createElement("a"), u = URL.createObjectURL(new Blob([interativa.html], { type: "text/html" }));
+    a.href = u; a.download = interativa.nome; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    log("Baixado: " + interativa.nome + ".");
+  });
 
   /* ---------- baixar ---------- */
   $("#assunto").addEventListener("input", function () { this.dataset.editado = "1"; });

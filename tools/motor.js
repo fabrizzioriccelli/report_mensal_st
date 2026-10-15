@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.8 (2026-10-15)";
+  var VERSAO = "3.9 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -272,7 +272,9 @@
   function aplicar(tpl, modelo) { return desenhar(compilar(tpl), [modelo]); }
 
   /* Remove comentários de edição, mantendo os condicionais do Outlook (<!--[if mso]>). */
-  function semComentarios(html) { return html.replace(/<!--(?!\[if|<!\[endif\]|>)[\s\S]*?-->/g, ""); }
+  /* Tira os comentários do template, menos os condicionais do Outlook e as marcas de seção
+     (<!--secao:nome-->), que o converter-html-eml.html usa para montar o e-mail resumido. */
+  function semComentarios(html) { return html.replace(/<!--(?!\[if|<!\[endif\]|>|secao:)[\s\S]*?-->/g, ""); }
 
   /* =================================================================== */
   /* 6. MODELO DO E-MAIL                                                  */
@@ -1013,12 +1015,116 @@
     return m ? { versao: m[1], dados: "dados/MODELO.txt (backup)" } : null;
   }
 
+  /* ---------- E-mail resumido + versão interativa ---------- */
+
+  /* Nome de cada seção (marcas <!--secao:nome--> do template) e as que o e-mail resumido leva. */
+  var SECOES = {
+    capa: "Capa e números do projeto principal", lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas",
+    transformation: "Creative Transformation", aprendizados: "O que aprendemos", foco: "Foco do próximo mês",
+    agenda: "Também vem aí", rodape: "Encerramento e assinatura"
+  };
+  var SECOES_RESUMO = ["capa", "resumo", "foco", "rodape"];
+  var MARCA_SECAO = /<!--secao:([a-z]+)-->/g;
+
+  /* Seções que a página tem, na ordem: [{ id, nome }]. Vazio = arquivo de antes da versão 3.9 (sem marcas). */
+  function secoesDoHtml(html) {
+    var r = [], m;
+    MARCA_SECAO.lastIndex = 0;
+    while ((m = MARCA_SECAO.exec(html))) if (m[1] !== "fim" && m[1] !== "interativo") r.push({ id: m[1], nome: SECOES[m[1]] || m[1] });
+    return r;
+  }
+
+  /* Fonte de títulos (classe ft) e de texto (classe fx) usadas na página, para o bloco novo seguir o report. */
+  function fonteDaClasse(html, cls, padrao) {
+    var m = new RegExp('class="' + cls + '[ "][^>]*?font-family:([^;"]+)').exec(html);
+    return m ? m[1].trim() : padrao;
+  }
+  function escAttr(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* Bloco "Ver o report completo": rótulo, título, o que ficou de fora e o botão (tabela com fundo: funciona no Outlook). */
+  function blocoInterativo(html, op) {
+    var ft = fonteDaClasse(html, "ft", "Arial, Helvetica, sans-serif"), fx = fonteDaClasse(html, "fx", "Arial, Helvetica, sans-serif");
+    var fora = (op.fora || []).map(function (id) { return SECOES[id] || id; });
+    var lista = fora.length ? fora.slice(0, -1).join(", ") + (fora.length > 1 ? " e " : "") + fora[fora.length - 1] : "";
+    var texto = op.chamada || ((lista ? "Na versão completa estão também: " + lista + ". " : "") +
+      (op.temVideo ? "Lá, os vídeos das campanhas tocam e as peças abrem maiores no clique." : "Lá, as peças abrem maiores no clique."));
+    return '<!--secao:interativo-->\n' +
+      '  <tr>\n    <td class="px" style="padding:40px 40px 0 40px;">\n' +
+      '      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #000000;">\n        <tr>\n          <td style="padding:22px 0 0 0;">\n' +
+      '            <p class="fx" style="margin:0;font-family:' + fx + ';font-size:10px;line-height:14px;font-weight:bold;color:#EC0000;letter-spacing:2px;">REPORT COMPLETO</p>\n' +
+      '            <p class="ft h2" style="margin:8px 0 0 0;font-family:' + ft + ';font-weight:bold;font-size:22px;line-height:27px;color:#EC0000;letter-spacing:-0.5px;">' + textoSeguroSimples(op.titulo || "Este e-mail é o resumo do mês.") + '</p>\n' +
+      '            <p class="fx tm" style="margin:6px 0 0 0;font-family:' + fx + ';font-size:13px;line-height:19px;color:#222222;">' + textoSeguroSimples(texto) + '</p>\n' +
+      '            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;"><tr>\n' +
+      '              <td bgcolor="#EC0000" style="background:#EC0000;border-radius:999px;padding:13px 26px;">' +
+      '<a class="cta" href="' + escAttr(op.link) + '" target="_blank" style="font-family:' + fx + ';font-size:14px;line-height:18px;font-weight:bold;color:#FFFFFF;text-decoration:none;">' + textoSeguroSimples(op.botao || "Ver o report completo (interativo)") + ' &#8594;</a></td>\n' +
+      '            </tr></table>\n' +
+      '            <p class="fx ts" style="margin:10px 0 0 0;font-family:' + fx + ';font-size:11px;line-height:16px;color:#5F5F5F;">Abre no navegador (Chrome ou Edge).</p>\n' +
+      '          </td>\n        </tr>\n      </table>\n    </td>\n  </tr>\n';
+  }
+  function textoSeguroSimples(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* Miniatura de vídeo (alt "Vídeo: ...") sem link passa a abrir a versão interativa, onde o vídeo toca. */
+  function ligarVideos(html, link) {
+    var n = 0;
+    html = html.replace(/(<a\b[^>]*>\s*)?(<img\b[^>]*?\salt="Vídeo: [^"]*"[^>]*>)/g, function (m, a, img) {
+      if (a) return m;
+      n++;
+      return '<a href="' + escAttr(link) + '" target="_blank" style="text-decoration:none;">' + img + "</a>";
+    });
+    return { html: html, n: n };
+  }
+
+  /* Renumera as etiquetas de seção (01, 02...) na ordem em que aparecem. */
+  function renumerarSecoes(html) {
+    var n = 0;
+    return html.replace(/(border-radius:999px;padding:0 7px;letter-spacing:1px;">)(\d{2})(<\/span>)/g, function (m, a, x, c) { n++; return a + (n < 10 ? "0" : "") + n + c; });
+  }
+
+  /*
+   * emailResumido(html, { manter: [ids], link, botao, titulo, chamada })
+   *   Corta as seções que não estão em "manter", põe o bloco "Ver o report completo" antes do
+   *   encerramento, liga as miniaturas de vídeo ao link e renumera as seções.
+   *   Devolve { html, mantidas, fora, videos } ou { erro }.
+   */
+  function emailResumido(html, op) {
+    var partes = html.split(/(<!--secao:[a-z]+-->)/);
+    if (partes.length < 3) return { erro: "Este arquivo não tem as marcas de seção (foi gerado antes da versão 3.9). Gere a página de novo pelo gerar-report.html." };
+    var manter = op.manter || SECOES_RESUMO, mantidas = [], fora = [], out = partes[0], atual = null, bloco = false;
+    var temVideo = /data-video="/.test(html) || /alt="Vídeo: /.test(html);
+    for (var i = 1; i < partes.length; i += 2) {
+      var id = /secao:([a-z]+)/.exec(partes[i])[1], corpo = partes[i + 1] || "";
+      if (id === "interativo") continue;
+      if ((id === "rodape" || id === "fim") && !bloco && op.link) {
+        out += blocoInterativo(html, { link: op.link, botao: op.botao, titulo: op.titulo, chamada: op.chamada, fora: fora, temVideo: temVideo }) + "  ";
+        bloco = true;
+      }
+      if (id === "fim") { out += partes[i] + corpo; continue; }
+      if (manter.indexOf(id) >= 0) { out += partes[i] + corpo; mantidas.push(id); }
+      else fora.push(id);
+    }
+    var v = op.link ? ligarVideos(out, op.link) : { html: out, n: 0 };
+    return { html: renumerarSecoes(v.html), mantidas: mantidas, fora: fora, videos: v.n };
+  }
+
+  /* Página interativa para hospedar (SharePoint): tira só o que o navegador acrescentou ao salvar
+     (janela de ampliação já montada, atributos do clique, marcas da edição). O script fica e roda de novo. */
+  function paginaInterativa(html) {
+    var saiu = [];
+    function tira(re, nome) { var n = 0; html = html.replace(re, function () { n++; return ""; }); if (n) saiu.push({ item: nome, n: n }); }
+    tira(/<!-- saved from url=[^>]*-->\s*/gi, "marca do Chrome (saved from url)");
+    tira(/<div\b[^>]*\bid="amp"[\s\S]*?<\/div>\s*/g, "janela de ampliação já montada");
+    tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
+    tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
+    return { html: html, saiu: saiu, interativa: /data-(ampliar|video)="/.test(html) && /<script/i.test(html) };
+  }
+
   return {
     VERSAO: VERSAO, ler: ler, montar: montar, aplicar: aplicar, conferirLink: conferirLink, conferirHtml: conferirHtml,
     gerarEml: gerarEml, trocarImagens: trocarImagens, trocarVideos: trocarVideos, semComentarios: semComentarios, paraEmail: paraEmail, paraNavegador: paraNavegador,
     base64: base64, utf8: utf8, zip: zip, crc32: crc32, assuntoMime: assuntoMime, tipoMime: tipoMime,
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
+    SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });
