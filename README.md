@@ -2,7 +2,7 @@
 
 Modelo do report mensal da Creative Strategy PF (Customer Interactions): um e-mail executivo de uma página, enviado pelo Outlook, com peças e vídeos clicáveis. Ele é gerado a partir de **um arquivo de texto por mês**. Ninguém precisa editar HTML.
 
-**Versão 3.7.1 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 3.8 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -56,6 +56,7 @@ Contar o mês da área em uma página, sempre na mesma ordem:
 ```text
 report_mensal_st/
 ├── gerar-report.html        ← ABRA ESTE para gerar o e-mail
+├── converter-html-eml.html  ← editou a página no navegador? converte o .html em .eml
 ├── report_backup.html       ← backup: o layout aprovado num arquivo só (veja docs/BACKUP.md)
 ├── README.md                ← este guia
 ├── CHANGELOG.md             ← histórico de versões
@@ -167,6 +168,8 @@ Erros comuns e soluções: [docs/FAQ.md](docs/FAQ.md).
 
 Na página: **Baixar e-mail final (.eml)** (vai para o Outlook) e **Baixar página do mês (.html)** (guarde em `reports/`). Como abrir o `.eml` em cada Outlook: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
 
+Editou a página do mês direto no Chrome ou no Edge? Abra **`converter-html-eml.html`**, escolha o `.html` salvo e baixe o `.eml`. A página mostra o status de cada etapa em tempo real e converte de novo sozinha quando você salva o arquivo. Passo a passo: [docs/CONVERTER_HTML_EML.md](docs/CONVERTER_HTML_EML.md).
+
 ## 17. Como fazer backup
 
 - **Do mês:** o `.html` do mês em `reports/` e o `dados/AAAA-MM.txt` já são o backup daquele mês.
@@ -238,5 +241,6 @@ Mais de 25 perguntas, com respostas passo a passo: **[docs/FAQ.md](docs/FAQ.md)*
 
 - Testes do motor: `node tests/motor.test.js` (só Node.js).
 - Teste da página de ponta a ponta, em 7 larguras de tela (320 a 1440 px): `node tests/ferramenta.e2e.js` (Node.js + Playwright).
+- Teste do conversor (página editada no navegador → `.eml`, com acompanhamento do arquivo): `node tests/conversor.e2e.js` (Node.js + Playwright).
 - Nenhum dos dois é necessário para gerar o report.
 - Commits por assunto: `report: outubro 2026`, `assets: …`, `docs: …`, `tools: …`. Registre mudanças de layout ou de motor no [CHANGELOG.md](CHANGELOG.md).

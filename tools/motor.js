@@ -9,7 +9,9 @@
  *   1. lê os arquivos "campo: valor" (dados do mês e marca);
  *   2. confere tudo (campos, imagens, links, pendências);
  *   3. monta o modelo do e-mail e aplica no template/report.html;
- *   4. gera a versão em texto puro e o arquivo .eml (MIME).
+ *   4. gera a versão em texto puro e o arquivo .eml (MIME);
+ *   5. converte uma página do mês editada no navegador em .eml
+ *      (converter-html-eml.html).
  *
  * Roda no navegador (tools/gerar-report.html carrega este arquivo) e no
  * Node.js (testes em tests/). Sem nenhuma dependência externa.
@@ -21,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.7.1 (2026-10-15)";
+  var VERSAO = "3.8 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -904,10 +906,119 @@
     return out;
   }
 
+  /* =================================================================== */
+  /* 11. HTML EDITADO NO NAVEGADOR → E-MAIL (converter-html-eml.html)     */
+  /* =================================================================== */
+
+  /* Tira do HTML o que só funciona no navegador: script, janela de ampliação, vídeo,
+     atributos do clique e da edição. Devolve o HTML do e-mail e o que saiu (para o status). */
+  function limparHtmlEditado(html) {
+    var saiu = [];
+    function tira(re, nome) {
+      var n = 0;
+      html = html.replace(re, function () { n++; return ""; });
+      if (n) saiu.push({ item: nome, n: n });
+    }
+    tira(/<!-- saved from url=[^>]*-->\s*/gi, "marca do Chrome (saved from url)");
+    tira(/<script\b[\s\S]*?<\/script>\s*/gi, "script");
+    tira(/<style\b[^>]*>\s*\/\* Ampliar peças[\s\S]*?<\/style>\s*/g, "estilo da ampliação");
+    tira(/<div\b[^>]*\bid="amp"[\s\S]*?<\/div>\s*/g, "janela de ampliação");
+    tira(/<video\b[\s\S]*?<\/video>\s*/gi, "vídeo");
+    tira(/ data-(?:ampliar|legenda|video)="[^"]*"/g, "atributo de ampliação ou vídeo");
+    tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
+    tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
+    return { html: html, saiu: saiu };
+  }
+
+  /* Endereços das imagens (<img src>), sem repetir, na ordem em que aparecem. */
+  function imagensDoHtml(html) {
+    var vistas = {}, lista = [];
+    html.replace(/<img\b[^>]*?\ssrc="([^"]*)"/gi, function (m, src) {
+      if (!vistas[src]) { vistas[src] = 1; lista.push(src); }
+      return m;
+    });
+    return lista;
+  }
+
+  /* De onde vem a imagem: embutida (data:), já anexada (cid:), internet, blob (prévia, morta) ou arquivo ao lado. */
+  function origemImagem(src) {
+    if (/^data:image\/(png|jpe?g|gif);base64,/i.test(src)) return "embutida";
+    if (/^data:/i.test(src)) return "embutida-incompativel";
+    if (/^cid:/i.test(src)) return "cid";
+    if (/^https?:\/\//i.test(src)) return "internet";
+    if (/^blob:/i.test(src)) return "blob";
+    return "arquivo";
+  }
+
+  var B64I = {};
+  for (var q = 0; q < 64; q++) B64I[B64.charCodeAt(q)] = q;
+  function deBase64(s) {
+    s = s.replace(/[^A-Za-z0-9+\/]/g, "");
+    var out = new Uint8Array(Math.floor(s.length * 3 / 4)), o = 0, i;
+    for (i = 0; i + 3 < s.length; i += 4) {
+      var v = B64I[s.charCodeAt(i)] << 18 | B64I[s.charCodeAt(i + 1)] << 12 | B64I[s.charCodeAt(i + 2)] << 6 | B64I[s.charCodeAt(i + 3)];
+      out[o++] = v >> 16 & 255; out[o++] = v >> 8 & 255; out[o++] = v & 255;
+    }
+    var r = s.length - i;
+    if (r >= 2) {
+      var w = B64I[s.charCodeAt(i)] << 18 | B64I[s.charCodeAt(i + 1)] << 12 | (r === 3 ? B64I[s.charCodeAt(i + 2)] << 6 : 0);
+      out[o++] = w >> 16 & 255;
+      if (r === 3) out[o++] = w >> 8 & 255;
+    }
+    return out.subarray(0, o);
+  }
+
+  /* Imagem embutida (data:image/...;base64,...) → { bytes, ext }. */
+  function imagemDeDataUri(src) {
+    var m = /^data:image\/(png|jpe?g|gif);base64,(.*)$/i.exec(src);
+    if (!m) return null;
+    var ext = m[1].toLowerCase() === "jpeg" ? "jpg" : m[1].toLowerCase();
+    return { bytes: deBase64(m[2]), ext: ext };
+  }
+
+  /* Troca o src das imagens pelo novo endereço (ex.: cid:...). */
+  function trocarSrc(html, mapa) {
+    return html.replace(/(<img\b[^>]*?\ssrc=")([^"]*)(")/gi, function (m, a, src, c) {
+      return Object.prototype.hasOwnProperty.call(mapa, src) ? a + mapa[src] + c : m;
+    });
+  }
+
+  function desfazEntidades(s) {
+    return s.replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+      .replace(/&#(\d+);/g, function (m, n) { return String.fromCodePoint(+n); })
+      .replace(/&#x([0-9a-f]+);/gi, function (m, n) { return String.fromCodePoint(parseInt(n, 16)); })
+      .replace(/&amp;/g, "&");
+  }
+
+  /* Assunto do e-mail: o <title> da página. */
+  function assuntoDoHtml(html) {
+    var m = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(html);
+    return m ? desfazEntidades(m[1]).replace(/\s+/g, " ").trim() : "";
+  }
+
+  /* Versão em texto puro (para quem não vê HTML), com os links entre parênteses. */
+  function textoDoHtml(html) {
+    var t = html.replace(/<head[\s\S]*?<\/head>/i, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<(style|script)\b[\s\S]*?<\/\1>/gi, "")
+      .replace(/<a\b[^>]*?href="(https?:[^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, function (m, u, x) { return x + " (" + u + ")"; })
+      .replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|tr|h\d|li|div|table)>/gi, "\n").replace(/<[^>]+>/g, " ");
+    return desfazEntidades(t).split("\n").map(function (l) { return l.replace(/[ \t ]+/g, " ").trim(); })
+      .filter(function (l, i, a) { return l || (i > 0 && a[i - 1]); }).join("\n").trim() + "\n";
+  }
+
+  /* Comentário que a ferramenta grava no topo do arquivo: versão e arquivo de dados. */
+  function origemDoHtml(html) {
+    var m = /Arquivo gerado por gerar-report\.html \(versão ([^)]*\))\) a partir de ([^ ]+)/.exec(html);
+    if (m) return { versao: m[1], dados: m[2] };
+    m = /BACKUP DO REPORT · versão ([^\n]*?\))/.exec(html);
+    return m ? { versao: m[1], dados: "dados/MODELO.txt (backup)" } : null;
+  }
+
   return {
     VERSAO: VERSAO, ler: ler, montar: montar, aplicar: aplicar, conferirLink: conferirLink, conferirHtml: conferirHtml,
     gerarEml: gerarEml, trocarImagens: trocarImagens, trocarVideos: trocarVideos, semComentarios: semComentarios, paraEmail: paraEmail, paraNavegador: paraNavegador,
     base64: base64, utf8: utf8, zip: zip, crc32: crc32, assuntoMime: assuntoMime, tipoMime: tipoMime,
+    limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
+    imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

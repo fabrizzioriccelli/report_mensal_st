@@ -2,6 +2,16 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.8 · 2026-10-15 · Converter HTML editado em e-mail, com status em tempo real
+
+- **Nova página `converter-html-eml.html`:** escolha (ou arraste) a página do mês editada no Chrome ou no Edge e baixe o `.eml`. Ela tira o que o e-mail não aceita (script, janela de ampliação, vídeo, marcas do clique e da edição), coloca as imagens dentro do e-mail como anexos embutidos e confere o HTML para o Outlook.
+- **Status em tempo real:** barra de progresso, relógio, cada etapa com ✓ / ! / ✕, o tempo gasto e o detalhe (ex.: "Imagem 3 de 11 · 120 KB"), e um registro com horário.
+- **Acompanhar o arquivo:** no Chrome e no Edge, a página relê o arquivo a cada 1,5 s e converte de novo sozinha quando você salva.
+- Imagens salvas pelo Chrome numa pasta ao lado (`_files`) entram pelo botão "Escolher a pasta das imagens"; formatos que o Outlook não mostra (webp, svg) viram PNG.
+- Prévia do e-mail convertido (computador e celular) e assunto tirado do título da página.
+- Motor: `limparHtmlEditado`, `imagensDoHtml`, `origemImagem`, `deBase64`, `imagemDeDataUri`, `trocarSrc`, `assuntoDoHtml`, `textoDoHtml`, `origemDoHtml` (com testes). Teste de ponta a ponta em `tests/conversor.e2e.js`.
+- Passo a passo em `docs/CONVERTER_HTML_EML.md`.
+
 ## 3.7.1 · 2026-10-15 · ▶ que não cobre o rosto
 
 - Em peças grandes (capa e destaque), o botão ▶ desenhado sobre a miniatura do vídeo fica menor e no canto inferior esquerdo, para não cobrir o rosto de quem aparece. Nas miniaturas de "Também neste mês", continua no centro.
