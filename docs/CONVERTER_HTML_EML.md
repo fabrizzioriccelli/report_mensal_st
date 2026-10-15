@@ -80,6 +80,14 @@ No e-mail resumido:
 
 Na versão interativa, cada vídeo ganha, abaixo da miniatura, o botão **"▶ Assistir ao vídeo"**, que abre o vídeo por cima do report.
 
+**Movimento na versão interativa** (no estilo das páginas de produto):
+- uma barra vermelha fina no topo cresce conforme a rolagem;
+- cada seção aparece suave ao entrar na tela;
+- os números grandes contam do zero até o valor;
+- a barra do Creative X cresce até o valor.
+
+Quem tem "reduzir movimento" ligado no sistema vê tudo parado. Durante a edição no navegador, nada se mexe. O e-mail não muda.
+
 > **SharePoint e arquivos .html:** em muitos SharePoint, por segurança da Microsoft, o `.html` **baixa** em vez de abrir direto no navegador. Quem clicar abre o arquivo baixado (Chrome ou Edge) e ele funciona igual, com vídeo e ampliação. Teste o link com uma pessoa de outra equipe antes do envio geral.
 
 A página precisa ter sido gerada pela **versão 4.0** ou mais nova: ela marca as seções e guarda a miniatura do vídeo sem ▶. Se o conversor avisar, gere a página de novo pelo `gerar-report.html`.

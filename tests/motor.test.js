@@ -517,5 +517,18 @@ teste("emailResumido não liga vídeos ao link (só o completo com botão, ligar
   assert.ok(html.length > 0);
 });
 
+teste("movimento: só na página, script injetado uma vez (de novo troca, não duplica), marcas saem no e-mail", function () {
+  var h = '<html><head></head><body><table><!--secao:capa--><tr><td><p style="font-size:30px">12,5%</p></td></tr><!--secao:fim--></table></body></html>';
+  var nav = M.paraNavegador(h), duas = M.paraNavegador(nav);
+  assert.ok(/bl\.id='leitura'/.test(nav) && /\[data-motion\] \[data-rv\]/.test(nav));
+  assert.strictEqual((duas.match(/box\.id='amp'/g) || []).length, 1);
+  assert.strictEqual((duas.match(/Ampliar peças/g) || []).length, 1);
+  var salvo = nav.replace("<html>", '<html data-motion="">').replace("<td>", '<td data-rv="on">').replace('<p style', '<p data-conta="ok" style').replace("</body>", '<div id="leitura" aria-hidden="true" style="transform: scaleX(0.4);"></div></body>');
+  var limpo = M.limparHtmlEditado(salvo).html;
+  assert.ok(!/data-(rv|motion|conta)|id="leitura"|<script/.test(limpo), limpo);
+  assert.ok(/12,5%/.test(limpo));
+  assert.ok(!/leitura|data-motion/.test(M.paraEmail(h)));
+});
+
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");
 process.exit(falhas ? 1 : 0);
