@@ -2,6 +2,11 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.6 · 2026-10-15 · Resumo do mês: o que foi bem e o que melhorar
+
+- **Resumo do mês** logo abaixo da capa (blocos `[FOI BEM 1..3]` e `[A MELHORAR 1..3]`): duas colunas na grade (288 + 24 + 288), com o filete no topo em verde do guia (positivo) e em âmbar (atenção). No celular, uma embaixo da outra. Quem lê entende o mês em 10 segundos.
+- Etiqueta de variação que começa com "-" e texto (ex.: "-Menos da metade") mostra a seta para baixo sem o sinal de menos.
+
 ## 3.5 · 2026-10-15 · Foto da capa maior, peças clicáveis e selo no Foco
 
 - **Foto da capa 20% maior:** 184 → 220 px (quadrada, cantos de 20 px); o texto ao lado fica com 356 px. No celular, 180 → 216 px.

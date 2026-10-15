@@ -2,7 +2,7 @@
 
 Modelo do report mensal da Creative Strategy PF (Customer Interactions): um e-mail executivo de uma página, enviado pelo Outlook, com peças e vídeos clicáveis. Ele é gerado a partir de **um arquivo de texto por mês**. Ninguém precisa editar HTML.
 
-**Versão 3.5 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 3.6 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">

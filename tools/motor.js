@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.5 (2026-10-15)";
+  var VERSAO = "3.6 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -81,6 +81,8 @@
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
     { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
+    { bloco: "FOI BEM", max: 3, campos: { texto: 1 } },
+    { bloco: "A MELHORAR", max: 3, campos: { texto: 1 } },
     { bloco: "LANCAMOS", campos: { titulo: 0 } },
     { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0 }, PECA) },
     { bloco: "RESULTADO", max: 3, campos: NUM },
@@ -444,7 +446,7 @@
       var t = v.variacao.replace(/^[-−]\s*/, "");
       var verde = chaveCampo(v.variacao_cor || "verde") !== "ambar";
       return seguro('<span style="display:inline-block;background:' + (verde ? cor.positivo_fundo : cor.atencao_fundo) + ";color:" + (verde ? cor.positivo : cor.atencao) +
-        ';font-weight:bold;padding:0 7px;border-radius:999px;white-space:nowrap;">' + (desce ? "&#9660; &minus;" : "&#9650; ") + esc(t) + "</span>");
+        ';font-weight:bold;padding:0 7px;border-radius:999px;white-space:nowrap;">' + (desce ? "&#9660; " + (/^\d/.test(t) ? "&minus;" : "") : "&#9650; ") + esc(t) + "</span>");
     }
     function status(v, nomeBloco) {
       if (!v.status) return seguro("");
@@ -510,6 +512,19 @@
       }),
       sobra: sobra
     };
+
+    /* Resumo do mês (sem número de seção): o que foi bem (verde do guia) e o que precisa melhorar (âmbar).
+       Duas colunas de 288 px no computador; no celular, uma embaixo da outra. */
+    var fb = L["FOI BEM"] || [], am = L["A MELHORAR"] || [], balanco = null;
+    if (fb.length || am.length) {
+      var lb = fb.length && am.length ? colunas(LARGURA, 2) : [LARGURA, LARGURA];
+      function itensBalanco(lista, nome) { return lista.map(function (v, i) { curto(v, "texto", 90, nome + " " + (i + 1)); return { texto: texto(v.texto) }; }); }
+      balanco = {
+        bem: fb.length ? { itens: itensBalanco(fb, "FOI BEM"), largura: lb[0] } : null,
+        melhorar: am.length ? { itens: itensBalanco(am, "A MELHORAR"), largura: fb.length ? lb[1] : lb[0] } : null,
+        dois: !!(fb.length && am.length)
+      };
+    }
 
     /* 02 · O que lançamos */
     var DS = D.simples.DESTAQUE, lanc = L.LANCAMENTO || [], res = L.RESULTADO || [];
@@ -635,7 +650,7 @@
       assunto: assunto, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
-      abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
+      abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
     };
 
     if (prob.some(function (p) { return p.nivel === "erro"; })) return { ok: false, problemas: prob };
@@ -682,6 +697,8 @@
     o.push("PROJETO PRINCIPAL: " + t(S["PROJETO PRINCIPAL"].nome), t(S["PROJETO PRINCIPAL"].resumo));
     (L.NUMERO || []).forEach(function (v) { o.push(num(v)); });
     var l = lk(S["PROJETO PRINCIPAL"]); if (l) o.push(l);
+    if ((L["FOI BEM"] || []).length) { o.push("", "FOI BEM"); L["FOI BEM"].forEach(function (v) { o.push("+ " + t(v.texto)); }); }
+    if ((L["A MELHORAR"] || []).length) { o.push("", "A MELHORAR"); L["A MELHORAR"].forEach(function (v) { o.push("! " + t(v.texto)); }); }
     if (S.DESTAQUE || (L.LANCAMENTO || []).length) {
       o.push("", "O QUE LANÇAMOS" + (S.LANCAMOS && S.LANCAMOS.titulo ? ": " + t(S.LANCAMOS.titulo) : ""));
       if (S.DESTAQUE) {
