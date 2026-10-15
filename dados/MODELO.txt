@@ -57,7 +57,7 @@ contato: lorem.ipsum@empresa.com
 # ----------------------------------------------------------------------
 #  EDITAR AQUI: 01 · O MÊS EM UMA FRASE (capa)
 #  frase + frase_final formam uma frase de até ~8 palavras.
-#  frase_final aparece em itálico, na linha de baixo.
+#  frase_final aparece mais leve, na linha de baixo (o guia não tem itálico).
 #  previa: o texto cinza que aparece ao lado do assunto na caixa de
 #  entrada (até ~110 caracteres).
 # ----------------------------------------------------------------------
@@ -70,7 +70,9 @@ previa: Lorem ipsum dolor sit amet: X% de lorem ipsum no mês.
 # ----------------------------------------------------------------------
 #  EDITAR AQUI: PROJETO PRINCIPAL (capa)
 #  O resultado mais importante do mês. Aparece só na capa, com a peça
-#  (recorte quadrado) e até 4 números.
+#  (recorte quadrado, 220 x 220 px; envie com 440 px ou mais) e até 4 números.
+#  Clique na peça: com link, abre o link (e-mail e navegador); sem link,
+#  na página do navegador a peça abre maior; no e-mail, não clica.
 # ----------------------------------------------------------------------
 [PROJETO PRINCIPAL]
 nome: Lorem ipsum dolor
@@ -152,7 +154,7 @@ titulo: Lorem ipsum
 detalhe: era X
 variacao: +X%
 
-# Lançamentos compactos ("Também no ar", até 3).
+# Lançamentos compactos ("Também neste mês", até 3).
 #  status: etiqueta curta. status_cor: verde (no ar / implementado)
 #  ou ambar (previsto / aguardando resultado).
 #  A miniatura é recortada em faixa horizontal (368 x 144 px). Em vídeo,
@@ -269,9 +271,14 @@ levamos: lorem ipsum dolor.
 # ----------------------------------------------------------------------
 #  EDITAR AQUI: 06 · FOCO DO PRÓXIMO MÊS
 # ----------------------------------------------------------------------
+#  selo (opcional): o PNG original do selo da campanha, na versão feita
+#  para fundo vermelho. Fica ao lado do título (computador) ou acima dele
+#  (celular). Não redesenhe o selo. Sem selo, deixe vazio.
 [FOCO]
 prioridade: Lorem ipsum dolor sit amet.
 texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do.
+selo:
+descricao_selo:
 
 
 # ----------------------------------------------------------------------

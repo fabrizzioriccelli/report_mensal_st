@@ -65,6 +65,9 @@ Procure o bloco e cole o link depois de `link: `, numa linha só. Qual link copi
 ### Por que o "Ver peça →" aparece cinza no rascunho?
 Porque o link ainda não foi preenchido. Ele aparece cinza e **não clica**, para ninguém achar que funciona. Com o link, fica vermelho e clicável.
 
+### A imagem da peça é clicável?
+Com `link:` preenchido, sim: a imagem e o "Ver peça →" abrem o link, no e-mail e no navegador. Sem link, no e-mail ela não clica (de propósito: nada de link falso). Na página do mês (.html), um clique na peça sem link abre a imagem inteira, maior; **Esc** ou **×** fecham.
+
 ### Como tirar o botão de uma peça?
 Deixe `link:` vazio. A peça continua aparecendo, sem botão.
 

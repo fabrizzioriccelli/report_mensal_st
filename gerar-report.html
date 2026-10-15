@@ -305,7 +305,7 @@
     var ti = $("#imgs"); ti.replaceChildren();
     r.imagens.forEach(function (im, i) {
       var pr = prontas[i];
-      ti.appendChild(el("tr", {}, [el("td", { text: im.caminho }), el("td", { text: im.w + " × " + im.h + " px" + (im.play ? " · com ▶" : "") }),
+      ti.appendChild(el("tr", {}, [el("td", { text: im.caminho }), el("td", { text: im.w + " × " + im.h + " px" + (im.play ? " · com ▶" : "") + (im.ampliada ? " · ampliada, só na página do navegador" : "") }),
         el("td", { text: kb(ARQ[im.caminho].size) + " · " + pr.ow + "×" + pr.oh }), el("td", { text: kb(pr.bytes.length) + " · " + pr.w + "×" + pr.h + (pr.mantida ? " (sem alteração)" : "") })]));
     });
     previa();
@@ -328,7 +328,7 @@
     var img = abertas[reg.caminho], nw = img.naturalWidth, nh = img.naturalHeight;
     var png = /\.png$/i.test(file.name), jpg = /\.jpe?g$/i.test(file.name);
     /* Largura final: o dobro da tela (nítida em telas de alta resolução); 700 px nas que ocupam a tela toda no celular. */
-    var alvo = reg.fluida ? Math.max(reg.w * 2, 700) : reg.w * 2;
+    var alvo = reg.ampliada ? reg.w : reg.fluida ? Math.max(reg.w * 2, 700) : reg.w * 2;
     var sx = 0, sy = 0, sw = nw, sh = nh, W, H;
     if (reg.recorte && reg.h) {
       var r = reg.w / reg.h;
@@ -384,7 +384,7 @@
     var html = Motor.trocarImagens(atual.html, function (id) {
       var p = prontas[id - 1], u = URL.createObjectURL(new Blob([p.bytes], { type: Motor.tipoMime(p.nome) })); urls.push(u); return u;
     });
-    $("#pv").srcdoc = comFontes(html);
+    $("#pv").srcdoc = comFontes(Motor.paraNavegador(html));
   }
   document.querySelectorAll("[data-w]").forEach(function (b) {
     b.addEventListener("click", function () {
@@ -394,16 +394,19 @@
   });
 
   /* ---------- 4. gerar ---------- */
+  /* Imagens que vão no e-mail: todas menos as versões ampliadas (essas só servem à página do navegador). */
+  function doEmail() { return prontas.filter(function (p, i) { return !atual.imagens[i].ampliada; }); }
   function cidDe(p) { return "img" + p.nome + "@report"; }
   function endereco(p) { return atual.config.modo === "hospedadas" ? atual.config.base.replace(/\/?$/, "/") + p.nome : "cid:" + cidDe(p); }
   $("#bEml").addEventListener("click", function () {
     var rasc = $("#rascunho").checked && !$("#draftRow").hidden;
-    var html = Motor.trocarImagens(atual.html, function (id) { return endereco(prontas[id - 1]); });
+    /* No e-mail não vai a versão ampliada das peças (só a página do navegador usa). */
+    var html = Motor.paraEmail(Motor.trocarImagens(atual.html, function (id) { return endereco(prontas[id - 1]); }));
     var assunto = (rasc ? "[RASCUNHO] " : "") + atual.assunto;
     if (rasc) html = html.replace(/<title>/, "<title>[RASCUNHO] ");
     var lint = Motor.conferirHtml(html).filter(function (x) { return x.nivel === "erro" || (!rasc && x.nivel === "pendencia"); });
     if (lint.length) { $("#gerarInfo").textContent = "Não gerei: " + lint.map(function (x) { return x.msg; }).join(" "); return; }
-    var imagens = atual.config.modo === "hospedadas" ? [] : prontas.map(function (p) { return { cid: cidDe(p), nome: "img" + p.nome, bytes: p.bytes }; });
+    var imagens = atual.config.modo === "hospedadas" ? [] : doEmail().map(function (p) { return { cid: cidDe(p), nome: "img" + p.nome, bytes: p.bytes }; });
     var eml = Motor.gerarEml({ assunto: assunto, html: html, texto: atual.texto, imagens: imagens });
     var nome = atual.nomeArquivo + (rasc ? "-RASCUNHO" : "") + ".eml";
     baixar(nome, eml, "message/rfc822");
@@ -413,14 +416,14 @@
   });
   $("#bHtml").addEventListener("click", function () {
     /* Página do mês para guardar: as imagens vão dentro do arquivo, então ela abre em qualquer computador. */
-    var html = comFontes(Motor.trocarImagens(atual.html, function (id) { var p = prontas[id - 1]; return "data:" + Motor.tipoMime(p.nome) + ";base64," + Motor.base64(p.bytes); }));
+    var html = comFontes(Motor.paraNavegador(Motor.trocarImagens(atual.html, function (id) { var p = prontas[id - 1]; return "data:" + Motor.tipoMime(p.nome) + ";base64," + Motor.base64(p.bytes); })));
     html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html (versão " + Motor.VERSAO + ") a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Não edite: edite o arquivo de dados e gere de novo. -->");
     var nome = atual.nomeArquivo.replace(/^report-/, "") + ".html";
     baixar(nome, html, "text/html");
     $("#gerarInfo").textContent = "Baixado: " + nome + ". Guarde na pasta reports/ do projeto.";
   });
   $("#bZip").addEventListener("click", function () {
-    baixar(atual.nomeArquivo + "-imagens.zip", Motor.zip(prontas.map(function (p) { return { nome: p.nome, bytes: p.bytes }; })), "application/zip");
+    baixar(atual.nomeArquivo + "-imagens.zip", Motor.zip(doEmail().map(function (p) { return { nome: p.nome, bytes: p.bytes }; })), "application/zip");
     $("#gerarInfo").textContent = "Copie as imagens do .zip para " + atual.config.base + " (modo hospedadas).";
   });
 })();

@@ -2,6 +2,14 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.5 · 2026-10-15 · Foto da capa maior, peças clicáveis e selo no Foco
+
+- **Foto da capa 20% maior:** 184 → 220 px (quadrada, cantos de 20 px); o texto ao lado fica com 356 px. No celular, 180 → 216 px.
+- **Clique nas peças:** com `link:`, a peça e o "Ver peça →" abrem o link (e-mail e navegador), com realce ao passar o mouse onde o cliente aceita. Sem link, a peça não clica no e-mail (nenhum link inventado). Na página do mês (.html) e na prévia, um clique abre a peça **inteira e maior** por cima do report: funciona com mouse, toque e teclado (Tab, Enter, Esc), com o foco voltando para a peça ao fechar.
+- A versão ampliada (até 1400 px, sem recorte) só vai na página do navegador: o `.eml` continua sem script e sem essas imagens extras.
+- **Selo de campanha no Foco** (`selo:` e `descricao_selo:` em `[FOCO]`): o PNG original, ao lado do título no computador (184 px) e acima dele no celular (160 px). Sem sobreposição de camadas, então funciona no Outlook.
+- "Também no ar" virou **"Também neste mês"**: serve para peças finalizadas, no ar ou ainda sem resultado.
+
 ## 3.4 · 2026-10-13 · Celular mais confortável
 
 - Topo: no celular, o mês aparece numa linha discreta abaixo de "Creative Strategy PF" (antes o selo branco caía para uma linha própria).

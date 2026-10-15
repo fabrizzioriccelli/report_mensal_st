@@ -117,14 +117,16 @@ Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt
 | `[LANCAMOS]` | **02** · título da seção "O que lançamos" |
 | `[DESTAQUE]` | **02** · projeto em destaque (peça vertical no computador, horizontal no celular) |
 | `[RESULTADO 1]` a `[RESULTADO 3]` | **02** · números do destaque |
-| `[LANCAMENTO 1]` a `[LANCAMENTO 3]` | **02** · "Também no ar", com miniatura |
+| `[LANCAMENTO 1]` a `[LANCAMENTO 3]` | **02** · "Também neste mês", com miniatura |
 | `[CREATIVE X]` | **03** · score anterior → atual, barra e frase |
 | `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Creative Transformation |
 | `[APRENDIZADO 1]` a `[3]` | **05** · O que aprendemos |
-| `[FOCO]` | **06** · bloco vermelho do foco do próximo mês |
+| `[FOCO]` | **06** · bloco vermelho do foco do próximo mês; `selo:` opcional (PNG original do selo da campanha, versão para fundo vermelho) |
 | `[AGENDA 1]` a `[AGENDA 6]` | **07** · Também vem aí (linhas de 3) |
 
 A formiguinha aparece sozinha no rodapé. Não há campo para ela no arquivo do mês.
+
+**Clique nas peças.** Com `link:` preenchido, a peça e o "Ver peça →" abrem o link no e-mail e no navegador. Sem link, a peça não clica no e-mail (nada de link falso); na página do mês (.html), um clique abre a peça inteira, maior, por cima do report (Esc ou × fecham).
 
 **Regra do report:** cada projeto aparece **uma vez**. O projeto principal não se repete em "O que lançamos".
 

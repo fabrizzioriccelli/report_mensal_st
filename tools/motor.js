@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.4 (2026-10-13)";
+  var VERSAO = "3.5 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -89,7 +89,7 @@
     { bloco: "TRANSFORMATION", campos: { titulo: 0 } },
     { bloco: "TRANSFORMATION", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, citacao: 0, resultado: 0, icones: 0 }, PECA) },
     { bloco: "APRENDIZADO", max: 3, campos: { titulo: 1, texto: 0, levamos: 0 } },
-    { bloco: "FOCO", campos: { prioridade: 1, texto: 0 } },
+    { bloco: "FOCO", campos: { prioridade: 1, texto: 0, selo: 0, descricao_selo: 0 } },
     { bloco: "AGENDA", max: 6, campos: { data: 0, titulo: 1, detalhe: 0 } }
   ];
 
@@ -277,6 +277,11 @@
   /* GRADE do e-mail (computador): 600 px de conteúdo = 3 colunas de 184 px + 2 espaços de 24 px.
      Todas as seções usam essas linhas, para tudo ficar alinhado de cima a baixo. */
   var COL = 184, ESP = 24, LARGURA = 600;
+  /* Foto da capa (projeto principal): 20% maior que a coluna (184 → 220 px), quadrada.
+     O texto ao lado fica com o resto da linha: 600 − 24 − 220 = 356 px. */
+  var FOTO_CAPA = 220;
+  /* Imagem ampliada (só na página do navegador, clique na peça): até 1400 px de largura, sem recorte. */
+  var AMPLIADA = 1400;
   /* Divide "total" em n colunas com espaços de 24 px entre elas (a soma fecha exata). */
   function colunas(total, n) {
     var base = Math.floor((total - ESP * (n - 1)) / n), sobra = total - ESP * (n - 1) - base * n, r = [];
@@ -361,15 +366,16 @@
     function imagem(caminho, w, h, op) {
       op = op || {};
       var med = medidas[caminho];
+      if (op.ampliada) { w = med ? Math.min(med.w, AMPLIADA) : AMPLIADA; h = 0; }
       if (!h && med) h = Math.round(w * med.h / med.w);
-      var chave = caminho + "|" + w + "|" + (h || "") + "|" + (op.play ? 1 : 0) + "|" + (op.ancora || "");
+      var chave = caminho + "|" + w + "|" + (h || "") + "|" + (op.play ? 1 : 0) + "|" + (op.ancora || "") + "|" + (op.ampliada ? "z" : "");
       var reg = porCaminho[chave];
       if (!reg) {
-        reg = { id: imagens.length + 1, caminho: caminho, w: w, h: h || 0, recorte: !!op.recorte, play: !!op.play, papel: op.papel || "", fluida: !!op.fluida, ancora: op.ancora || "centro" };
+        reg = { id: imagens.length + 1, caminho: caminho, w: w, h: h || 0, recorte: !!op.recorte, play: !!op.play, papel: op.papel || "", fluida: !!op.fluida, ancora: op.ancora || "centro", ampliada: !!op.ampliada };
         reg.token = "@@IMG" + reg.id + "@@";
         imagens.push(reg); porCaminho[chave] = reg;
       }
-      return { src: seguro(reg.token), w: w, h: h || "", alt: op.alt || "" };
+      return { src: seguro(reg.token), w: w, h: h || "", alt: op.alt || "", zoom: "", legenda: "" };
     }
     /* Espaço da imagem ainda não escolhida: superfície Lisboa com a indicação do formato (só no rascunho). */
     function placeholder(w, h, rotulo, raio, video) {
@@ -409,8 +415,14 @@
         if (ENQUADRAMENTOS.indexOf(anc) < 0) { problema(prob, "aviso", arqD, v._linhas.enquadramento, "[" + nomeBloco + "] enquadramento deve ser " + ENQUADRAMENTOS.join(", ") + ". Usei centro."); anc = "centro"; }
         r.img = imagem(cam, w, h, { recorte: !!h, play: tipo === "video", alt: alt, papel: nomeBloco, fluida: !!(op && op.fluida), ancora: anc });
         r.img.link = href;
+        /* Versão ampliada da peça (inteira, sem recorte), para o clique na página do navegador.
+           Não vai no e-mail: lá a imagem só clica quando tem link (paraEmail tira o atributo). */
+        if (tipo !== "video" && !(op && op.semAmpliar)) {
+          var z = imagem(cam, 0, 0, { ampliada: true, alt: desc, papel: nomeBloco + " (ampliada)" });
+          r.img.zoom = z.src; r.img.legenda = seguro(esc(desc));
+        }
         /* Versão para celular (outro formato, ex.: horizontal no lugar da vertical) */
-        if (op && op.celular) { r.img_m = imagem(cam, op.celular.w, op.celular.h, { recorte: true, play: tipo === "video", alt: alt, papel: nomeBloco + " (celular)", fluida: true, ancora: op.celular.ancora || anc }); r.img_m.link = href; }
+        if (op && op.celular) { r.img_m = imagem(cam, op.celular.w, op.celular.h, { recorte: true, play: tipo === "video", alt: alt, papel: nomeBloco + " (celular)", fluida: true, ancora: op.celular.ancora || anc }); r.img_m.link = href; r.img_m.zoom = r.img.zoom; r.img_m.legenda = r.img.legenda; }
       }
       return r;
     }
@@ -478,7 +490,7 @@
     function proxSecao() { secoes++; return (secoes < 10 ? "0" : "") + secoes; }
 
     /* 01 · Abertura */
-    var pp = peca(P, "PROJETO PRINCIPAL", COL, COL, 20, { dica: "368 x 368 px", fluida: true, corCta: "#FFFFFF", corCtaPendente: "#F5DECF" });
+    var pp = peca(P, "PROJETO PRINCIPAL", FOTO_CAPA, FOTO_CAPA, 20, { dica: "440 x 440 px", fluida: true, corCta: "#FFFFFF", corCtaPendente: "#F5DECF" });
     var nums = (L.NUMERO || []);
     /* Grade: até 3 números, um por coluna de 184 px (alinhados com as seções de baixo); 4 números, 4 colunas iguais. */
     var larg = nums.length <= 3 ? nums.map(function () { return COL; }) : colunas(LARGURA, nums.length);
@@ -554,7 +566,7 @@
       transformation = {
         n: proxSecao(), titulo: texto((D.simples.TRANSFORMATION || {}).titulo || ""),
         projetos: tr.map(function (v, i) {
-          var nb = "TRANSFORMATION " + (i + 1), p = peca(v, nb, 68, 52, 8, { dica: "136 x 104 px" }, "projeto");
+          var nb = "TRANSFORMATION " + (i + 1), p = peca(v, nb, 68, 52, 8, { dica: "136 x 104 px", semAmpliar: true }, "projeto");
           var icones = (v.icones || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean).map(function (ic, j) {
             var cam = "assets/icones/" + ic.replace(/\.png$/i, "") + ".png";
             if (!existe(cam)) problema(prob, "erro", arqD, v._linhas.icones, "[" + nb + "] ícone não encontrado: " + cam);
@@ -587,9 +599,16 @@
     }
 
     /* 06 · Foco */
-    var FO = D.simples.FOCO, foco = FO ? {
-      n: proxSecao(), mes: texto(maiusculas(prox)), prioridade: texto(FO.prioridade), texto: texto(FO.texto)
-    } : null;
+    var FO = D.simples.FOCO, foco = null;
+    if (FO) {
+      /* Selo da campanha (opcional): o PNG original, ao lado do título no computador e acima dele no celular.
+         Nunca redesenhado: só reduzido. Use a versão feita para fundo vermelho. */
+      var selo = null, camSelo = FO.selo ? caminhoImagem(FO.selo) : "";
+      if (camSelo && ehPendencia(FO.selo)) { problema(prob, "pendencia", arqD, FO._linhas.selo, "[FOCO] selo: " + FO.selo); camSelo = ""; }
+      if (camSelo && !existe(camSelo)) { problema(prob, "erro", arqD, FO._linhas.selo, "[FOCO] selo não encontrado: " + camSelo + ". Confira o nome do arquivo."); camSelo = ""; }
+      if (camSelo) selo = { img: imagem(camSelo, 184, 0, { alt: FO.descricao_selo || "Selo da campanha", papel: "selo (foco)" }), img_m: imagem(camSelo, 160, 0, { alt: FO.descricao_selo || "Selo da campanha", papel: "selo (foco, celular)" }) };
+      foco = { n: proxSecao(), mes: texto(maiusculas(prox)), prioridade: texto(FO.prioridade), texto: texto(FO.texto), selo: selo, largura_texto: selo ? 544 - 184 - 24 : 544 };
+    }
 
     /* 07 · Também vem aí */
     var ag = L.AGENDA || [], agenda = null;
@@ -790,6 +809,34 @@
   /* Troca os marcadores @@IMGn@@ pelo endereço final de cada imagem. */
   function trocarImagens(html, fn) { return html.replace(/@@IMG(\d+)@@/g, function (m, id) { return fn(+id); }); }
 
+  /* E-mail: sem ampliação (nenhum cliente de e-mail roda script). A peça só clica quando tem link. */
+  function paraEmail(html) { return html.replace(/ data-(ampliar|legenda)="[^"]*"/g, ""); }
+
+  /* Página do navegador: clicar numa peça sem link abre a imagem inteira, maior, por cima do report.
+     Teclado: Tab chega na peça, Enter ou Espaço abre, Esc fecha. Peça com link continua indo para o link. */
+  var AMPLIAR_CSS = "img[data-ampliar]{cursor:zoom-in;transition:opacity .15s,box-shadow .15s;}" +
+    "img[data-ampliar]:hover,img[data-ampliar]:focus-visible{opacity:.92;box-shadow:0 0 0 3px #FFFFFF,0 0 0 5px #EC0000;outline:none;}" +
+    "a img{transition:opacity .15s;}a:hover img,a:focus-visible img{opacity:.88;}" +
+    "#amp{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;background:#000000D9;}" +
+    "#amp[open]{display:flex;}#amp img{max-width:min(1100px,100%);max-height:calc(100vh - 120px);width:auto;height:auto;border-radius:20px;background:#FFFFFF;}" +
+    "#amp p{margin:12px 0 0;color:#FFFFFF;font:14px/20px Arial,Helvetica,sans-serif;text-align:center;max-width:680px;}" +
+    "#amp button{position:absolute;top:16px;right:16px;width:44px;height:44px;border:0;border-radius:999px;background:#FFFFFF;color:#EC0000;font:bold 22px/44px Arial,Helvetica,sans-serif;cursor:pointer;}" +
+    "#amp button:focus-visible{outline:3px solid #FFFFFF;outline-offset:3px;}";
+  var AMPLIAR_JS = "(function(){var d=document,box=d.createElement('div'),im=d.createElement('img'),tx=d.createElement('p'),bt=d.createElement('button'),volta=null;" +
+    "box.id='amp';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label','Peça ampliada');bt.type='button';bt.setAttribute('aria-label','Fechar');bt.textContent='\u00D7';" +
+    "box.appendChild(bt);box.appendChild(im);box.appendChild(tx);d.body.appendChild(box);" +
+    "function fecha(){box.removeAttribute('open');im.removeAttribute('src');if(volta)volta.focus();}" +
+    "function abre(el){volta=el;im.src=el.getAttribute('data-ampliar');im.alt=el.getAttribute('data-legenda')||el.alt||'';tx.textContent=el.getAttribute('data-legenda')||'';box.setAttribute('open','');bt.focus();}" +
+    "bt.onclick=fecha;box.onclick=function(e){if(e.target===box)fecha();};d.addEventListener('keydown',function(e){if(e.key==='Escape'&&box.hasAttribute('open'))fecha();});" +
+    "Array.prototype.forEach.call(d.querySelectorAll('img[data-ampliar]'),function(el){if(el.closest('a')){el.removeAttribute('data-ampliar');return;}" +
+    "el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label','Ampliar: '+(el.getAttribute('data-legenda')||el.alt||'peça'));el.title='Clique para ampliar';" +
+    "el.addEventListener('click',function(){abre(el);});el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();abre(el);}});});})();";
+  function paraNavegador(html) {
+    if (html.indexOf("data-ampliar=") < 0) return html;
+    return html.replace("</head>", "<style>\n/* Ampliar peças (só na página do navegador) */\n" + AMPLIAR_CSS + "\n</style>\n</head>")
+      .replace(/<\/body>(?![\s\S]*<\/body>)/, "<script>\n" + AMPLIAR_JS + "\n</script>\n</body>");
+  }
+
   /* =================================================================== */
   /* 10. ZIP SIMPLES (sem compressão) para o modo "hospedadas"            */
   /* =================================================================== */
@@ -816,7 +863,7 @@
 
   return {
     VERSAO: VERSAO, ler: ler, montar: montar, aplicar: aplicar, conferirLink: conferirLink, conferirHtml: conferirHtml,
-    gerarEml: gerarEml, trocarImagens: trocarImagens, semComentarios: semComentarios,
+    gerarEml: gerarEml, trocarImagens: trocarImagens, semComentarios: semComentarios, paraEmail: paraEmail, paraNavegador: paraNavegador,
     base64: base64, utf8: utf8, zip: zip, crc32: crc32, assuntoMime: assuntoMime, tipoMime: tipoMime,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };

@@ -273,5 +273,40 @@ teste("conferência de HTML detecta recursos que o Outlook não aceita", functio
   assert.deepStrictEqual(M.conferirHtml('<img src="cid:a" width="10" alt="">'), []);
 });
 
+teste("capa: foto do projeto principal com 220 px (20% maior que a coluna), quadrada", function () {
+  var r = montar(MINIMO);
+  assert.ok(r.imagens.some(function (i) { return i.papel === "PROJETO PRINCIPAL" && i.w === 220 && i.h === 220 && i.recorte; }));
+  assert.ok(r.html.indexOf('width="356"') > 0 && r.html.indexOf('width="220"') > 0, "texto 356 + 24 + foto 220 = 600");
+});
+
+teste("ampliar: peça sem link abre maior no navegador; no e-mail não há script nem versão ampliada", function () {
+  var r = montar(MINIMO.replace("link: https://empresa.sharepoint.com/:i:/s/site/abc", "link:"));
+  var amp = r.imagens.filter(function (i) { return i.ampliada; });
+  assert.strictEqual(amp.length, 1, "uma versão ampliada por peça");
+  assert.ok(amp[0].w <= 1400 && !amp[0].recorte, "ampliada: inteira, até 1400 px");
+  assert.ok(/data-ampliar="@@IMG\d+@@"/.test(r.html));
+  var email = M.paraEmail(r.html);
+  assert.ok(email.indexOf("data-ampliar") < 0 && email.indexOf("data-legenda") < 0);
+  assert.deepStrictEqual(M.conferirHtml(email.replace(/@@IMG\d+@@/g, "cid:x")).filter(function (x) { return x.nivel === "erro"; }), []);
+  var nav = M.paraNavegador(r.html);
+  assert.ok(nav.indexOf("<script>") > 0 && nav.indexOf("img[data-ampliar]") > 0 && nav.indexOf("Escape") > 0);
+  assert.strictEqual(M.paraNavegador("<html><body></body></html>"), "<html><body></body></html>", "sem peça, nada é injetado");
+});
+
+teste("ampliar: peça com link continua sendo link (a âncora envolve a imagem)", function () {
+  var r = montar(MINIMO);
+  assert.ok(/<a href="https:\/\/empresa\.sharepoint\.com[^"]*" target="_blank"[^>]*><img [^>]*data-ampliar=/.test(r.html));
+});
+
+teste("foco: selo da campanha ao lado do título (computador) e acima (celular)", function () {
+  var r = montar(MINIMO + "\n[FOCO]\nprioridade: Campanha\nselo: icone-lupa.png\ndescricao_selo: Selo da campanha");
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  var selos = r.imagens.filter(function (i) { return /^selo/.test(i.papel); });
+  assert.deepStrictEqual(selos.map(function (i) { return i.w; }).sort(), [160, 184]);
+  assert.ok(r.html.indexOf('alt="Selo da campanha"') > 0);
+  r = montar(MINIMO + "\n[FOCO]\nprioridade: Campanha\nselo: nao-existe.png");
+  assert.ok(!r.ok && niveis(r, "erro").some(function (p) { return /selo não encontrado/.test(p.msg); }));
+});
+
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");
 process.exit(falhas ? 1 : 0);
