@@ -11,7 +11,7 @@
 
 ## report_backup.html
 
-**O que é:** o layout aprovado, num arquivo só, com as imagens dentro. Conteúdo: o modelo em branco (Lorem Ipsum, `X%`, espaços de imagem). Sem dados reais. **Versão:** escrita no comentário do topo do arquivo (hoje, 3.6 de 2026-10-15) e no [CHANGELOG.md](../CHANGELOG.md).
+**O que é:** o layout aprovado, num arquivo só, com as imagens dentro. Conteúdo: o modelo em branco (Lorem Ipsum, `X%`, espaços de imagem). Sem dados reais. **Versão:** escrita no comentário do topo do arquivo (hoje, 3.6.1 de 2026-10-15) e no [CHANGELOG.md](../CHANGELOG.md).
 
 **Como abrir:** dois cliques (abre no navegador). Não precisa da pasta do projeto nem de internet.
 

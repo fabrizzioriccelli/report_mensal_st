@@ -316,14 +316,14 @@ teste("destaque: número longo em 3 resultados gera aviso (não cabe no celular)
   assert.ok(!niveis(r, "aviso").some(function (p) { return /RESULTADO/.test(p.msg); }));
 });
 
-teste("resumo do mês: foi bem (verde) e a melhorar (âmbar), em duas colunas", function () {
+teste("resumo da campanha: foi bem (verde) e a melhorar (âmbar), em duas colunas", function () {
   var r = montar(MINIMO + "\n[FOI BEM 1]\ntexto: Ponto bom\n[A MELHORAR 1]\ntexto: Ponto fraco");
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
-  assert.ok(r.html.indexOf("FOI BEM") > 0 && r.html.indexOf("A MELHORAR") > 0 && r.html.indexOf("RESUMO DO MÊS") > 0);
+  assert.ok(r.html.indexOf("FOI BEM") > 0 && r.html.indexOf("A MELHORAR") > 0 && r.html.indexOf("RESUMO DA CAMPANHA") > 0);
   assert.ok(/border-top:2px solid #21634F/.test(r.html) && /border-top:2px solid #945400/.test(r.html));
   assert.ok((r.html.match(/width="288"/g) || []).length >= 2, "duas colunas de 288 px");
   assert.ok(r.texto.indexOf("+ Ponto bom") >= 0 && r.texto.indexOf("! Ponto fraco") >= 0);
-  assert.ok(montar(MINIMO).html.indexOf("RESUMO DO MÊS") < 0, "sem os blocos, o resumo não aparece");
+  assert.ok(montar(MINIMO).html.indexOf("RESUMO DA CAMPANHA") < 0, "sem os blocos, o resumo não aparece");
 });
 
 teste("variação em texto com seta para baixo não ganha sinal de menos", function () {

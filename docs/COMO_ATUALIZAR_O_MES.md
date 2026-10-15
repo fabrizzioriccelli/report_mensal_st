@@ -121,7 +121,7 @@ Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt
 | `[CREATIVE X]` | **03** · score anterior → atual, barra e frase |
 | `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Creative Transformation |
 | `[APRENDIZADO 1]` a `[3]` | **05** · O que aprendemos |
-| `[FOI BEM 1]` a `[3]`, `[A MELHORAR 1]` a `[3]` | Resumo do mês, logo abaixo da capa: o que foi bem (verde) e o que precisa melhorar (âmbar) |
+| `[FOI BEM 1]` a `[3]`, `[A MELHORAR 1]` a `[3]` | Resumo da campanha, logo abaixo da capa: o que foi bem (verde) e o que precisa melhorar (âmbar) |
 | `[FOCO]` | **06** · bloco vermelho do foco do próximo mês; `selo:` opcional (PNG original do selo da campanha, versão para fundo vermelho) |
 | `[AGENDA 1]` a `[AGENDA 6]` | **07** · Também vem aí (linhas de 3) |
 

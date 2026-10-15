@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.6 (2026-10-15)";
+  var VERSAO = "3.6.1 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -513,7 +513,7 @@
       sobra: sobra
     };
 
-    /* Resumo do mês (sem número de seção): o que foi bem (verde do guia) e o que precisa melhorar (âmbar).
+    /* Resumo da campanha (sem número de seção): o que foi bem (verde do guia) e o que precisa melhorar (âmbar).
        Duas colunas de 288 px no computador; no celular, uma embaixo da outra. */
     var fb = L["FOI BEM"] || [], am = L["A MELHORAR"] || [], balanco = null;
     if (fb.length || am.length) {

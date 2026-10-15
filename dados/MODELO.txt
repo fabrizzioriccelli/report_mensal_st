@@ -114,7 +114,7 @@ variacao: +X%
 
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: RESUMO DO MÊS (logo abaixo da capa, sem número de seção)
+#  EDITAR AQUI: RESUMO DA CAMPANHA (logo abaixo da capa, sem número de seção)
 #  Até 3 frases em cada lado. Uma frase curta por bloco (até ~90 caracteres).
 #  FOI BEM aparece em verde; A MELHORAR, em âmbar. Para tirar, apague os blocos.
 # ----------------------------------------------------------------------
