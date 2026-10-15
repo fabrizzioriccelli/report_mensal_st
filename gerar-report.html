@@ -367,7 +367,10 @@
   }
   /* Botão ▶ padrão: círculo branco com sombra e triângulo na cor da marca. Faz parte da imagem, então aparece em qualquer Outlook. */
   function desenharPlay(g, W, H, cor) {
-    var r = Math.round(Math.min(W, H) * 0.24), x = W / 2, y = H / 2;
+    /* Miniaturas pequenas: ▶ no centro. Peças grandes (capa, destaque): ▶ menor,
+       no canto inferior esquerdo, para não cobrir o rosto ou a peça. */
+    var m = Math.min(W, H), r = Math.round(m * 0.24), x = W / 2, y = H / 2;
+    if (m >= 400) { r = Math.round(m * 0.1); x = Math.round(r * 1.7); y = H - Math.round(r * 1.7); }
     g.save();
     g.shadowColor = "rgba(0,0,0,0.35)"; g.shadowBlur = r * 0.5; g.shadowOffsetY = r * 0.08;
     g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = "rgba(255,255,255,0.94)"; g.fill();

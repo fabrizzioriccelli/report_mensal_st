@@ -2,6 +2,10 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.7.1 · 2026-10-15 · ▶ que não cobre o rosto
+
+- Em peças grandes (capa e destaque), o botão ▶ desenhado sobre a miniatura do vídeo fica menor e no canto inferior esquerdo, para não cobrir o rosto de quem aparece. Nas miniaturas de "Também neste mês", continua no centro.
+
 ## 3.7 · 2026-10-15 · Vídeo no clique, até 6 lançamentos e "Resumo das campanhas"
 
 - **Vídeo que toca no clique** (campo `video:` com um `.mp4` ou `.webm` na pasta do mês): na página do mês (.html) e na prévia, o clique na miniatura abre o vídeo por cima do report e ele começa a tocar (mouse, toque e teclado; Esc ou × fecham). O vídeo vai dentro da página baixada. No e-mail, nada muda: a miniatura com ▶ abre o `link`, sem script e sem vídeo anexado.

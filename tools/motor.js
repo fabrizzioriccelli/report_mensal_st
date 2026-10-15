@@ -21,7 +21,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "3.7 (2026-10-15)";
+  var VERSAO = "3.7.1 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
