@@ -9,6 +9,7 @@ A versão atual aparece na página `gerar-report.html`, no topo de `report_backu
 - A versão ampliada (até 1400 px, sem recorte) só vai na página do navegador: o `.eml` continua sem script e sem essas imagens extras.
 - **Selo de campanha no Foco** (`selo:` e `descricao_selo:` em `[FOCO]`): o PNG original, ao lado do título no computador (184 px) e acima dele no celular (160 px). Sem sobreposição de camadas, então funciona no Outlook.
 - "Também no ar" virou **"Também neste mês"**: serve para peças finalizadas, no ar ou ainda sem resultado.
+- Aviso na Conferência quando um número do destaque (com 3 resultados) passa de 7 caracteres: no celular ele invadiria a coluna ao lado. Prefira formatos curtos (`2,4x`, `R$ 479`, `3.010`).
 
 ## 3.4 · 2026-10-13 · Celular mais confortável
 

@@ -527,6 +527,8 @@
           categoria: seguro(marcarPendencias(categoria(DS.categoria).s)), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
           largura_texto: textoDestaque, colunas: res.length * 3 - 2,
           resultados: res.map(function (v, i) {
+            /* No celular os resultados ficam em terços (~110 px): número longo (ex.: "R$ 200,34") invade a coluna ao lado. */
+            curto(v, "valor", res.length === 3 ? 7 : 11, "RESULTADO " + (i + 1));
             return {
               valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)),
               largura: lr[i], primeiro: i === 0, estilo: "padding:14px 0 0 0;", classe_m: res.length === 3 ? "third" : "half"
