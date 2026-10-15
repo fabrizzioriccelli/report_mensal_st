@@ -316,14 +316,14 @@ teste("destaque: número longo em 3 resultados gera aviso (não cabe no celular)
   assert.ok(!niveis(r, "aviso").some(function (p) { return /RESULTADO/.test(p.msg); }));
 });
 
-teste("resumo da campanha: foi bem (verde) e a melhorar (âmbar), em duas colunas", function () {
+teste("resumo das campanhas: foi bem (verde) e a melhorar (âmbar), em duas colunas", function () {
   var r = montar(MINIMO + "\n[FOI BEM 1]\ntexto: Ponto bom\n[A MELHORAR 1]\ntexto: Ponto fraco");
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
-  assert.ok(r.html.indexOf("FOI BEM") > 0 && r.html.indexOf("A MELHORAR") > 0 && r.html.indexOf("RESUMO DA CAMPANHA") > 0);
+  assert.ok(r.html.indexOf("FOI BEM") > 0 && r.html.indexOf("A MELHORAR") > 0 && r.html.indexOf("RESUMO DAS CAMPANHAS") > 0);
   assert.ok(/border-top:2px solid #21634F/.test(r.html) && /border-top:2px solid #945400/.test(r.html));
   assert.ok((r.html.match(/width="288"/g) || []).length >= 2, "duas colunas de 288 px");
   assert.ok(r.texto.indexOf("+ Ponto bom") >= 0 && r.texto.indexOf("! Ponto fraco") >= 0);
-  assert.ok(montar(MINIMO).html.indexOf("RESUMO DA CAMPANHA") < 0, "sem os blocos, o resumo não aparece");
+  assert.ok(montar(MINIMO).html.indexOf("RESUMO DAS CAMPANHAS") < 0, "sem os blocos, o resumo não aparece");
 });
 
 teste("variação em texto com seta para baixo não ganha sinal de menos", function () {
@@ -331,6 +331,36 @@ teste("variação em texto com seta para baixo não ganha sinal de menos", funct
   assert.ok(r.html.indexOf("&#9660; Menos da metade") > 0);
   r = montar(MINIMO.replace("variacao: +100%", "variacao: -12%"));
   assert.ok(r.html.indexOf("&#9660; &minus;12%") > 0);
+});
+
+teste("vídeo da peça: toca no clique da página do navegador; no e-mail some (sem script, sem arquivo)", function () {
+  var ex = function (p) { return /video-teste\.mp4$/.test(p) || existe(p); };
+  var r = M.montar({ dados: MINIMO.replace("tipo: peca", "tipo: video\nvideo: video-teste.mp4"), arquivoDados: "t.txt", marca: MARCA, template: TEMPLATE, existe: ex });
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  assert.strictEqual(r.videos.length, 1);
+  assert.ok(/data-video="@@VID1@@"/.test(r.html));
+  assert.ok(M.paraEmail(r.html).indexOf("data-video") < 0);
+  var nav = M.paraNavegador(M.trocarVideos(r.html, function () { return "x.mp4"; }));
+  assert.ok(nav.indexOf('data-video="x.mp4"') > 0 && nav.indexOf("createElement('video')") > 0);
+  r = M.montar({ dados: MINIMO.replace("tipo: peca", "tipo: video\nvideo: nao-existe.mp4"), arquivoDados: "t.txt", marca: MARCA, template: TEMPLATE, existe: existe });
+  assert.ok(!r.ok && niveis(r, "erro").some(function (p) { return /vídeo não encontrado/.test(p.msg); }));
+});
+
+teste("lançamentos: até 6, em linhas de 3 colunas de 184 px", function () {
+  var bl = "";
+  for (var i = 1; i <= 4; i++) bl += "\n[LANCAMENTO " + i + "]\nnome: L" + i + "\nimagem: icone-lupa.png";
+  var r = montar(MINIMO + bl);
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  var m = r.modelo.lancamos.linhas_compactos;
+  assert.strictEqual(m.length, 2);
+  assert.strictEqual(m[1].itens.length, 3, "a 2ª linha é completada com espaço vazio");
+  assert.ok(m[1].itens[1].vazio && m[1].itens[0].largura === 184);
+});
+
+teste("foto do banco de imagens (assets/fotos/) não abre ampliada", function () {
+  var ex = function (p) { return /^assets\/fotos\//.test(p) || existe(p); };
+  var r = M.montar({ dados: MINIMO.replace("imagem: icone-prancheta.png", "imagem: assets/fotos/foto-x.jpg"), arquivoDados: "t.txt", marca: MARCA, template: TEMPLATE, existe: ex });
+  assert.ok(r.ok && !r.imagens.some(function (i) { return i.ampliada; }));
 });
 
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");

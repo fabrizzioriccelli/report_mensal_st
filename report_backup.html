@@ -3,7 +3,7 @@
 <head>
 <!--
   ======================================================================
-  BACKUP DO REPORT · versão 3.6.1 (2026-10-15)
+  BACKUP DO REPORT · versão 3.7 (2026-10-15)
   ======================================================================
   O que é: o layout aprovado do report, num arquivo só, com as imagens
   dentro (abre em qualquer navegador, sem a pasta do projeto).
@@ -48,6 +48,7 @@
     .px{padding-left:20px !important;padding-right:20px !important;}
     .col{display:block !important;width:100% !important;box-sizing:border-box !important;padding-left:0 !important;padding-right:0 !important;border-left:0 !important;}
     .gap{padding-bottom:28px !important;}
+    .pt0{padding-top:0 !important;}
     .half{display:inline-block !important;width:49% !important;box-sizing:border-box !important;border-left:0 !important;padding:0 8px 18px 0 !important;vertical-align:top !important;}
     .hide-m{display:none !important;}
     .show-m{display:block !important;max-height:none !important;overflow:visible !important;}
@@ -207,29 +208,6 @@
   </tr>
 
   <tr>
-    <td class="px" style="padding:36px 40px 0 40px;">
-      <p class="fx" style="margin:0 0 14px 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:#000000;letter-spacing:2px;">RESUMO DA CAMPANHA</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          
-          <td class="col gap" width="288" valign="top" style="width:288px;border-top:2px solid #21634F;padding-top:12px;">
-            <p class="fx" style="margin:0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:#A3E0CE;color:#21634F;border-radius:999px;padding:0 8px;">&#9650; FOI BEM</span></p>
-            <p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#21634F;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet: X%.</p><p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#21634F;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet.</p>
-          </td>
-          
-          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-          
-          <td class="col" width="288" valign="top" style="width:288px;border-top:2px solid #945400;padding-top:12px;">
-            <p class="fx" style="margin:0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:#FFE1B9;color:#945400;border-radius:999px;padding:0 8px;">&#9660; A MELHORAR</span></p>
-            <p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#945400;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet: X%.</p><p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#945400;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet.</p>
-          </td>
-          
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <p class="fx" style="margin:0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:#127277;letter-spacing:2px;"><span style="display:inline-block;background:#CDECEE;color:#127277;border-radius:999px;padding:0 7px;letter-spacing:1px;">02</span>&nbsp;&nbsp;O QUE LANÇAMOS</p>
       <p class="ft h2" style="margin:8px 0 0 0;font-family:'Santander Headline', Arial, Helvetica, sans-serif;font-weight:bold;font-size:26px;line-height:31px;color:#EC0000;letter-spacing:-0.5px;">Lorem ipsum dolor sit amet.</p>
@@ -292,6 +270,7 @@
             <p class="fx" style="margin:0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:#127277;letter-spacing:1.5px;">TAMBÉM NESTE MÊS</p>
           </td>
         </tr>
+        
         <tr>
 
           <td class="col gap" width="184" valign="top" style="width:184px;">
@@ -300,24 +279,27 @@
             <p class="ft" style="margin:6px 0 0 0;font-family:'Santander Headline', Arial, Helvetica, sans-serif;font-weight:bold;font-size:16px;line-height:20px;color:#EC0000;">Lorem ipsum</p>
             <p class="fx tm" style="margin:4px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:12px;line-height:17px;color:#000000;">Lorem ipsum dolor sit amet, consectetur. <span title="Link ainda não definido" style="color:#767676;font-weight:bold;white-space:nowrap;">Ver peça&nbsp;&#8594;</span></p>
           </td>
-          
+
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+
           <td class="col gap" width="184" valign="top" style="width:184px;">
             <table role="presentation" width="184" cellpadding="0" cellspacing="0" border="0" style="width:184px;"><tr><td height="72" align="center" valign="middle" bgcolor="#FBF1EA" style="height:72px;background:#FBF1EA;border:1px solid #F0B998;border-radius:20px;"><p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:#EC0000;letter-spacing:1.5px;">&#9654; VÍDEO</p><p style="margin:3px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:12px;color:#767676;">700 x 274 px</p></td></tr></table>
             <p class="fx" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:16px;"><span class="wrap-m" style="display:inline-block;background:#FFE1B9;color:#945400;font-weight:bold;padding:0 7px;border-radius:999px;white-space:nowrap;">&#9675; Resultado em XX/XX</span></p>
             <p class="ft" style="margin:6px 0 0 0;font-family:'Santander Headline', Arial, Helvetica, sans-serif;font-weight:bold;font-size:16px;line-height:20px;color:#EC0000;">Lorem ipsum</p>
             <p class="fx tm" style="margin:4px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:12px;line-height:17px;color:#000000;">Lorem ipsum dolor sit amet, consectetur. <span title="Link ainda não definido" style="color:#767676;font-weight:bold;white-space:nowrap;">&#9654;&nbsp;Assistir</span></p>
           </td>
-          
+
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+
           <td class="col" width="184" valign="top" style="width:184px;">
             <table role="presentation" width="184" cellpadding="0" cellspacing="0" border="0" style="width:184px;"><tr><td height="72" align="center" valign="middle" bgcolor="#FBF1EA" style="height:72px;background:#FBF1EA;border:1px solid #F0B998;border-radius:20px;"><p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:#EC0000;letter-spacing:1.5px;">IMAGEM</p><p style="margin:3px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:12px;color:#767676;">700 x 274 px</p></td></tr></table>
             <p class="fx" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:16px;"><span class="wrap-m" style="display:inline-block;background:#FFE1B9;color:#945400;font-weight:bold;padding:0 7px;border-radius:999px;white-space:nowrap;">&#9675; Resultado em XX/XX</span></p>
             <p class="ft" style="margin:6px 0 0 0;font-family:'Santander Headline', Arial, Helvetica, sans-serif;font-weight:bold;font-size:16px;line-height:20px;color:#EC0000;">Lorem ipsum</p>
             <p class="fx tm" style="margin:4px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:12px;line-height:17px;color:#000000;">Lorem ipsum dolor sit amet, consectetur. <span title="Link ainda não definido" style="color:#767676;font-weight:bold;white-space:nowrap;">Ver peça&nbsp;&#8594;</span></p>
           </td>
-          
+
         </tr>
+        
       </table>
     </td>
   </tr>
@@ -350,6 +332,29 @@
               </tr>
             </table>
           </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="px" style="padding:40px 40px 0 40px;">
+      <p class="fx" style="margin:0 0 14px 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:14px;font-weight:bold;color:#000000;letter-spacing:2px;">RESUMO DAS CAMPANHAS</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          
+          <td class="col gap" width="288" valign="top" style="width:288px;border-top:2px solid #21634F;padding-top:12px;">
+            <p class="fx" style="margin:0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:#A3E0CE;color:#21634F;border-radius:999px;padding:0 8px;">&#9650; FOI BEM</span></p>
+            <p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#21634F;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet: X%.</p><p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#21634F;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet.</p>
+          </td>
+          
+          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+          
+          <td class="col" width="288" valign="top" style="width:288px;border-top:2px solid #945400;padding-top:12px;">
+            <p class="fx" style="margin:0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:#FFE1B9;color:#945400;border-radius:999px;padding:0 8px;">&#9660; A MELHORAR</span></p>
+            <p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#945400;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet: X%.</p><p class="fx tm" style="margin:10px 0 0 0;font-family:'Santander Micro Text', Arial, Helvetica, sans-serif;font-size:13px;line-height:19px;color:#000000;"><span style="color:#945400;font-weight:bold;">&#9679;</span>&nbsp; Lorem ipsum dolor sit amet.</p>
+          </td>
+          
         </tr>
       </table>
     </td>

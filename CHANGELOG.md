@@ -2,6 +2,13 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 3.7 · 2026-10-15 · Vídeo no clique, até 6 lançamentos e "Resumo das campanhas"
+
+- **Vídeo que toca no clique** (campo `video:` com um `.mp4` ou `.webm` na pasta do mês): na página do mês (.html) e na prévia, o clique na miniatura abre o vídeo por cima do report e ele começa a tocar (mouse, toque e teclado; Esc ou × fecham). O vídeo vai dentro da página baixada. No e-mail, nada muda: a miniatura com ▶ abre o `link`, sem script e sem vídeo anexado.
+- **"Resumo das campanhas"** (antes "Resumo da campanha"): agora fica depois do Creative X e antes do Creative Transformation, fechando os resultados. Até 4 frases em cada lado.
+- **"Também neste mês" com até 6 lançamentos**, em linhas de 3 na grade (184 px cada). Com 1 a 3, nada muda.
+- Fotos do banco de imagens não abrem ampliadas (são ilustrativas).
+
 ## 3.6.1 · 2026-10-15 · "Resumo da campanha"
 
 - O bloco "Resumo do mês" passou a se chamar **"Resumo da campanha"**.

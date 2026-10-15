@@ -70,7 +70,7 @@ link: https://empresa.sharepoint.com/:i:/s/creative/E...
 - Pode ser a imagem original, em alta: a ferramenta reduz e recorta.
 - `descricao_imagem` é o que aparece quando a imagem não carrega e o que leitores de tela leem.
 - `enquadramento`: qual parte fica no recorte (`centro`, `topo`, `baixo`, `esquerda`, `direita`).
-- Vídeo: use uma imagem do vídeo **sem** ▶ (a ferramenta desenha) e `tipo: video`.
+- Vídeo: use uma imagem do vídeo **sem** ▶ (a ferramenta desenha) e `tipo: video`. Para o vídeo tocar com um clique na página do mês (.html), coloque o arquivo `.mp4` (ou `.webm`) na pasta do mês e escreva `video: nome-do-arquivo.mp4` no bloco. No e-mail, o vídeo não vai junto: a miniatura com ▶ abre o `link`.
 - Que link colar: [LINKS_SHAREPOINT_STREAM.md](LINKS_SHAREPOINT_STREAM.md).
 
 **7. Atualize os insights** (o que explica o desempenho): `resumo` do projeto principal, `texto` do destaque e `significado` do Creative X. Explicação que os dados não comprovam é **hipótese**: escreva "pode indicar", "sugere".
@@ -117,11 +117,11 @@ Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt
 | `[LANCAMOS]` | **02** · título da seção "O que lançamos" |
 | `[DESTAQUE]` | **02** · projeto em destaque (peça vertical no computador, horizontal no celular) |
 | `[RESULTADO 1]` a `[RESULTADO 3]` | **02** · números do destaque |
-| `[LANCAMENTO 1]` a `[LANCAMENTO 3]` | **02** · "Também neste mês", com miniatura |
+| `[LANCAMENTO 1]` a `[LANCAMENTO 6]` | **02** · "Também neste mês", com miniatura (linhas de 3) |
 | `[CREATIVE X]` | **03** · score anterior → atual, barra e frase |
+| `[FOI BEM 1]` a `[4]`, `[A MELHORAR 1]` a `[4]` | Resumo das campanhas, depois do Creative X e antes do Creative Transformation: o que foi bem (verde) e o que precisa melhorar (âmbar) |
 | `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Creative Transformation |
 | `[APRENDIZADO 1]` a `[3]` | **05** · O que aprendemos |
-| `[FOI BEM 1]` a `[3]`, `[A MELHORAR 1]` a `[3]` | Resumo da campanha, logo abaixo da capa: o que foi bem (verde) e o que precisa melhorar (âmbar) |
 | `[FOCO]` | **06** · bloco vermelho do foco do próximo mês; `selo:` opcional (PNG original do selo da campanha, versão para fundo vermelho) |
 | `[AGENDA 1]` a `[AGENDA 6]` | **07** · Também vem aí (linhas de 3) |
 

@@ -79,6 +79,7 @@
     .px{padding-left:20px !important;padding-right:20px !important;}
     .col{display:block !important;width:100% !important;box-sizing:border-box !important;padding-left:0 !important;padding-right:0 !important;border-left:0 !important;}
     .gap{padding-bottom:28px !important;}
+    .pt0{padding-top:0 !important;}
     .half{display:inline-block !important;width:49% !important;box-sizing:border-box !important;border-left:0 !important;padding:0 8px 18px 0 !important;vertical-align:top !important;}
     .hide-m{display:none !important;}
     .show-m{display:block !important;max-height:none !important;overflow:visible !important;}
@@ -173,7 +174,7 @@
                      Foto da capa: 220 x 220 px (20% maior que a coluna de 184 px), quadrada, cantos de 20 px.
                      No celular: 216 px, centralizada (classe himg). -->
                 <td class="col" width="220" valign="middle" align="center" style="width:220px;">
-                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
                 </td>
               </tr>
             </table>
@@ -210,34 +211,6 @@
   </tr>
   {{/abertura}}
 
-  {{#balanco}}
-  <!-- RESUMO DA CAMPANHA · o que foi bem (verde do guia) e o que precisa melhorar (âmbar), na grade: 288 + 24 + 288.
-       Cada coluna tem o filete no topo, como os números e a agenda. No celular, uma embaixo da outra. -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOI BEM 1..3] e [A MELHORAR 1..3] texto -->
-  <tr>
-    <td class="px" style="padding:36px 40px 0 40px;">
-      <p class="fx" style="margin:0 0 14px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;">RESUMO DA CAMPANHA</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          {{#bem}}
-          <td class="col{{#dois}} gap{{/dois}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.positivo}};padding-top:12px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.positivo_fundo}};color:{{cor.positivo}};border-radius:999px;padding:0 8px;">&#9650; FOI BEM</span></p>
-            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}
-          </td>
-          {{/bem}}
-          {{#dois}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/dois}}
-          {{#melhorar}}
-          <td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.atencao}};padding-top:12px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.atencao_fundo}};color:{{cor.atencao}};border-radius:999px;padding:0 8px;">&#9660; A MELHORAR</span></p>
-            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}
-          </td>
-          {{/melhorar}}
-        </tr>
-      </table>
-    </td>
-  </tr>
-  {{/balanco}}
-
   {{#lancamos}}
   <!-- 02 · O QUE LANÇAMOS · 1 projeto em destaque + compactos -->
   <!-- EDITAR AQUI → dados/AAAA-MM.txt › [LANCAMOS] titulo · [DESTAQUE] · [RESULTADO 1..3] · [LANCAMENTO 1..3] -->
@@ -255,7 +228,7 @@
         <tr>
           {{#peca}}{{#img}}
           <td class="hide-m" width="184" valign="top" style="width:184px;">
-            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
           </td>
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
           {{/img}}{{#placeholder}}
@@ -265,7 +238,7 @@
           <td class="col" width="{{largura_texto}}" valign="top" style="width:{{largura_texto}}px;">
             {{#peca}}{{#img_m}}<!-- Só no celular: a mesma peça em formato horizontal, na largura da tela (no computador fica escondida). -->
             <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
               <div style="font-size:16px;line-height:16px;">&nbsp;</div>
             </div>{{/img_m}}{{#placeholder_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{placeholder_m}}<div style="font-size:16px;line-height:16px;">&nbsp;</div></div>{{/placeholder_m}}{{/peca}}
             {{#categoria}}<p class="fx" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
@@ -295,7 +268,7 @@
   {{/destaque}}
 
   {{#tem_compactos}}
-  <!-- Lançamentos compactos ("Também neste mês"): até 3 por linha -->
+  <!-- Lançamentos compactos ("Também neste mês"): até 6, em linhas de 3 -->
   <tr>
     <td class="px" style="padding:30px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -304,17 +277,22 @@
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">TAMBÉM NESTE MÊS</p>
           </td>
         </tr>
+        {{#linhas_compactos}}
         <tr>
-          {{#compactos}}
+          {{#itens}}
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
-          <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
-            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+          {{#vazio}}<td class="hide-m" width="{{largura}}" style="width:{{largura}}px;">&nbsp;</td>{{/vazio}}
+          {{^vazio}}
+          <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
+            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
             {{#status}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
             <p class="ft" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
             {{#texto_cta}}<p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
           </td>
-          {{/compactos}}
+          {{/vazio}}
+          {{/itens}}
         </tr>
+        {{/linhas_compactos}}
       </table>
     </td>
   </tr>
@@ -360,6 +338,34 @@
     </td>
   </tr>
   {{/cx}}
+
+  {{#balanco}}
+  <!-- RESUMO DAS CAMPANHAS · o que foi bem (verde do guia) e o que precisa melhorar (âmbar), na grade: 288 + 24 + 288.
+       Cada coluna tem o filete no topo, como os números e a agenda. No celular, uma embaixo da outra. -->
+  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOI BEM 1..3] e [A MELHORAR 1..3] texto -->
+  <tr>
+    <td class="px" style="padding:40px 40px 0 40px;">
+      <p class="fx" style="margin:0 0 14px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;">RESUMO DAS CAMPANHAS</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          {{#bem}}
+          <td class="col{{#dois}} gap{{/dois}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.positivo}};padding-top:12px;">
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.positivo_fundo}};color:{{cor.positivo}};border-radius:999px;padding:0 8px;">&#9650; FOI BEM</span></p>
+            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}
+          </td>
+          {{/bem}}
+          {{#dois}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/dois}}
+          {{#melhorar}}
+          <td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.atencao}};padding-top:12px;">
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.atencao_fundo}};color:{{cor.atencao}};border-radius:999px;padding:0 8px;">&#9660; A MELHORAR</span></p>
+            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}
+          </td>
+          {{/melhorar}}
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/balanco}}
 
   {{#transformation}}
   <!-- 04 · CREATIVE TRANSFORMATION · superfície Lisboa com cartão branco -->
