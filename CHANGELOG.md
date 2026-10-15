@@ -2,6 +2,18 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.1 · 2026-10-15 · Movimento na versão interativa
+
+Só na página do navegador (versão interativa e página do mês); o e-mail não muda (nenhum cliente de e-mail roda script).
+
+- **Barra de leitura:** linha vermelha fina no topo, que cresce conforme a rolagem.
+- **Seções aparecem ao entrar na tela:** sobem 28 px e ganham opacidade (0,7 a 0,9 s, curva suave).
+- **Números grandes contam do zero até o valor** quando aparecem (1,2 s): capa, resultados do destaque e Creative X. No fim, o texto volta a ser exatamente o original (mesmo formato: `R$ 1.234`, `12,5%`, `+40%`, `2,5x`).
+- **Barra do Creative X cresce** da esquerda até o valor.
+- Desligado com **"reduzir movimento"** no sistema (tudo aparece parado, números no valor final), durante a **edição no navegador** (designMode) e na impressão.
+- Salvou a página no meio de uma animação? O conversor tira todas as marcas do movimento do e-mail, e a versão interativa sai com o script desta versão (páginas antigas ganham o movimento ao passar pelo conversor).
+- Teste novo: `tests/movimento.e2e.js`.
+
 ## 4.0 · 2026-10-15 · Dois e-mails de uma vez, Transformation Hub com prints, vídeo sem ▶ no resumo
 
 - **O conversor gera os dois e-mails de uma vez:** você edita o `.html` (inclusive pelo Inspecionar do Chrome), escolhe o arquivo e saem o **e-mail completo**, o **e-mail resumido** (com o botão "Ver o report completo") e a **versão interativa** para o SharePoint. Sem o link, o completo já sai e o resumido espera o link; a prévia mostra os dois.

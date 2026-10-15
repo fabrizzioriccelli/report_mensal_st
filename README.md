@@ -2,7 +2,7 @@
 
 Modelo do report mensal da Creative Strategy PF (Customer Interactions): um e-mail executivo de uma página, enviado pelo Outlook, com peças e vídeos clicáveis. Ele é gerado a partir de **um arquivo de texto por mês**. Ninguém precisa editar HTML.
 
-**Versão 4.0 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 4.1 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -242,5 +242,6 @@ Mais de 25 perguntas, com respostas passo a passo: **[docs/FAQ.md](docs/FAQ.md)*
 - Testes do motor: `node tests/motor.test.js` (só Node.js).
 - Teste da página de ponta a ponta, em 7 larguras de tela (320 a 1440 px): `node tests/ferramenta.e2e.js` (Node.js + Playwright).
 - Teste do conversor (página editada no navegador → `.eml`, com acompanhamento do arquivo): `node tests/conversor.e2e.js` (Node.js + Playwright).
+- Teste do movimento da página (números contando, seções aparecendo, barras crescendo, "reduzir movimento"): `node tests/movimento.e2e.js` (Node.js + Playwright).
 - Nenhum dos dois é necessário para gerar o report.
 - Commits por assunto: `report: outubro 2026`, `assets: …`, `docs: …`, `tools: …`. Registre mudanças de layout ou de motor no [CHANGELOG.md](CHANGELOG.md).

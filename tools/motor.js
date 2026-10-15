@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.0 (2026-10-15)";
+  var VERSAO = "4.1 (2026-10-15)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -907,10 +907,55 @@
     "if(v){var alvo=a||el,b=d.createElement('button');b.type='button';b.className='vidpill';b.tabIndex=-1;b.innerHTML='&#9654;&nbsp; Assistir ao v&iacute;deo';b.onclick=function(){abre(el);};alvo.parentNode.insertBefore(b,alvo.nextSibling);}" +
     "el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label',(v?'Assistir: ':'Ampliar: ')+(el.getAttribute('data-legenda')||el.alt||'peça'));el.title=v?'Clique para assistir':'Clique para ampliar';" +
     "el.addEventListener('click',function(){abre(el);});el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();abre(el);}});});})();";
+
+  /* Movimento na página do navegador (não vai no e-mail), no estilo das páginas de produto:
+     barra de leitura no topo; cada seção aparece ao entrar na tela; os números grandes contam
+     do zero até o valor; a barra do Creative X cresce. Desligado com "reduzir movimento" no
+     sistema e durante a edição no navegador (designMode). Ao terminar, o texto volta a ser
+     exatamente o original, e o conversor tira as marcas (data-rv, data-barra, data-conta,
+     data-motion, #leitura) se a página for salva pelo navegador. */
+  var MOVIMENTO_CSS = "#leitura{position:fixed;top:0;left:0;right:0;height:4px;background:#EC0000;transform-origin:0 50%;transform:scaleX(0);z-index:8;pointer-events:none;}" +
+    "[data-motion] [data-rv]{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .9s cubic-bezier(.2,.8,.2,1);}" +
+    "[data-motion] [data-rv=on]{opacity:1;transform:none;}" +
+    "[data-motion] td[data-barra]{transform:scaleX(0);transform-origin:0 50%;transition:transform 1.3s cubic-bezier(.2,.8,.2,1) .35s;}" +
+    "[data-motion] td[data-barra=on]{transform:none;}" +
+    "[data-conta]{font-variant-numeric:tabular-nums;}" +
+    "@media print{[data-motion] [data-rv]{opacity:1 !important;transform:none !important;}#leitura{display:none;}}";
+  var MOVIMENTO_JS = "(function(){var d=document,w=window,raiz=d.documentElement;" +
+    "var bl=d.createElement('div');bl.id='leitura';bl.setAttribute('aria-hidden','true');d.body.appendChild(bl);" +
+    "function lendo(){var h=raiz.scrollHeight-raiz.clientHeight;bl.style.transform='scaleX('+(h>0?Math.min(1,(w.pageYOffset||raiz.scrollTop)/h):0)+')';}" +
+    "w.addEventListener('scroll',lendo,{passive:true});w.addEventListener('resize',lendo);lendo();" +
+    "if((w.matchMedia&&w.matchMedia('(prefers-reduced-motion: reduce)').matches)||!('IntersectionObserver' in w)||d.designMode==='on')return;" +
+    "raiz.setAttribute('data-motion','');" +
+    /* alvos: as células de cada linha de seção (entre as marcas secao:nome) */
+    "var tw=d.createTreeWalker(d.body,128),c,alvos=[];" +
+    "while((c=tw.nextNode())){var m=/^secao:([a-z]+)$/.exec(c.nodeValue.trim());if(!m||m[1]==='fim')continue;" +
+    "var e=c.nextSibling;while(e&&e.nodeType===3)e=e.nextSibling;if(e&&e.nodeType===1&&e.tagName==='TBODY')e=e.firstChild;" +
+    "for(;e&&!(e.nodeType===8&&/^secao:/.test(e.nodeValue.trim()));e=e.nextSibling){if(e.nodeType===1&&e.tagName==='TR'){for(var k=0;k<e.children.length;k++)alvos.push(e.children[k]);}}}" +
+    /* barra do Creative X: a parte preenchida (altura 8, largura em %, menor que 100%) */
+    "Array.prototype.forEach.call(d.querySelectorAll('td[height=\"8\"]'),function(t){var wd=t.getAttribute('width')||'';if(/%$/.test(wd)&&wd!=='100%'&&!t.previousElementSibling)t.setAttribute('data-barra','');});" +
+    "var NUM=/^([^\\d]*?)(\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,(\\d+))?([^\\d]*)$/;" +
+    "function conta(el){if(d.designMode==='on')return;var orig=el.textContent,m=NUM.exec(orig.trim());if(!m)return;" +
+    "var pre=m[1],inteiro=m[2],dec=m[3]||'',suf=m[4];" +
+    "if(!/^[\\s+\\-\\u2212]*(R\\$\\s?)?$/.test(pre)||!/^\\s*(%|x|p\\.p\\.|mil)?\\s*$/i.test(suf))return;" +
+    "var alvo=parseFloat(inteiro.replace(/\\./g,'')+'.'+(dec||'0')),casas=dec.length,milhar=inteiro.indexOf('.')>=0;" +
+    "if(alvo<10&&!pre.trim()&&!suf.trim())return;" +
+    "if(parseFloat(w.getComputedStyle(el).fontSize)<22)return;" +
+    "el.setAttribute('data-conta','');var t0=null,dur=1200;" +
+    "function fmt(v){var s=v.toFixed(casas).split('.'),i=s[0];if(milhar)i=i.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');return pre+i+(casas?','+s[1]:'')+suf;}" +
+    "function passo(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/dur),ez=1-Math.pow(1-p,3);el.textContent=p<1?fmt(alvo*ez):orig;if(p<1)w.requestAnimationFrame(passo);else el.setAttribute('data-conta','ok');}" +
+    "el.textContent=fmt(0);w.requestAnimationFrame(passo);}" +
+    "function anima(td){Array.prototype.forEach.call(td.querySelectorAll('p,span,b,td'),function(el){if(!el.children.length)conta(el);});" +
+    "Array.prototype.forEach.call(td.querySelectorAll('td[data-barra]'),function(b){b.setAttribute('data-barra','on');});}" +
+    "var io=new IntersectionObserver(function(es){es.forEach(function(en){if(!en.isIntersecting)return;var el=en.target;io.unobserve(el);el.setAttribute('data-rv','on');anima(el);});},{threshold:0.12,rootMargin:'0px 0px -8% 0px'});" +
+    "alvos.forEach(function(td){td.setAttribute('data-rv','');io.observe(td);});})();";
+  /* Estilo e script que esta função injeta (para trocar, sem duplicar, numa página que já os tem). */
+  var INJETADO_CSS = /<style\b[^>]*>\s*\/\* Ampliar peças[\s\S]*?<\/style>\s*/g, INJETADO_JS = /<script\b[^>]*>[^<]*box\.id='amp'[\s\S]*?<\/script>\s*/g;
   function paraNavegador(html) {
-    if (html.indexOf("data-ampliar=") < 0 && html.indexOf("data-video=") < 0) return html;
-    return html.replace("</head>", "<style>\n/* Ampliar peças (só na página do navegador) */\n" + AMPLIAR_CSS + "\n</style>\n</head>")
-      .replace(/<\/body>(?![\s\S]*<\/body>)/, "<script>\n" + AMPLIAR_JS + "\n</script>\n</body>");
+    html = html.replace(INJETADO_CSS, "").replace(INJETADO_JS, "");
+    if (html.indexOf("data-ampliar=") < 0 && html.indexOf("data-video=") < 0 && html.indexOf("<!--secao:") < 0) return html;
+    return html.replace("</head>", "<style>\n/* Ampliar peças e movimento (só na página do navegador) */\n" + AMPLIAR_CSS + MOVIMENTO_CSS + "\n</style>\n</head>")
+      .replace(/<\/body>(?![\s\S]*<\/body>)/, "<script>\n" + AMPLIAR_JS + "\n" + MOVIMENTO_JS + "\n</script>\n</body>");
   }
 
   /* =================================================================== */
@@ -956,6 +1001,8 @@
     tira(/<div\b[^>]*\bid="amp"[\s\S]*?<\/div>\s*/g, "janela de ampliação");
     tira(/<video\b[\s\S]*?<\/video>\s*/gi, "vídeo");
     tira(/<button\b[^>]*class="vidpill"[^>]*>[\s\S]*?<\/button>\s*/g, "botão \"Assistir ao vídeo\"");
+    tira(/<div\b[^>]*\bid="leitura"[^>]*><\/div>\s*/g, "barra de leitura");
+    tira(/ data-(?:rv|motion|barra|conta)(?:="[^"]*")?(?=[\s>\/])/g, "marca do movimento");
     tira(/ data-(?:ampliar|legenda|video|thumb)="[^"]*"/g, "atributo de ampliação ou vídeo");
     tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
     tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
@@ -1160,9 +1207,16 @@
     tira(/<!-- saved from url=[^>]*-->\s*/gi, "marca do Chrome (saved from url)");
     tira(/<div\b[^>]*\bid="amp"[\s\S]*?<\/div>\s*/g, "janela de ampliação já montada");
     tira(/<button\b[^>]*class="vidpill"[^>]*>[\s\S]*?<\/button>\s*/g, "botão \"Assistir ao vídeo\" já montado");
+    tira(/<div\b[^>]*\bid="leitura"[^>]*><\/div>\s*/g, "barra de leitura já montada");
+    tira(/ data-(?:rv|motion|barra|conta)(?:="[^"]*")?(?=[\s>\/])/g, "marca do movimento");
+    /* Script e estilo da página trocados pelos desta versão (a página ganha o que houver de novo). */
+    INJETADO_CSS.lastIndex = INJETADO_JS.lastIndex = 0;
+    var antigo = html.search(INJETADO_CSS) >= 0 || html.search(INJETADO_JS) >= 0;
+    html = paraNavegador(html);
+    if (antigo) saiu.push({ item: "script da página atualizado para a versão " + VERSAO, n: 1 });
     tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
     tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
-    return { html: html, saiu: saiu, interativa: /data-(ampliar|video)="/.test(html) && /<script/i.test(html) };
+    return { html: html, saiu: saiu, interativa: (/data-(ampliar|video)="/.test(html) || /<!--secao:/.test(html)) && /<script/i.test(html) };
   }
 
   return {
