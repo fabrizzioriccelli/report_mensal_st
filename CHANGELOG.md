@@ -13,6 +13,7 @@ Teste do time: no Outlook, o e-mail-resumo saiu "quadrado" e diferente da prévi
 - **Altura de linha exata no Outlook** (`mso-line-height-rule:exactly`) em todos os textos do resumo, e a fonte de reserva do Outlook (Arial) também nas etiquetas e no botão.
 - **Link de arquivo:** o aviso diz que o Outlook na Web e o celular não abrem link de arquivo (`C:\…`, `\\servidor\…`). Para enviar à área, use o link `https://` do ambiente autorizado.
 - O report (página e e-mail completo) não mudou. Testes: 67 no motor (botão sem VML, um único link, sem cantos arredondados) e o teste do emulador confere o `.eml` baixado nas duas versões (pasta do projeto e avulsa).
+- **Guia operacional e apresentação executiva (kit):** telas refeitas no emulador 4.5 (captura real, dados fictícios): prévia do resumo com cantos retos, aviso novo do link de arquivo e o resumo de exemplo. No guia, o teste de envio passa a ser "para você e para uma pessoa do time", e "Problemas comuns" ganhou "O botão chegou como imagem e não clica" (e-mail gerado antes da 4.5: baixe o `.eml` de novo).
 - **Ainda não testado num Outlook de verdade** (este ambiente não tem Outlook). Teste: abrir o `.eml`, enviar para você e para uma pessoa do time, e clicar no botão no computador e no celular.
 
 ## 4.4 · 2026-10-16 · Link de arquivo no e-mail-resumo, adicionar itens com a grade ajustada
