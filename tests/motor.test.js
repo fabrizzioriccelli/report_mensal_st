@@ -585,51 +585,105 @@ teste("link_report_completo vira a meta da página e sai do e-mail; caminho loca
   assert.ok(!/report-completo/.test(local.html) && niveis(local, "aviso").some(function (p) { return /link_report_completo/.test(p.msg); }));
 });
 
-teste("dadosDoResumo: lê da página cada campo, na ordem, com as regras de seleção", function () {
-  var d = M.dadosDoResumo(montar(COMPLETO).html).d;
+teste("dadosDoResumo: lê da página cada campo e lista os indicadores candidatos (sem criar nenhum)", function () {
+  var r = M.dadosDoResumo(montar(COMPLETO).html), d = r.d;
   assert.strictEqual(d.periodo, "MARÇO 2027");
   assert.strictEqual(d.frase, "Mês de teste,"); assert.strictEqual(d.frase_final, "tudo sintético.");
   assert.strictEqual(d.principal.nome, "Projeto Alfa"); assert.strictEqual(d.principal.resumo, "Resumo do projeto alfa.", "sem o \"Ver peça\"");
   assert.deepStrictEqual(d.numeros.map(function (n) { return n.valor + "|" + n.tom_variacao; }), ["12,5%|verde", "R$ 1,00|verde", "3x|ambar"]);
-  assert.strictEqual(d.numeros[1].detalhe, "", "número sem detalhe não desalinha os outros");
-  assert.deepStrictEqual(d.bem.map(function (b) { return b.texto; }), ["Bem um.", "Bem dois."], "até 2 \"foi bem\"");
-  assert.deepStrictEqual(d.lancamentos.map(function (b) { return b.nome; }), ["Lançamento Um", "Lançamento Dois", "Lançamento Três"], "os 3 primeiros lançamentos");
-  assert.strictEqual(d.lancamentos[1].tom_status, "ambar");
-  assert.deepStrictEqual(d.transformation.itens.map(function (b) { return b.nome + "|" + b.status; }), ["Agente Um|", "Agente Dois|○ Previsão: abr/27"]);
-  assert.strictEqual(d.transformation.titulo, "Como estamos transformando a forma de criar.");
+  assert.strictEqual(d.numeros[1].detalhe, "", "número sem detalhe fica vazio (não inventa)");
+  assert.deepStrictEqual(d.indicadores.map(function (x) { return x.chave + "|" + x.valor + "|" + x.grupo; }),
+    ["numero-1|12,5%|Projeto principal", "numero-2|R$ 1,00|Projeto principal", "numero-3|3x|Projeto principal", "resultado-1|40|Destaque do mês", "cx|75%|Creative X"]);
   assert.strictEqual(d.cx.anterior + ">" + d.cx.atual + " " + d.cx.variacao + " " + d.cx.tom, "70%>75% +5 p.p. verde");
-  assert.strictEqual(d.foco.mes, "ABRIL");
-  assert.deepStrictEqual(d.agenda.map(function (a) { return a.data + "|" + a.titulo; }), ["12 ABR|Evento um", "A DEFINIR|Evento dois"]);
-  assert.strictEqual(d.contato, "time@empresa.com");
+  assert.deepStrictEqual(d.tem, { campanhas: true, aprendizados: true, transformation: true, proximos: true });
+  assert.strictEqual(r.pendencias.length, 0, r.pendencias.join(" | "));
 });
 
-teste("emailResumo: diagramação própria, estática, um único destino (o botão), blocos sem conteúdo somem", function () {
+teste("emailResumo: curto, até 3 indicadores, um único destino (o botão \"Acessar report completo\")", function () {
   var html = montar(COMPLETO).html, LINK = "https://empresa.sharepoint.com/sites/cs/report-atual.html";
   var r = M.emailResumo(html, { link: LINK });
-  assert.deepStrictEqual(r.blocos, ["visao", "resultados", "campanhas", "aprendizados", "andamento", "proximos"]);
+  assert.deepStrictEqual(r.indicadores, ["numero-1", "numero-2", "numero-3"], "padrão: os números do projeto principal");
   var hrefs = r.html.match(/href="[^"]*"/g) || [];
   assert.ok(hrefs.length === 2 && hrefs.every(function (h) { return h === 'href="' + LINK + '"'; }), hrefs.join(" "));
-  assert.ok(!/data-campo|data-tom|secao:|<script|&#9654;|Ver peça|Documento modelo/.test(r.html), "estático e sem os links das peças");
+  assert.ok(/Acessar report completo/.test(r.html) && /<v:roundrect\b/.test(r.html), "botão (também no Outlook para Windows)");
+  assert.ok(/12,5%/.test(r.html) && /R\$ 1,00/.test(r.html) && /3x/.test(r.html) && /Projeto Alfa/.test(r.html));
+  assert.ok(!/data-campo|data-tom|secao:|<script|&#9654;|Ver peça|Documento modelo|Evento um|Aprendizado A|Lançamento Um/.test(r.html), "estático, sem links das peças e sem o detalhe das seções");
   assert.ok(!/\{\{|\}\}/.test(r.html));
-  assert.ok(/12,5%/.test(r.html) && /Agente Dois/.test(r.html) && /Evento um/.test(r.html) && /Aprendizado A/.test(r.html));
-  assert.ok(!/Bem três|Lançamento Quatro/.test(r.html), "regras de seleção: só os primeiros");
   assert.strictEqual(M.conferirHtml(r.html).filter(function (x) { return x.nivel === "erro"; }).length, 0);
+  /* Escolha da pessoa: outros indicadores; nunca mais de 3; chave que não existe é ignorada. */
+  var e = M.emailResumo(html, { link: LINK, indicadores: ["cx", "resultado-1", "numero-1", "numero-2", "nao-existe"] });
+  assert.deepStrictEqual(e.indicadores, ["cx", "resultado-1", "numero-1"]);
+  assert.ok(/75%/.test(e.html) && /Creative X/.test(e.html) && !/R\$ 1,00/.test(e.html));
   /* Sem link: aviso no lugar do botão, nenhum link. */
   var s = M.emailResumo(html, {});
   assert.ok(!/href=/.test(s.html) && /FALTA O LINK DO REPORT COMPLETO/.test(s.html) && !s.temLink);
-  /* Seção apagada (sem Creative X nem balanço) some; bloco desmarcado vai para "fora". */
-  var sem = montar(COMPLETO.replace(/\[CREATIVE X\][\s\S]*?\[TRANSFORMATION\]/, "[TRANSFORMATION]")).html;
-  var t = M.emailResumo(sem, { link: LINK, blocos: { aprendizados: false } });
-  assert.ok(t.vazios.indexOf("resultados") >= 0 && t.fora.indexOf("aprendizados") >= 0 && !/RESULTADOS E EVOLUÇÃO|APRENDIZADOS/.test(t.html));
+  /* Sem nenhum número na página: o e-mail sai só com a frase e a chamada (nada é inventado). */
+  var semNum = montar(COMPLETO.replace(/\[NUMERO 1\][\s\S]*?\[DESTAQUE\]/, "[DESTAQUE]").replace(/\[RESULTADO 1\][^\[]*/, "").replace(/\[CREATIVE X\][^\[]*/, "")).html;
+  var z = M.emailResumo(semNum, { link: LINK });
+  assert.deepStrictEqual(z.indicadores, []);
+  assert.ok(!/PRINCIPAIS RESULTADOS/.test(z.html) && /Acessar report completo/.test(z.html));
 });
 
-teste("emailResumo acompanha a edição: texto trocado na página, item apagado e página antiga", function () {
+teste("emailResumo acompanha a edição da página; página antiga avisa; modelo vira pendência", function () {
   var html = montar(COMPLETO).html;
-  var editado = html.replace(">Evento um<", ">Evento editado<").replace(/<p class="ft" data-campo="aprendizado-2\.titulo"[^>]*>Aprendizado B<\/p>/, "");
+  var editado = html.replace(/(data-campo="numero-1\.valor"[^>]*>)12,5%/, "$118,0%").replace(/(data-campo="frase"[^>]*>)Mês de teste,/, "$1Frase editada,");
   var r = M.emailResumo(editado, { link: "https://empresa.sharepoint.com/x" });
-  assert.ok(/Evento editado/.test(r.html) && !/Evento um/.test(r.html) && !/Aprendizado B/.test(r.html));
+  assert.ok(/18,0%/.test(r.html) && !/12,5%/.test(r.html) && /Frase editada/.test(r.html));
   assert.ok(M.emailResumo(html.replace(/ data-campo="[^"]*"/g, ""), {}).erro, "página sem os campos: avisa para gerar de novo");
   assert.ok(M.dadosDoResumo(montar(MODELO).html).pendencias.length > 10, "modelo: Lorem e X viram pendências do resumo");
+});
+
+teste("importarDados: resposta do Copilot (blocos do arquivo de dados) vira campos da página", function () {
+  var r = M.importarDados(["[EDICAO]", "mes: Novembro", "ano: 2099", "proximo_mes: Dezembro", "", "[NUMERO 1]", "valor: 12,5%", "titulo: Taxa A", "variacao: -10%",
+    "[NUMERO 2]", "valor: R$ 1,00", "variacao: +5%", "variacao_cor: ambar", "[CREATIVE X]", "atual: 75%", "variacao: -2 p.p.",
+    "[LANCAMENTO 1]", "status: No ar", "status_cor: verde", "nome: Peça", "[DESTAQUE]", "categoria: Grupo · Teste", "[BLOCO INVENTADO]", "x: 1"].join("\n"));
+  var c = r.campos;
+  assert.strictEqual(c.periodo.texto, "NOVEMBRO 2099");
+  assert.strictEqual(c["foco.mes"].texto, "DEZEMBRO");
+  assert.strictEqual(c["numero-1.valor"].texto, "12,5%");
+  assert.strictEqual(c["numero-1.variacao"].tipo, "etiqueta"); assert.ok(/^▼/.test(c["numero-1.variacao"].texto)); assert.strictEqual(c["numero-1.variacao"].tom, "verde");
+  assert.ok(/^▲ \+5%$/.test(c["numero-2.variacao"].texto) && c["numero-2.variacao"].tom === "ambar");
+  assert.ok(/2 p\.p\./.test(c["cx.variacao"].texto) && c["cx.variacao"].tom === "ambar", "Creative X caiu: âmbar");
+  assert.strictEqual(c["lancamento-1.status"].texto, "● No ar");
+  assert.strictEqual(c["destaque.categoria"].texto, "GRUPO · TESTE");
+  assert.ok(r.problemas.some(function (p) { return /BLOCO INVENTADO/.test(p.msg); }), "bloco desconhecido é avisado, não aplicado");
+  assert.strictEqual(M.nomeDoReport("NOVEMBRO 2099"), "report-2099-11.html");
+  assert.strictEqual(M.nomeDoReport("[MÊS] [ANO]"), "report.html");
+});
+
+teste("importarDados: todos os blocos da biblioteca de prompts (docs/PROMPTS_COPILOT.md) são aceitos", function () {
+  var doc = ler("docs/PROMPTS_COPILOT.md"), ref = /### Formato de blocos[\s\S]*?```text\n([\s\S]*?)```/.exec(doc)[1];
+  var blocos = ref.split("\n").filter(Boolean).map(function (l) {
+    var m = /^\[([^\]]+)\](?:\s+a\s+\[(\d+)\])?\s+(.*)$/.exec(l.trim()), nome = m[1].replace(/ \d+$/, " 1");
+    return "[" + nome + "]\n" + m[3].split(" · ").map(function (c) { c = c.trim(); return c + ": " + (/_cor$/.test(c) ? "verde" : c === "mes" ? "Janeiro" : c === "ano" ? "2099" : "Teste " + c); }).join("\n");
+  }).join("\n\n");
+  var r = M.importarDados(blocos);
+  assert.deepStrictEqual(r.problemas, [], JSON.stringify(r.problemas));
+  /* Todo campo importável tem lugar no modelo em branco do emulador (tools/coringa.js). */
+  var janela = {}; new Function("window", fs.readFileSync(path.join(RAIZ, "tools/coringa.js"), "utf8"))(janela);
+  var faltam = Object.keys(r.campos).filter(function (k) { return janela.CORINGA_HTML.indexOf('data-campo="' + k + '"') < 0; });
+  assert.deepStrictEqual(faltam, [], "campos sem lugar no modelo em branco");
+});
+
+teste("PDF anexo no Transformation Hub: vai dentro da página, abre em nova aba; no e-mail vira texto", function () {
+  var r = montar(COMPLETO.replace("links: Agente Dois | [INSERIR LINK]", "links: Documento fictício (PDF) | one-brief.pdf"), { existe: function (c) { return c === "assets/icones/one-brief.pdf" || existe(c); } });
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  assert.strictEqual(r.anexos.length, 1);
+  assert.ok(/<a href="#" data-anexo="@@ANX1@@" target="_blank" class="cta"[^>]*>Documento fictício \(PDF\)&nbsp;&#8594;<\/a>/.test(r.html));
+  var pag = M.trocarAnexos(r.html, function () { return "data:application/pdf;base64,JVBERi0="; });
+  assert.ok(/data-anexo="data:application\/pdf;base64,JVBERi0="/.test(pag));
+  var em = M.paraEmail(pag);
+  assert.ok(!/data-anexo|application\/pdf/.test(em) && /Documento fictício \(PDF\) \(no report completo\)/.test(em), "no e-mail: texto, sem o PDF");
+  var faltando = montar(COMPLETO.replace("links: Agente Dois | [INSERIR LINK]", "links: Documento | nao-existe.pdf"));
+  assert.ok(niveis(faltando, "erro").some(function (p) { return /documento não encontrado/.test(p.msg); }));
+});
+
+teste("marcas de edição (data-img, data-item, data-campo) existem na página e saem do e-mail", function () {
+  var html = montar(COMPLETO).html;
+  assert.ok(/data-img="principal"/.test(html) && /data-img="destaque"/.test(html) && /data-img="transformation-1-logo"/.test(html));
+  assert.ok(/data-item="numero-1"/.test(html) && /data-item="lancamento-4"/.test(html) && /data-item="agenda-2"/.test(html));
+  var em = M.paraEmail(html), limpo = M.limparHtmlEditado(html).html;
+  [em, limpo].forEach(function (h) { assert.ok(!/data-(img|item|campo|tom)=|EDITAR AQUI|report-completo/.test(h)); });
 });
 
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");

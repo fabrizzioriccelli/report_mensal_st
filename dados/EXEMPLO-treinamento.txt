@@ -2,7 +2,7 @@
 #  EXEMPLO DE TREINAMENTO · CONTEÚDO 100% FICTÍCIO
 # ======================================================================
 #  Para praticar e para as capturas do guia operacional
-#  (apresentacoes/guia-operacional). NÃO é um report real:
+#  (kit/guia-operacional). NÃO é um report real:
 #  nomes, números e imagens são inventados de propósito, e o período
 #  (Janeiro 2099) deixa isso claro em qualquer captura.
 #  As imagens ficam em assets/exemplo/ (peças neutras, sem pessoas e
@@ -19,7 +19,7 @@ ano: 2099
 proximo_mes: Fevereiro
 pasta_imagens: assets/exemplo
 contato: time.exemplo@empresa.com
-link_report_completo: https://empresa.sharepoint.com/sites/exemplo/report-atual.html
+link_report_completo: https://www.example.com/report-completo.html
 
 # ----------------------------------------------------------------------
 #  EDITAR AQUI: 01 · O MÊS EM UMA FRASE (capa)
@@ -173,7 +173,7 @@ resultado:
 icones:
 logo: icone-exemplo.png
 descricao_logo: Ícone de exemplo
-links: Documento de exemplo | https://empresa.sharepoint.com/sites/exemplo/documento ; Agente de exemplo | https://empresa.sharepoint.com/sites/exemplo/agente
+links: Documento de exemplo | https://www.example.com/documento ; Agente de exemplo | https://www.example.com/agente
 prints: print-exemplo.png
 descricao_prints: Tela fictícia de um agente
 imagem:

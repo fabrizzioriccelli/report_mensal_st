@@ -50,7 +50,7 @@ Por que o e-mail não leva o arquivo de fonte: o Outlook para Windows ignora fon
 ## 3. Colocar os arquivos `.otf` (quando chegarem)
 
 1. Baixe as fontes no **Portal da Marca** (link no Brand Guide) ou peça a Marca. Confirme que o uso está liberado para documentos internos.
-2. No PyCharm, arraste os arquivos para a pasta **`assets/fonts/`**.
+2. No Explorador de Arquivos, copie os arquivos para a pasta **`assets/fonts/`**.
 3. Abra `assets/fonts/fontes-santander.css`. Cada peso tem um bloco assim:
    ```css
    /* FONTE OFICIAL SANTANDER — INSERIR ARQUIVO .OTF AQUI (nome PROVISÓRIO) · USADA NO REPORT */
@@ -95,7 +95,7 @@ A captura acima foi feita num ambiente sem Arial e sem Georgia: a Arial aparece 
 
 As famílias e os pesos deste guia vêm do **Brand Guide**, não do Canva.
 
-## 6. Editar as fontes no PyCharm
+## 6. Onde mudar as fontes (manutenção)
 
 | Quero… | Onde |
 |---|---|

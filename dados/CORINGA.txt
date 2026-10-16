@@ -1,0 +1,290 @@
+# ======================================================================
+#  CORINGA · MODELO EM BRANCO PARA O EMULADOR
+# ======================================================================
+#  Gera o "modelo em branco" que o emulador (converter-html-eml.html)
+#  abre no botão "Começar do modelo em branco". Não tem dado real:
+#  textos entre [colchetes], números em X e imagens neutras
+#  (assets/coringa/). Traz o máximo de cada seção; no emulador, o
+#  que não for usado no mês é ocultado ("Ocultar item").
+#  Quem mantém a ferramenta: depois de mudar o template, gere a página
+#  deste arquivo e atualize tools/coringa.js (docs/ARQUITETURA.md).
+# ======================================================================
+
+[EDICAO]
+mes: [Mês]
+ano: [Ano]
+proximo_mes: [Próximo mês]
+pasta_imagens: assets/coringa
+contato: [E-mail de contato da área]
+link_report_completo:
+
+[ABERTURA]
+frase: [Frase do mês, primeira parte]
+frase_final: [segunda parte, mais leve.]
+previa: [Texto da caixa de entrada, até 110 caracteres]
+
+[PROJETO PRINCIPAL]
+nome: [Nome do projeto principal]
+resumo: [Resumo do resultado mais importante do mês, em uma ou duas frases.]
+imagem: coringa-principal.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[NUMERO 1]
+valor: X%
+titulo: [Indicador 1]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[NUMERO 2]
+valor: X%
+titulo: [Indicador 2]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[NUMERO 3]
+valor: X%
+titulo: [Indicador 3]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[LANCAMOS]
+titulo: [Título da seção O que lançamos.]
+
+[DESTAQUE]
+categoria: [Categoria · Canal]
+titulo: [Título do projeto em destaque]
+texto: [Texto do projeto em destaque: o que foi feito e por quê.]
+imagem: coringa-destaque.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+nota: [Nota sobre os resultados (opcional).]
+
+[RESULTADO 1]
+valor: X%
+titulo: [Resultado 1]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[RESULTADO 2]
+valor: X%
+titulo: [Resultado 2]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[RESULTADO 3]
+valor: X%
+titulo: [Resultado 3]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[LANCAMENTO 1]
+status: [Status]
+status_cor: ambar
+nome: [Nome do lançamento 1]
+texto: [Texto curto do lançamento.]
+imagem: coringa-lancamento.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 2]
+status: [Status]
+status_cor: ambar
+nome: [Nome do lançamento 2]
+texto: [Texto curto do lançamento.]
+imagem: coringa-lancamento.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 3]
+status: [Status]
+status_cor: ambar
+nome: [Nome do lançamento 3]
+texto: [Texto curto do lançamento.]
+imagem: coringa-lancamento.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 4]
+status: [Status]
+status_cor: ambar
+nome: [Nome do lançamento 4]
+texto: [Texto curto do lançamento.]
+imagem: coringa-lancamento.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 5]
+status: [Status]
+status_cor: ambar
+nome: [Nome do lançamento 5]
+texto: [Texto curto do lançamento.]
+imagem: coringa-lancamento.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 6]
+status: [Status]
+status_cor: ambar
+nome: [Nome do lançamento 6]
+texto: [Texto curto do lançamento.]
+imagem: coringa-lancamento.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[CREATIVE X]
+subtitulo: [Score criativo · período]
+anterior: X%
+atual: X%
+variacao: +X p.p.
+periodo: [Mês anterior vs. mês atual]
+referencia: [Referência: X%]
+significado: [O que o score significa neste mês.]
+
+[FOI BEM 1]
+texto: [O que foi bem 1.]
+
+[FOI BEM 2]
+texto: [O que foi bem 2.]
+
+[FOI BEM 3]
+texto: [O que foi bem 3.]
+
+[FOI BEM 4]
+texto: [O que foi bem 4.]
+
+[A MELHORAR 1]
+texto: [O que melhorar 1.]
+
+[A MELHORAR 2]
+texto: [O que melhorar 2.]
+
+[A MELHORAR 3]
+texto: [O que melhorar 3.]
+
+[A MELHORAR 4]
+texto: [O que melhorar 4.]
+
+[TRANSFORMATION]
+titulo: [Título da seção Transformation Hub.]
+
+[TRANSFORMATION 1]
+status: [Status ou previsão de lançamento]
+status_cor: ambar
+nome: [Nome do projeto 1]
+texto: [O que o projeto faz e em que etapa está.]
+citacao:
+resultado: [Resultado ou próximo passo.]
+icones:
+logo: coringa-logo.png
+descricao_logo: [Descrição do logo]
+links: [Texto do link] | [INSERIR LINK]
+imagem:
+descricao_imagem:
+prints: coringa-print.png
+descricao_prints: [Descrição do print]
+tipo: projeto
+link:
+
+[TRANSFORMATION 2]
+status: [Status ou previsão de lançamento]
+status_cor: ambar
+nome: [Nome do projeto 2]
+texto: [O que o projeto faz e em que etapa está.]
+citacao:
+resultado: [Resultado ou próximo passo.]
+icones:
+logo: coringa-logo.png
+descricao_logo: [Descrição do logo]
+links: [Texto do link] | [INSERIR LINK]
+imagem:
+descricao_imagem:
+prints: coringa-print.png
+descricao_prints: [Descrição do print]
+tipo: projeto
+link:
+
+[TRANSFORMATION 3]
+status: [Status ou previsão de lançamento]
+status_cor: ambar
+nome: [Nome do projeto 3]
+texto: [O que o projeto faz e em que etapa está.]
+citacao:
+resultado: [Resultado ou próximo passo.]
+icones:
+logo: coringa-logo.png
+descricao_logo: [Descrição do logo]
+links: [Texto do link] | [INSERIR LINK]
+imagem:
+descricao_imagem:
+prints: coringa-print.png
+descricao_prints: [Descrição do print]
+tipo: projeto
+link:
+
+[APRENDIZADO 1]
+titulo: [Aprendizado 1]
+texto: [O que os dados mostraram.]
+levamos: [o que levamos para os próximos meses.]
+
+[APRENDIZADO 2]
+titulo: [Aprendizado 2]
+texto: [O que os dados mostraram.]
+levamos: [o que levamos para os próximos meses.]
+
+[APRENDIZADO 3]
+titulo: [Aprendizado 3]
+texto: [O que os dados mostraram.]
+levamos: [o que levamos para os próximos meses.]
+
+[FOCO]
+prioridade: [Prioridade do próximo mês.]
+texto: [Texto do foco do próximo mês.]
+selo: coringa-selo.png
+descricao_selo: [Descrição do selo]
+
+[AGENDA 1]
+data: [Data]
+titulo: [Item da agenda 1]
+detalhe: [Detalhe]
+
+[AGENDA 2]
+data: [Data]
+titulo: [Item da agenda 2]
+detalhe: [Detalhe]
+
+[AGENDA 3]
+data: [Data]
+titulo: [Item da agenda 3]
+detalhe: [Detalhe]
+
+[AGENDA 4]
+data: [Data]
+titulo: [Item da agenda 4]
+detalhe: [Detalhe]
+
+[AGENDA 5]
+data: [Data]
+titulo: [Item da agenda 5]
+detalhe: [Detalhe]
+
+[AGENDA 6]
+data: [Data]
+titulo: [Item da agenda 6]
+detalhe: [Detalhe]

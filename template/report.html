@@ -126,7 +126,7 @@
 <body style="margin:0;padding:0;background:{{cor.fundo_pagina}};" bgcolor="{{cor.fundo_pagina}}">
 
 <!-- Pré-visualização da caixa de entrada (escondida no corpo) -->
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:{{cor.fundo_pagina}};">
+<div data-campo="previa" style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:{{cor.fundo_pagina}};">
   {{previa}}
   &#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;
 </div>
@@ -158,7 +158,7 @@
                 <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid {{cor.capa_filete}};{{/logo}}">
                   <p class="ft brand" style="margin:0;font-family:{{fonte.titulos}};font-size:19px;line-height:22px;font-weight:bold;color:#FFFFFF;letter-spacing:-0.2px;">Creative Strategy PF</p>
                   <!-- Só no celular: o mês numa linha discreta abaixo do nome (no computador, é o selo à direita). -->
-                  <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;{{edicao}}</p></div>
+                  <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p></div>
                 </td>
               </tr>
             </table>
@@ -182,7 +182,7 @@
                 <td class="col gap" width="356" valign="middle" style="width:356px;">
                   <!-- EDITAR AQUI: FRASE DO MÊS E PROJETO PRINCIPAL → dados/AAAA-MM.txt › [ABERTURA] frase, frase_final · [PROJETO PRINCIPAL] nome, resumo, link -->
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O MÊS EM UMA FRASE</p>
-                  <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:36px;line-height:40px;color:#FFFFFF;letter-spacing:-1px;" data-campo="frase">{{frase}}{{#frase_final}}<br><span data-campo="frase_final" style="font-weight:normal;color:{{cor.capa_destaque}};">{{frase_final}}</span>{{/frase_final}}</p>
+                  <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:36px;line-height:40px;color:#FFFFFF;letter-spacing:-1px;"><span data-campo="frase">{{frase}}</span>{{#frase_final}}<br><span data-campo="frase_final" style="font-weight:normal;color:{{cor.capa_destaque}};">{{frase_final}}</span>{{/frase_final}}</p>
                   <p class="fx" style="margin:18px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;">PROJETO PRINCIPAL</p>
                   <p class="fx" data-campo="principal.nome" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:15px;line-height:20px;font-weight:bold;color:#FFFFFF;">{{nome}}</p>
                   {{#resumo_cta}}<p class="fx tm" data-campo="principal.resumo" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">{{resumo_cta}}</p>{{/resumo_cta}}
@@ -192,7 +192,7 @@
                      Foto da capa: 220 x 220 px (20% maior que a coluna de 184 px), quadrada, cantos de 20 px.
                      No celular: 216 px, centralizada (classe himg). -->
                 <td class="col" width="220" valign="middle" align="center" style="width:220px;">
-                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-campo="principal.imagem" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-campo="principal.imagem" data-img="principal" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
                 </td>
               </tr>
             </table>
@@ -212,7 +212,7 @@
         <tr>
           {{#numeros}}
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
-          <td class="{{classe_m}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
+          <td class="{{classe_m}}" data-item="numero-{{idx}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr><td style="border-top:2px solid {{cor_filete}};padding-top:12px;">
                 <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;" data-campo="numero-{{idx}}.valor">{{valor}}</p>
@@ -236,7 +236,7 @@
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O QUE LANÇAMOS</p>
-      {{#titulo}}<p class="ft h2" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
+      {{#titulo}}<p class="ft h2" data-campo="lancamos.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
     </td>
   </tr>
 
@@ -247,7 +247,7 @@
         <tr>
           {{#peca}}{{#img}}
           <td class="hide-m" width="184" valign="top" style="width:184px;">
-            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+            {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-img="destaque" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
           </td>
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
           {{/img}}{{#placeholder}}
@@ -257,7 +257,7 @@
           <td class="col" width="{{largura_texto}}" valign="top" style="width:{{largura_texto}}px;">
             {{#peca}}{{#img_m}}<!-- Só no celular: a mesma peça em formato horizontal, na largura da tela (no computador fica escondida). -->
             <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
+              {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-img="destaque" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
               <div style="font-size:16px;line-height:16px;">&nbsp;</div>
             </div>{{/img_m}}{{#placeholder_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{placeholder_m}}<div style="font-size:16px;line-height:16px;">&nbsp;</div></div>{{/placeholder_m}}{{/peca}}
             {{#categoria}}<p class="fx" data-campo="destaque.categoria" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
@@ -269,7 +269,7 @@
               <tr>
                 {{#resultados}}
                 {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
-                <td class="{{classe_m}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
+                <td class="{{classe_m}}" data-item="resultado-{{idx}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
                   <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.texto}};" data-campo="resultado-{{idx}}.valor">{{valor}}</p>
                   <p class="fx ts" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_corpo}};"><b data-campo="resultado-{{idx}}.titulo" style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br><span data-campo="resultado-{{idx}}.detalhe">{{detalhe}}</span>{{/detalhe}}</p>
                   {{#variacao}}<p class="fx" data-campo="resultado-{{idx}}.variacao" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
@@ -302,8 +302,8 @@
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
           {{#vazio}}<td class="hide-m" width="{{largura}}" style="width:{{largura}}px;">&nbsp;</td>{{/vazio}}
           {{^vazio}}
-          <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
-            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+          <td class="{{classe}}" data-item="lancamento-{{idx}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
+            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-img="lancamento-{{idx}}" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
             {{#status}}<p class="fx" data-campo="lancamento-{{idx}}.status" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
             <p class="ft" data-campo="lancamento-{{idx}}.nome" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
             {{#texto_cta}}<p class="fx tm" data-campo="lancamento-{{idx}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
@@ -372,14 +372,14 @@
           {{#bem}}
           <td class="col{{#dois}} gap{{/dois}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.positivo}};padding-top:12px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.positivo_fundo}};color:{{cor.positivo}};border-radius:999px;padding:0 8px;">&#9650; FOI BEM</span></p>
-            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="bem-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
+            {{#itens}}<p class="fx tm" data-item="bem-{{idx}}" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="bem-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
           </td>
           {{/bem}}
           {{#dois}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/dois}}
           {{#melhorar}}
           <td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.atencao}};padding-top:12px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.atencao_fundo}};color:{{cor.atencao}};border-radius:999px;padding:0 8px;">&#9660; A MELHORAR</span></p>
-            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="melhorar-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
+            {{#itens}}<p class="fx tm" data-item="melhorar-{{idx}}" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="melhorar-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
           </td>
           {{/melhorar}}
         </tr>
@@ -411,13 +411,13 @@
           <td class="px" style="padding:0 28px 26px 28px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="background:{{cor.fundo_email}};border-radius:20px;">
               {{#projetos}}
-              <tr>
+              <tr data-item="transformation-{{numero}}">
                 <td data-bloco="transformation-{{numero}}" style="padding:18px 20px;{{borda}}">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                       {{#tem_visual}}
                       <td width="70" valign="top" style="width:70px;padding-right:14px;">
-                        {{#logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/logo}}{{#logo_placeholder}}<table role="presentation" width="56" cellpadding="0" cellspacing="0" border="0" style="width:56px;"><tr><td height="56" align="center" valign="middle" bgcolor="{{cor.transformation_placeholder_fundo}}" style="height:56px;background:{{cor.transformation_placeholder_fundo}};border:2px dashed {{cor.transformation_placeholder_borda}};border-radius:28px;"><p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:8px;line-height:11px;font-weight:bold;color:{{cor.transformation}};letter-spacing:1px;">LOGO</p></td></tr></table>{{/logo_placeholder}}
+                        {{#logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="transformation-{{numero}}-logo" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/logo}}{{#logo_placeholder}}<table role="presentation" width="56" cellpadding="0" cellspacing="0" border="0" style="width:56px;"><tr><td height="56" align="center" valign="middle" bgcolor="{{cor.transformation_placeholder_fundo}}" style="height:56px;background:{{cor.transformation_placeholder_fundo}};border:2px dashed {{cor.transformation_placeholder_borda}};border-radius:28px;"><p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:8px;line-height:11px;font-weight:bold;color:{{cor.transformation}};letter-spacing:1px;">LOGO</p></td></tr></table>{{/logo_placeholder}}
                         {{#icones}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}" style="display:inline-block;border:0;width:{{w}}px;height:auto;{{margem}}">{{/icones}}
                         {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:8px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{#placeholder}}<table role="presentation" width="68" cellpadding="0" cellspacing="0" border="0" style="width:68px;"><tr><td height="52" align="center" valign="middle" bgcolor="{{cor.transformation_placeholder_fundo}}" style="height:52px;background:{{cor.transformation_placeholder_fundo}};border:2px dashed {{cor.transformation_placeholder_borda}};border-radius:8px;"><p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:8px;line-height:11px;font-weight:bold;color:{{cor.transformation}};letter-spacing:1px;">IMAGEM</p></td></tr></table>{{/placeholder}}{{/peca}}
                       </td>
@@ -427,8 +427,8 @@
                         <p class="ft" data-campo="transformation-{{numero}}.nome" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:17px;line-height:22px;color:{{cor.transformation_titulo}};">{{nome}}</p>
                         {{#texto_cta}}<p class="fx tm" data-campo="transformation-{{numero}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
                         {{#links}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;">{{links}}</p>{{/links}}
-                        {{#citacao}}<p class="fx tm" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.transformation}};">&#8220;{{citacao}}&#8221;</p>{{/citacao}}
-                        {{#resultado}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};"><b style="color:{{cor.texto}};">Resultado:</b> {{resultado}}</p>{{/resultado}}
+                        {{#citacao}}<p class="fx tm" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.transformation}};">&#8220;<span data-campo="transformation-{{numero}}.citacao">{{citacao}}</span>&#8221;</p>{{/citacao}}
+                        {{#resultado}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};"><b style="color:{{cor.texto}};">Resultado:</b> <span data-campo="transformation-{{numero}}.resultado">{{resultado}}</span></p>{{/resultado}}
                       </td>
                     </tr>
                     {{#tem_prints}}
@@ -438,7 +438,7 @@
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
                           {{#prints}}
                           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
-                          <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} class="fluid" style="display:block;border:1px solid {{cor.transformation_linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td>
+                          <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} data-img="transformation-{{numero}}-print-{{pidx}}" class="fluid" style="display:block;border:1px solid {{cor.transformation_linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td>
                           {{/prints}}
                         </tr></table>
                       </td>
@@ -468,7 +468,7 @@
         <tr>
           {{#itens}}
           {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
-          <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
+          <td class="{{classe}}" data-item="aprendizado-{{numero}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
             <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:36px;line-height:38px;color:{{cor.grupo_aprendizado}};">{{numero}}</p>
             <p class="ft" data-campo="aprendizado-{{numero}}.titulo" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{titulo}}</p>
             {{#texto}}<p class="fx tm" data-campo="aprendizado-{{numero}}.texto" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
@@ -495,13 +495,13 @@
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
           <td class="col" width="{{largura_texto}}" valign="middle" style="width:{{largura_texto}}px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;FOCO DE <span data-campo="foco.mes">{{mes}}</span></p>
-            {{#selo}}{{#img_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></div>{{/img_m}}{{/selo}}
+            {{#selo}}{{#img_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="selo" style="display:block;border:0;width:{{w}}px;height:auto;margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></div>{{/img_m}}{{/selo}}
             <p class="ft h2" data-campo="foco.prioridade" style="margin:10px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">{{prioridade}}</p>
             {{#texto}}<p class="fx tm" data-campo="foco.texto" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
           </td>
           {{#selo}}{{#img}}
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-          <td class="hide-m" width="184" valign="middle" align="right" style="width:184px;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></td>
+          <td class="hide-m" width="184" valign="middle" align="right" style="width:184px;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="selo" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></td>
           {{/img}}{{/selo}}
           </tr></table>
           </td>
@@ -524,7 +524,7 @@
         <tr>
           {{#celulas}}
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;border-top:1px solid {{filete}};">&nbsp;</td>{{/primeiro}}
-          <td class="col" width="184" valign="top" style="width:184px;padding:12px 0;border-top:1px solid {{filete}};">
+          <td class="col"{{^vazio}} data-item="agenda-{{idx}}"{{/vazio}} width="184" valign="top" style="width:184px;padding:12px 0;border-top:1px solid {{filete}};">
             {{^vazio}}
             {{#dia}}<p class="ft" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:22px;line-height:24px;color:{{cor.grupo_aprendizado}};">{{dia}} <span class="fx" style="font-family:{{fonte.texto}};font-size:10px;font-weight:bold;letter-spacing:1.5px;">{{mes}}</span></p>{{/dia}}
             {{^dia}}<p class="fx" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:28px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{rotulo}}</p>{{/dia}}
@@ -542,61 +542,51 @@
   {{/agenda}}
 
   <!--secao:rodape-->
-  <!-- RODAPÉ · encerramento em duas faixas, na grade de 3 colunas:
-       1. faixa clara (Rio): despedida e informações (colunas 1 e 2) e a formiguinha
-          em pé sobre a faixa vermelha, alinhada à direita, sobre a chama (coluna 3);
-       2. faixa vermelha: assinatura da área e a chama no canto inferior direito (Brand Guide 3.10). -->
+  <!-- RODAPÉ · encerramento em Vermelho Santander (Brand Guide 3.2: vermelho como fundo; textos, chama
+       e filetes em branco). Fecha como a capa abre. Despedida e contato (colunas 1 e 2), formiguinha
+       à direita (coluna 3); abaixo de um filete branco, a assinatura da área com a chama no canto
+       inferior direito (Brand Guide 3.10). -->
   <!-- EDITAR AQUI: ENCERRAMENTO → dados/AAAA-MM.txt › [EDICAO] proximo_mes, contato. A assinatura é fixa (NÃO ALTERAR). -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px rt" bgcolor="{{cor.rodape_claro}}" style="background:{{cor.rodape_claro}};border-radius:34px 34px 0 0;padding:32px 40px 0 40px;">
+    <td class="px ra" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:34px;padding:32px 40px 26px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td class="fw" width="392" valign="top" style="width:392px;padding-bottom:28px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:2px;">ENCERRAMENTO</p>
-            <p class="ft h2" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">Até {{proximo_mes_minusculo}}.</p>
-            <p class="fx tm" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto_corpo}};">Obrigado por acompanhar o report da Creative Strategy PF.</p>
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
+          <td class="fw" width="392" valign="top" style="width:392px;padding-bottom:4px;">
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;">ENCERRAMENTO</p>
+            <p class="ft h2" data-campo="ate" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">Até {{proximo_mes_minusculo}}.</p>
+            <p class="fx tm" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">Obrigado por acompanhar o report da Creative Strategy PF.</p>
+            {{#contato}}
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr>
+              <td class="col" valign="top" style="padding-top:12px;border-top:1px solid {{cor.foco_rotulo}};">
+                <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;">DÚVIDAS E SUGESTÕES</p>
+                <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:#FFFFFF;word-break:break-word;" data-campo="contato">{{contato}}</p>
+              </td>
+            </tr></table>
+            {{/contato}}
+          </td>
+          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+          <td class="fant" width="184" valign="bottom" align="right" style="width:184px;">
+            {{#rodape_formiga}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="formiguinha" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#FFFFFF;">{{/rodape_formiga}}
+          </td>
+        </tr>
+        <tr><td colspan="3" style="padding:20px 0 18px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="{{cor.foco_rotulo}}" style="height:1px;background:{{cor.foco_rotulo}};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
+        <tr>
+          <td colspan="3">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                {{#contato}}
-                <td class="col gap" width="184" valign="top" style="width:184px;padding-top:12px;border-top:1px solid {{cor.abertura_linha}};">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:1.5px;">DÚVIDAS E SUGESTÕES</p>
-                  <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};word-break:break-word;" data-campo="contato">{{contato}}</p>
+                <td valign="bottom" style="padding-right:16px;">
+                  <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:15px;line-height:19px;color:#FFFFFF;">Creative Strategy PF</p>
+                  <p class="fx wrap-m" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;white-space:nowrap;">CUSTOMER INTERACTIONS&nbsp;&nbsp;·&nbsp;&nbsp;REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
                 </td>
-                <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;border-top:1px solid {{cor.abertura_linha}};">&nbsp;</td>
-                {{/contato}}
-                <td class="col" width="184" valign="top" style="width:184px;padding-top:12px;border-top:1px solid {{cor.abertura_linha}};">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:1.5px;">PRÓXIMA EDIÇÃO</p>
-                  <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};" data-campo="proximo_mes">{{proximo_mes}}</p>
+                <td valign="bottom" align="right" width="{{#rodape_logo}}{{w}}{{/rodape_logo}}{{^rodape_logo}}1{{/rodape_logo}}">
+                  {{#rodape_logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#FFFFFF;">{{/rodape_logo}}
                 </td>
               </tr>
             </table>
           </td>
-          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-          <td class="fant" width="184" valign="bottom" align="right" style="width:184px;">
-            {{#rodape_formiga}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="formiguinha" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/rodape_formiga}}
-          </td>
         </tr>
       </table>
-    </td>
-  </tr>
-  <tr>
-    <td class="rb" bgcolor="{{cor.rodape_claro}}" style="background:{{cor.rodape_claro}};border-radius:0 0 34px 34px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-    <td class="px ra" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:34px;padding:26px 40px 28px 40px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td valign="bottom" style="padding-right:16px;">
-            <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:15px;line-height:19px;color:#FFFFFF;">Creative Strategy PF</p>
-            <p class="fx wrap-m" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;white-space:nowrap;">CUSTOMER INTERACTIONS&nbsp;&nbsp;·&nbsp;&nbsp;REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;{{edicao}}</p>
-          </td>
-          <td valign="bottom" align="right" width="{{#rodape_logo}}{{w}}{{/rodape_logo}}{{^rodape_logo}}1{{/rodape_logo}}">
-            {{#rodape_logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#FFFFFF;">{{/rodape_logo}}
-          </td>
-        </tr>
-      </table>
-    </td>
-    </tr></table>
     </td>
   </tr>
 

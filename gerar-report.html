@@ -390,6 +390,7 @@
     });
     /* Vídeos das peças (campo "video"): na prévia, endereço temporário do próprio arquivo. */
     html = Motor.trocarVideos(html, function (id) { var u = URL.createObjectURL(ARQ[atual.videos[id - 1].caminho]); urls.push(u); return u; });
+    html = Motor.trocarAnexos(html, function () { return "#"; });
     $("#pv").srcdoc = comFontes(Motor.paraNavegador(html));
   }
   document.querySelectorAll("[data-w]").forEach(function (b) {
@@ -425,12 +426,15 @@
     /* Página do mês para guardar: as imagens vão dentro do arquivo, então ela abre em qualquer computador. */
     var html = comFontes(Motor.paraNavegador(Motor.trocarImagens(atual.html, function (id) { var p = prontas[id - 1]; return "data:" + Motor.tipoMime(p.nome) + ";base64," + Motor.base64(p.bytes); })));
     /* Vídeos vão dentro da página (o arquivo abre em qualquer computador, sem a pasta do projeto). */
-    var vids = atual.videos || [];
-    Promise.all(vids.map(function (v) { return ARQ[v.caminho].arrayBuffer().then(function (b) { return "data:" + (/\.webm$/i.test(v.caminho) ? "video/webm" : "video/mp4") + ";base64," + Motor.base64(new Uint8Array(b)); }); }))
-      .then(function (dados) { baixarPagina(Motor.trocarVideos(html, function (id) { return dados[id - 1]; })); });
+    var vids = atual.videos || [], anx = atual.anexos || [];
+    /* Documentos em PDF (links do Transformation Hub) também vão dentro da página: abrem em nova aba no clique. */
+    function base64De(cam, tipo) { return ARQ[cam].arrayBuffer().then(function (b) { return "data:" + tipo + ";base64," + Motor.base64(new Uint8Array(b)); }); }
+    Promise.all([Promise.all(vids.map(function (v) { return base64De(v.caminho, /\.webm$/i.test(v.caminho) ? "video/webm" : "video/mp4"); })),
+      Promise.all(anx.map(function (a) { return base64De(a.caminho, "application/pdf"); }))])
+      .then(function (r) { baixarPagina(Motor.trocarAnexos(Motor.trocarVideos(html, function (id) { return r[0][id - 1]; }), function (id) { return r[1][id - 1]; })); });
   });
   function baixarPagina(html) {
-    html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html (versão " + Motor.VERSAO + ") a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Para mudar o conteúdo, edite o arquivo de dados e gere de novo. Para achar um texto aqui, procure EDITAR AQUI. Próximo passo: converter-html-eml.html (e-mail-resumo e versão interativa). -->");
+    html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html (versão " + Motor.VERSAO + ") a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Para mudar o conteúdo, edite o arquivo de dados e gere de novo. Para editar textos, números e imagens: abra este arquivo no emulador (converter-html-eml.html). -->");
     var nome = atual.nomeArquivo.replace(/^report-/, "") + ".html";
     baixar(nome, html, "text/html");
     $("#gerarInfo").textContent = "Baixado: " + nome + ". Guarde na pasta reports/ do projeto." + ((atual.videos || []).length ? " Os vídeos tocam ao clicar na peça (só nesta página; no e-mail, a peça abre o link)." : "");

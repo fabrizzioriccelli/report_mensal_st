@@ -1,224 +1,168 @@
 # Como atualizar o report todo mês
 
-Guia para quem não programa. Leva de 30 a 60 minutos por mês, quase tudo para reunir os dados.
+Passo a passo para o time, no **emulador** (`kit/emulador-report.html`). É o mesmo conteúdo do guia ilustrado, [kit/guia-operacional.pdf](../kit/guia-operacional.pdf), em texto. Depois dos dados aprovados, leva de 30 a 45 minutos.
 
-| O quê | Para quê | Onde editar |
+Você precisa de: **Chrome ou Edge**, o arquivo `emulador-report.html`, as imagens do mês, os resultados aprovados pela área, acesso ao ambiente corporativo autorizado (para publicar o report) e o **Outlook**. Não precisa instalar nada.
+
+```text
+imagens do mês ─┐
+resultados ─────┼─► emulador (Chrome/Edge) ─► report-AAAA-MM.html ─► ambiente autorizado ─► link
+Copilot ────────┘        │                                                                   │
+                         └──────────── e-mail-resumo (.eml) ◄── até 3 indicadores + link ◄───┘
+                                              │
+                                              ▼
+                                  Outlook ─► área (botão "Acessar report completo")
+```
+
+---
+
+## 1. Arquivos e pastas (Explorador de Arquivos)
+
+| Arquivo | O que é | O que fazer |
 |---|---|---|
-| **`dados/AAAA-MM.txt`** | Textos, números, imagens e links do mês: **a única fonte** do report completo e do e-mail-resumo | PyCharm ou Bloco de Notas |
-| **`assets/AAAA-MM/`** | As imagens (e vídeos) do mês | Explorador de Arquivos |
-| **`gerar-report.html`** | Conferir e gerar a página do mês (`.html`) | Dois cliques (abre no Chrome ou no Edge) |
-| **`converter-html-eml.html`** | Gerar o **e-mail-resumo** (`.eml`) e a **versão interativa** (`.html`, para o SharePoint) | Dois cliques |
+| `emulador-report.html` | A ferramenta | Abrir no Chrome ou no Edge |
+| `report-AAAA-MM.html` | O report do mês, salvo pelo emulador | Publicar; abrir no emulador para editar de novo |
+| `report-AAAA-MM-resumo.eml` | O e-mail-resumo | Dois cliques: abre no Outlook |
+| Pasta de imagens do mês | Peças, logos, prints | Escolher em "Trocar imagem" |
 
-Você **não** precisa editar HTML. Como usar o PyCharm: [GUIA_PYCHARM.md](GUIA_PYCHARM.md).
+**Explorador de Arquivos**
 
-## O fluxo definitivo
+1. Abrir: tecla **Windows + E**.
+2. **Downloads** fica no painel da esquerda. É para lá que vai o que o navegador baixa (o `.eml`, por exemplo).
+3. **Mostrar as extensões** (`.html`, `.eml`): Windows 11, menu **Exibir › Mostrar › Extensões de nomes de arquivos**; Windows 10, aba **Exibir** › marque **Extensões de nomes de arquivos**.
+4. **Pasta do mês:** em Documentos › Report mensal, botão direito › **Novo › Pasta** (ou Ctrl+Shift+N) › `2026-11`. Dentro dela, a pasta `imagens`.
+5. **Renomear:** clique no arquivo e aperte **F2**. Mantenha a extensão.
+6. **Mais recente primeiro:** **Classificar › Data de modificação**. **Procurar:** caixa de pesquisa, `report-2026`.
+7. Arquivo com **(1)** no nome (`report-2026-11 (1).html`) é download repetido: fique com o mais recente.
 
-```text
-dados/AAAA-MM.txt ─► gerar-report.html ─► página do mês (.html) ─► Chrome (conferir, ver o movimento)
-   (PyCharm)            (conferência)                                  │
-                                                                       ▼
-          Outlook ◄── e-mail-resumo (.eml) ◄── converter-html-eml.html ──► versão interativa (.html) ─► SharePoint
-       (porta de entrada,                       (o "emulador")                (report completo:            │
-        1 botão) ───────────────────────────── link "Ver report completo" ────── movimento, vídeos) ◄────────┘
-```
+**Abrir o emulador:** dois cliques em `emulador-report.html`. Abriu em outro programa? Botão direito › **Abrir com** › **Google Chrome** ou **Microsoft Edge** (não aparece? "Escolher outro aplicativo"). Ou arraste o arquivo para uma janela do navegador.
 
-- **Report completo (HTML):** a experiência inteira, com movimento ao rolar, vídeos e peças que abrem maiores. Fica no SharePoint.
-- **E-mail-resumo:** a porta de entrada. Estático, leitura rápida dos destaques e **um único link**, o botão "Ver report completo".
-- **Uma fonte só:** os dois saem do mesmo arquivo de dados. Você nunca digita o mesmo conteúdo duas vezes.
+### Padrão de nomes das imagens
 
----
+| Regra | Certo | Evite |
+|---|---|---|
+| Minúsculas, sem acento, sem espaço | `campanha_natal_principal.jpg` | `Campanha Natal (final).JPG` |
+| Palavras separadas por `_` | `black_friday_selo.png` | `black-friday selo.png` |
+| Campanha ou projeto + o que é a imagem | `one_brief_icone.png` | `imagem1.png` |
+| O que é: `principal`, `destaque`, `peca_1`, `icone`, `logo`, `print`, `selo` | `copy_agent_icone.jpg` | `logo novo novo.jpg` |
+| `.png` (logos, selos, prints) ou `.jpg` (fotos e peças) | `agente_x_print.png` | `.heic`, `.webp` |
 
-## O mês em 15 passos
+Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440 px ou mais; destaque 368 × 600; lançamentos 736 × 288; logo do Transformation Hub 112 × 112; print 1008 px de largura; selo: o PNG original, sem redesenhar.
 
-### Preparar (passos 1 a 2)
+## 2. Editar no emulador
 
-**1. Abra o projeto no PyCharm.** *File → Open* → pasta `report_mensal_st`. No ambiente do banco, se usar Git, primeiro **atualize** a pasta: *Git → Update Project* (Ctrl+T).
+**Abrir:** "Começar do modelo em branco" (todas as seções, com textos de exemplo [entre colchetes]) ou "Abrir um report salvo (.html)" (por exemplo, o do mês anterior). O report aparece logo abaixo, pronto para editar.
 
-**2. Crie o arquivo do mês.** Na pasta `dados`, copie o arquivo do mês anterior (ou o `MODELO.txt`) e renomeie a cópia para o mês novo, por exemplo `2026-10.txt`.
-- No PyCharm: clique no arquivo → **Ctrl+C** → clique na pasta `dados` → **Ctrl+V** → digite o nome novo → **OK**.
-- Copiar o mês anterior aproveita o que se repete (títulos fixos, contato). Copiar o `MODELO.txt` começa do zero: textos em **Lorem Ipsum**, números em **X** (`X%`, `R$ X`, `X p.p.`) e imagens e links em `[INSERIR …]`. Tudo isso é conteúdo de exemplo: troque pelo do mês.
-
-Crie também a pasta de imagens: botão direito em `assets` → *New → Directory* → `2026-10`.
-
-### Preencher (passos 3 a 8)
-
-Abra `dados/2026-10.txt`. Cada linha é `campo: valor`: troque só o que vem **depois dos dois-pontos**. Linhas com `#` são instruções e não vão para o e-mail. Cada seção começa com um título `EDITAR AQUI` (procure com Ctrl+F).
-
-Textos: frases curtas e diretas, como pede o Brand Guide (até 80 caracteres por frase, sem jargão, foco no resultado).
-
-**3. Atualize o período** (bloco `[EDICAO]`, no topo):
-```text
-[EDICAO]
-mes: Outubro
-ano: 2026
-proximo_mes: Novembro
-pasta_imagens: assets/2026-10
-contato: [INSERIR E-MAIL OU CANAL DO TIME]
-link_report_completo: https://empresa.sharepoint.com/…/report-atual.html
-```
-`link_report_completo` é o link de compartilhamento da versão interativa no SharePoint (o destino do botão do e-mail-resumo). Se a área usar sempre o **mesmo arquivo** no SharePoint (substituído todo mês, mesmo nome), o link não muda e você preenche uma vez só. Ainda não tem? Deixe vazio: o conversor pede o link na hora. Nunca use um caminho do computador (`C:\…`, `\\servidor\…`): ele não abre para mais ninguém.
-
-**4. Insira os resultados.** Antes de digitar, escolha **o que** destacar. Use o [Prompt 1 e o Prompt 2 do Copilot](PROMPTS_COPILOT.md) com a planilha do mês. Regras:
-- O **projeto principal** é o resultado mais importante do mês. O **1º número** dele aparece em vermelho: use o indicador mais relevante.
-- Não destaque variações pequenas só para preencher espaço. Menos números, mais claros.
-- **Não invente número.** Se o dado ainda não chegou, deixe o `X`: a ferramenta não deixa enviar enquanto houver `X` ou Lorem Ipsum.
-
-```text
-[NUMERO 1]
-valor: X,X%
-titulo: CTR
-detalhe: era X,X%
-variacao: +X%
-```
-
-**5. Atualize os comparativos.** `detalhe:` é a base de comparação ("era X%", "vs. mês anterior"). `variacao:` vira a etiqueta verde com ▲.
-- Começa com `-` (ex.: `-12%`) → seta ▼. Use quando cair é bom (custo, CPC).
-- Resultado que pede atenção → acrescente `variacao_cor: ambar`.
-- **% × p.p.:** de 40% para 52% é **+12 p.p.** (diferença de porcentagens) ou **+30%** (variação relativa). Não troque um pelo outro.
-- No **Creative X**, preencha `anterior` e `atual` em %: a ferramenta calcula a variação em p.p. e a barra sozinha. Sem o anterior, nada é calculado.
-
-**6. Insira as imagens.** Coloque as imagens em `assets/2026-10/` e escreva o nome no bloco:
-```text
-imagem: campanha-x.jpg
-descricao_imagem: Peça da campanha X no app, com o cartão em destaque
-enquadramento: centro
-tipo: peca
-link: https://empresa.sharepoint.com/:i:/s/creative/E...
-```
-- Pode ser a imagem original, em alta: a ferramenta reduz e recorta.
-- `descricao_imagem` é o que aparece quando a imagem não carrega e o que leitores de tela leem.
-- `enquadramento`: qual parte fica no recorte (`centro`, `topo`, `baixo`, `esquerda`, `direita`).
-- Vídeo: use uma imagem do vídeo **sem** ▶ (a ferramenta desenha) e `tipo: video`. Para o vídeo tocar com um clique na página do mês (.html), coloque o arquivo `.mp4` (ou `.webm`) na pasta do mês e escreva `video: nome-do-arquivo.mp4` no bloco. No e-mail, o vídeo não vai junto: a miniatura com ▶ abre o `link`.
-- Que link colar: [LINKS_SHAREPOINT_STREAM.md](LINKS_SHAREPOINT_STREAM.md).
-
-**7. Atualize os insights** (o que explica o desempenho): `resumo` do projeto principal, `texto` do destaque e `significado` do Creative X. Explicação que os dados não comprovam é **hipótese**: escreva "pode indicar", "sugere".
-
-**8. Atualize os aprendizados e o foco** (`[APRENDIZADO 1]` a `[3]`, `[FOCO]`). O [Prompt 5](PROMPTS_COPILOT.md#prompt-5--aprendizados) ajuda a separar aprendizado de opinião.
-
-Salve: **Ctrl+S** (o PyCharm também salva sozinho). No Bloco de Notas: *Arquivo → Salvar*, codificação **UTF-8**.
-
-### Conferir (passos 9 a 12)
-
-**9. Revise o layout.** Dois cliques em `gerar-report.html` → **Selecionar a pasta do projeto** → escolha a pasta principal. O mês mais recente é escolhido sozinho. Veja a **Prévia** no fim da página.
-
-**10. Teste o desktop:** na Prévia, botão **Computador**. Os números da capa estão numa linha só? Algum título quebrou feio? Encurte o texto no `.txt`.
-
-**11. Teste o mobile:** botão **Celular**. Nada pode sair da tela. A peça do destaque aparece na horizontal, acima do texto.
-
-**12. Verifique erros.** Leia a **Conferência**:
-- **erro**: impede gerar. Ao lado aparece o arquivo e a **linha**.
-- **falta**: ainda tem Lorem Ipsum, `X`, "Mês", "AAAA", `[INSERIR …]` ou link vazio. Gera só RASCUNHO.
-- **aviso** / **para saber**: confira, mas não impede.
-
-Corrigiu algo? **Salve** e clique em **Selecionar a pasta** de novo. Depois, na seção **Teste os links**, clique em **Abrir** em cada link.
-
-Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt 8](PROMPTS_COPILOT.md#prompt-8--auditoria-da-análise).
-
-### Entregar (passos 13 a 20)
-
-**13. Baixe a página do mês.** Em `gerar-report.html`, **Baixar página do mês (.html)** → salve em `reports/` com o nome sugerido (`2026-10.html`). Ela abre em qualquer navegador, com imagens e vídeos dentro.
-
-**14. Confira no Chrome.** Dois cliques no arquivo salvo. Role a página: as seções aparecem suaves, os números grandes contam até o valor e a barra do Creative X cresce. O vídeo do projeto principal toca no clique; as peças abrem maiores. Aperte **F12 → ícone do celular** (Ctrl+Shift+M) para ver como fica no celular.
-
-**15. Abra o conversor.** Dois cliques em `converter-html-eml.html` → **Escolher o arquivo .html** → escolha a página do passo 13. O **Status** mostra cada etapa em tempo real (✓ pronto, ! olhar, ✕ problema).
-
-**16. Suba a versão interativa.** **Baixar versão interativa (.html)** → suba numa pasta do SharePoint que o público do e-mail consiga abrir → **Copiar link** → cole no campo **Link do report completo** (ou guarde em `link_report_completo` e gere de novo).
-
-**17. Revise o e-mail-resumo.** Na **Prévia**, aba **E-mail-resumo**, botões **Computador** e **Celular**. Confira período, números, campanhas, aprendizados, Transformation Hub e próximos passos. Os blocos podem ser desmarcados em **Blocos do e-mail-resumo**. Como os destaques são escolhidos: [CONVERTER_HTML_EML.md](CONVERTER_HTML_EML.md#como-o-resumo-escolhe-os-destaques).
-
-**18. Baixe e teste.** **Baixar e-mail-resumo (.eml)** → dois cliques no arquivo (pasta Downloads): o Outlook abre uma **mensagem nova**. Envie primeiro **só para você**. No Outlook do computador e no celular, confira o layout e **clique em "Ver report completo"**: o report precisa abrir. Peça a alguém de outra equipe para testar o link (permissão do SharePoint).
-
-**19. Envie.** Abra o `.eml` de novo, coloque os destinatários autorizados e envie pelo Outlook corporativo. Precisa mandar o report inteiro por e-mail? **Baixar e-mail completo (.eml, opcional)**. Detalhes: [HOW_TO_EXPORT_EML.md](HOW_TO_EXPORT_EML.md).
-
-**20. Registre.** Anote a data do envio e a versão (o nome do arquivo em `reports/`). No ambiente do banco, com Git: *Commit* (Ctrl+K) com a mensagem `report: outubro 2026` → *Push* (Ctrl+Shift+K). Sem Git: copie a pasta do projeto para o local de backup combinado ([BACKUP.md](BACKUP.md)).
-
-> **Dados reais só em ambiente autorizado.** A página do mês, a versão interativa e os `.eml` têm resultados internos: ficam no computador do trabalho, no SharePoint e no Outlook corporativos. Não suba para repositório público nem para serviços externos.
-
----
-
-## Mapa: cada bloco e onde ele aparece
-
-| Bloco no arquivo | Onde aparece no e-mail |
-|---|---|
-| `[EDICAO]` | Selo do mês na capa, "Foco de…", assunto e o rodapé ("Até [próximo mês].", "Dúvidas e sugestões" = `contato`, "Próxima edição" = `proximo_mes`, assinatura com o mês) |
-| `[ABERTURA]` | **01** · frase do mês na capa (`frase` + `frase_final` em itálico) e o texto da caixa de entrada (`previa`) |
-| `[PROJETO PRINCIPAL]` | **01** · nome, resumo e peça na capa |
-| `[NUMERO 1]` a `[NUMERO 3]` (até 4) | **01** · faixa "Projeto principal em números", um por coluna da grade (o 1º em vermelho). Use 3; com 4, as colunas ficam iguais e saem da grade |
-| `[LANCAMOS]` | **02** · título da seção "O que lançamos" |
-| `[DESTAQUE]` | **02** · projeto em destaque (peça vertical no computador, horizontal no celular) |
-| `[RESULTADO 1]` a `[RESULTADO 3]` | **02** · números do destaque |
-| `[LANCAMENTO 1]` a `[LANCAMENTO 6]` | **02** · "Também neste mês", com miniatura (linhas de 3) |
-| `[CREATIVE X]` | **03** · score anterior → atual, barra e frase |
-| `[FOI BEM 1]` a `[4]`, `[A MELHORAR 1]` a `[4]` | Resumo das campanhas, depois do Creative X e antes do Transformation Hub: o que foi bem (verde) e o que precisa melhorar (âmbar) |
-| `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Transformation Hub: nome, texto, `status` (ex.: "Previsão de lançamento: nov/26"), `logo:` (PNG original do logo do projeto, 56 px), `links:` (ex.: documento e agente) e até 3 prints (`prints:`, `descricao_prints:`) |
-| `[APRENDIZADO 1]` a `[3]` | **05** · O que aprendemos |
-| `[FOCO]` | **06** · bloco vermelho do foco do próximo mês; `selo:` opcional (PNG original do selo da campanha, versão para fundo vermelho) |
-| `[AGENDA 1]` a `[AGENDA 6]` | **07** · Também vem aí (linhas de 3) |
-
-A formiguinha aparece sozinha no rodapé. Não há campo para ela no arquivo do mês.
-
-**Clique nas peças.** Com `link:` preenchido, a peça e o "Ver peça →" abrem o link no e-mail e no navegador. Sem link, a peça não clica no e-mail (nada de link falso); na página do mês (.html), um clique abre a peça inteira, maior, por cima do report (Esc ou × fecham).
-
-**Regra do report:** cada projeto aparece **uma vez**. O projeto principal não se repete em "O que lançamos".
-
----
-
-## Onde está cada texto no HTML?
-
-O caminho recomendado é sempre o arquivo do mês: o layout nunca quebra e o mês seguinte começa de uma cópia. Mas a página gerada (`reports/2026-10.html`) também leva **comentários `EDITAR AQUI`**, para quem precisar achar um texto direto nela (Ctrl+F no PyCharm ou no Chrome, em "Ver código-fonte"):
-
-```html
-<!-- EDITAR AQUI: PERÍODO → dados/AAAA-MM.txt › [EDICAO] mes, ano (selo do mês) -->
-<!-- EDITAR AQUI: RESULTADO PRINCIPAL (INDICADORES) → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 3] … -->
-<!-- EDITAR AQUI: IMAGEM DO PROJETO PRINCIPAL → … -->
-<!-- EDITAR AQUI: APRENDIZADO → dados/AAAA-MM.txt › [APRENDIZADO 1..3] titulo, texto, levamos -->
-```
-
-Cada comentário diz o bloco e o campo do arquivo de dados. Se editar a página direto (PyCharm ou Chrome), **passe a mesma mudança para o arquivo de dados**: senão ela some quando o report for gerado de novo.
-
-**Não apague** os atributos `data-campo="…"` dos textos: são eles que levam cada texto para o e-mail-resumo. O movimento (números contando, barra crescendo) também não depende de nada que você edita: ele reconhece a estrutura das seções, então trocar texto, número ou imagem não quebra a animação.
-
-## Receitas rápidas
+**Barra de ferramentas:** Salvar report (.html) · Importar conteúdo (Copilot) · Desfazer · Computador / Celular. A linha ao lado diz o que aconteceu.
 
 | Quero… | Faço… |
 |---|---|
-| Tirar um item (número, lançamento, aprendizado) | Apago o bloco inteiro, do `[NOME]` até antes do próximo bloco |
-| Tirar uma seção inteira | Apago todos os blocos dela. A numeração das seções se ajusta |
-| Acrescentar um item | Copio um bloco igual, colo embaixo e troco o número. Limites: 4 números (recomendado 3), 3 resultados, 3 lançamentos, 3 Transformation, 3 aprendizados, 6 agenda |
-| Trocar o texto do botão | `tipo: peca` (Ver peça →), `video` (▶ Assistir), `projeto` (Ver projeto →), `demo` (Ver demonstração →) |
-| Tirar o botão | Deixo `link:` vazio |
-| Status de um lançamento | `status: Resultado em 28/10` e `status_cor: ambar` (previsto) ou `verde` (no ar) |
-| Data na agenda | `data: 12 OUT` aparece grande e vermelha; `data: A DEFINIR` aparece em cinza |
-| Ícones no Transformation Hub | `icones: icone-prancheta, icone-lupa` (arquivos de `assets/icones/`) |
-| Prints no Transformation Hub | `prints: print-1.png, print-2.png` (até 3, na pasta do mês) e `descricao_prints: Tela do agente \| Resultado` (separados por `\|`) |
-| Logo de um projeto do Transformation Hub | `logo: logo-agente.png` (PNG original, na pasta do mês) e `descricao_logo: Logo do agente`. O logo ocupa o lugar dos ícones |
-| Links de um projeto do Transformation Hub | `links: Documento One Brief \| https://… ; Briefing Agent \| https://…` (texto `\|` endereço; vários, separados por `;`) |
-| Previsão de lançamento | `status: Previsão de lançamento: nov/26` e `status_cor: ambar` |
-| Trocar imagem por vídeo | Na peça: `tipo: video`, `imagem:` com a capa (sem ▶) e `video: arquivo.mp4` (na pasta do mês). Desfazer: volte `tipo: peca` e apague a linha `video:` |
-| Quebrar a linha de um título | Escrevo `<br>` no ponto da quebra |
+| Mudar um texto | Clico no texto (contorno tracejado) e escrevo. O exemplo [entre colchetes] fica selecionado: o que eu digito entra no lugar. **Enter** confirma; **Shift+Enter** quebra a linha |
+| Mudar um indicador | Clico no valor, no título e na base de comparação e escrevo. Na variação: `▲ +25%` ou `▼ −20%`. Ao clicar na etiqueta aparecem **Cor: verde** (positivo; custo que caiu também é positivo) e **Cor: âmbar** (atenção) |
+| Mudar o período | Clico no período (ex.: `NOVEMBRO 2026`): ele muda em todos os lugares |
+| Tirar um item sem dado | Passo o mouse no item › **Ocultar item** (canto de cima, à direita). Nunca deixo o número do mês anterior nem escrevo 0 |
+| Tirar uma seção inteira | **Seções do report** › desmarco a seção. A numeração se ajusta |
+| Voltar atrás | **Desfazer** (imagem, link, cor, item); **Ctrl+Z** (texto) |
 
-## Erros comuns
+`%` é variação relativa (+30%); `p.p.` é diferença entre duas porcentagens (de 40% para 52% = +12 p.p.). Não troque um pelo outro.
 
-| A ferramenta diz | O que fazer |
+### Trocar uma imagem: os 11 passos
+
+1. Prepare a imagem: `.png` ou `.jpg`, nome no padrão, na pasta `imagens` do mês.
+2. Abra o emulador e o report.
+3. Encontre a imagem na página (role dentro do quadro).
+4. Passe o mouse sobre ela: aparece a barra vermelha.
+5. Clique em **Trocar imagem**.
+6. Na janela **Abrir** do Windows, vá até a pasta `imagens` do mês.
+7. Clique no arquivo e em **Abrir**.
+8. Confira a imagem no lugar e a linha de estado ("Imagem trocada: nome-do-arquivo"). Se aparecer "pode ficar borrada", a imagem é menor que o espaço: peça a versão em alta.
+9. Clique em **Descrição** e escreva o que a imagem mostra.
+10. Clique em **Salvar report (.html)**.
+11. Reabra o arquivo salvo e confira se a imagem continua lá.
+
+**Imagens opcionais:** selo, logo e prints do Transformation Hub têm **Tirar imagem** (o espaço sai junto). **Vídeo:** no projeto principal, no destaque e nos lançamentos, **Colocar vídeo** (`.mp4`); depois, **Trocar vídeo** ou **Tirar o vídeo**. No report completo o vídeo toca; no e-mail vai só a capa.
+
+**Links:** passe o mouse no link › **Colocar link** / **Trocar link** (endereço com `https://`; caminho do computador, como `C:\…`, é recusado), **Anexar PDF** (o documento vai dentro do report e abre em nova aba) ou **Tirar link**. No Transformation Hub, **Texto do link** muda o nome do link.
+
+### Campanhas (O que lançamos)
+
+Destaque do mês (categoria, título, texto, imagem e até 3 resultados) e até 6 lançamentos (status, nome, texto, imagem). Status em verde (no ar) ou âmbar (em teste, previsto). Lançamentos a menos no mês: **Ocultar item** nos que sobrarem.
+
+### Importar conteúdo do Copilot
+
+1. Organize os textos e números no Copilot corporativo com a [biblioteca de prompts](PROMPTS_COPILOT.md) (prompts 1 a 10).
+2. Com tudo aprovado, use o **Prompt 11** e copie a resposta.
+3. No emulador, **Importar conteúdo (Copilot)** › cole › **Aplicar na página**.
+4. O emulador diz quantos campos preencheu e o que ficou de fora. Confira campo a campo.
+
+Imagens, links e PDF não vêm pelo Copilot: troque na página.
+
+### Salvar, reabrir e recuperar
+
+- **Salvar report (.html):** o Chrome ou o Edge abre a janela **Salvar como**, com o nome sugerido (`report-2026-11.html`). Escolha a pasta do mês. Sem a janela, o arquivo vai para Downloads. Salvar de novo grava por cima.
+- Depois de salvar, o estado diz se ainda sobraram textos [entre colchetes] ou links sem endereço.
+- **Reabrir:** "Abrir um report salvo (.html)". Textos, números e imagens voltam como ficaram.
+- **Fechou sem salvar?** Ao abrir o emulador de novo: "Há uma edição não salva…" › **Recuperar a edição**. A cópia fica só neste navegador, neste computador.
+- **Mês novo a partir do anterior:** abra o report do mês anterior e troque o período. Ao salvar, o emulador lista os números que ninguém mexeu: confira antes de "Salvar mesmo assim".
+
+## 3. Conferir e publicar
+
+**No navegador:** dois cliques no `report-AAAA-MM.html`. Textos sem [colchetes]; números iguais à fonte, com base e cor certas; imagens nítidas; links e PDF abrindo em nova aba; vídeo tocando; ao rolar, os números contam até o valor.
+
+**No celular:** no emulador, botão **Celular**; depois de publicado, abra o link no celular.
+
+**Publicar:**
+
+1. Publique o `report-AAAA-MM.html` no **ambiente corporativo autorizado** da área, com acesso para quem vai receber o e-mail.
+2. Copie o link de compartilhamento (começa com `https://`).
+3. No emulador, passo 3, cole em **Link do report completo**.
+4. Teste numa janela anônima (Chrome) ou InPrivate (Edge): **Ctrl+Shift+N**, cole e aperte Enter. O report precisa abrir.
+
+## 4. E-mail-resumo e envio
+
+1. **Sem o link**, o botão "Baixar e-mail-resumo" fica bloqueado e a prévia mostra "FALTA O LINK DO REPORT COMPLETO".
+2. **Indicadores:** vêm marcados os números do projeto principal (até 3). Troque se quiser (resultados do destaque ou Creative X). Só aparecem indicadores que estão no report.
+3. **Botão:** "Acessar report completo", o único link do e-mail.
+4. **Status:** ✓ pronto · ! olhar · ✕ problema. **Prévia:** Computador e Celular.
+5. **Baixar e-mail-resumo (.eml):** vai para Downloads (`report-AAAA-MM-resumo.eml`).
+6. **Outlook:** dois cliques no `.eml`. O Outlook clássico abre uma mensagem nova com assunto e imagens. Abriu como mensagem recebida (novo Outlook)? **Encaminhar** e apague o cabeçalho do topo.
+7. Envie primeiro **só para você**: confira no computador e no celular e clique no botão.
+8. Tudo certo: abra o `.eml` de novo, coloque os destinatários autorizados e envie.
+
+## 5. Problemas comuns
+
+| O que aconteceu | O que fazer |
 |---|---|
-| "Linha sem ':'" | Falta o `:` depois do nome do campo, ou é um comentário sem `#` no começo |
-| "Bloco [...] desconhecido" | O nome entre colchetes foi alterado. Use os nomes do mapa acima |
-| "imagem não encontrada" | Nome do arquivo diferente: confira maiúsculas, acentos e extensão (`.jpg` / `.png`) |
-| "o campo ... é obrigatório" | Preencha o campo indicado |
-| "Campo ... não existe ... ignorado" | Nome de campo digitado errado (ex.: `titlo`) |
-| "é um caminho de rede" | Você colou `\\servidor\...` ou `C:\...`. Use o link do SharePoint |
-| "não está salvo em UTF-8" | Salve o arquivo em UTF-8 (o PyCharm já salva assim) |
-| A página não mudou | Salve e clique em **Selecionar a pasta** de novo |
-| Conversor: "Falta o link do report completo" | Suba a versão interativa no SharePoint e cole o link (passo 16) |
-| Conversor: "Esta página não tem os campos do resumo" | A página é de antes da versão 4.2: gere de novo pelo `gerar-report.html` |
-| O resumo deixou um item de fora | É a regra de seleção (os primeiros de cada lista). Mude a ordem dos blocos no arquivo de dados: o 1º é o que entra |
+| O emulador abriu em outro programa | Botão direito › Abrir com › Chrome ou Edge |
+| Não consigo escrever no texto | Clique dentro do contorno tracejado. Rótulos fixos (ex.: "O QUE LANÇAMOS") não mudam |
+| "A imagem não abriu" | Use `.png` ou `.jpg` |
+| "pode ficar borrada" | A imagem é menor que o espaço: peça a versão em alta |
+| "Link não aceito" | O endereço precisa começar com `https://` |
+| Fechei sem salvar | Abra o emulador: **Recuperar a edição** |
+| Não acho o arquivo salvo | Downloads ou a pasta escolhida; pesquise `report-` no Explorador |
+| "Confira os números antes de salvar" | O período mudou e há números iguais ao mês anterior: atualize ou oculte |
+| "Falta o link do report completo" | Publique o report e cole o link no passo 3 |
+| "Ainda é texto do modelo" | Sobrou texto [entre colchetes] ou X: corrija e salve |
+| O botão do e-mail não abre o report | Teste o link em janela anônima; peça acesso para o público |
 
-Mais dúvidas: [FAQ.md](FAQ.md).
+## 6. Checklist mensal
 
-## O que mudar raramente
+**Preparar**
+- [ ] Resultados aprovados pela área
+- [ ] Imagens do mês na pasta, com nomes no padrão (logos e selos: PNG original)
+- [ ] Textos organizados (Copilot, prompts 1 a 10)
 
-| Arquivo | Quando | Guia |
-|---|---|---|
-| `config/marca.txt` | Chama, fonte, cores, formiguinha, domínios de link | Comentários do próprio arquivo, [GUIA_TIPOGRAFIA.md](GUIA_TIPOGRAFIA.md), [assets/marca/README.md](../assets/marca/README.md) |
-| `template/report.html` | Mudar o **layout** (exige alguém que conheça HTML de e-mail) | [ARQUITETURA.md](ARQUITETURA.md) |
-| `tools/motor.js` | Nunca, no dia a dia | — |
+**Editar e salvar**
+- [ ] Período certo
+- [ ] Frase do mês e projeto principal
+- [ ] Indicadores: valor, base, variação e cor (sem dado: item oculto)
+- [ ] Imagens trocadas e descrições escritas
+- [ ] Links com `https://` (ou PDF anexado)
+- [ ] Nenhum texto [entre colchetes]
+- [ ] Salvo como `report-AAAA-MM.html`, reaberto e conferido (computador e celular)
+
+**Publicar e enviar**
+- [ ] Report publicado no ambiente autorizado; link testado em janela anônima
+- [ ] Link colado no emulador; até 3 indicadores; status verde; prévia conferida
+- [ ] `.eml` aberto no Outlook, enviado primeiro para você, botão testado
+- [ ] Enviado aos destinatários autorizados

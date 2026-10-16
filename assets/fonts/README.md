@@ -5,7 +5,7 @@ Esta pasta recebe os arquivos **oficiais** das fontes Santander. **Hoje ela não
 ## Passo a passo (quando os arquivos chegarem)
 
 1. Baixe os `.otf` no **Portal da Marca** (link no Brand Guide, seção 3.3) ou peça a Marca.
-2. No PyCharm, arraste os arquivos para esta pasta (`assets/fonts/`).
+2. No Explorador de Arquivos, copie os arquivos para esta pasta (`assets/fonts/`).
 3. Abra `fontes-santander.css` (nesta pasta). Procure (Ctrl+F) `INSERIR ARQUIVO .OTF AQUI`.
 4. Em cada bloco, confira se o nome dentro de `url("…")` é igual ao nome do arquivo. Se não for, troque **só** o nome. Os nomes de hoje são **provisórios**.
 5. Abra `gerar-report.html` → **Selecionar a pasta do projeto**. Na **Conferência**, em "Para saber", aparece "Fontes Santander: N de 13 arquivos encontrados".
