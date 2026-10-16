@@ -4,56 +4,42 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 
 ## ANTES DE ENVIAR
 
-**Conteúdo** (no arquivo `dados/AAAA-MM.txt`)
+**Conteúdo** (no emulador)
 
-- [ ] Mês correto (`mes`, `ano`, `proximo_mes`, `pasta_imagens`)
-- [ ] Projeto principal correto (nome, resumo, peça)
-- [ ] Nenhum conteúdo de exemplo restante: Lorem Ipsum, `X`, "Mês", "AAAA"
-- [ ] Métricas atualizadas e conferidas com a fonte (painel ou planilha)
-- [ ] Creative X atualizado (anterior, atual, período)
-- [ ] Transformation Hub atualizado (status/previsão, logo, links, prints), conferido com a área
-- [ ] `link_report_completo` preenchido (link do SharePoint, não caminho do computador) ou link em mãos
-- [ ] Aprendizados e foco do próximo mês escritos
-- [ ] Agenda atualizada
+- [ ] Período correto (muda em toda a página)
+- [ ] Frase do mês e projeto principal (nome, resumo, imagem)
+- [ ] Indicadores conferidos com a fonte aprovada: valor, base de comparação, variação e cor; sem dado, item oculto (nunca 0 nem o número do mês anterior)
+- [ ] Creative X atualizado (anterior, atual, variação em p.p.)
+- [ ] Campanhas: destaque, resultados e lançamentos; o que não vale no mês, oculto
+- [ ] Transformation Hub (status/previsão, logo, links ou PDF), conferido com a área
+- [ ] Aprendizados, foco do próximo mês e agenda
+- [ ] Nenhum texto de exemplo [entre colchetes] nem `X` (o estado avisa depois de salvar)
+- [ ] Imagens trocadas, nítidas, com descrição; links com `https://`
+- [ ] Salvo como `report-AAAA-MM.html`, reaberto no emulador e conferido
 
-**Na página `gerar-report.html`**
+**No navegador (report salvo)**
 
-- [ ] Conferência sem **erros** e sem **pendências** (faixa verde: "Tudo certo")
-- [ ] Miniaturas atualizadas (seção "Imagens preparadas" com os arquivos do mês)
-- [ ] Prévia conferida em **Computador** e em **Celular**
-- [ ] Todas as imagens abrem: "Ver peça" de cada uma abre a peça grande
-- [ ] Todos os vídeos abrem: "▶ Assistir" toca **com som**
-- [ ] Todos os links funcionam (seção "Teste os links" → **Abrir** em cada linha)
-- [ ] Nenhum placeholder restante (`[...]`, Lorem Ipsum, `X`)
-- [ ] Prévia no **Celular**: a peça do destaque aparece (na horizontal) e nada sai da tela
-
-**No Chrome (página do mês)**
-
-- [ ] Página do mês salva em `reports/` e aberta no Chrome
 - [ ] Movimento: seções aparecem, números contam até o valor certo, barra do Creative X cresce
-- [ ] Vídeo toca no clique; peças abrem maiores; Esc fecha
-- [ ] Celular (F12 → Ctrl+Shift+M): nada sai da tela
+- [ ] Vídeo toca no clique; peças abrem maiores; PDF abre em nova aba; Esc fecha
+- [ ] Celular (botão "Celular" no emulador; depois, o link no celular): nada sai da tela
 
-**No conversor (`converter-html-eml.html`)**
+**Publicação e e-mail-resumo**
 
-- [ ] Versão interativa baixada e enviada ao SharePoint; link copiado e colado
-- [ ] Status sem ✕; "Ainda não preenchido" não aparece
-- [ ] Prévia do **e-mail-resumo** conferida em Computador e Celular: período, números, campanhas, aprendizados, Transformation Hub, próximos passos
-- [ ] Um único botão ("Ver report completo") no fim; nenhuma imagem com ▶
+- [ ] Report publicado no ambiente corporativo autorizado; link de compartilhamento colado no emulador
+- [ ] Link testado em janela anônima (Ctrl+Shift+N); uma pessoa de outra equipe também abriu
+- [ ] Até 3 indicadores escolhidos; botão "Acessar report completo"
+- [ ] Status sem ✕; prévia conferida em Computador e Celular
 
 **Envio de teste (só para você)**
 
-- [ ] `-resumo.eml` baixado (e o completo, só se for usar)
-- [ ] Outlook Desktop revisado: layout, imagens e links
-- [ ] Outlook Web revisado (se a área usa)
-- [ ] Celular revisado: tudo legível, sem rolar para o lado, botões funcionam
-- [ ] Assunto e pré-visualização corretos na caixa de entrada
-- [ ] O botão "Ver report completo" abre o report (no computador e no celular); uma pessoa de outra equipe também conseguiu abrir
+- [ ] `-resumo.eml` baixado e aberto no Outlook
+- [ ] Layout, imagens, assunto e pré-visualização corretos (computador, web se a área usa, celular)
+- [ ] O botão "Acessar report completo" abre o report (computador e celular)
 
 **Envio para a área**
 
-- [ ] `-resumo.eml` aberto de novo, destinatários autorizados preenchidos, enviado pelo Outlook corporativo
-- [ ] `.html` do mês guardado em `reports/`
+- [ ] `-resumo.eml` aberto de novo, destinatários autorizados, enviado pelo Outlook corporativo
+- [ ] `report-AAAA-MM.html` guardado na pasta do mês
 
 ## Permissões (quando houver peça ou vídeo novo)
 
@@ -73,8 +59,9 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 
 | Verificação | Status |
 |---|---|
-| Motor: 62 testes automáticos (inclui estado vazio, paleta do Brand Guide, e-mail-resumo e regras de seleção) | Passam |
-| Conversor de ponta a ponta (e-mail-resumo com um único destino, versão interativa, e-mail completo, acompanhar o arquivo) | Passa |
+| Motor: 66 testes automáticos (estado vazio, paleta do Brand Guide, e-mail-resumo, indicadores, importação do Copilot, PDF anexo) | Passam |
+| Emulador de ponta a ponta, como uma pessoa faria, com conteúdo fictício: abrir o modelo, editar texto, número e cor, trocar imagem, colocar link (e recusar caminho do computador), ocultar item e seção, tirar imagem opcional, importar conteúdo, salvar, reabrir, aviso do mês anterior, recuperar a edição, e-mail-resumo (3 indicadores, um único destino, sem link bloqueado), `.eml` MIME; também na versão avulsa | Passa |
+| Chamadas da apresentação (PDF) abrindo o emulador, o guia e o report no visualizador do Chromium | Passa |
 | Movimento na versão interativa (contagem, barra, reduzir movimento, edição) | Passa |
 | Página de geração de ponta a ponta no Chromium, sem vazar para o lado de 320 a 1440 px | Passa |
 | Fonte `.otf` de teste em `assets/fonts/` | Carrega na prévia e no `.html`; fora do `.eml` |
@@ -82,5 +69,6 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 | Estrutura do `.eml` (texto + HTML, imagens embutidas) | Conferida |
 | Imagens grandes reduzidas e recortadas com boa qualidade | Conferido |
 | Outlook Desktop, Outlook Web, novo Outlook, celular | **Não testado** (sem Outlook neste ambiente) |
-| Links reais, permissões, vídeo com som | **Não testado** (depende do SharePoint do banco) |
+| Links reais, permissões, vídeo com som | **Não testado** (depende do ambiente corporativo) |
+| Microsoft Edge, Windows (Explorador, janela "Salvar como"), PowerPoint | **Não testado** (ambiente Linux com Chromium) |
 | Modo escuro | **Não testado** |

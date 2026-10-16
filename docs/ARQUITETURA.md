@@ -110,6 +110,23 @@ O e-mail-resumo **não corta** o report: ele tem template próprio (`RESUMO_TPL`
 - **Onde os atributos vivem:** só na página. `paraEmail` e `limparHtmlEditado` tiram `data-campo`, `data-tom`, os comentários `EDITAR AQUI` e a meta `report-completo` dos e-mails.
 - **Movimento independente do conteúdo:** o script do movimento reconhece a estrutura (marcas de seção, números com fonte grande, a barra do Creative X), não os textos de um mês. Trocar texto, número ou imagem não exige mexer em código.
 
+## Emulador: edição na própria página (4.3)
+
+- **Uma página, três papéis:** o emulador abre o report num `iframe` (`srcdoc`, `sandbox="allow-same-origin"`, sem script: o movimento fica parado na edição). A página de fora instrumenta o documento: `contenteditable` nos `[data-campo]`, barra flutuante para `img[data-img]`, links (`a.cta`, `a[data-anexo]`, link pendente) e `[data-item]`.
+- **Marcas do template:** `data-campo` (texto ou número; também lido pelo e-mail-resumo), `data-tom` (verde/âmbar), `data-img` (imagem trocável; cópias de computador e celular têm a mesma chave), `data-item` (item ocultável) e `<!--secao:x-->` (seções). Saem de todo e-mail (`paraEmail`, `limparHtmlEditado`).
+- **Salvar:** o documento é clonado, perde as marcas do editor (`contenteditable`, `data-ed-*`, barra, CSS) e os nós ocultados, renumera as seções e passa por `Motor.paginaInterativa` (script do movimento, ampliação, vídeo e PDF). Grava com `showSaveFilePicker` (Chrome/Edge) ou baixa. Páginas de antes da 4.3 (frase do mês com a segunda parte dentro) são normalizadas ao abrir.
+- **Imagens:** recortadas e reduzidas no navegador (`canvas`) para o dobro do tamanho na tela (JPEG 0,86; PNG para logo e selo); a versão ampliada vai até 1400 px; vídeo ganha a miniatura com ▶.
+- **Rascunho:** IndexedDB (`emulador-report`), só no navegador do computador, apagado ao salvar.
+- **Importação:** `Motor.importarDados` lê o formato de blocos (`ler`) e devolve `{campos: {"numero-1.valor": {texto, tipo, tom}}}`; variação ganha a seta e o tom.
+
+### Modelo em branco (coringa)
+
+`dados/CORINGA.txt` (máximo de cada seção; textos [entre colchetes]; números em X; imagens neutras de `assets/coringa/`) → página gerada pelo `gerar-report.html` → `tools/coringa.js` (`window.CORINGA_HTML`, com `<` escapado). Depois de mudar o template: gere a página do CORINGA, atualize `tools/coringa.js`, rode `node tools/montar-avulso.js` e os testes.
+
+### Kit
+
+`node tools/montar-avulso.js` embute `tools/motor.js` e `tools/coringa.js` no emulador (`kit/emulador-report.html`, ~0,8 MB), que funciona sozinho em qualquer pasta. As chamadas da apresentação usam links relativos (`emulador-report.html`, `guia-operacional.pdf`, report do mês): no PowerPoint e no PDF, resolvem a partir da pasta da apresentação.
+
 ## Progressive enhancement
 
 | Camada | O que é | Onde funciona |
@@ -167,7 +184,7 @@ O que a ferramenta **não** consegue verificar: se o link abre e se o destinatá
 | Fontes | No e-mail, só fontes instaladas (Santander, se houver; senão Arial), configuráveis. Os `.otf` de `assets/fonts/` entram só na prévia e na página `.html`, embutidos; nunca no `.eml` |
 | `gerar-report.html` | Carrega apenas `tools/motor.js`, local. Sem CDN, sem bibliotecas, sem chamadas de rede |
 | `tools/motor.js` | JavaScript puro, sem dependências |
-| Testes (`tests/`) | Opcionais, para desenvolvimento. `motor.test.js` usa só o Node.js; `ferramenta.e2e.js`, `conversor.e2e.js` e `movimento.e2e.js` usam o Playwright. Nenhum deles é necessário para gerar o report |
+| Testes (`tests/`) | Opcionais, para desenvolvimento. `motor.test.js` usa só o Node.js; `ferramenta.e2e.js`, `emulador.e2e.js` e `movimento.e2e.js` usam o Playwright. Nenhum deles é necessário para gerar o report |
 
 ## Modos de operação
 

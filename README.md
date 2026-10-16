@@ -1,13 +1,13 @@
 # Report Mensal · Creative Strategy PF
 
-Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas experiências que saem do **mesmo arquivo de texto por mês**:
+Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas experiências que saem **da mesma página**:
 
-- **o report completo** (HTML, no SharePoint): movimento ao rolar, vídeos e peças que abrem maiores;
-- **o e-mail-resumo** (Outlook): a porta de entrada, estático, com os destaques do mês e um único botão, "Ver report completo".
+- **o report completo** (HTML): movimento ao rolar, vídeos, peças e documentos no clique;
+- **o e-mail-resumo** (Outlook): a porta de entrada, estático, com a frase do mês, até 3 indicadores e um único botão, "Acessar report completo".
 
-Ninguém precisa editar HTML.
+O time atualiza tudo no **emulador**: um arquivo só, que abre no Chrome ou no Edge, sem instalar nada.
 
-**Versão 4.2 (2026-10-16).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 4.3 (2026-10-16).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -15,26 +15,40 @@ Ninguém precisa editar HTML.
 <img src="docs/preview-modelo-celular.jpg" width="200" alt="Prévia do modelo em branco no celular">
 </p>
 
-> Este repositório é um **modelo sem dados**: textos em **Lorem Ipsum**, números como **X%**, **R$ X** e **X p.p.**, e espaços marcados para imagens e links. Nada disso é resultado real. Os dados de cada mês ficam só no ambiente do banco (veja [Segurança dos dados](#segurança-dos-dados)).
+> Este repositório é um **modelo sem dados**: o modelo em branco tem textos [entre colchetes] e números em **X**; o exemplo de treinamento é **fictício** (Janeiro 2099). Nada disso é resultado real. Os dados de cada mês ficam só no ambiente corporativo autorizado (veja [Segurança dos dados](#segurança-dos-dados)).
 >
 > Identidade visual conforme o **Brand Guide Santander Brasil (maio/2026)**: paleta, tipografia, chama, cantos e tom de voz ([ARQUITETURA.md › Brand Guide](docs/ARQUITETURA.md#brand-guide-como-foi-aplicado-num-e-mail)).
 
 ---
 
-## 1. O que é
+## Para o time: o kit
 
-Uma ferramenta simples para montar o report mensal:
+Tudo o que o time usa está em **[`kit/`](kit/)**:
 
-- **você escreve** o conteúdo do mês num arquivo de texto (`dados/AAAA-MM.txt`);
-- **uma página no navegador** (`gerar-report.html`) confere tudo, prepara as imagens e gera a página do mês;
-- **o conversor** (`converter-html-eml.html`) gera o **e-mail-resumo** (`.eml`) e a **versão interativa** para o SharePoint;
-- **o Outlook** abre o e-mail-resumo pronto para enviar; o botão dele leva ao report completo.
+| Arquivo | Para quê |
+|---|---|
+| [`emulador-report.html`](kit/emulador-report.html) | **O emulador.** Abre o modelo em branco ou o report salvo, edita textos, indicadores, imagens e links na própria página, salva o report do mês e gera o e-mail-resumo (`.eml`) |
+| [`guia-operacional.pdf`](kit/guia-operacional.pdf) | **O guia**, passo a passo, com telas reais do emulador e a biblioteca de 12 prompts do Copilot ([.pptx](kit/guia-operacional.pptx) editável) |
+| [`apresentacao-executiva.pdf`](kit/apresentacao-executiva.pdf) | A apresentação da nova experiência, 10 slides ([.pptx](kit/apresentacao-executiva.pptx)). As chamadas abrem os arquivos desta pasta |
+| [`report-exemplo.html`](kit/report-exemplo.html) | Um report completo de exemplo (fictício), para ver a experiência |
+| [`report-coringa.html`](kit/report-coringa.html) | O modelo em branco (o mesmo que o emulador abre em "Começar do modelo em branco") |
 
-Passo a passo do mês: [docs/COMO_ATUALIZAR_O_MES.md](docs/COMO_ATUALIZAR_O_MES.md). Guia ilustrado para quem nunca mexeu no projeto: [apresentacoes/guia-operacional.pdf](apresentacoes/guia-operacional.pdf).
+**O mês em 8 passos** (detalhes no guia e em [docs/COMO_ATUALIZAR_O_MES.md](docs/COMO_ATUALIZAR_O_MES.md)):
 
-## 2. Para que serve
+1. **Organizar:** imagens do mês numa pasta, com nomes no padrão (`black_friday_selo.png`, `one_brief_icone.png`).
+2. **Abrir** o `emulador-report.html` no Chrome ou no Edge.
+3. **Editar** na própria página: clique no texto e escreva; passe o mouse na imagem e "Trocar imagem"; "Ocultar item" no que não vale no mês. Ou cole o conteúdo organizado pelo Copilot em **Importar conteúdo**.
+4. **Salvar** o report do mês (`report-AAAA-MM.html`).
+5. **Conferir:** reabrir o arquivo salvo, no computador e no celular.
+6. **Publicar** no ambiente corporativo autorizado e colar o link no emulador.
+7. **E-mail-resumo:** escolher até 3 indicadores e baixar o `.eml`.
+8. **Enviar** pelo Outlook: primeiro para você, depois para a área.
 
-Contar o mês da área em uma página, sempre na mesma ordem:
+Regras que o emulador segue: não cria nem calcula número; indicador sem dado é ocultado (nunca 0 nem o número do mês anterior); ao mudar o período de um report antigo, lista os números que ninguém mexeu antes de salvar; sem o link do report completo, o e-mail-resumo não é liberado.
+
+## Como o report conta o mês
+
+Sempre na mesma ordem:
 
 | | Seção | Pergunta que responde |
 |---|---|---|
@@ -46,216 +60,60 @@ Contar o mês da área em uma página, sempre na mesma ordem:
 | 06 | **Foco do próximo mês** | Qual é a prioridade agora? |
 | 07 | **Também vem aí** | O que está na agenda? |
 
-## 3. Como funciona
-
-```text
-  VOCÊ EDITA                        ABRE NO NAVEGADOR          RESULTADO
-  dados/AAAA-MM.txt  (texto)   ─┐
-  assets/AAAA-MM/    (imagens)  ─┼──►  gerar-report.html  ──►  AAAA-MM.html (página do mês) → reports/ → Chrome
-  config/marca.txt   (raro)    ─┘     (confere e monta)              │
-                                                                     ▼
-                                       converter-html-eml.html ──►  AAAA-MM-interativo.html → SharePoint (report completo)
-                                                               └──►  AAAA-MM-resumo.eml      → Outlook → enviar
-```
-
-- **Lorem Ipsum, `X` e `[INSERIR …]` = ainda não preenchido.** A página lista cada um, com a linha. Enquanto houver algum, só sai um RASCUNHO.
-- **Imagens:** pode usar a original, em alta. A página reduz e recorta no formato de cada espaço.
-- **Nada sai do computador:** a página só lê a pasta escolhida. Sem internet, sem servidor, sem instalação.
-
-## 4. Estrutura de arquivos
-
-```text
-report_mensal_st/
-├── gerar-report.html        ← ABRA ESTE para gerar o e-mail
-├── converter-html-eml.html  ← página do mês → e-mail-resumo + versão interativa (+ e-mail completo, opcional)
-├── report_backup.html       ← backup: o layout aprovado num arquivo só (veja docs/BACKUP.md)
-├── README.md                ← este guia
-├── CHANGELOG.md             ← histórico de versões
-├── dados/                   ← O QUE VOCÊ EDITA TODO MÊS
-│   ├── MODELO.txt           modelo em branco (copie para AAAA-MM.txt)
-│   └── EXEMPLO-treinamento.txt  exemplo 100% fictício, para praticar
-├── assets/                  ← IMAGENS
-│   ├── marca/               chama do Santander (oficial) e paleta de cores
-│   ├── formiguinha/         a personagem (arquivo original)
-│   ├── icones/              ícones do Transformation Hub
-│   ├── exemplo/             imagens neutras do exemplo de treinamento
-│   ├── fonts/               fontes Santander: CSS pronto, arquivos .otf entram aqui
-│   └── fotos/               fotos do banco de imagens (só no ambiente do banco)
-├── config/
-│   └── marca.txt            fontes, cores, chama, formiguinha, links (raramente)
-├── reports/                 página de cada mês, gerada (histórico, no ambiente do banco)
-├── docs/                    guias
-├── apresentacoes/           apresentação executiva e guia operacional (PowerPoint e PDF)
-├── template/report.html     layout aprovado com {{campos}} (técnico, não editar)
-├── tools/motor.js           motor que monta o e-mail (técnico, não editar)
-└── tests/                   testes automáticos (técnico, opcional)
-```
-
-**Só três lugares mudam no dia a dia:** `dados/`, `assets/AAAA-MM/` e, de vez em quando, `config/marca.txt`.
-
-## 5. Como abrir o projeto
-
-1. Baixe ou copie a pasta do projeto inteira (com todas as subpastas), por um caminho **aprovado pela empresa**.
-2. Abra a pasta no **PyCharm** (*File → Open* → escolha a pasta `report_mensal_st`). Passo a passo: [docs/GUIA_PYCHARM.md](docs/GUIA_PYCHARM.md).
-3. Sem PyCharm, o Bloco de Notas também serve para editar os `.txt` (salve sempre em **UTF-8**).
-
-## 6. Como visualizar o HTML
-
-| Quero ver… | Faço… |
-|---|---|
-| O e-mail do mês | Abro `gerar-report.html` (dois cliques) → **Selecionar a pasta do projeto** → a **Prévia** aparece no fim da página, com os botões Computador e Celular |
-| O layout aprovado, sem a ferramenta | Abro `report_backup.html` (dois cliques) |
-| Um mês já enviado | Abro `reports/AAAA-MM.html` |
-
-`template/report.html` sozinho **não** é o e-mail: ele tem `{{campos}}` que a ferramenta preenche.
-
-## 7. Como utilizar o PyCharm
-
-Abrir a pasta, editar o `.txt`, salvar, abrir no navegador, desfazer, usar o Git: tudo em [docs/GUIA_PYCHARM.md](docs/GUIA_PYCHARM.md). Nenhum plugin é obrigatório.
-
-## 8. Como atualizar os resultados
-
-Passo a passo completo: **[docs/COMO_ATUALIZAR_O_MES.md](docs/COMO_ATUALIZAR_O_MES.md)**. Em resumo:
-
-1. Copie `dados/MODELO.txt` (ou o mês anterior) para `dados/AAAA-MM.txt`.
-2. Troque o conteúdo de exemplo (Lorem Ipsum, `X%`, `[INSERIR …]`) pelos dados do mês. Não invente número para completar o layout.
-3. Abra `gerar-report.html`, confira e gere o `.eml`.
-
-Para escolher **quais** resultados destacar, use os prompts do Copilot: [docs/PROMPTS_COPILOT.md](docs/PROMPTS_COPILOT.md).
-
-## 9. Como trocar as imagens
-
-1. Coloque a imagem em `assets/AAAA-MM/` (nome simples, sem espaço nem acento).
-2. No bloco da peça, escreva `imagem: nome-do-arquivo.jpg` e descreva a imagem em `descricao_imagem:`.
-3. Se a parte importante for cortada, use `enquadramento: topo` (ou `baixo`, `esquerda`, `direita`, `centro`).
-
-Fotos do banco de imagens aprovado: [assets/fotos/README.md](assets/fotos/README.md).
-
-## 10. Como editar os textos
-
-Tudo está em `dados/AAAA-MM.txt`, no formato `campo: valor`. Troque só o que vem depois dos dois-pontos. Para quebrar a linha num título, escreva `<br>`. Cada seção do arquivo começa com `EDITAR AQUI`.
-
-Os textos não ficam no HTML: a página monta o HTML a cada geração, para o layout nunca quebrar. Para ver qual campo preenche cada trecho, procure `EDITAR AQUI` em `template/report.html`.
-
-## 11. Como adicionar ou retirar seções
-
-- **Retirar** um item (um número, um lançamento): apague o bloco inteiro no `.txt`.
-- **Retirar uma seção inteira:** apague todos os blocos dela. A seção some e a numeração se ajusta sozinha.
-- **Adicionar** um item: copie um bloco igual e troque o número (`[LANCAMENTO 3]`).
-- **Uma seção nova, que não existe no modelo:** exige mudar o template. Veja [docs/FAQ.md](docs/FAQ.md#posso-criar-uma-seção-nova).
-
-## 12. Como manter a identidade Santander
-
-- Siga o **Brand Guide Santander Brasil (maio/2026)**. Ele é interno e **não** fica no repositório; peça a Marca.
-- Fundo só em Branco, Lisboa, Rio ou Vermelho Santander. Sobre branco, títulos em vermelho e textos em preto. Paleta e regras: [assets/marca/README.md](assets/marca/README.md).
-- Use só a **chama** oficial (sem o nome escrito), em branco sobre o vermelho.
-- A formiguinha aparece **uma vez**, no rodapé, fechando o report. Use sempre o arquivo original.
-- Não use peças, logos ou fotos baixadas da internet.
-
-## 13. Como utilizar a tipografia
-
-Famílias do Brand Guide: **Santander Headline** Bold (títulos), **Santander Micro Text** (textos) e **Santander Condensed** (frase da capa). A Santander Script (voz do cliente) não é usada.
-
-- **Quando os `.otf` chegarem:** copie para `assets/fonts/` e confira os nomes em `assets/fonts/fontes-santander.css` ([passo a passo](assets/fonts/README.md)).
-- **Enquanto isso:** aparece a fonte Santander se estiver instalada no computador; senão, **Arial** (alternativa, não é a fonte oficial).
-- **No e-mail (.eml):** vale sempre a fonte instalada; o Outlook não carrega arquivos de fonte.
-
-Detalhes: [docs/GUIA_TIPOGRAFIA.md](docs/GUIA_TIPOGRAFIA.md).
-
-## 14. Como testar o mobile
-
-Na página `gerar-report.html`, seção **Prévia**, clique em **Celular**. Depois, o teste de verdade: envie o `.eml` para você e abra no celular. Checklist em [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
-
-## 15. Como verificar erros
-
-A seção **Conferência** da página lista tudo, com o arquivo e a **linha**:
-
-| Etiqueta | Significa | Impede? |
-|---|---|---|
-| **erro** | Algo quebrado (bloco com nome errado, imagem que não existe, link de rede) | Impede gerar |
-| **falta** | Campo `[INSERIR …]` ou link ainda vazio | Só deixa gerar RASCUNHO |
-| **aviso** / **para saber** | Confira, mas pode seguir | Não |
-
-Erros comuns e soluções: [docs/FAQ.md](docs/FAQ.md).
-
-## 16. Como exportar
-
-Na página: **Baixar página do mês (.html)** (guarde em `reports/` e confira no Chrome). O e-mail que a área recebe é o **e-mail-resumo**, gerado a seguir no conversor; **Baixar e-mail completo (.eml)** é opcional. Como abrir o `.eml` em cada Outlook: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
-
-Depois de gerar a página do mês, abra **`converter-html-eml.html`** e escolha o `.html` do mês (editado ou não no Chrome): ele gera, de uma vez, o **e-mail-resumo** (destaques do mês, estático, com um único botão "Ver report completo"), a **versão interativa** (o report completo, com movimento, vídeos e peças ampliáveis) para o SharePoint e, se precisar, o **e-mail completo**. A página mostra o status de cada etapa em tempo real e converte de novo sozinha quando você salva o arquivo ou muda uma opção. Passo a passo: [docs/CONVERTER_HTML_EML.md](docs/CONVERTER_HTML_EML.md).
-
-## 17. Como fazer backup
-
-- **Do mês:** o `.html` do mês em `reports/` e o `dados/AAAA-MM.txt` já são o backup daquele mês.
-- **Do projeto:** o Git guarda todas as versões. No ambiente do banco, faça *commit* e *push* depois de cada mês.
-- **Do layout:** `report_backup.html`.
-
-Tudo em [docs/BACKUP.md](docs/BACKUP.md).
-
-## 18. Como recuperar versões anteriores
-
-- Desfazer algo que acabou de digitar: **Ctrl+Z** no PyCharm.
-- Voltar um arquivo para como estava antes (mesmo sem Git): PyCharm → botão direito no arquivo → **Local History → Show History**.
-- Voltar para uma versão salva no Git: botão direito → **Git → Show History** → escolha a versão.
-
-Passo a passo: [docs/BACKUP.md](docs/BACKUP.md#restaurar).
-
-## 19. Problemas frequentes
-
-| Problema | Solução |
-|---|---|
-| A página diz que não encontrou a pasta | Escolha a pasta **principal** (a que tem `dados`, `config`, `template`) |
-| "imagem não encontrada" | Confira o nome do arquivo: maiúsculas, acentos e extensão |
-| Acentos estranhos (`Ã©`) | Salve o `.txt` em **UTF-8** (o PyCharm já salva assim) |
-| Editei, mas a página não mudou | Salve e clique em **Selecionar a pasta** de novo |
-| O botão "Baixar e-mail completo" está cinza | Ainda há itens em **falta**. Preencha ou gere um RASCUNHO para teste |
-| O `.eml` abre como mensagem recebida | Use **Encaminhar** ([HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md)) |
-| O e-mail corporativo bloqueou o `.zip` | É a política de segurança. Não tente contornar: use o caminho aprovado pela TI ([CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md)) |
-
-## 20. Perguntas e respostas
-
-Mais de 25 perguntas, com respostas passo a passo: **[docs/FAQ.md](docs/FAQ.md)**.
-
----
-
 ## Segurança dos dados
 
-- **Este repositório não tem dados reais.** Só o modelo (Lorem Ipsum e `X`), a chama, a formiguinha e os ícones.
-- **Não ficam aqui:** o Brand Guide (interno), os `.otf` das fontes (proprietários) e as fotos do banco de imagens (licenciadas).
-- **Resultados, peças e vídeos reais** ficam só no ambiente do banco (máquina do trabalho, SharePoint e repositório corporativo). Nunca no GitHub pessoal, no computador pessoal ou em ferramentas externas.
-- **Fotos do banco de imagens** (Shutterstock, licenciadas para o banco) **não vão para o GitHub pessoal**: a pasta `assets/fotos/` está no `.gitignore`. Veja [assets/fotos/README.md](assets/fotos/README.md).
+- **Este repositório não tem dados reais.** Só o modelo, o exemplo fictício, a chama, a formiguinha e os ícones.
+- **Não ficam aqui:** o Brand Guide (interno), os `.otf` das fontes (proprietários), as fotos do banco de imagens (licenciadas; `assets/fotos/` está no `.gitignore`) e os reports reais de cada mês.
+- **Resultados, peças, vídeos e documentos reais** ficam só no ambiente corporativo autorizado. Nunca em repositório pessoal, computador pessoal ou ferramenta externa. O Copilot usado é o corporativo.
+- O emulador não envia nada para a internet: só lê e grava os arquivos que você escolhe. A cópia da edição em andamento fica no navegador do próprio computador, até salvar.
 - O histórico antigo deste repositório tem versões com dados reais. Veja [docs/BACKUP.md › Histórico do Git](docs/BACKUP.md#histórico-do-git-e-dados-antigos).
 
 ## Documentação
 
 | Guia | Para quê |
 |---|---|
-| [COMO_ATUALIZAR_O_MES.md](docs/COMO_ATUALIZAR_O_MES.md) | **Atualizar o mês** (comece por aqui) |
-| [GUIA_PYCHARM.md](docs/GUIA_PYCHARM.md) | Usar o PyCharm do zero: abrir, editar, visualizar, Git |
-| [FAQ.md](docs/FAQ.md) | Perguntas frequentes |
-| [PROMPTS_COPILOT.md](docs/PROMPTS_COPILOT.md) | Prompts para analisar os resultados no Microsoft Copilot |
+| [kit/guia-operacional.pdf](kit/guia-operacional.pdf) | **O guia do time** (comece por aqui) |
+| [COMO_ATUALIZAR_O_MES.md](docs/COMO_ATUALIZAR_O_MES.md) | O mesmo passo a passo, em texto |
+| [EMULADOR.md](docs/EMULADOR.md) | Cada função do emulador, o e-mail-resumo e o status |
+| [PROMPTS_COPILOT.md](docs/PROMPTS_COPILOT.md) | Biblioteca de 12 prompts do Microsoft Copilot (com o formato para importar) |
 | [TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md) | Checklist antes de enviar |
-| [GUIA_TIPOGRAFIA.md](docs/GUIA_TIPOGRAFIA.md) | Fontes Santander, arquivos `.otf` e a alternativa |
-| [BACKUP.md](docs/BACKUP.md) | Backup, versões e recuperação |
-| [LINKS_SHAREPOINT_STREAM.md](docs/LINKS_SHAREPOINT_STREAM.md) | Qual link copiar, permissões, como testar |
-| [CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md) | Primeiro uso no banco e teste piloto |
 | [HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md) | O que é o `.eml`, como abrir e enviar |
 | [OUTLOOK_COMPATIBILITY.md](docs/OUTLOOK_COMPATIBILITY.md) | O que funciona em cada Outlook |
-| [ARQUITETURA.md](docs/ARQUITETURA.md) | Decisões técnicas, aplicação do Brand Guide e o que foi testado |
+| [FAQ.md](docs/FAQ.md) | Perguntas frequentes |
+| [GUIA_TIPOGRAFIA.md](docs/GUIA_TIPOGRAFIA.md) | Fontes Santander, arquivos `.otf` e a alternativa |
+| [LINKS_SHAREPOINT_STREAM.md](docs/LINKS_SHAREPOINT_STREAM.md) | Qual link copiar, permissões, como testar |
+| [CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md) | Primeiro uso no banco e teste piloto |
+| [BACKUP.md](docs/BACKUP.md) | Backup, versões e recuperação |
+| [ARQUITETURA.md](docs/ARQUITETURA.md) | Decisões técnicas, Brand Guide aplicado e o que foi testado |
 
 ## Limitações conhecidas
 
-- **Não testado num Outlook real** (este ambiente não tem Outlook). Layout, geração e estrutura do `.eml` foram verificados no Chromium (de 320 a 1440 px de largura) e com um leitor de e-mail padrão. Antes do primeiro envio, faça o **teste piloto** ([CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md)).
-- **Fontes Santander:** os `.otf` ainda não estão no projeto. O código já está pronto para recebê-los; até lá, aparece a fonte instalada ou Arial ([GUIA_TIPOGRAFIA.md](docs/GUIA_TIPOGRAFIA.md)).
-- **Brand Guide em e-mail:** a margem de 8% e o Botão de Início "Começa agora" não foram aplicados (quebrariam a grade aprovada; o botão é um arquivo oficial não recebido). Detalhes em [ARQUITETURA.md](docs/ARQUITETURA.md#brand-guide-como-foi-aplicado-num-e-mail). **VALIDAR COM MARCA**.
+- **Não testado num Outlook real, no Edge nem no Windows** (o ambiente de desenvolvimento é Linux com Chromium, a base do Chrome e do Edge). Layout, edição, salvamento, `.eml` e links foram verificados no Chromium (de 320 a 1440 px). Antes do primeiro envio, faça o **teste piloto** ([CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md)).
+- **Salvar por cima do mesmo arquivo** usa a janela "Salvar como" do Chrome e do Edge. Em navegadores sem esse recurso, o report vai para Downloads.
+- **Fontes Santander:** os `.otf` não estão no projeto; aparece a fonte instalada ou Arial ([GUIA_TIPOGRAFIA.md](docs/GUIA_TIPOGRAFIA.md)).
+- **Brand Guide em e-mail:** a margem de 8% e o Botão de Início "Começa agora" não foram aplicados ([ARQUITETURA.md](docs/ARQUITETURA.md#brand-guide-como-foi-aplicado-num-e-mail)). **VALIDAR COM MARCA**.
 - No Outlook para Windows, os cantos aparecem retos e o layout é sempre o de computador.
-- Links, permissões e vídeo com som dependem do SharePoint/Stream do banco e só podem ser testados lá.
+- Links, permissões e vídeo dependem do ambiente corporativo e só podem ser testados lá.
 
-## Para quem for manter o código
+---
 
-- Testes do motor: `node tests/motor.test.js` (só Node.js).
-- Teste da página de ponta a ponta, em 7 larguras de tela (320 a 1440 px): `node tests/ferramenta.e2e.js` (Node.js + Playwright).
-- Teste do conversor (página editada no navegador → `.eml`, com acompanhamento do arquivo): `node tests/conversor.e2e.js` (Node.js + Playwright).
-- Teste do movimento da página (números contando, seções aparecendo, barras crescendo, "reduzir movimento"): `node tests/movimento.e2e.js` (Node.js + Playwright).
-- Nenhum dos dois é necessário para gerar o report.
-- Commits por assunto: `report: outubro 2026`, `assets: …`, `docs: …`, `tools: …`. Registre mudanças de layout ou de motor no [CHANGELOG.md](CHANGELOG.md).
+## Para quem mantém a ferramenta
+
+| Parte | Arquivo |
+|---|---|
+| Emulador (fonte) | `converter-html-eml.html` (usa `tools/motor.js` e `tools/coringa.js`) |
+| Emulador avulso (o do kit) | `node tools/montar-avulso.js` → `kit/emulador-report.html` (motor e modelo embutidos) |
+| Motor (template, resumo, `.eml`, importação) | `tools/motor.js` |
+| Layout | `template/report.html` (com `{{campos}}`; marcas `data-campo`, `data-img`, `data-item`) |
+| Modelo em branco | `dados/CORINGA.txt` + `assets/coringa/` → página gerada → `tools/coringa.js` ([ARQUITETURA.md](docs/ARQUITETURA.md#modelo-em-branco-coringa)) |
+| Geração por arquivo de dados (caminho técnico) | `gerar-report.html` + `dados/*.txt` + `config/marca.txt` |
+| Backup do layout | `report_backup.html` ([BACKUP.md](docs/BACKUP.md)) |
+
+Testes (Node.js; os `e2e` também precisam do Playwright):
+
+- `node tests/motor.test.js`: motor (66 testes).
+- `node tests/emulador.e2e.js`: o fluxo completo do emulador como uma pessoa faria (abrir, editar, imagem, link, ocultar, importar, salvar, reabrir, recuperar, resumo, `.eml`). Com `EMULADOR=kit/emulador-report.html`, testa a versão avulsa.
+- `node tests/ferramenta.e2e.js`: geração pelo arquivo de dados, em 7 larguras de tela.
+- `node tests/movimento.e2e.js`: o movimento da página (números contando, seções aparecendo, "reduzir movimento").
+
+Commits por assunto (`tools: …`, `docs: …`, `kit: …`). Registre mudanças de layout ou de motor no [CHANGELOG.md](CHANGELOG.md).

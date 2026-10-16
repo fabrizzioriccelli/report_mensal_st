@@ -1,6 +1,6 @@
 # Perguntas frequentes
 
-Respostas curtas, para quem não programa. Arquivo do mês = `dados/AAAA-MM.txt`. Página = `gerar-report.html`. Como usar o PyCharm: [GUIA_PYCHARM.md](GUIA_PYCHARM.md).
+Respostas curtas. O time atualiza o report no **emulador** (`kit/emulador-report.html`): passo a passo em [COMO_ATUALIZAR_O_MES.md](COMO_ATUALIZAR_O_MES.md) e [EMULADOR.md](EMULADOR.md). As perguntas sobre `dados/AAAA-MM.txt` e `gerar-report.html` são do caminho técnico (manutenção da ferramenta).
 
 **Índice:** [Conteúdo](#conteúdo) · [Imagens](#imagens) · [Links](#links) · [Seções e blocos](#seções-e-blocos) · [Marca e fontes](#marca-e-fontes) · [Testar e conferir](#testar-e-conferir) · [Erros](#erros) · [Versões e backup](#versões-e-backup) · [Segurança](#segurança)
 
@@ -111,7 +111,7 @@ Só as da paleta do Brand Guide, conforme [assets/marca/README.md](../assets/mar
 Na página, **Prévia → Celular**. Depois, envie o `.eml` para você e abra no celular. Nada pode sair para o lado da tela.
 
 ### Como identificar um erro de CSS?
-Sintoma: algo desalinhado, vazando para o lado ou com cor errada **depois de mexer no template**. Compare com `report_backup.html`. Para desfazer, use **Local History** ou **Git → Rollback** no PyCharm ([GUIA_PYCHARM.md](GUIA_PYCHARM.md#9-desfazer-mudanças)). No dia a dia (só o `.txt`), não há como gerar erro de CSS.
+Sintoma: algo desalinhado, vazando para o lado ou com cor errada **depois de mexer no template**. Compare com `report_backup.html`. Para desfazer, volte o arquivo para a versão anterior no histórico do repositório ([BACKUP.md](BACKUP.md#restaurar)). No dia a dia (emulador), não há como gerar erro de CSS: o layout é fixo.
 
 ### A prévia ficou estranha só no Outlook.
 O Outlook para Windows mostra cantos retos e sempre o layout de computador. Compare com [OUTLOOK_COMPATIBILITY.md](OUTLOOK_COMPATIBILITY.md). Confira sempre o e-mail **recebido**.
@@ -125,7 +125,7 @@ Na linha indicada falta o `:` depois do nome do campo, ou é um comentário sem 
 O nome entre colchetes foi alterado. Use os nomes do modelo (`[NUMERO 1]`, `[LANCAMENTO 2]`…).
 
 ### Os acentos viraram `Ã©`.
-O arquivo foi salvo fora do UTF-8. No PyCharm já é UTF-8; no Bloco de Notas: *Salvar como → Codificação: UTF-8*.
+O arquivo foi salvo fora do UTF-8. No Bloco de Notas: *Salvar como → Codificação: UTF-8*.
 
 ### O botão "Baixar e-mail completo" está cinza.
 Ainda há itens em **falta**. Preencha ou, para testar, marque **Gerar um RASCUNHO**.
@@ -136,10 +136,10 @@ Salve o arquivo e clique em **Selecionar a pasta do projeto** de novo.
 ## Versões e backup
 
 ### Como voltar para a versão anterior?
-No PyCharm: botão direito no arquivo → **Git → Show History** → escolha a versão → **Get**. Sem Git: **Local History → Show History**. Detalhes: [BACKUP.md](BACKUP.md#restaurar).
+Report do mês: abra o `report-AAAA-MM.html` salvo daquele mês (pasta do mês). Ferramenta: histórico do repositório corporativo. Detalhes: [BACKUP.md](BACKUP.md#restaurar).
 
 ### Apaguei um arquivo. Como recupero?
-Botão direito na pasta onde ele estava → **Local History → Show History** → **Revert**. Com Git: **Git → Rollback**.
+Procure na Lixeira do Windows (botão direito › **Restaurar**). Report já publicado: baixe de novo do ambiente autorizado.
 
 ### Como utilizar o backup?
 `report_backup.html` mostra o layout aprovado: abra com dois cliques. Para restaurar arquivos do projeto, use o Git ([BACKUP.md](BACKUP.md)).

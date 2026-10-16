@@ -15,7 +15,7 @@ Os itens marcados com **VALIDAR COM TI** dependem de políticas internas que est
 - **E-mail de fora para dentro:** muitos bancos bloqueiam anexos `.zip` ou arquivos `.html` e `.js`, que fazem parte do projeto. Não tente contornar o bloqueio (renomear extensão, compactar com senha etc.). Pergunte à TI qual é o caminho aprovado: OneDrive corporativo, Teams, um repositório interno ou a própria TI copiar.
 - **Dados internos:** os dados reais do banco (números, peças, vídeos) devem ficar **só** no ambiente corporativo: na máquina do trabalho e no SharePoint. Não leve esses dados para o computador pessoal, para o GitHub pessoal nem para ferramentas externas. O repositório guarda só o modelo em branco.
 
-**Caminho indicado pela TI:** criar o repositório no ambiente corporativo e levar para lá **só os arquivos atuais** (sem o histórico do repositório pessoal). Depois, editar e versionar por lá, com o PyCharm ([GUIA_PYCHARM.md](GUIA_PYCHARM.md)).
+**Caminho indicado pela TI:** criar o repositório no ambiente corporativo e levar para lá **só os arquivos atuais** (sem o histórico do repositório pessoal). Depois, a manutenção da ferramenta acontece por lá. O time não precisa do repositório: usa só o kit (`kit/`), com o emulador.
 
 **VALIDAR COM TI:** o passo a passo do repositório corporativo e se é permitido abrir um arquivo `.html` local no Edge.
 

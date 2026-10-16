@@ -4,51 +4,38 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Converter HTML em e-mail (.eml) · Creative Strategy PF</title>
+<title>Emulador do report mensal · Creative Strategy PF</title>
 <!--
-  CONVERTER HTML EDITADO EM E-MAIL (.eml)
+  EMULADOR DO REPORT MENSAL (antigo "converter HTML em .eml")
   ----------------------------------------------------------------------
-  Para quando você editou a página do mês direto no navegador (Chrome ou
-  Edge, inclusive pelo Inspecionar) e quer mandar por e-mail. Gera, de uma vez:
-    · o E-MAIL-RESUMO (.eml): a porta de entrada. Diagramação própria,
-      estática, com os destaques do mês (lidos da página: campos
-      data-campo do template) e UM ÚNICO link, o botão final "Ver report
-      completo". Sem vídeo, sem ampliação, sem nada que pareça clicável;
-    · a VERSÃO INTERATIVA (.html, o report completo com movimento, vídeos
-      e peças ampliáveis) para subir no SharePoint: é o destino do botão;
-    · o e-mail COMPLETO (.eml), opcional: o report inteiro no e-mail.
+  O centro da operação mensal, no Chrome ou no Edge, sem instalar nada:
+    1. ABRIR: começar do modelo em branco (o "coringa", embutido aqui)
+       ou abrir o report salvo do mês anterior (.html);
+    2. EDITAR: textos, números, imagens, vídeos e links direto na página
+       (clique no texto e escreva; passe o mouse na imagem e troque);
+    3. SALVAR: o report completo do mês (.html), com as alterações dentro.
+       É o arquivo publicado no ambiente corporativo autorizado;
+    4. LINK: o endereço do report publicado (o botão do e-mail usa esse link);
+    5. E-MAIL-RESUMO: até 3 indicadores e uma única chamada, "Acessar report
+       completo";
+    6. .EML: e-mail de verdade (MIME, imagens dentro), que o Outlook abre
+       como mensagem nova.
+  Nada é enviado para a internet: a página só lê e grava os arquivos que
+  você escolher. Uma cópia da edição em andamento fica guardada neste
+  navegador até você salvar (para não perder nada se a aba fechar).
 
-  Abra este arquivo no Edge ou no Chrome (dois cliques) ou pelo endereço
-  local (ex.: http://localhost:8000/converter-html-eml.html). Não precisa
-  instalar nada e nada é enviado para a internet: a página só lê o
-  arquivo que você escolher.
-
-  O que ela faz, com o status de cada etapa na tela em tempo real:
-    1. lê o .html salvo pelo navegador;
-    2. reconhece o report (versão e mês);
-    3. tira o que o e-mail não aceita (script, ampliação, vídeo,
-       marcas da edição);
-       3b. monta o e-mail-resumo com os destaques (regras fixas de
-           seleção: tools/motor.js, RESUMO_REGRAS) e o botão final;
-    4. coloca as imagens dentro do e-mail (anexos embutidos, cid:);
-    5. confere o HTML para o Outlook;
-    6. monta os dois .eml (mensagem nova no Outlook, pronta para enviar);
-    7. prepara a versão interativa (.html), com os prints colocados à mão
-       já embutidos.
-  Com "Acompanhar o arquivo" ligado, ela converte de novo sozinha toda
-  vez que você salvar o .html.
-
-  Precisa do arquivo tools/motor.js na mesma estrutura de pastas.
+  Precisa de tools/motor.js e tools/coringa.js na mesma estrutura de pastas
+  (a versão avulsa, para o time, já traz os dois embutidos).
 -->
 <style>
-  :root{--red:#EC0000;--ink:#222222;--gray:#5F5F5F;--rule:#E3DFDC;--bg:#F5F3F1;--ok:#21634F;--okbg:#E3F5EF;--warn:#945400;--warnbg:#FFF1DE;--errbg:#FBE7E8}
+  :root{--red:#EC0000;--ink:#222222;--gray:#5F5F5F;--rule:#E3DFDC;--bg:#F5F3F1;--ok:#21634F;--okbg:#E3F5EF;--warn:#945400;--warnbg:#FFF1DE;--errbg:#FBE7E8;--lisboa:#FBF1EA}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Arial,sans-serif}
-  header{background:#fff;border-top:6px solid var(--red);border-bottom:1px solid var(--rule)}
-  header div{max-width:1100px;margin:0 auto;padding:18px 24px}
-  h1{margin:0;font:bold 22px Georgia,serif;color:var(--red)}
-  header p{margin:4px 0 0;color:var(--gray);font-size:14px}
-  main{max-width:1100px;margin:0 auto;padding:24px;display:grid;gap:18px}
+  header{background:var(--red);color:#fff}
+  header div{max-width:1180px;margin:0 auto;padding:18px 24px}
+  h1{margin:0;font:bold 22px Arial,sans-serif;color:#fff}
+  header p{margin:4px 0 0;font-size:14px;color:#fff}
+  main{max-width:1180px;margin:0 auto;padding:24px;display:grid;gap:18px}
   section{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:18px 20px}
   h2{margin:0 0 10px;font-size:16px;display:flex;gap:10px;align-items:center}
   h2 b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:14px;flex:none}
@@ -57,10 +44,11 @@
   label.btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
   .pri{background:var(--red)!important;border-color:var(--red)!important;color:#fff!important}
   button:disabled{opacity:.4;cursor:not-allowed}
-  label.btn:focus-within,button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  label.btn:focus-within,button:focus-visible,input:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
   .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px}
-  .drop{margin-top:12px;border:2px dashed #CFC9C4;border-radius:10px;padding:18px;text-align:center;color:var(--gray);font-size:14px}
+  .drop{margin-top:12px;border:2px dashed #CFC9C4;border-radius:10px;padding:14px;text-align:center;color:var(--gray);font-size:14px}
   .drop.over{border-color:var(--red);background:#FFF5F5;color:var(--ink)}
+  .aviso{border-radius:10px;padding:12px 16px;background:var(--warnbg);color:var(--warn);font-weight:600;margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
   .banner{border-radius:10px;padding:12px 16px;font-weight:600;margin:0;background:#F3F1EF;color:var(--gray)}
   .banner.ok{background:var(--okbg);color:var(--ok)}.banner.warn{background:var(--warnbg);color:var(--warn)}.banner.err{background:var(--errbg);color:#990000}.banner.run{background:#EEF0F3;color:#3D4A5C}
   .barra{height:8px;border-radius:8px;background:#F0ECE9;overflow:hidden;margin:12px 0 4px}
@@ -80,113 +68,151 @@
   .et b{display:block;font-size:14px}.et span{display:block;font-size:13px;color:var(--gray)}
   .et ul{margin:4px 0 0;padding-left:18px;font-size:13px}
   .tempo{font-size:12px;color:var(--gray);white-space:nowrap;font-variant-numeric:tabular-nums}
-  .vigia{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--gray);margin-top:10px;min-height:20px}
-  .ponto{width:9px;height:9px;border-radius:50%;background:#CFC9C4;flex:none}
-  .ponto.on{background:var(--ok);box-shadow:0 0 0 0 rgba(33,99,79,.5);animation:pulsa 1.6s infinite}
-  @keyframes pulsa{70%{box-shadow:0 0 0 7px rgba(33,99,79,0)}100%{box-shadow:0 0 0 0 rgba(33,99,79,0)}}
-  @media (prefers-reduced-motion:reduce){.ponto.on{animation:none}}
   pre.log{margin:8px 0 0;max-height:220px;overflow:auto;background:#FAF8F6;border:1px solid #F0ECE9;border-radius:8px;padding:10px;font:12px/1.6 Consolas,Menlo,monospace;white-space:pre-wrap}
   details summary{cursor:pointer;font-weight:600;font-size:14px;margin-top:12px}
   input[type=text]{font:inherit;font-size:14px;padding:9px 10px;border:1px solid #CFC9C4;border-radius:8px;width:min(620px,100%)}
   .check{display:flex;gap:8px;align-items:center;font-size:14px}
-  iframe{width:100%;height:760px;border:1px solid var(--rule);border-radius:8px;background:#EAE4DE;transition:width .2s}
+  .check input{accent-color:var(--red);width:16px;height:16px}
+  iframe{width:100%;border:1px solid var(--rule);border-radius:8px;background:#EAE4DE;transition:width .2s}
+  #prev{height:760px}
+  #edFrame{height:calc(100vh - 84px);min-height:480px;display:block;margin:0 auto}
   .tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
   .frame{display:flex;justify-content:center}
   code{background:#F3F1EF;padding:1px 5px;border-radius:4px;font-size:13px}
-  fieldset{border:0;margin:0;padding:0}
-  .modos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:6px}
-  .modo{display:flex;gap:10px;align-items:flex-start;border:1px solid #CFC9C4;border-radius:10px;padding:12px 14px;cursor:pointer;font-size:14px}
-  .modo:has(input:checked){border-color:var(--red);box-shadow:0 0 0 1px var(--red);background:#FFF9F9}
-  .modo input{margin-top:3px;accent-color:var(--red)}
-  .modo b{display:block}.modo span{color:var(--gray);font-size:13px}
-  .campo{margin-top:14px}.campo label{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
-  .secoes{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:4px}
+  .campo{margin-top:14px}.campo>label{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
+  .lista{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:4px}
   .passos{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--gray)}
+  .inicio{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:12px}
+  .cartao{border:1px solid #CFC9C4;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff}
+  .cartao b{font-size:15px}.cartao span{font-size:13px;color:var(--gray)}
+  .ferramentas{position:sticky;top:0;z-index:5;background:#fff;padding:10px 0;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:1px solid var(--rule)}
+  .estado{font-size:13px;color:var(--gray)}
+  .estado.sujo{color:var(--warn);font-weight:600}.estado.salvo{color:var(--ok);font-weight:600}
+  .ajuda{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 18px;margin:10px 0 12px;font-size:13px;color:var(--gray)}
+  .ajuda b{color:var(--ink)}
+  #painelImportar{border:1px solid var(--rule);border-radius:10px;padding:14px;margin:10px 0;background:var(--lisboa)}
+  #painelImportar textarea{width:100%;min-height:180px;font:12.5px/1.5 Consolas,Menlo,monospace;border:1px solid #CFC9C4;border-radius:8px;padding:10px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:30}
+  .modal>div{background:#fff;border-radius:14px;max-width:620px;width:calc(100% - 32px);padding:22px 24px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+  .modal h3{margin:0 0 8px;font-size:18px;color:var(--red)}
+  .modal ul{font-size:14px;max-height:260px;overflow:auto}
   [hidden]{display:none !important}
 </style>
 </head>
 <body>
 <header><div>
-  <h1>Converter HTML em e-mail (.eml)</h1>
-  <p>Lê a página do mês (.html, editada ou não) e gera, de uma vez, o <b>e-mail-resumo</b> (os destaques do mês e um único botão "Ver report completo"), a <b>versão interativa</b> (o report completo, com movimento, vídeos e peças ampliáveis) para o SharePoint e, se precisar, o <b>e-mail completo</b>. <span id="versao"></span></p>
+  <h1>Emulador do report mensal</h1>
+  <p>Abra, edite e salve o report completo; depois gere o e-mail-resumo (.eml) com um único botão para o report. Tudo no navegador, sem instalar nada. <span id="versao"></span></p>
 </div></header>
 
 <main>
+  <!-- 1 · ABRIR -->
   <section aria-labelledby="s1">
-    <h2 id="s1"><b>1</b>Escolha o arquivo .html do mês</h2>
-    <p class="muted">No Chrome ou no Edge, salve a página editada com <b>Ctrl+S</b> e escolha <b>"Página da Web, completa"</b> (a opção "somente HTML" perde as edições). Depois escolha esse arquivo aqui.</p>
-    <div class="row">
-      <label class="btn pri" id="escolher">Escolher o arquivo .html<input type="file" id="arquivo" accept=".html,.htm,text/html"></label>
-      <label class="check"><input type="checkbox" id="acompanhar" checked> Acompanhar o arquivo: converter de novo sempre que eu salvar</label>
+    <h2 id="s1"><b>1</b>Abra o report</h2>
+    <div class="inicio">
+      <div class="cartao">
+        <b>Começar um mês novo</b>
+        <span>Abre o modelo em branco (o "coringa"): todas as seções, com textos e imagens de exemplo para trocar.</span>
+        <div><button type="button" class="pri" id="bModelo">Começar do modelo em branco</button></div>
+      </div>
+      <div class="cartao">
+        <b>Continuar um report salvo</b>
+        <span>Abre um report salvo antes (.html), por exemplo o do mês anterior, para editar ou só gerar o e-mail.</span>
+        <div><label class="btn" id="escolher">Abrir um report salvo (.html)<input type="file" id="arquivo" accept=".html,.htm,text/html"></label></div>
+        <div class="drop" id="drop">ou arraste o arquivo .html para cá</div>
+      </div>
     </div>
-    <div class="drop" id="drop">ou arraste o arquivo .html para cá</div>
-    <div class="row" id="pastaRow">
-      <label class="btn">Escolher a pasta das imagens<input type="file" id="pasta" webkitdirectory multiple></label>
-      <span class="muted">Só se houver imagens em arquivo ao lado do .html: prints colocados pelo Inspecionar (escolha a pasta do .html) ou a pasta que o Chrome cria ao salvar (termina em <code>_files</code> ou <code>_arquivos</code>). <span id="pastaInfo"></span></span>
-    </div>
-  </section>
-
-  <section aria-labelledby="s5">
-    <h2 id="s5"><b>2</b>E-mail-resumo e link do report completo</h2>
-    <p class="muted">O <b>e-mail-resumo</b> é a porta de entrada: uma leitura rápida dos destaques do mês, estática, com <b>um único botão</b> no fim ("Ver report completo"), que abre a versão interativa no SharePoint. Os destaques saem da própria página, sempre pelas mesmas regras (veja abaixo). Mudou alguma opção? A conversão se refaz sozinha.</p>
-    <div class="campo" id="campoSecoes">
-      <label>Blocos do e-mail-resumo</label>
-      <div class="secoes" id="secoes"><span class="muted">Escolha o arquivo para ver os blocos.</span></div>
-      <details>
-        <summary>Como o resumo escolhe os destaques</summary>
-        <ul class="passos" id="regras"></ul>
-      </details>
-    </div>
-    <div class="campo">
-      <label for="link">Link do report completo (versão interativa) <span class="muted">(o e-mail-resumo só sai com ele)</span></label>
-      <input type="text" id="link" inputmode="url" placeholder="https://empresa.sharepoint.com/…/report-outubro.html" autocomplete="off">
-      <p class="muted" id="linkInfo"></p>
-      <ol class="passos">
-        <li>Baixe a versão interativa: <button type="button" id="bInterativa" disabled>Baixar versão interativa (.html)</button> <span id="interInfo" class="muted"></span></li>
-        <li>Suba esse arquivo numa pasta do SharePoint (ou OneDrive) que o público do e-mail consiga abrir. Em muitos SharePoint, o .html baixa em vez de abrir direto: quem clicar abre o arquivo baixado e ele funciona igual. Teste o link com alguém de outra equipe.</li>
-        <li>Copie o link de compartilhamento e cole aqui em cima. Para não colar todo mês, guarde-o no arquivo de dados (<code>[EDICAO] link_report_completo:</code>): a página já vem com ele e este campo se preenche sozinho.</li>
-      </ol>
-      <label class="check" style="margin-top:8px;font-weight:normal"><input type="checkbox" id="botaoNoCompleto"> Pôr o botão "Ver report completo" também no e-mail completo (opcional)</label>
-    </div>
-    <div class="campo">
-      <label for="botao">Texto do botão</label>
-      <input type="text" id="botao" value="Ver report completo">
+    <div class="aviso" id="recuperar" hidden>
+      <span id="recuperarTxt"></span>
+      <button type="button" class="pri" id="bRecuperar">Recuperar a edição</button>
+      <button type="button" id="bDescartar">Descartar</button>
     </div>
     <details>
-      <summary>Como colocar prints no HTML (Inspecionar do Chrome)</summary>
-      <ol class="passos">
-        <li>Coloque os prints (<code>.png</code> ou <code>.jpg</code>) na <b>mesma pasta</b> do .html do mês. Use nomes sem espaço, ex.: <code>print-copy-agent.png</code>.</li>
-        <li>Abra o .html no Chrome, clique com o botão direito no projeto do <b>Transformation Hub</b> → <b>Inspecionar</b>. No painel, aperte <b>Ctrl+F</b> e procure <code>transformation-1</code> (ou <code>-2</code>, <code>-3</code>): é o projeto 1, 2 ou 3.</li>
-        <li>Dentro dele, ache o último parágrafo do texto (<code>&lt;p …&gt;</code>), clique com o botão direito nele → <b>Edit as HTML</b>, vá até o fim e cole o bloco abaixo. Troque o nome do arquivo e a descrição.</li>
-        <li>Salve a página (<b>Ctrl+S</b>, "Página da Web, completa") e escolha aqui o .html e, no passo 1, <b>a pasta das imagens</b> (a pasta onde estão os prints).</li>
-      </ol>
-      <div class="row">
-        <label for="qtdPrints"><b>Quantos prints:</b></label>
-        <select id="qtdPrints"><option>1</option><option>2</option><option>3</option></select>
-        <button type="button" id="bCopiar">Copiar o bloco</button>
-        <span id="copiado" class="muted"></span>
-      </div>
-      <textarea id="snippet" readonly rows="9" style="width:100%;margin-top:10px;font:12px/1.5 Consolas,Menlo,monospace;border:1px solid var(--rule);border-radius:8px;padding:10px"></textarea>
-      <p class="muted">No e-mail, os prints aparecem lado a lado (um embaixo do outro no celular). Na versão interativa, abrem inteiros e maiores no clique. Prints grandes são reduzidos sozinhos (até 1200 px de largura).</p>
+      <summary>Avançado: imagens em arquivo ao lado do .html</summary>
+      <p class="muted">Só para páginas salvas pelo Chrome como "Página da Web, completa" (com a pasta <code>_files</code>). Os reports salvos por este emulador já trazem tudo dentro.</p>
+      <div class="row"><label class="btn">Escolher a pasta das imagens<input type="file" id="pasta" webkitdirectory multiple></label> <span class="muted" id="pastaInfo"></span></div>
     </details>
   </section>
 
-  <section aria-labelledby="s2">
-    <h2 id="s2"><b>3</b>Status</h2>
-    <p id="banner" class="banner" role="status" aria-live="polite">Aguardando o arquivo.</p>
-    <div class="barra" id="barra" role="progressbar" aria-label="Andamento da conversão" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
+  <!-- 2 · EDITAR E SALVAR -->
+  <section aria-labelledby="s2" id="secEditar" hidden>
+    <h2 id="s2"><b>2</b>Edite e salve o report</h2>
+    <div class="ajuda">
+      <span><b>Texto ou número:</b> clique e escreva. Enter confirma; Shift+Enter quebra a linha.</span>
+      <span><b>Imagem ou vídeo:</b> passe o mouse e use "Trocar imagem" (ou "Trocar vídeo").</span>
+      <span><b>Link:</b> passe o mouse em um link vermelho e use "Trocar link".</span>
+      <span><b>Item que não vale este mês:</b> passe o mouse e use "Ocultar item".</span>
+    </div>
+    <div class="ferramentas">
+      <button type="button" class="pri" id="bSalvar">Salvar report (.html)</button>
+      <button type="button" id="bImportar">Importar conteúdo (Copilot)</button>
+      <button type="button" id="bDesfazer" disabled>Desfazer</button>
+      <span class="tabs" role="group" aria-label="Tamanho da edição">
+        <button type="button" data-ew="100%" aria-pressed="true">Computador</button>
+        <button type="button" data-ew="400px" aria-pressed="false">Celular</button>
+      </span>
+      <span class="estado" id="estado" role="status" aria-live="polite"></span>
+    </div>
+    <div id="painelImportar" hidden>
+      <p class="muted" style="margin-bottom:8px"><b>Cole aqui a resposta do Copilot</b> (formato do Prompt 11 do guia: blocos como <code>[NUMERO 1]</code> e linhas <code>valor: 12,5%</code>). Os campos correspondentes da página são preenchidos; nada mais muda. Confira depois, campo a campo.</p>
+      <textarea id="txtImportar" spellcheck="false" placeholder="[EDICAO]&#10;mes: Novembro&#10;ano: 2026&#10;&#10;[NUMERO 1]&#10;valor: 12,5%&#10;titulo: Taxa de clique&#10;detalhe: Outras peças: 10%"></textarea>
+      <div class="row"><button type="button" class="pri" id="bAplicar">Aplicar na página</button><button type="button" id="bFecharImportar">Fechar</button><span class="muted" id="importarInfo"></span></div>
+    </div>
+    <details>
+      <summary>Seções do report (mostrar ou ocultar neste mês)</summary>
+      <div class="lista" id="secoesRep"></div>
+    </details>
+    <div class="frame" style="margin-top:4px"><iframe id="edFrame" title="Report em edição" sandbox="allow-same-origin"></iframe></div>
+  </section>
+
+  <!-- 3 · LINK -->
+  <section aria-labelledby="s3" id="secLink" hidden>
+    <h2 id="s3"><b>3</b>Link do report completo</h2>
+    <p class="muted">O e-mail-resumo leva quem lê para o report completo. Para isso, o report salvo no passo 2 precisa estar <b>publicado no ambiente corporativo autorizado</b>, com permissão para quem vai receber o e-mail. Cole aqui o endereço que esse ambiente fornecer.</p>
+    <div class="campo">
+      <label for="link">Link do report completo</label>
+      <input type="text" id="link" inputmode="url" placeholder="https://…" autocomplete="off">
+      <p class="muted" id="linkInfo"></p>
+    </div>
+    <ol class="passos">
+      <li>Publique o arquivo salvo (<span id="nomeSalvo">report do mês</span>) no ambiente autorizado da área.</li>
+      <li>Copie o endereço de compartilhamento e cole aqui em cima. Ele precisa começar com <code>https://</code>.</li>
+      <li>Abra o endereço numa aba anônima ou peça para alguém de outra equipe: o report precisa abrir.</li>
+    </ol>
+  </section>
+
+  <!-- 4 · E-MAIL-RESUMO -->
+  <section aria-labelledby="s4" id="secResumo" hidden>
+    <h2 id="s4"><b>4</b>E-mail-resumo</h2>
+    <p class="muted">Curto de propósito: o período, a frase do mês, <b>até 3 indicadores</b> e uma única chamada, "Acessar report completo". O resto fica no report completo.</p>
+    <div class="campo">
+      <label>Indicadores do e-mail (até 3)</label>
+      <div class="lista" id="indicadores"><span class="muted">Abra um report para ver os indicadores.</span></div>
+      <p class="muted" style="margin-top:6px">Vêm marcados os números do projeto principal. Pode trocar por outros indicadores da página. Nenhum número é criado aqui: só aparecem os que estão no report.</p>
+    </div>
+    <div class="campo">
+      <label for="botao">Texto do botão</label>
+      <input type="text" id="botao" value="Acessar report completo">
+    </div>
+  </section>
+
+  <!-- 5 · STATUS -->
+  <section aria-labelledby="s5" id="secStatus" hidden>
+    <h2 id="s5"><b>5</b>Status</h2>
+    <p id="banner" class="banner" role="status" aria-live="polite">Aguardando o report.</p>
+    <div class="barra" id="barra" role="progressbar" aria-label="Andamento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
     <div class="medidor"><span id="pct">0%</span><span id="relogio">—</span></div>
     <ol class="etapas" id="etapas"></ol>
-    <div class="vigia"><span class="ponto" id="ponto"></span><span id="vigiaTxt">Sem arquivo acompanhado.</span></div>
     <details>
       <summary>Registro (o que aconteceu, com horário)</summary>
       <pre class="log" id="log" aria-live="off"></pre>
     </details>
   </section>
 
-  <section aria-labelledby="s3" id="secBaixar" hidden>
-    <h2 id="s3"><b>4</b>Baixe o e-mail</h2>
-    <p class="muted" style="margin-bottom:6px"><label for="assunto"><b>Assunto</b></label> (vem do título da página; pode mudar aqui):</p>
+  <!-- 6 · BAIXAR -->
+  <section aria-labelledby="s6" id="secBaixar" hidden>
+    <h2 id="s6"><b>6</b>Baixe o e-mail (.eml)</h2>
+    <p class="muted" style="margin-bottom:6px"><label for="assunto"><b>Assunto</b></label> (vem do título do report; pode mudar aqui):</p>
     <input type="text" id="assunto">
     <div class="row">
       <button type="button" class="pri" id="bEmlRes" disabled>Baixar e-mail-resumo (.eml)</button>
@@ -199,17 +225,16 @@
     <details>
       <summary>Depois de baixar: como abrir e enviar</summary>
       <ol class="muted">
-        <li>Na pasta Downloads, dê dois cliques no <code>.eml</code>. O Outlook abre uma <b>mensagem nova</b> com o report e o assunto.</li>
-        <li>Envie primeiro <b>só para você</b> e confira no computador e no celular. Clique no botão "Ver report completo" e veja se o report abre.</li>
-        <li>Tudo certo? Abra o <code>.eml</code> de novo, coloque os destinatários e envie.</li>
+        <li>Na pasta Downloads, dê dois cliques no <code>.eml</code>. O Outlook abre uma <b>mensagem nova</b>, com o assunto e as imagens.</li>
+        <li>Envie primeiro <b>só para você</b>. Confira no computador e no celular e clique em "Acessar report completo": o report precisa abrir.</li>
+        <li>Tudo certo? Abra o <code>.eml</code> de novo, coloque os destinatários autorizados e envie pelo e-mail corporativo.</li>
       </ol>
-      <p class="muted">As edições feitas no navegador não voltam para o arquivo de dados. Para não perdê-las no próximo mês, passe as mesmas mudanças para <code>dados/AAAA-MM.txt</code>.</p>
     </details>
   </section>
 
-  <section aria-labelledby="s4" id="secPrev" hidden>
-    <h2 id="s4">Prévia dos e-mails</h2>
-    <p class="muted">É o que vai dentro do .eml: estático, sem ampliação nem vídeo (o e-mail não roda script).</p>
+  <section aria-labelledby="s7" id="secPrev" hidden>
+    <h2 id="s7">Prévia do e-mail</h2>
+    <p class="muted">É o que vai dentro do .eml: estático, sem vídeo nem animação (e-mail não roda script).</p>
     <div class="row tabs" role="group" aria-label="Qual e-mail">
       <button type="button" data-qual="resumido" aria-pressed="true">E-mail-resumo</button>
       <button type="button" data-qual="completo" aria-pressed="false">E-mail completo</button>
@@ -218,469 +243,707 @@
       <button type="button" data-w="100%" aria-pressed="true">Computador</button>
       <button type="button" data-w="390px" aria-pressed="false">Celular</button>
     </div>
-    <div class="frame" style="margin-top:12px"><iframe id="prev" title="Prévia do e-mail convertido"></iframe></div>
+    <div class="frame" style="margin-top:12px"><iframe id="prev" title="Prévia do e-mail"></iframe></div>
   </section>
 </main>
 
+<div class="modal" id="modal" hidden><div role="dialog" aria-modal="true" aria-labelledby="modalTit">
+  <h3 id="modalTit"></h3><div id="modalCorpo"></div>
+  <div class="row"><button type="button" class="pri" id="modalOk"></button><button type="button" id="modalCancela"></button></div>
+</div></div>
+<input type="file" id="fImagem" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+<input type="file" id="fVideo" accept="video/mp4,video/webm,.mp4,.webm" hidden>
+<input type="file" id="fPdf" accept="application/pdf,.pdf" hidden>
+
 <script src="tools/motor.js"></script>
+<script src="tools/coringa.js"></script>
 <script>
 (function () {
   "use strict";
   var $ = function (s) { return document.querySelector(s); };
   $("#versao").textContent = "Versão " + Motor.VERSAO + ".";
 
-  var ETAPAS = [
-    { id: "ler", nome: "Ler o arquivo" },
-    { id: "origem", nome: "Reconhecer o report" },
-    { id: "limpar", nome: "Tirar o que o e-mail não aceita" },
-    { id: "resumir", nome: "Montar o e-mail-resumo (destaques do mês)" },
-    { id: "imagens", nome: "Colocar as imagens dentro dos e-mails" },
-    { id: "completo", nome: "Montar o e-mail completo (.eml)" },
-    { id: "resumido", nome: "Montar o e-mail-resumo (.eml)" },
-    { id: "interativa", nome: "Preparar a versão interativa (.html)" }
-  ];
-  /* Na prévia, imagem que falta aparece como um bloco cinza (em vez de um link quebrado). */
-  var FALTA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120"><rect width="100%" height="100%" fill="#E3DFDC"/><text x="50%" y="54%" font-family="Arial" font-size="13" fill="#5F5F5F" text-anchor="middle">imagem faltando</text></svg>');
-  var ICONE = { espera: "", rodando: "", ok: "✓", aviso: "!", erro: "✕" };
-  var pastaArquivos = {};      /* imagens da pasta "_files", por nome */
-  var interativa = null, handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, resumido = null, previas = {}, qualPrev = "resumido", urls = [];
-  var inicio = 0, relogioTimer = null;
-
-  /* ---------- status em tempo real ---------- */
+  /* =================================================================== */
+  /* Utilidades                                                           */
+  /* =================================================================== */
   function hora() { return new Date().toLocaleTimeString("pt-BR"); }
   function log(msg) { var l = $("#log"); l.textContent += "[" + hora() + "] " + msg + "\n"; l.scrollTop = l.scrollHeight; }
   function kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
   function seg(ms) { return (ms / 1000).toFixed(1).replace(".", ",") + " s"; }
-  function banner(cls, txt) { var b = $("#banner"); b.className = "banner " + cls; b.textContent = txt; }
-  function progresso(p, fim) {
-    p = Math.max(0, Math.min(100, Math.round(p)));
-    $("#barra i").style.width = p + "%"; $("#barra").setAttribute("aria-valuenow", p); $("#pct").textContent = p + "%";
-    $("#barra").classList.toggle("fim", !!fim);
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function respira() { return new Promise(function (r) { setTimeout(r, 16); }); }
+  function baixar(nome, conteudo, tipo) {
+    var a = document.createElement("a"), u = URL.createObjectURL(conteudo instanceof Blob ? conteudo : new Blob([conteudo], { type: tipo }));
+    a.href = u; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
   }
-  function montarEtapas() {
-    var ol = $("#etapas"); ol.textContent = "";
-    ETAPAS.forEach(function (e) {
-      var li = document.createElement("li"); li.id = "et-" + e.id; li.dataset.estado = "espera";
-      li.innerHTML = '<span class="ic" aria-hidden="true"></span><div class="et"><b></b><span>Aguardando.</span></div><span class="tempo"></span>';
-      li.querySelector("b").textContent = e.nome; ol.appendChild(li);
+  /* Janela de confirmação (em vez do confirm() do navegador). */
+  function perguntar(titulo, corpoHtml, ok, cancela) {
+    return new Promise(function (res) {
+      $("#modalTit").textContent = titulo; $("#modalCorpo").innerHTML = corpoHtml;
+      $("#modalOk").textContent = ok; $("#modalCancela").textContent = cancela || ""; $("#modalCancela").hidden = !cancela;
+      $("#modal").hidden = false; $("#modalOk").focus();
+      function fim(v) { $("#modal").hidden = true; $("#modalOk").onclick = $("#modalCancela").onclick = null; res(v); }
+      $("#modalOk").onclick = function () { fim(true); }; $("#modalCancela").onclick = function () { fim(false); };
     });
   }
-  function etapa(id, estado, detalhe, itens) {
-    var li = $("#et-" + id); li.dataset.estado = estado;
-    li.querySelector(".ic").textContent = ICONE[estado];
-    li.querySelector(".et span").textContent = detalhe || "";
-    var ul = li.querySelector("ul"); if (ul) ul.remove();
-    if (itens && itens.length) {
-      ul = document.createElement("ul");
-      itens.forEach(function (t) { var x = document.createElement("li"); x.textContent = t; ul.appendChild(x); });
-      li.querySelector(".et").appendChild(ul);
-    }
-    if (estado === "rodando") li.dataset.t0 = performance.now();
-    else if (li.dataset.t0) li.querySelector(".tempo").textContent = seg(performance.now() - li.dataset.t0);
+
+  /* =================================================================== */
+  /* Rascunho guardado neste navegador (IndexedDB), até salvar            */
+  /* =================================================================== */
+  var DB = null;
+  function abrirDB() {
+    if (DB) return Promise.resolve(DB);
+    return new Promise(function (ok) {
+      try {
+        var r = indexedDB.open("emulador-report", 1);
+        r.onupgradeneeded = function () { r.result.createObjectStore("rascunho"); };
+        r.onsuccess = function () { DB = r.result; ok(DB); }; r.onerror = function () { ok(null); };
+      } catch (e) { ok(null); }
+    });
   }
-  function relogio(ligar) {
-    clearInterval(relogioTimer);
-    if (ligar) { inicio = performance.now(); relogioTimer = setInterval(function () { $("#relogio").textContent = "Tempo: " + seg(performance.now() - inicio); }, 100); }
+  function guardarRascunho(v) { return abrirDB().then(function (db) { if (!db) return; try { db.transaction("rascunho", "readwrite").objectStore("rascunho").put(v, "atual"); } catch (e) {} }); }
+  function lerRascunho() { return abrirDB().then(function (db) { return db ? new Promise(function (ok) { try { var q = db.transaction("rascunho").objectStore("rascunho").get("atual"); q.onsuccess = function () { ok(q.result || null); }; q.onerror = function () { ok(null); }; } catch (e) { ok(null); } }) : null; }); }
+  function apagarRascunho() { return abrirDB().then(function (db) { if (!db) return; try { db.transaction("rascunho", "readwrite").objectStore("rascunho").delete("atual"); } catch (e) {} }); }
+
+  /* =================================================================== */
+  /* EDITOR: o report aberto num quadro, editável no lugar                */
+  /* =================================================================== */
+  var ED = { doc: null, nome: "", origem: "", periodoInicial: "", sujo: false, desfazer: [], ocultas: {}, nomeSalvo: "", alterados: {} };
+  var EDITOR_CSS =
+    "[data-ed-campo]{outline:1px dashed rgba(236,0,0,.45);outline-offset:2px;border-radius:3px;cursor:text;transition:background-color .15s}" +
+    "[data-ed-campo]:hover{outline:2px dashed #EC0000;background-color:rgba(255,225,185,.35)}" +
+    "[data-ed-campo]:focus{outline:2px solid #EC0000;background-color:rgba(255,241,201,.6)}" +
+    "[data-ed-alterado]{outline-color:#21634F !important}" +
+    "img[data-img]{outline:2px dashed rgba(236,0,0,.55);outline-offset:3px;cursor:pointer}" +
+    "[data-item]:hover{box-shadow:0 0 0 2px rgba(236,0,0,.18) inset}" +
+    "#ed-barra{position:absolute;z-index:99;display:flex;flex-wrap:wrap;gap:6px;max-width:330px;font:700 12px/1 Arial,sans-serif}" +
+    "#ed-barra[hidden]{display:none !important}" +
+    "#ed-barra button{all:unset;background:#EC0000;color:#fff;border-radius:999px;padding:7px 11px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.28);font:700 12px/1 Arial,sans-serif}" +
+    "#ed-barra button.cinza{background:#222}#ed-barra button.verde{background:#21634F}#ed-barra button.ambar{background:#945400}" +
+    "#ed-barra button:hover{filter:brightness(1.12)}" +
+    ".show-m{}";
+  function marcarSujo() {
+    ED.sujo = true;
+    $("#estado").className = "estado sujo"; $("#estado").textContent = "Alterações não salvas (a edição fica guardada neste navegador até salvar).";
+    clearTimeout(ED.timer); ED.timer = setTimeout(function () { guardarRascunho({ nome: ED.nome, origem: ED.origem, periodoInicial: ED.periodoInicial, html: htmlEdicao(), quando: Date.now() }); reconverter(); }, 1200);
   }
-  /* Devolve o controle ao navegador para a tela atualizar entre as etapas. */
-  function respira() { return new Promise(function (r) { setTimeout(r, 16); }); }
+  function camposDe(chave) { return Array.prototype.slice.call(ED.doc.querySelectorAll('[data-campo="' + chave + '"]')); }
+
+  /* Página → versão para editar: sem script (o movimento e os cliques ficam parados), sem o que o navegador montou. */
+  function paraEditar(html) {
+    var limpo = Motor.paginaInterativa(html).html.replace(/<script\b[\s\S]*?<\/script>\s*/gi, "");
+    return limpo.replace("</head>", '<style id="ed-css">' + EDITOR_CSS + "</style>\n</head>");
+  }
+  function abrirNoEditor(html, nome, origem, periodoInicial) {
+    ED.nome = nome; ED.origem = origem; ED.desfazer = []; ED.ocultas = {}; ED.alterados = {}; ED.sujo = false;
+    $("#bDesfazer").disabled = true;
+    var fr = $("#edFrame");
+    fr.onload = function () {
+      ED.doc = fr.contentDocument;
+      instrumentar();
+      ED.periodoInicial = periodoInicial !== undefined ? periodoInicial : periodoAtual();
+      $("#secEditar").hidden = false; $("#secLink").hidden = false; $("#secResumo").hidden = false; $("#secStatus").hidden = false;
+      $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
+      montarSecoes(); reconverter(true);
+      document.querySelector(".ferramentas").scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    fr.srcdoc = paraEditar(html);
+  }
+  function periodoAtual() { var p = ED.doc && ED.doc.querySelector('[data-campo="periodo"]'); return p ? p.textContent.replace(/\s+/g, " ").trim() : ""; }
+
+  function instrumentar() {
+    var d = ED.doc;
+    /* Página de antes da 4.3: a frase do mês (campo) continha a segunda parte (outro campo). Separa as duas,
+       para cada parte ser editada sozinha (como nas páginas novas). */
+    Array.prototype.forEach.call(d.querySelectorAll("[data-campo]"), function (el) {
+      if (el.tagName === "IMG" || !el.querySelector("[data-campo]")) return;
+      var sp = d.createElement("span"); sp.setAttribute("data-campo", el.getAttribute("data-campo"));
+      while (el.firstChild && !(el.firstChild.nodeType === 1 && el.firstChild.matches("[data-campo], br"))) sp.appendChild(el.firstChild);
+      el.insertBefore(sp, el.firstChild); el.removeAttribute("data-campo");
+    });
+    /* textos e números */
+    Array.prototype.forEach.call(d.querySelectorAll("[data-campo]"), function (el) {
+      if (el.tagName === "IMG" || el.getAttribute("data-campo") === "previa") return;
+      if (el.parentElement && el.parentElement.closest("[data-ed-campo]")) { return; }
+      el.setAttribute("contenteditable", "true"); el.setAttribute("spellcheck", "true"); el.setAttribute("data-ed-campo", "");
+      Array.prototype.forEach.call(el.querySelectorAll("a"), function (a) { a.setAttribute("contenteditable", "false"); });
+    });
+    d.addEventListener("focusin", function (e) {
+      var el = e.target.closest && e.target.closest("[data-ed-campo]"); if (!el) return;
+      /* "[Texto do modelo]": a marca âmbar some ao clicar e o texto fica selecionado; o que se digita entra no lugar. */
+      var tirou = 0;
+      Array.prototype.forEach.call(el.querySelectorAll("span"), function (sp) {
+        if (/^\[[^\]]*\]$/.test(sp.textContent.trim()) && /background:\s*(#FFE1B9|rgb\(255,\s*225,\s*185\))/i.test(sp.getAttribute("style") || "")) { sp.replaceWith(d.createTextNode(sp.textContent)); tirou++; }
+      });
+      if (tirou || /^\s*(\[[^\]]*\]\s*)+$/.test(el.textContent)) setTimeout(function () {
+        if (d.activeElement !== el && !el.contains(d.activeElement)) return;
+        var r = d.createRange(), s = d.getSelection(); r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r);
+      }, 0);
+      var chip = el.matches("[data-tom]") ? el : el.querySelector("[data-tom]");
+      if (chip) barraEtiqueta(el, chip);
+    });
+    d.addEventListener("input", function (e) {
+      var el = e.target.closest && e.target.closest("[data-ed-campo]"); if (!el) return;
+      el.setAttribute("data-ed-alterado", "");
+      var chave = el.getAttribute("data-campo"); ED.alterados[chave] = true;
+      /* o período aparece em vários lugares: muda em todos */
+      camposDe(chave).forEach(function (o) { if (o !== el) { o.innerHTML = el.innerHTML; o.setAttribute("data-ed-alterado", ""); } });
+      marcarSujo();
+    });
+    d.addEventListener("keydown", function (e) {
+      if (!e.target.closest || !e.target.closest("[data-ed-campo]")) return;
+      if (e.key === "Enter") { e.preventDefault(); if (e.shiftKey) d.execCommand("insertLineBreak"); else e.target.blur(); }
+      if ((e.ctrlKey || e.metaKey) && /^[biu]$/i.test(e.key)) e.preventDefault();
+    });
+    d.addEventListener("paste", function (e) {
+      if (!e.target.closest || !e.target.closest("[data-ed-campo]")) return;
+      e.preventDefault(); d.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text/plain").replace(/\s*\n\s*/g, " "));
+    });
+    /* links não navegam durante a edição */
+    d.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a"); if (a) e.preventDefault(); }, true);
+    /* barra flutuante: imagem, link ou item */
+    var barra = d.createElement("div"); barra.id = "ed-barra"; barra.setAttribute("data-editor", ""); barra.hidden = true; d.body.appendChild(barra);
+    var esconder = null;
+    barra.addEventListener("mouseenter", function () { clearTimeout(esconder); });
+    barra.addEventListener("mouseleave", function () { esconder = setTimeout(function () { barra.hidden = true; }, 500); });
+    d.addEventListener("mouseover", function (e) {
+      var t = e.target; if (!t.closest || t.closest("#ed-barra")) return;
+      var img = t.closest("img[data-img]"), a = t.closest('a.cta, a[data-anexo], span[title="Link ainda não definido"]'), item = t.closest("[data-item]");
+      if (img) mostrarBarra(img, ferramentasImagem(img), img.getBoundingClientRect().width < 200 ? "abaixo" : "");
+      else if (a) mostrarBarra(a, ferramentasLink(a));
+      else if (d.activeElement && d.activeElement.hasAttribute("data-ed-campo") && d.activeElement.contains(t)) return;
+      else if (item) mostrarBarra(item, [["Ocultar item", function () { ocultarItem(item); }, "cinza"]], "direita");
+      else return;
+      clearTimeout(esconder);
+    });
+    d.addEventListener("mouseout", function (e) { if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest("#ed-barra")) { clearTimeout(esconder); esconder = setTimeout(function () { barra.hidden = true; }, 700); } });
+  }
+  /* onde: (padrão) dentro, no canto de cima à esquerda · "acima" · "abaixo" (imagem pequena) · "direita" (dentro, no canto de cima à direita, longe do começo do texto) */
+  function mostrarBarra(alvo, botoes, onde) {
+    var d = ED.doc, barra = d.getElementById("ed-barra"), r = alvo.getBoundingClientRect(), w = d.defaultView;
+    barra.textContent = "";
+    botoes.forEach(function (b) { var x = d.createElement("button"); x.type = "button"; x.textContent = b[0]; if (b[2]) x.className = b[2]; x.addEventListener("mousedown", function (e) { e.preventDefault(); }); x.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); b[1](); }); barra.appendChild(x); });
+    barra.hidden = false;
+    var top = r.top + w.scrollY + (onde === "acima" ? -38 : onde === "direita" ? 4 : onde === "abaixo" ? r.height + 4 : 8);
+    var left = onde === "direita" ? r.right + w.scrollX - barra.offsetWidth - 4 : r.left + w.scrollX + 8;
+    left = Math.max(4, Math.min(left, w.scrollX + d.documentElement.clientWidth - barra.offsetWidth - 4));
+    barra.style.top = Math.max(w.scrollY + 4, top) + "px"; barra.style.left = left + "px";
+  }
+  function barraEtiqueta(campo, chip) {
+    mostrarBarra(campo, [["Cor: verde", function () { tom(chip, "verde"); }, "verde"], ["Cor: âmbar", function () { tom(chip, "ambar"); }, "ambar"]], "acima");
+  }
+  var TONS = { verde: ["#A3E0CE", "#21634F"], ambar: ["#FFE1B9", "#945400"] };
+  function tom(chip, t) {
+    var antes = [chip.getAttribute("data-tom"), chip.style.background, chip.style.color];
+    chip.setAttribute("data-tom", t); chip.style.background = TONS[t][0]; chip.style.color = TONS[t][1];
+    pilha(function () { chip.setAttribute("data-tom", antes[0]); chip.style.background = antes[1]; chip.style.color = antes[2]; });
+    var c = chip.closest("[data-campo]"); if (c) { c.setAttribute("data-ed-alterado", ""); ED.alterados[c.getAttribute("data-campo")] = true; }
+    marcarSujo();
+  }
+  function pilha(fn) { ED.desfazer.push(fn); $("#bDesfazer").disabled = false; }
+  $("#bDesfazer").addEventListener("click", function () { var f = ED.desfazer.pop(); if (f) { f(); marcarSujo(); } $("#bDesfazer").disabled = !ED.desfazer.length; });
 
   /* ---------- imagens ---------- */
+  function ferramentasImagem(img) {
+    var b = [["Trocar imagem", function () { escolher("#fImagem", function (f) { trocarImagem(img.getAttribute("data-img"), f); }); }]];
+    var chave = img.getAttribute("data-img"), video = img.hasAttribute("data-video");
+    if (video) b.push(["Trocar vídeo", function () { escolher("#fVideo", function (f) { trocarVideo(chave, f, false); }); }], ["Tirar o vídeo", function () { tirarVideo(chave); }, "cinza"]);
+    else if (/^(principal|destaque|lancamento-\d+)$/.test(chave)) b.push(["Colocar vídeo", function () { escolher("#fVideo", function (f) { trocarVideo(chave, f, true); }); }, "cinza"]);
+    if (/^(selo|transformation-\d+-(logo|print-\d+))$/.test(chave)) b.push(["Tirar imagem", function () { tirarImagem(chave); }, "cinza"]);
+    b.push(["Descrição", function () { var n = prompt("Descrição da imagem (o que ela mostra):", img.alt.replace(/^Vídeo: /, "")); if (n !== null) mesmasImagens(chave).forEach(function (i) { var antes = i.alt; i.alt = (i.hasAttribute("data-video") ? "Vídeo: " : "") + n; i.setAttribute("data-legenda", n); pilha(function () { i.alt = antes; }); }); marcarSujo(); }, "cinza"]);
+    return b;
+  }
+  function escolher(sel, fn) { var i = $(sel); i.value = ""; i.onchange = function () { if (i.files[0]) fn(i.files[0]); }; i.click(); }
+  function mesmasImagens(chave) { return Array.prototype.slice.call(ED.doc.querySelectorAll('img[data-img="' + chave + '"]')); }
+  function lerComo(file, modo) { return new Promise(function (ok, falha) { var r = new FileReader(); r.onload = function () { ok(r.result); }; r.onerror = falha; r[modo](file); }); }
+  function carregar(src) { return new Promise(function (ok, falha) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { falha(new Error("A imagem não abriu. Use .jpg ou .png.")); }; im.src = src; }); }
+  /* Recorta (se a imagem tem altura fixa) e reduz para o dobro do tamanho na tela (nitidez em telas de alta resolução). */
+  function desenhar(im, w, h, png, play) {
+    var W = w * 2, H = h ? h * 2 : Math.round(W * im.naturalHeight / im.naturalWidth);
+    if (!h && im.naturalWidth < W) { W = im.naturalWidth; H = im.naturalHeight; }
+    var c = document.createElement("canvas"); c.width = W; c.height = H; var g = c.getContext("2d");
+    if (!png) { g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, W, H); }
+    var esc_ = Math.max(W / im.naturalWidth, H / im.naturalHeight), sw = W / esc_, sh = H / esc_;
+    g.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, 0, 0, W, H);
+    if (play) desenharPlay(g, W, H, "#EC0000");
+    return png ? c.toDataURL("image/png") : c.toDataURL("image/jpeg", 0.86);
+  }
+  function desenharPlay(g, W, H, cor) {
+    var m = Math.min(W, H), r = Math.round(m * 0.24), x = W / 2, y = H / 2;
+    if (m >= 400) { r = Math.round(m * 0.1); x = Math.round(r * 1.7); y = H - Math.round(r * 1.7); }
+    g.save(); g.shadowColor = "rgba(0,0,0,0.35)"; g.shadowBlur = r * 0.5; g.shadowOffsetY = r * 0.08;
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = "rgba(255,255,255,0.94)"; g.fill(); g.restore();
+    g.beginPath(); var t = r * 0.42; g.moveTo(x - t * 0.62, y - t); g.lineTo(x - t * 0.62, y + t); g.lineTo(x + t, y); g.closePath(); g.fillStyle = cor; g.fill();
+  }
+  function ampliada(im) {
+    var W = Math.min(1400, im.naturalWidth), H = Math.round(W * im.naturalHeight / im.naturalWidth), c = document.createElement("canvas");
+    c.width = W; c.height = H; var g = c.getContext("2d"); g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, W, H); g.drawImage(im, 0, 0, W, H); return c.toDataURL("image/jpeg", 0.88);
+  }
+  async function trocarImagem(chave, file) {
+    if (!/^image\//.test(file.type)) { await perguntar("Arquivo não é uma imagem", "<p>Escolha um arquivo <b>.jpg</b> ou <b>.png</b>.</p>", "Entendi"); return; }
+    var im = await carregar(await lerComo(file, "readAsDataURL")), png = file.type === "image/png" && /logo|selo/.test(chave);
+    var pequenas = [];
+    mesmasImagens(chave).forEach(function (i) {
+      var w = +i.getAttribute("width") || i.width, h = +i.getAttribute("height") || 0;
+      if (im.naturalWidth < w * 2) pequenas.push(w * 2);
+      var antes = { src: i.getAttribute("src"), thumb: i.getAttribute("data-thumb"), zoom: i.getAttribute("data-ampliar") };
+      var video = i.hasAttribute("data-video");
+      i.setAttribute("src", desenhar(im, w, h, png, video));
+      if (video) i.setAttribute("data-thumb", desenhar(im, w, h, png, false));
+      if (i.hasAttribute("data-ampliar")) i.setAttribute("data-ampliar", ampliada(im));
+      if (!h) i.removeAttribute("height");
+      pilha(function () { i.setAttribute("src", antes.src); if (antes.thumb !== null) i.setAttribute("data-thumb", antes.thumb); if (antes.zoom !== null) i.setAttribute("data-ampliar", antes.zoom); });
+    });
+    $("#estado").textContent = "Imagem trocada: " + file.name + (pequenas.length ? ". Atenção: ela é menor que o ideal (" + Math.max.apply(null, pequenas) + " px de largura) e pode ficar borrada." : ".");
+    marcarSujo();
+  }
+  async function trocarVideo(chave, file, novo) {
+    if (!/\.(mp4|webm)$/i.test(file.name)) { await perguntar("Formato de vídeo", "<p>Use um vídeo <b>.mp4</b> (ou .webm).</p>", "Entendi"); return; }
+    if (file.size > 25 * 1048576 && !(await perguntar("Vídeo grande", "<p>O vídeo tem " + kb(file.size) + ". O report fica pesado para abrir. Continuar mesmo assim?</p>", "Continuar", "Escolher outro"))) return;
+    var dados = await lerComo(file, "readAsDataURL");
+    if (/^data:application\/octet-stream/.test(dados)) dados = dados.replace(/^data:application\/octet-stream/, /\.webm$/i.test(file.name) ? "data:video/webm" : "data:video/mp4");
+    for (var k = 0, l = mesmasImagens(chave); k < l.length; k++) {
+      var i = l[k], antes = { video: i.getAttribute("data-video"), src: i.getAttribute("src"), thumb: i.getAttribute("data-thumb"), zoom: i.getAttribute("data-ampliar"), alt: i.alt };
+      if (novo) {
+        var im = await carregar(i.getAttribute("src")), w = +i.getAttribute("width"), h = +i.getAttribute("height") || 0;
+        i.setAttribute("data-thumb", i.getAttribute("src")); i.setAttribute("src", desenhar(im, w, h, false, true)); i.removeAttribute("data-ampliar");
+        if (!/^Vídeo: /.test(i.alt)) i.alt = "Vídeo: " + i.alt;
+      }
+      i.setAttribute("data-video", dados); i.setAttribute("data-legenda", i.alt.replace(/^Vídeo: /, ""));
+      (function (i, antes) { pilha(function () { ["video", "thumb"].forEach(function (k2) { var v = antes[k2], at = "data-" + k2; if (v === null) i.removeAttribute(at); else i.setAttribute(at, v); }); i.setAttribute("src", antes.src); i.alt = antes.alt; if (antes.zoom !== null) i.setAttribute("data-ampliar", antes.zoom); }); })(i, antes);
+    }
+    $("#estado").textContent = "Vídeo colocado: " + file.name + " (" + kb(file.size) + "). Ele toca no report completo; no e-mail vai só a imagem.";
+    marcarSujo();
+  }
+  /* Imagem opcional (selo, logo e prints do Transformation Hub): sai com o espaço dela. */
+  function tirarImagem(chave) {
+    var tirados = [];
+    function tira(n) { if (n && n.parentNode) { tirados.push([n, n.parentNode, n.nextSibling]); n.remove(); } }
+    mesmasImagens(chave).forEach(function (i) {
+      var td = i.closest("td"), div = i.parentElement && i.parentElement.matches("div.show-m") ? i.parentElement : null;
+      if (div) { tira(div); return; }
+      if (/-print-\d+$/.test(chave)) {
+        var linha = td.parentElement, antes = td.previousElementSibling, depois = td.nextElementSibling, espaco = function (x) { return x && !x.querySelector("img") && !x.textContent.replace(/ /g, "").trim(); };
+        if (espaco(antes)) tira(antes); else if (espaco(depois)) tira(depois);
+        tira(td);
+        if (!linha.querySelector("img")) tira(linha.closest("td[colspan]") ? linha.closest("td[colspan]").parentElement : linha);
+        return;
+      }
+      if (td && td.querySelectorAll("img").length === 1 && !td.textContent.trim()) tira(td); else tira(i);
+    });
+    pilha(function () { tirados.reverse().forEach(function (t) { t[1].insertBefore(t[0], t[2]); }); });
+    ED.doc.getElementById("ed-barra").hidden = true;
+    $("#estado").textContent = "Imagem tirada. Para voltar: Desfazer."; marcarSujo();
+  }
+  function tirarVideo(chave) {
+    mesmasImagens(chave).forEach(function (i) {
+      var antes = { video: i.getAttribute("data-video"), src: i.getAttribute("src"), thumb: i.getAttribute("data-thumb"), alt: i.alt };
+      if (antes.thumb) i.setAttribute("src", antes.thumb);
+      i.removeAttribute("data-video"); i.removeAttribute("data-thumb"); i.alt = i.alt.replace(/^Vídeo: /, ""); i.setAttribute("data-ampliar", "");
+      pilha(function () { i.setAttribute("data-video", antes.video); i.setAttribute("data-thumb", antes.thumb); i.setAttribute("src", antes.src); i.alt = antes.alt; i.removeAttribute("data-ampliar"); });
+    });
+    marcarSujo();
+  }
+
+  /* ---------- links ---------- */
+  /* Link ainda sem endereço (modelo): vira um link de verdade quando recebe o endereço ou o PDF. */
+  function virarLink(el) {
+    if (el.tagName === "A") return el;
+    var a = ED.doc.createElement("a"), claro = /F5DECF/i.test(el.style.color) || /245,\s*222,\s*207/.test(el.style.color);
+    a.setAttribute("href", "#"); a.setAttribute("target", "_blank"); a.className = "cta"; a.setAttribute("contenteditable", "false");
+    a.setAttribute("style", "color:" + (claro ? "#FFFFFF" : "#EC0000") + ";font-weight:bold;text-decoration:none;" + (/nowrap/.test(el.getAttribute("style")) ? "white-space:nowrap;" : ""));
+    a.innerHTML = el.innerHTML; el.replaceWith(a);
+    pilha(function () { a.replaceWith(el); });
+    return a;
+  }
+  function ferramentasLink(a) {
+    var pend = a.tagName !== "A", b = [[pend ? "Colocar link" : "Trocar link", function () { trocarLink(a); }], ["Anexar PDF", function () { escolher("#fPdf", function (f) { anexarPdf(a, f); }); }, "cinza"]];
+    if (a.closest('[data-item^="transformation-"]')) b.push(["Texto do link", function () {
+      var atual = a.textContent.replace(/\s*→\s*$/, "").trim(), n = prompt("Texto do link (ex.: Documento One Brief):", /^\[.*\]$/.test(atual) ? "" : atual);
+      if (n === null || !n.trim()) return; var antes = a.innerHTML; a.innerHTML = esc(n.trim()) + "&nbsp;&#8594;"; pilha(function () { a.innerHTML = antes; }); marcarSujo();
+    }, "cinza"]);
+    b.push(["Tirar link", function () { tirarLink(a); }, "cinza"]);
+    return b;
+  }
+  async function trocarLink(a) {
+    var atual = a.tagName !== "A" || a.hasAttribute("data-anexo") ? "" : a.getAttribute("href");
+    var u = prompt("Endereço (link) que este botão abre. Ele precisa começar com https://", atual || "https://");
+    if (u === null) return; u = u.trim();
+    var p = Motor.conferirLinkSimples(u).filter(function (x) { return x.nivel === "erro"; });
+    if (!/^https:\/\//i.test(u)) p.unshift({ msg: "precisa começar com https://" });
+    if (p.length) { await perguntar("Link não aceito", "<p>Este endereço " + esc(p[0].msg) + "</p><p>Use o link de compartilhamento do ambiente autorizado. Um caminho do computador (C:\\…) não abre para mais ninguém.</p>", "Entendi"); return; }
+    a = virarLink(a);
+    var antigo = a.getAttribute("href"), anexo = a.getAttribute("data-anexo");
+    var mesmos = Array.prototype.filter.call(ED.doc.querySelectorAll("a"), function (x) { return x === a || (!anexo && antigo && antigo !== "#" && x.getAttribute("href") === antigo); });
+    mesmos.forEach(function (x) { x.setAttribute("href", u); x.setAttribute("target", "_blank"); x.removeAttribute("data-anexo"); });
+    pilha(function () { mesmos.forEach(function (x) { x.setAttribute("href", antigo); if (anexo) x.setAttribute("data-anexo", anexo); }); });
+    $("#estado").textContent = "Link trocado."; marcarSujo();
+  }
+  async function anexarPdf(a, file) {
+    if (!/\.pdf$/i.test(file.name)) { await perguntar("Formato", "<p>Escolha um arquivo <b>.pdf</b>.</p>", "Entendi"); return; }
+    var dados = (await lerComo(file, "readAsDataURL")).replace(/^data:[^;]*;/, "data:application/pdf;");
+    a = virarLink(a);
+    var antes = { href: a.getAttribute("href"), anexo: a.getAttribute("data-anexo") };
+    a.setAttribute("href", "#"); a.setAttribute("data-anexo", dados); a.setAttribute("title", "Abre o documento (PDF) em nova aba");
+    pilha(function () { a.setAttribute("href", antes.href); if (antes.anexo === null) a.removeAttribute("data-anexo"); else a.setAttribute("data-anexo", antes.anexo); });
+    $("#estado").textContent = "PDF anexado: " + file.name + ". No report completo, o link abre o PDF em nova aba; no e-mail, vira texto."; marcarSujo();
+  }
+  function tirarLink(a) {
+    var pai = a.parentNode, prox = a.nextSibling, sep = a.previousElementSibling && /·/.test(a.previousElementSibling.textContent) && !a.previousElementSibling.matches("a") ? a.previousElementSibling : null;
+    var sepProx = sep ? sep.nextSibling : null;
+    if (sep) sep.remove(); a.remove();
+    pilha(function () { pai.insertBefore(a, prox); if (sep) pai.insertBefore(sep, a); });
+    marcarSujo();
+  }
+
+  /* ---------- ocultar item e seção ---------- */
+  function ocultarItem(item) {
+    var antes = item.innerHTML;
+    if (item.tagName === "TD") { item.innerHTML = "&nbsp;"; item.removeAttribute("data-item"); pilha(function () { item.innerHTML = antes; item.setAttribute("data-item", ""); }); }
+    else { var pai = item.parentNode, prox = item.nextSibling; item.remove(); pilha(function () { pai.insertBefore(item, prox); }); }
+    ED.doc.getElementById("ed-barra").hidden = true;
+    $("#estado").textContent = "Item ocultado. Para voltar: Desfazer."; marcarSujo();
+  }
+  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
+  function nosDaSecao(id) {
+    var w = ED.doc.createTreeWalker(ED.doc.body, NodeFilter.SHOW_COMMENT), n, ini = null, prox = null;
+    while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue); if (!m) continue; if (ini && !prox) { prox = n; break; } if (m[1] === id) ini = n; }
+    var r = []; if (!ini) return r;
+    for (var el = ini.nextSibling; el && el !== prox; el = el.nextSibling) r.push(el);
+    return r;
+  }
+  function montarSecoes() {
+    var box = $("#secoesRep"); box.textContent = "";
+    Object.keys(NOMES_SEC).forEach(function (id) {
+      var nos = ED.ocultas[id] || nosDaSecao(id); if (!nos.length && !ED.ocultas[id]) return;
+      var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.checked = !ED.ocultas[id]; c.value = id;
+      c.addEventListener("change", function () { mostrarSecao(id, c.checked); });
+      l.appendChild(c); l.appendChild(document.createTextNode(" " + NOMES_SEC[id])); box.appendChild(l);
+    });
+  }
+  function mostrarSecao(id, mostrar) {
+    if (!mostrar) {
+      var nos = nosDaSecao(id).filter(function (n) { return n.nodeType === 1; });
+      nos.forEach(function (n) { n.setAttribute("data-ed-oculta", ""); n.style.display = "none"; });
+      ED.ocultas[id] = nos;
+    } else { (ED.ocultas[id] || []).forEach(function (n) { n.removeAttribute("data-ed-oculta"); n.style.display = ""; }); delete ED.ocultas[id]; }
+    marcarSujo();
+  }
+
+  /* ---------- importar conteúdo (Copilot) ---------- */
+  $("#bImportar").addEventListener("click", function () { $("#painelImportar").hidden = false; $("#txtImportar").focus(); });
+  $("#bFecharImportar").addEventListener("click", function () { $("#painelImportar").hidden = true; });
+  $("#bAplicar").addEventListener("click", function () {
+    var r = Motor.importarDados($("#txtImportar").value), feitos = [], faltam = [];
+    Object.keys(r.campos).forEach(function (chave) {
+      var c = r.campos[chave], els = camposDe(chave);
+      if (!els.length) { faltam.push(chave); return; }
+      els.forEach(function (el) {
+        var antes = el.innerHTML;
+        if (c.tipo === "etiqueta") {
+          var chip = el.matches("[data-tom]") ? el : el.querySelector("[data-tom]");
+          if (chip) { chip.textContent = c.texto; chip.setAttribute("data-tom", c.tom); chip.style.background = TONS[c.tom][0]; chip.style.color = TONS[c.tom][1]; }
+          else el.textContent = c.texto;
+        } else {
+          var cta = el.querySelector("a.cta"), html = esc(c.texto).replace(/&lt;br\s*\/?&gt;/gi, "<br>");
+          var dentro = el.querySelector("[data-campo]");
+          if (dentro) { while (el.firstChild && el.firstChild !== dentro) el.removeChild(el.firstChild); el.insertAdjacentHTML("afterbegin", html); }
+          else if (cta) { el.innerHTML = html + " "; el.appendChild(cta); }
+          else el.innerHTML = html;
+        }
+        el.setAttribute("data-ed-alterado", ""); ED.alterados[chave] = true;
+        pilha(function () { el.innerHTML = antes; });
+      });
+      feitos.push(chave);
+    });
+    var msg = feitos.length + " campo(s) preenchido(s)." + (faltam.length ? " Não existem nesta página (ficaram de fora): " + faltam.join(", ") + "." : "") +
+      (r.problemas.length ? " Observações: " + r.problemas.map(function (p) { return p.msg; }).join(" ") : "");
+    $("#importarInfo").textContent = msg; log("Importação: " + msg);
+    if (feitos.length) marcarSujo();
+  });
+
+  /* ---------- salvar ---------- */
+  /* HTML da edição (sem as marcas do editor, sem script): o que fica guardado no rascunho. */
+  function htmlEdicao() {
+    var doc = ED.doc.cloneNode(true);
+    Array.prototype.forEach.call(doc.querySelectorAll("[data-editor], #ed-css"), function (n) { n.remove(); });
+    Array.prototype.forEach.call(doc.querySelectorAll("[data-ed-oculta]"), function (n) { n.remove(); });
+    Array.prototype.forEach.call(doc.querySelectorAll("[contenteditable], [data-ed-campo], [data-ed-alterado], [spellcheck]"), function (n) {
+      n.removeAttribute("contenteditable"); n.removeAttribute("data-ed-campo"); n.removeAttribute("data-ed-alterado"); n.removeAttribute("spellcheck");
+    });
+    /* título (assunto) e texto da caixa de entrada acompanham o período e a frase */
+    var per = doc.querySelector('[data-campo="periodo"]'), frase = doc.querySelector('[data-campo="frase"]'), prev = doc.querySelector('[data-campo="previa"]');
+    if (per) { var t = per.textContent.replace(/\s+/g, " ").trim(), mes = t.charAt(0) + t.slice(1).toLocaleLowerCase("pt-BR"); doc.title = "Creative Strategy PF | Report de " + mes.replace(/(\d{4})$/, "$1"); }
+    var fraseFinal = doc.querySelector('[data-campo="frase_final"]');
+    if (frase && prev && Object.keys(ED.alterados).some(function (k) { return /^frase/.test(k); })) prev.textContent = (frase.textContent + " " + (fraseFinal ? fraseFinal.textContent : "")).replace(/\s+/g, " ").trim();
+    var html = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+    return Motor.renumerarSecoes(html);
+  }
+  function htmlParaSalvar() { return Motor.paginaInterativa(htmlEdicao().replace(/<!-- Editado no emulador[^>]*-->\n?/, "").replace("<head>", "<head>\n<!-- Editado no emulador do report (versão " + Motor.VERSAO + ") em " + new Date().toLocaleString("pt-BR") + ". -->")).html; }
+  /* Nome do campo para gente (no lugar da chave técnica). */
+  function rotuloNumero(k) {
+    var m = /^(numero|resultado)-(\d+)\.(\w+)$/.exec(k), parte = { valor: "valor", detalhe: "base de comparação", variacao: "variação", anterior: "anterior", atual: "atual" };
+    if (m) return (m[1] === "numero" ? "Número " + m[2] + " da capa" : "Resultado " + m[2] + " do destaque") + " (" + parte[m[3]] + ")";
+    m = /^cx\.(\w+)$/.exec(k); if (m) return "Creative X (" + (parte[m[1]] || m[1]) + ")";
+    return k;
+  }
+  async function conferirAntesDeSalvar() {
+    var per = periodoAtual();
+    if (ED.origem !== "arquivo" || !ED.periodoInicial || per === ED.periodoInicial) return true;
+    /* Report do mês anterior com período novo: números que ninguém mexeu podem ser do mês passado. */
+    var NUM = /\.(valor|detalhe|variacao|anterior|atual)$/, lista = [];
+    Array.prototype.forEach.call(ED.doc.querySelectorAll("[data-campo]"), function (el) {
+      var k = el.getAttribute("data-campo"); if (!NUM.test(k) || ED.alterados[k] || el.closest("[data-ed-oculta]")) return;
+      var t = el.textContent.replace(/\s+/g, " ").trim(), r = rotuloNumero(k) + ": " + t; if (t && lista.indexOf(r) < 0) lista.push(r);
+    });
+    if (!lista.length) return true;
+    return perguntar("Confira os números antes de salvar", "<p>O período mudou de <b>" + esc(ED.periodoInicial) + "</b> para <b>" + esc(per) + "</b>, mas estes números não foram alterados. Eles ainda são do mês anterior?</p><ul>" +
+      lista.slice(0, 20).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul><p>Salve só se eles valem para o mês novo. Indicador sem dado: oculte o item (não deixe o número antigo).</p>", "Salvar mesmo assim", "Voltar e conferir");
+  }
+  $("#bSalvar").addEventListener("click", async function () {
+    if (!ED.doc) return;
+    if (!(await conferirAntesDeSalvar())) return;
+    var html = htmlParaSalvar(), nome = Motor.nomeDoReport(periodoAtual()), salvo = "";
+    if (window.showSaveFilePicker) {
+      try {
+        var h = await window.showSaveFilePicker({ suggestedName: nome, types: [{ description: "Report (página HTML)", accept: { "text/html": [".html"] } }] });
+        var wr = await h.createWritable(); await wr.write(new Blob([html], { type: "text/html" })); await wr.close(); salvo = h.name;
+      } catch (e) { if (e.name === "AbortError") return; }
+    }
+    if (!salvo) { baixar(nome, html, "text/html"); salvo = nome + " (pasta Downloads)"; }
+    ED.sujo = false; ED.nomeSalvo = salvo; apagarRascunho();
+    var faltaTxt = (Array.prototype.map.call(ED.doc.querySelectorAll("[data-ed-campo]"), function (e) { return e.textContent; }).join(" ").match(/\[[^\]\n]{1,80}\]/g) || []).length, faltaLink = ED.doc.querySelectorAll('span[title="Link ainda não definido"]').length;
+    $("#estado").className = "estado salvo"; $("#estado").textContent = "Salvo às " + hora() + ": " + salvo + ". É este arquivo que você publica (passo 3)." +
+      (faltaTxt || faltaLink ? " Ainda falta: " + [faltaTxt ? faltaTxt + " texto(s) do modelo entre [colchetes]" : "", faltaLink ? faltaLink + " link(s) sem endereço (troque ou tire)" : ""].filter(Boolean).join(" e ") + "." : "");
+    $("#nomeSalvo").textContent = salvo; log("Report salvo: " + salvo + " (" + kb(Motor.utf8(html).length) + ").");
+    converter(new File([html], salvo.replace(/ \(.*$/, ""), { type: "text/html" }));
+  });
+  window.addEventListener("beforeunload", function (e) { if (ED.sujo) { e.preventDefault(); e.returnValue = ""; } });
+
+  /* ---------- abrir ---------- */
+  $("#bModelo").addEventListener("click", async function () {
+    if (!window.CORINGA_HTML) { await perguntar("Modelo não encontrado", "<p>O modelo em branco (tools/coringa.js) não está junto deste arquivo. Use a versão avulsa do emulador.</p>", "Entendi"); return; }
+    if (ED.sujo && !(await perguntar("Trocar de report?", "<p>Há alterações não salvas no report aberto. Elas continuam guardadas neste navegador até você abrir outro.</p>", "Abrir o modelo", "Voltar"))) return;
+    abrirNoEditor(window.CORINGA_HTML, "modelo em branco", "modelo");
+    log("Aberto: modelo em branco (coringa).");
+  });
+  async function abrirArquivo(file) {
+    if (ED.sujo && !(await perguntar("Trocar de report?", "<p>Há alterações não salvas no report aberto.</p>", "Abrir o outro", "Voltar"))) return;
+    var html = await file.text();
+    if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) { await perguntar("Arquivo não reconhecido", "<p>Este arquivo não parece um report (.html).</p>", "Entendi"); return; }
+    abrirNoEditor(html, file.name, "arquivo");
+    log("Aberto: " + file.name + " (" + kb(file.size) + ").");
+  }
+  $("#arquivo").addEventListener("change", function () { if (this.files[0]) abrirArquivo(this.files[0]); this.value = ""; });
+  var drop = $("#drop");
+  ["dragenter", "dragover"].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function (t) { drop.addEventListener(t, function () { drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function (e) { e.preventDefault(); var f = e.dataTransfer.files[0]; if (f) abrirArquivo(f); });
+  lerRascunho().then(function (r) {
+    if (!r || !r.html) return;
+    $("#recuperarTxt").textContent = "Há uma edição não salva de " + r.nome + " (" + new Date(r.quando).toLocaleString("pt-BR") + "), guardada neste navegador.";
+    $("#recuperar").hidden = false;
+    $("#bRecuperar").onclick = function () { $("#recuperar").hidden = true; abrirNoEditor(r.html, r.nome, r.origem, r.periodoInicial); setTimeout(marcarSujo, 50); log("Edição recuperada: " + r.nome + "."); };
+    $("#bDescartar").onclick = function () { $("#recuperar").hidden = true; apagarRascunho(); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ew]"), function (b) {
+    b.addEventListener("click", function () {
+      Array.prototype.forEach.call(document.querySelectorAll("[data-ew]"), function (x) { x.setAttribute("aria-pressed", x === b); });
+      $("#edFrame").style.width = b.dataset.ew;
+    });
+  });
+
+  /* =================================================================== */
+  /* CONVERSÃO: e-mail-resumo, e-mail completo e status em tempo real     */
+  /* =================================================================== */
+  var ETAPAS = [
+    { id: "ler", nome: "Ler o report" },
+    { id: "origem", nome: "Reconhecer o report" },
+    { id: "limpar", nome: "Tirar o que o e-mail não aceita" },
+    { id: "resumir", nome: "Montar o e-mail-resumo (até 3 indicadores)" },
+    { id: "imagens", nome: "Colocar as imagens dentro dos e-mails" },
+    { id: "completo", nome: "Montar o e-mail completo (.eml)" },
+    { id: "resumido", nome: "Montar o e-mail-resumo (.eml)" }
+  ];
+  var FALTA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120"><rect width="100%" height="100%" fill="#E3DFDC"/><text x="50%" y="54%" font-family="Arial" font-size="13" fill="#5F5F5F" text-anchor="middle">imagem faltando</text></svg>');
+  var ICONE = { espera: "", rodando: "", ok: "✓", aviso: "!", erro: "✕" };
+  var pastaArquivos = {}, execucao = 0, resultado = null, resumido = null, previas = {}, qualPrev = "resumido", urls = [], inicio = 0, relogioTimer = null, ultimo = null;
+  function banner(cls, txt) { var b = $("#banner"); b.className = "banner " + cls; b.textContent = txt; }
+  function progresso(p, fim) { p = Math.max(0, Math.min(100, Math.round(p))); $("#barra i").style.width = p + "%"; $("#barra").setAttribute("aria-valuenow", p); $("#pct").textContent = p + "%"; $("#barra").classList.toggle("fim", !!fim); }
+  function montarEtapas() {
+    var ol = $("#etapas"); ol.textContent = "";
+    ETAPAS.forEach(function (e) { var li = document.createElement("li"); li.id = "et-" + e.id; li.dataset.estado = "espera"; li.innerHTML = '<span class="ic" aria-hidden="true"></span><div class="et"><b></b><span>Aguardando.</span></div><span class="tempo"></span>'; li.querySelector("b").textContent = e.nome; ol.appendChild(li); });
+  }
+  function etapa(id, estado, detalhe, itens) {
+    var li = $("#et-" + id); li.dataset.estado = estado; li.querySelector(".ic").textContent = ICONE[estado]; li.querySelector(".et span").textContent = detalhe || "";
+    var ul = li.querySelector("ul"); if (ul) ul.remove();
+    if (itens && itens.length) { ul = document.createElement("ul"); itens.forEach(function (t) { var x = document.createElement("li"); x.textContent = t; ul.appendChild(x); }); li.querySelector(".et").appendChild(ul); }
+    if (estado === "rodando") li.dataset.t0 = performance.now(); else if (li.dataset.t0) li.querySelector(".tempo").textContent = seg(performance.now() - li.dataset.t0);
+  }
+  function relogio(ligar) { clearInterval(relogioTimer); if (ligar) { inicio = performance.now(); relogioTimer = setInterval(function () { $("#relogio").textContent = "Tempo: " + seg(performance.now() - inicio); }, 100); } }
   function lerBytes(blob) { return blob.arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
-  /* Formato que o Outlook não mostra (webp, svg...): desenha num canvas e salva em PNG. */
   function paraPng(url) {
     return new Promise(function (ok, falha) {
       var im = new Image();
-      im.onload = function () {
-        var c = document.createElement("canvas"); c.width = im.naturalWidth || 600; c.height = im.naturalHeight || 400;
-        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
-        c.toBlob(function (b) { b ? lerBytes(b).then(ok) : falha(new Error("não deu para converter")); }, "image/png");
-      };
-      im.onerror = function () { falha(new Error("a imagem não abriu")); };
-      im.src = url;
+      im.onload = function () { var c = document.createElement("canvas"); c.width = im.naturalWidth || 600; c.height = im.naturalHeight || 400; c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); c.toBlob(function (b) { b ? lerBytes(b).then(ok) : falha(new Error("não deu para converter")); }, "image/png"); };
+      im.onerror = function () { falha(new Error("a imagem não abriu")); }; im.src = url;
     });
   }
   function nomeDoSrc(src) { try { src = decodeURIComponent(src); } catch (e) {} return src.split(/[?#]/)[0].split(/[\\/]/).pop(); }
-  /* Print grande colocado à mão (arquivo ao lado do .html): reduz para até 1200 px de largura. */
-  var MAX_PRINT = 1200;
-  function reduzir(bytes, ext) {
-    return new Promise(function (ok) {
-      var u = URL.createObjectURL(new Blob([bytes], { type: Motor.tipoMime("x." + ext) })), im = new Image();
-      im.onload = function () {
-        URL.revokeObjectURL(u);
-        if (im.naturalWidth <= MAX_PRINT) return ok({ bytes: bytes, ext: ext, reduzida: false });
-        var c = document.createElement("canvas"); c.width = MAX_PRINT; c.height = Math.round(im.naturalHeight * MAX_PRINT / im.naturalWidth);
-        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
-        var tipo = ext === "png" ? "image/png" : "image/jpeg";
-        c.toBlob(function (b) {
-          lerBytes(b).then(function (nb) {
-            if (tipo === "image/png" && nb.length > 900 * 1024) c.toBlob(function (j) { lerBytes(j).then(function (jb) { ok({ bytes: jb, ext: "jpg", reduzida: true }); }); }, "image/jpeg", 0.9);
-            else ok({ bytes: nb, ext: ext === "png" ? "png" : "jpg", reduzida: true });
-          });
-        }, tipo, 0.9);
-      };
-      im.onerror = function () { URL.revokeObjectURL(u); ok({ bytes: bytes, ext: ext, reduzida: false }); };
-      im.src = u;
-    });
-  }
-  function dataUri(bytes, ext) { return "data:" + Motor.tipoMime("x." + ext) + ";base64," + Motor.base64(bytes); }
+  function hostDe(u) { try { return new URL(u).host; } catch (e) { return u; } }
 
-  /* ---------- conversão ---------- */
+  /* Indicadores candidatos: caixas (até 3). */
+  function atualizarIndicadores(cand, escolha) {
+    var box = $("#indicadores"), chave = cand.map(function (x) { return x.chave + x.valor; }).join("|");
+    if (box.dataset.chave === chave) return;
+    var antes = {}; Array.prototype.forEach.call(box.querySelectorAll("input"), function (c) { antes[c.value] = c.checked; });
+    box.dataset.chave = chave; box.textContent = "";
+    if (!cand.length) { box.innerHTML = '<span class="muted">Este report não tem indicadores marcados.</span>'; return; }
+    cand.forEach(function (x) {
+      var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.value = x.chave;
+      c.checked = x.chave in antes ? antes[x.chave] : escolha.indexOf(x.chave) >= 0;
+      l.appendChild(c); l.appendChild(document.createTextNode(" " + x.valor + " · " + x.titulo + " (" + x.grupo + ")")); box.appendChild(l);
+    });
+    limitar();
+  }
+  function limitar() {
+    var cs = Array.prototype.slice.call(document.querySelectorAll("#indicadores input")), n = cs.filter(function (c) { return c.checked; }).length;
+    cs.forEach(function (c) { c.disabled = !c.checked && n >= Motor.RESUMO_REGRAS.indicadores; });
+  }
+  $("#indicadores").addEventListener("change", function () { limitar(); reconverter(); });
+
+  var adiar = null;
+  function reconverter(agora) {
+    clearTimeout(adiar);
+    adiar = setTimeout(function () { if (!ED.doc) return; var html = htmlParaSalvar(); converter(new File([html], (ED.nomeSalvo || Motor.nomeDoReport(periodoAtual())).replace(/ \(.*$/, ""), { type: "text/html" })); }, agora ? 30 : 600);
+  }
+  $("#link").addEventListener("input", function () { this.dataset.auto = ""; $("#linkInfo").textContent = ""; reconverter(); });
+  $("#botao").addEventListener("input", function () { reconverter(); });
+
   async function converter(file) {
-    var minha = ++execucao, t0 = performance.now();
-    var anterior = ultimoArquivo; ultimoArquivo = file;
+    var minha = ++execucao, t0 = performance.now(); ultimo = file;
     function parou() { return minha !== execucao; }
     var erros = [], avisos = [];
     resultado = null; resumido = null; previas = {};
     $("#bEml").disabled = true; $("#bEmlRes").disabled = true; $("#emlInfo").textContent = ""; $("#emlResInfo").textContent = "";
-    if (!anterior || anterior.name !== file.name) { interativa = null; $("#bInterativa").disabled = true; $("#interInfo").textContent = ""; }
     urls.forEach(URL.revokeObjectURL); urls = [];
-    montarEtapas(); progresso(0); relogio(true);
-    banner("run", "Convertendo " + file.name + "…");
-    log("Início: " + file.name + " (" + kb(file.size) + ").");
+    $("#secStatus").hidden = false; montarEtapas(); progresso(0); relogio(true);
+    banner("run", "Preparando o e-mail de " + file.name + "…");
 
-    /* 1. ler */
-    etapa("ler", "rodando", "Lendo " + file.name + "…"); await respira();
-    var html;
-    try { html = await file.text(); }
-    catch (e) { etapa("ler", "erro", "Não deu para ler o arquivo. Se ele foi salvo de novo, escolha-o outra vez."); return fim(["leitura"], []); }
-    if (parou()) return;
-    if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) { etapa("ler", "erro", "Este arquivo não parece uma página HTML."); return fim(["formato"], []); }
-    etapa("ler", "ok", file.name + " · " + kb(file.size)); progresso(10); log("Arquivo lido."); await respira();
+    etapa("ler", "rodando", "Lendo…"); await respira();
+    var html = await file.text(); if (parou()) return;
+    etapa("ler", "ok", file.name + " · " + kb(file.size)); progresso(10); await respira();
 
-    /* 2. origem */
     etapa("origem", "rodando", "Procurando a marca da ferramenta…"); await respira();
     var org = Motor.origemDoHtml(html), titulo = Motor.assuntoDoHtml(html);
-    if (org) { etapa("origem", "ok", "Report gerado pela versão " + org.versao + " a partir de " + org.dados + "."); log("Report: versão " + org.versao + ", " + org.dados + "."); }
-    else { etapa("origem", "aviso", "Não achei a marca da ferramenta. A conversão segue: confira a prévia antes de enviar."); avisos.push("origem"); log("Sem a marca da ferramenta."); }
-    /* Versão interativa já disponível (para subir no SharePoint e pegar o link); os prints colocados à mão entram no fim. */
-    var pg = Motor.paginaInterativa(html);
-    interativa = { html: pg.html, nome: file.name.replace(/\.(html?|htm)$/i, "") + "-interativo.html", ok: pg.interativa };
-    $("#bInterativa").disabled = false; $("#interInfo").textContent = interativa.nome + " · " + kb(Motor.utf8(pg.html).length);
+    var dr = Motor.dadosDoResumo(html), per = dr.ok ? dr.d.periodo : "";
+    if (org || dr.ok) etapa("origem", "ok", "Report " + (per ? "de " + per : "") + (org ? " · gerado pela versão " + org.versao : "") + ".");
+    else { etapa("origem", "aviso", "Não reconheci o report. Confira a prévia antes de enviar."); avisos.push("origem"); }
+    var meta = /<meta name="report-completo" content="([^"]*)"/.exec(html);
+    if (meta && (!$("#link").value.trim() || $("#link").dataset.auto === "1")) { var t = document.createElement("textarea"); t.innerHTML = meta[1]; $("#link").value = t.value; $("#link").dataset.auto = "1"; $("#linkInfo").textContent = "Veio do report."; }
     progresso(18); await respira();
 
-    /* 3. limpar */
-    etapa("limpar", "rodando", "Tirando script, ampliação, vídeo e marcas da edição…"); await respira();
+    etapa("limpar", "rodando", "Tirando script, ampliação, vídeo e marcas…"); await respira();
     var limpo = Motor.limparHtmlEditado(html);
     var saiu = limpo.saiu.map(function (s) { return s.item + (s.n > 1 ? " (" + s.n + ")" : ""); });
-    etapa("limpar", "ok", saiu.length ? "Saiu dos e-mails:" : "Nada para tirar: o HTML já estava pronto para e-mail.", saiu);
-    log(saiu.length ? "Removido: " + saiu.join(", ") + "." : "Nada para remover.");
-    progresso(26); await respira(); if (parou()) return;
+    etapa("limpar", "ok", saiu.length ? "Saiu dos e-mails:" : "Nada para tirar.", saiu); progresso(26); await respira(); if (parou()) return;
 
-    /* 4. e-mail-resumo: destaques lidos dos campos da página (data-campo), diagramação própria e um único botão */
-    var meta = /<meta name="report-completo" content="([^"]*)"/.exec(html);
-    if (meta && (!$("#link").value.trim() || $("#link").dataset.auto === "1")) { $("#link").value = desfaz(meta[1]); $("#link").dataset.auto = "1"; $("#linkInfo").textContent = "Veio da página (dados › [EDICAO] link_report_completo)."; }
-    var link = $("#link").value.trim(), botao = $("#botao").value.trim() || "Ver report completo", linkOk = /^https:\/\/[^\s]+$/i.test(link), resErro = "";
-    etapa("resumir", "rodando", "Lendo os destaques da página…"); await respira();
-    var blocos = {};
-    Array.prototype.forEach.call(document.querySelectorAll("#secoes input"), function (c) { blocos[c.value] = c.checked; });
-    var res = Motor.emailResumo(html, { link: linkOk ? link : "", botao: botao, blocos: blocos, assunto: titulo });
-    var itens = [], antigo = false;
-    if (res.erro) {
-      /* Página de antes da 4.2 (sem os campos): resumo no formato antigo (seções cortadas), para não parar o trabalho. */
-      antigo = true;
-      var semPlay = Motor.miniaturasSemPlay(html);
-      res = Motor.emailResumido(Motor.limparHtmlEditado(semPlay.html).html, { manter: Motor.SECOES_RESUMO, link: linkOk ? link : "", botao: botao });
-      if (res.erro) { resErro = res.erro; etapa("resumir", "erro", res.erro); erros.push("resumo"); }
-      else { itens.push("Página de antes da versão 4.2: o resumo saiu no formato antigo (capa, resumo das campanhas, foco e encerramento). Gere a página de novo pelo gerar-report.html para ter o e-mail-resumo novo."); avisos.push("antigo"); }
-    } else {
-      atualizarBlocos(res);
-      var d = res.dados;
-      if (res.blocos.indexOf("visao") >= 0) itens.push("Visão geral: " + (d.principal ? d.principal.nome : "sem projeto principal") + (d.numeros.length ? " · " + d.numeros.length + " número(s): " + d.numeros.map(function (n) { return n.valor; }).join(" · ") : ""));
-      if (res.blocos.indexOf("resultados") >= 0) itens.push("Resultados e evolução: " + [d.cx ? "Creative X " + (d.cx.anterior ? d.cx.anterior + " → " : "") + d.cx.atual : "", d.bem.length ? d.bem.length + " \"foi bem\"" : "", d.melhorar.length ? d.melhorar.length + " \"a melhorar\"" : ""].filter(Boolean).join(" · "));
-      if (res.blocos.indexOf("campanhas") >= 0) itens.push("Campanhas em destaque: " + [d.destaque ? d.destaque.titulo : "", d.lancamentos.map(function (l) { return l.nome; }).join(", ")].filter(Boolean).join(" · "));
-      if (res.blocos.indexOf("aprendizados") >= 0) itens.push("Aprendizados: " + d.aprendizados.map(function (a) { return a.titulo; }).join(" · "));
-      if (res.blocos.indexOf("andamento") >= 0) itens.push("Em andamento (Transformation Hub): " + d.transformation.itens.map(function (a) { return a.nome; }).join(" · "));
-      if (res.blocos.indexOf("proximos") >= 0) itens.push("Próximos passos: " + [d.foco ? d.foco.prioridade : "", d.agenda.map(function (a) { return a.titulo; }).join(" · ")].filter(Boolean).join(" · "));
-      if (res.fora.length) itens.push("Desmarcados (só no report completo): " + res.fora.map(function (b) { return nomeBloco(b); }).join("; "));
-      if (res.vazios.length) itens.push("Sem conteúdo nesta edição (não aparecem): " + res.vazios.map(function (b) { return nomeBloco(b); }).join("; "));
-      if (res.pendencias.length) { itens.push("Ainda não preenchido na página: " + res.pendencias.slice(0, 3).join(" | ") + (res.pendencias.length > 3 ? " (+" + (res.pendencias.length - 3) + ")" : "")); avisos.push("pendencias"); }
-      if (d.principal && !d.principal.imagem) itens.push("Projeto principal sem imagem no resumo (miniatura de vídeo antiga, com ▶, ou sem imagem).");
+    var link = $("#link").value.trim(), botao = $("#botao").value.trim() || "Acessar report completo", linkOk = /^https:\/\/[^\s]+$/i.test(link), resErro = "";
+    etapa("resumir", "rodando", "Escolhendo os indicadores…"); await respira();
+    var marcados = Array.prototype.filter.call(document.querySelectorAll("#indicadores input"), function (c) { return c.checked; }).map(function (c) { return c.value; });
+    var res = Motor.emailResumo(html, { link: linkOk ? link : "", botao: botao, indicadores: marcados, assunto: titulo }), itens = [];
+    if (res.erro) { resErro = res.erro; etapa("resumir", "erro", res.erro); erros.push("resumo"); }
+    else {
+      atualizarIndicadores(res.candidatos, res.indicadores);
+      res.indicadores.forEach(function (k) { var x = res.candidatos.filter(function (c) { return c.chave === k; })[0]; itens.push(x.valor + " · " + x.titulo + " (" + x.grupo + ")"); });
+      if (!res.indicadores.length) itens.push("Nenhum indicador na página: o e-mail sai só com a frase do mês e a chamada.");
+      if (res.pendencias.length) { itens.push("Ainda é texto do modelo: " + res.pendencias.slice(0, 3).join(" | ") + (res.pendencias.length > 3 ? " (+" + (res.pendencias.length - 3) + ")" : "")); avisos.push("pendencias"); }
+      if (!link) resErro = "Falta o link do report completo (passo 3).";
+      else if (!linkOk) resErro = "O link precisa começar com https://.";
+      etapa("resumir", resErro || res.pendencias.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + hostDe(link) + " (o único link do e-mail).", itens);
     }
-    if (!resErro) {
-      if (!link) resErro = "Falta o link do report completo (passo 2).";
-      else if (!linkOk) resErro = "O link precisa começar com https:// (copie o link de compartilhamento do SharePoint).";
-      etapa("resumir", resErro || antigo || (res.pendencias || []).length ? "aviso" : "ok", resErro ? resErro + " A prévia já aparece, com o aviso no lugar do botão." :
-        (antigo ? "Resumo no formato antigo. " : res.blocos.length + " bloco(s) · ") + "botão \"" + botao + "\" levando para " + hostDe(link) + " (o único link do e-mail).", itens);
-      log("E-mail-resumo: " + (antigo ? "formato antigo" : res.blocos.join(", ")) + ".");
-    }
-    /* E-mail completo: o report inteiro; com o link e a opção marcada, ganha o botão e as miniaturas de vídeo levam à versão interativa. */
     var completo = { html: limpo.html };
-    if (linkOk && $("#botaoNoCompleto").checked) {
-      var todas = Motor.secoesDoHtml(limpo.html).map(function (x) { return x.id; });
-      completo = todas.length ? Motor.emailResumido(limpo.html, { manter: todas, link: link, botao: botao, ligar: true }) : Motor.ligarVideos(limpo.html, link);
-    }
     progresso(32); await respira(); if (parou()) return;
 
-    /* 5. imagens (uma vez só, para os dois e-mails) */
     var lista = Motor.imagensDoHtml(completo.html);
     if (res.html) Motor.imagensDoHtml(res.html).forEach(function (x) { if (lista.indexOf(x) < 0) lista.push(x); });
-    var mapa = {}, mapaPrev = {}, porSrc = {}, total = 0, faltam = [], probs = [], deArquivo = {};
-    etapa("imagens", "rodando", lista.length ? "Imagem 0 de " + lista.length + "…" : "Procurando imagens…"); await respira();
+    var mapa = {}, mapaPrev = {}, porSrc = {}, total = 0, faltam = [], probs = [];
+    etapa("imagens", "rodando", "Imagem 0 de " + lista.length + "…"); await respira();
     for (var i = 0; i < lista.length; i++) {
       if (parou()) return;
       var src = lista[i], tipo = Motor.origemImagem(src), n = Object.keys(porSrc).length + 1, bytes = null, ext = "", rot = "Imagem " + (i + 1);
       try {
-        if (tipo === "embutida") { var d = Motor.imagemDeDataUri(src); bytes = d.bytes; ext = d.ext; mapaPrev[src] = src; }
-        else if (tipo === "embutida-incompativel") { bytes = await paraPng(src); ext = "png"; probs.push(rot + ": formato que o Outlook não mostra; convertida para PNG."); }
-        else if (tipo === "arquivo") {
-          var nome = nomeDoSrc(src), f = pastaArquivos[nome];
-          if (!f) { faltam.push(nome); mapaPrev[src] = FALTA; continue; }
-          if (/\.(png|jpe?g|gif)$/i.test(nome)) { bytes = await lerBytes(f); ext = nome.split(".").pop().toLowerCase().replace("jpeg", "jpg"); }
-          else { var u = URL.createObjectURL(f); urls.push(u); bytes = await paraPng(u); ext = "png"; probs.push(nome + ": convertida para PNG."); }
-          if (ext !== "gif") { var red = await reduzir(bytes, ext); if (red.reduzida) probs.push(nome + ": reduzida para " + MAX_PRINT + " px de largura (" + kb(bytes.length) + " → " + kb(red.bytes.length) + ")."); bytes = red.bytes; ext = red.ext; }
-          deArquivo[src] = dataUri(bytes, ext);
-        }
-        else if (tipo === "internet") { probs.push(rot + " vem da internet (" + src.slice(0, 60) + "…): fica como link. O Outlook pode pedir para baixar as imagens."); continue; }
-        else if (tipo === "blob") { erros.push("blob"); probs.push(rot + ": endereço temporário da prévia (blob:). Salve a página baixada pelo botão \"Baixar página do mês\", não a prévia."); continue; }
-        else { erros.push("cid"); probs.push(rot + ": aponta para um anexo (cid:) que não está neste arquivo."); continue; }
+        if (tipo === "embutida") { var dd = Motor.imagemDeDataUri(src); bytes = dd.bytes; ext = dd.ext; mapaPrev[src] = src; }
+        else if (tipo === "embutida-incompativel") { bytes = await paraPng(src); ext = "png"; }
+        else if (tipo === "arquivo") { var nome = nomeDoSrc(src), f = pastaArquivos[nome]; if (!f) { faltam.push(nome); mapaPrev[src] = FALTA; continue; } bytes = await lerBytes(f); ext = nome.split(".").pop().toLowerCase().replace("jpeg", "jpg"); }
+        else if (tipo === "internet") { probs.push(rot + " vem da internet: fica como link."); continue; }
+        else { erros.push("img"); probs.push(rot + ": endereço que não abre fora deste computador (" + tipo + ")."); continue; }
       } catch (e) { erros.push("img"); probs.push(rot + ": " + e.message + "."); continue; }
       var cid = "img" + String(n).padStart(2, "0") + "@report", arq = String(n).padStart(2, "0") + "-imagem." + ext;
       porSrc[src] = { cid: cid, nome: arq, bytes: bytes }; mapa[src] = "cid:" + cid; total += bytes.length;
-      if (!mapaPrev[src]) { var b = URL.createObjectURL(new Blob([bytes], { type: Motor.tipoMime(arq) })); urls.push(b); mapaPrev[src] = b; }
-      if (bytes.length > 1048576) probs.push(rot + " tem " + kb(bytes.length) + ": deixa o e-mail pesado.");
-      etapa("imagens", "rodando", "Imagem " + (i + 1) + " de " + lista.length + " · " + kb(bytes.length) + " · total " + kb(total));
-      progresso(32 + 38 * (i + 1) / lista.length); await respira();
+      if (!mapaPrev[src]) { var bu = URL.createObjectURL(new Blob([bytes], { type: Motor.tipoMime(arq) })); urls.push(bu); mapaPrev[src] = bu; }
+      etapa("imagens", "rodando", "Imagem " + (i + 1) + " de " + lista.length + " · total " + kb(total));
+      progresso(32 + 38 * (i + 1) / lista.length); if (i % 4 === 3) await respira();
     }
-    if (faltam.length) {
-      erros.push("faltam"); $("#pastaRow").hidden = false;
-      probs.unshift("Faltam " + faltam.length + " imagem(ns) que estão em arquivo ao lado do .html: " + faltam.slice(0, 4).join(", ") + (faltam.length > 4 ? "…" : "") + ". Use \"Escolher a pasta das imagens\" (passo 1).");
-    }
-    var estImg = erros.length ? "erro" : probs.length ? "aviso" : "ok";
-    if (estImg === "aviso") avisos.push("imagens");
-    etapa("imagens", estImg, Object.keys(porSrc).length + " imagem(ns) preparada(s) · " + kb(total), probs);
-    log(Object.keys(porSrc).length + " imagens preparadas (" + kb(total) + ")" + (probs.length ? "; " + probs.length + " observação(ões)" : "") + ".");
+    if (faltam.length) { erros.push("faltam"); probs.unshift("Faltam " + faltam.length + " imagem(ns) em arquivo ao lado do .html: " + faltam.slice(0, 4).join(", ") + ". Use \"Avançado: imagens em arquivo\" (passo 1)."); }
+    etapa("imagens", erros.length ? "erro" : probs.length ? "aviso" : "ok", Object.keys(porSrc).length + " imagem(ns) · " + kb(total), probs);
     progresso(72); await respira(); if (parou()) return;
-    if (!$("#assunto").dataset.editado || $("#assunto").dataset.arquivo !== file.name) { $("#assunto").value = titulo || "Report mensal"; $("#assunto").dataset.arquivo = file.name; }
+    if (!$("#assunto").dataset.editado) $("#assunto").value = titulo || "Report mensal";
     var base = file.name.replace(/\.(html?|htm)$/i, "");
-
-    /* 6 e 7. montar os dois .eml (mesmas regras: conferência do Outlook, tamanho) */
-    function montar(id, origem, nomeEml) {
+    function montar(origem, nomeEml) {
       var final = Motor.trocarSrc(origem, mapa), anexos = Motor.imagensDoHtml(final).filter(function (x) { return /^cid:/.test(x); })
         .map(function (x) { var c = x.slice(4); return Object.keys(porSrc).map(function (k) { return porSrc[k]; }).filter(function (p) { return p.cid === c; })[0]; }).filter(Boolean);
       var conf = Motor.conferirHtml(final).filter(function (c) { return c.nivel !== "info"; });
-      if (/url\(\s*['"]?data:/i.test(final)) conf.push({ nivel: "aviso", msg: "Há imagem de fundo embutida no CSS: o Outlook não mostra." });
       var r = { html: final, texto: Motor.textoDoHtml(final), imagens: anexos, nome: nomeEml };
       r.tam = Motor.gerarEml({ assunto: $("#assunto").value, html: r.html, texto: r.texto, imagens: anexos }).length;
-      var notas = conf.map(function (c) { return c.msg; });
-      if (r.tam > 10 * 1048576) notas.push("Acima de 10 MB alguns servidores recusam.");
-      r.notas = notas;
+      r.notas = conf.map(function (c) { return c.msg; }); if (r.tam > 10 * 1048576) r.notas.push("Acima de 10 MB alguns servidores recusam.");
       return r;
     }
-    etapa("completo", "rodando", "Montando o e-mail completo…"); await respira();
-    resultado = montar("completo", completo.html, base + ".eml");
-    previas.completo = Motor.trocarSrc(completo.html, mapaPrev);
-    etapa("completo", erros.length ? "erro" : resultado.notas.length ? "aviso" : "ok", erros.length ? "Não montei: há imagens com problema (veja acima)." :
-      "Mensagem de " + kb(resultado.tam) + " · " + resultado.imagens.length + " imagens" + (completo.html !== limpo.html ? " · com o botão para a versão interativa" : ""), resultado.notas);
-    if (resultado.notas.length) avisos.push("completo");
-    log("E-mail completo: " + kb(resultado.tam) + ".");
-    progresso(82); await respira(); if (parou()) return;
-
-    etapa("resumido", "rodando", "Montando o e-mail-resumo…"); await respira();
+    etapa("completo", "rodando", "Montando…"); await respira();
+    resultado = montar(completo.html, base + ".eml"); previas.completo = Motor.trocarSrc(completo.html, mapaPrev);
+    etapa("completo", erros.length ? "erro" : "ok", erros.length ? "Não montei: há imagens com problema." : "Opcional · " + kb(resultado.tam) + " · " + resultado.imagens.length + " imagens");
+    progresso(84); await respira(); if (parou()) return;
+    etapa("resumido", "rodando", "Montando…"); await respira();
     if (!res.html) etapa("resumido", "erro", "Sem o e-mail-resumo: " + resErro);
     else {
       previas.resumido = Motor.trocarSrc(res.html, mapaPrev);
-      var rr = montar("resumido", res.html, base + "-resumo.eml");
-      var links = (res.html.match(/<a\b[^>]*href=/gi) || []).length;
-      if (!antigo && links > 1) rr.notas.push("O e-mail-resumo tem " + links + " links; o esperado é um (o botão).");
-      if (erros.length) etapa("resumido", "erro", "Não montei: há imagens com problema (veja acima).");
+      var rr = montar(res.html, base + "-resumo.eml"), nl = (res.html.match(/<a\b[^>]*href=/gi) || []).length;
+      if (nl > 1) rr.notas.push("O e-mail-resumo tem " + nl + " links; o esperado é um.");
+      if (erros.length) etapa("resumido", "erro", "Não montei: há imagens com problema.");
       else if (resErro) etapa("resumido", "aviso", resErro + " (prévia pronta: " + kb(rr.tam) + ").");
-      else { resumido = rr; etapa("resumido", rr.notas.length ? "aviso" : "ok", "Mensagem de " + kb(rr.tam) + " · " + rr.imagens.length + " imagens · " + Math.round(100 * rr.tam / resultado.tam) + "% do tamanho do completo", rr.notas); if (rr.notas.length) avisos.push("resumido"); }
-      log("E-mail-resumo: " + kb(rr.tam) + (resErro ? " (sem link)" : "") + ".");
+      else { resumido = rr; etapa("resumido", rr.notas.length ? "aviso" : "ok", kb(rr.tam) + " · " + rr.imagens.length + " imagem(ns) · um único botão", rr.notas); }
     }
-    progresso(90); await respira(); if (parou()) return;
-
-    /* 8. versão interativa: prints colocados à mão entram embutidos (o arquivo vai sozinho para o SharePoint) */
-    etapa("interativa", "rodando", "Preparando a versão interativa…"); await respira();
-    var ih = interativa.html;
-    Object.keys(deArquivo).forEach(function (src) {
-      var m = {}; m[src] = deArquivo[src]; ih = Motor.trocarSrc(ih, m);
-      ih = ih.split('data-ampliar="' + src + '"').join('data-ampliar="' + deArquivo[src] + '"');
-    });
-    interativa.html = ih; $("#interInfo").textContent = interativa.nome + " · " + kb(Motor.utf8(ih).length);
-    var nArq = Object.keys(deArquivo).length;
-    etapa("interativa", interativa.ok ? "ok" : "aviso", interativa.ok ? interativa.nome + " · " + kb(Motor.utf8(ih).length) + ": vídeos com o botão \"Assistir ao vídeo\" e peças que abrem maiores no clique" + (nArq ? "; " + nArq + " print(s) embutido(s)" : "") + ". Suba no SharePoint (passo 2)." :
-      "A página não tem peças ampliáveis nem vídeos: a versão interativa fica igual ao e-mail completo.");
-    if (!interativa.ok) avisos.push("interativa");
-
-    $("#secPrev").hidden = false; $("#secBaixar").hidden = false;
-    mostrarPrevia();
-    fim(erros, avisos, performance.now() - t0);
-  }
-
-  function fim(erros, avisos, ms) {
-    relogio(false); if (ms) $("#relogio").textContent = "Tempo: " + seg(ms);
-    if (erros.length) {
-      progresso(100); $("#barra").classList.remove("fim");
-      banner("err", "Não deu para converter tudo. Veja a etapa marcada com ✕.");
-      $("#bEml").disabled = true; $("#bEmlRes").disabled = true; log("Fim com problema.");
-      return;
-    }
+    $("#secPrev").hidden = false; $("#secBaixar").hidden = false; mostrarPrevia();
+    relogio(false); $("#relogio").textContent = "Tempo: " + seg(performance.now() - t0);
+    if (erros.length) { progresso(100); banner("err", "Não deu para preparar o e-mail. Veja a etapa com ✕."); return; }
     progresso(100, true);
-    var r = !!resumido;
-    banner(r && !avisos.length ? "ok" : "warn", (r ? "Pronto: e-mail-resumo (e o completo, se precisar)." : "Quase: falta o link do report completo (passo 2) para liberar o e-mail-resumo.") +
-      (avisos.length && r ? " Há pontos para olhar (marcados com !)." : "") + (handle && $("#acompanhar").checked ? " Se salvar o .html de novo, a conversão se repete sozinha." : ""));
+    banner(resumido && !avisos.length ? "ok" : "warn", resumido ? "Pronto: e-mail-resumo." + (avisos.length ? " Há pontos para olhar (!)." : "") : "Quase: falta o link do report completo (passo 3) para liberar o e-mail-resumo.");
     $("#bEml").disabled = !resultado; $("#bEmlRes").disabled = !resumido;
-    $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(resultado.tam) + " · " + resultado.imagens.length + " imagens" : "";
-    $("#emlResInfo").textContent = resumido ? resumido.nome + " · " + kb(resumido.tam) + " · " + resumido.imagens.length + " imagens" : "Precisa do link do report completo (passo 2).";
-    log("Fim: pronto.");
+    $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(resultado.tam) : "";
+    $("#emlResInfo").textContent = resumido ? resumido.nome + " · " + kb(resumido.tam) : "Precisa do link do report completo (passo 3).";
   }
 
-  /* ---------- opções: mudou, converte de novo ---------- */
-  function hostDe(u) { try { return new URL(u).host; } catch (e) { return u; } }
-  function nomeBloco(id) { return (Motor.BLOCOS_RESUMO[id] || id).split(":")[0]; }
-  function desfaz(x) { var t = document.createElement("textarea"); t.innerHTML = x; return t.value; }
-  /* Caixas dos blocos do e-mail-resumo: bloco sem conteúdo na página fica desligado (não aparece). */
-  function atualizarBlocos(res) {
-    var box = $("#secoes"), marcadas = {};
-    Array.prototype.forEach.call(box.querySelectorAll("input"), function (c) { marcadas[c.value] = c.checked; });
-    var chave = Object.keys(Motor.BLOCOS_RESUMO).map(function (id) { return id + (res.vazios.indexOf(id) >= 0 ? "-" : "+"); }).join(",");
-    if (box.dataset.ids === chave) return;
-    box.dataset.ids = chave; box.textContent = "";
-    Object.keys(Motor.BLOCOS_RESUMO).forEach(function (id) {
-      var l = document.createElement("label"), c = document.createElement("input"), vazio = res.vazios.indexOf(id) >= 0;
-      l.className = "check"; c.type = "checkbox"; c.value = id; c.disabled = vazio;
-      c.checked = !vazio && (id in marcadas ? marcadas[id] : true);
-      l.appendChild(c); l.appendChild(document.createTextNode(" " + Motor.BLOCOS_RESUMO[id] + (vazio ? " (sem conteúdo nesta edição)" : ""))); box.appendChild(l);
-    });
-  }
-  (function regras() {
-    var R = Motor.RESUMO_REGRAS, ul = $("#regras");
-    ["Os textos e números saem da própria página (os mesmos do report completo). Editou a página ou o arquivo de dados? O resumo acompanha.",
-     "Ordem: a mesma do report. A ordem dos blocos no arquivo de dados é a ordem de prioridade: o 1º item é o que entra primeiro.",
-     "Visão geral: o projeto principal (nome, resumo e a imagem; vídeo vira só a miniatura, sem ▶) e até " + R.numeros + " números da capa.",
-     "Resultados e evolução: o Creative X (anterior → atual, variação e barra) e os " + R.bem + " primeiros \"foi bem\" e " + R.melhorar + " primeiros \"a melhorar\".",
-     "Campanhas em destaque: o destaque do mês (com até " + R.resultados + " resultados) e os " + R.lancamentos + " primeiros lançamentos.",
-     "Aprendizados: até " + R.aprendizados + ", com o \"levamos\". Em andamento: até " + R.andamento + " projetos do Transformation Hub, com o status.",
-     "Próximos passos: o foco do próximo mês e os " + R.agenda + " primeiros itens da agenda (\"Também vem aí\").",
-     "Item vazio ou apagado não aparece; bloco sem conteúdo some. Nada é inventado nem resumido por máquina.",
-     "Um único link: o botão \"Ver report completo\". Imagens não clicam e não há ▶."].forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
-  })();
-  var adiar = null;
-  function reconverter() {
-    clearTimeout(adiar);
-    adiar = setTimeout(function () { if (ultimoArquivo) { log("Opções mudaram: convertendo de novo."); (handle ? handle.getFile() : Promise.resolve(ultimoArquivo)).then(converter); } }, 500);
-  }
-  $("#secoes").addEventListener("change", reconverter);
-  $("#link").addEventListener("input", function () { this.dataset.auto = ""; $("#linkInfo").textContent = ""; reconverter(); });
-  $("#botao").addEventListener("input", reconverter);
-  $("#botaoNoCompleto").addEventListener("change", reconverter);
-
-  /* ---------- bloco de print para colar no Inspecionar ---------- */
-  function blocoPrint(n) {
-    var w = [0, 420, 198, 124][n], tds = [];
-    for (var k = 1; k <= n; k++) {
-      if (k > 1) tds.push('  <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>');
-      tds.push('  <td class="col' + (k < n ? " gap" : "") + '" width="' + w + '" valign="top" style="width:' + w + 'px;"><img src="NOME-DO-PRINT-' + k + '.png" width="' + w + '" alt="DESCREVA O PRINT ' + k + '" data-ampliar="" data-legenda="DESCREVA O PRINT ' + k + '" class="fluid" style="display:block;border:1px solid #F5DECF;width:' + w + 'px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#5F5F5F;"></td>');
-    }
-    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>\n' + tds.join("\n") + '\n</tr></table>';
-  }
-  function mostrarBloco() { $("#snippet").value = blocoPrint(+$("#qtdPrints").value); $("#copiado").textContent = ""; }
-  $("#qtdPrints").addEventListener("change", mostrarBloco);
-  $("#bCopiar").addEventListener("click", function () {
-    var t = $("#snippet"); t.select();
-    (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(function () { $("#copiado").textContent = "Copiado. Cole no Inspecionar (Edit as HTML)."; },
-      function () { document.execCommand("copy"); $("#copiado").textContent = "Copiado."; });
-  });
-  mostrarBloco();
-
-  $("#bInterativa").addEventListener("click", function () {
-    if (!interativa) return;
-    var a = document.createElement("a"), u = URL.createObjectURL(new Blob([interativa.html], { type: "text/html" }));
-    a.href = u; a.download = interativa.nome; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
-    log("Baixado: " + interativa.nome + ".");
-  });
-
-  /* ---------- baixar ---------- */
   $("#assunto").addEventListener("input", function () { this.dataset.editado = "1"; });
   function baixarEml(r, info) {
     if (!r) return;
     var eml = Motor.gerarEml({ assunto: $("#assunto").value, html: r.html, texto: r.texto, imagens: r.imagens });
-    var a = document.createElement("a"), u = URL.createObjectURL(new Blob([eml], { type: "message/rfc822" }));
-    a.href = u; a.download = r.nome; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
-    $(info).textContent = "Baixado: " + r.nome + ". Abra na pasta Downloads.";
-    log("Baixado: " + r.nome + ".");
+    baixar(r.nome, eml, "message/rfc822");
+    $(info).textContent = "Baixado: " + r.nome + ". Abra na pasta Downloads."; log("Baixado: " + r.nome + ".");
   }
   $("#bEml").addEventListener("click", function () { baixarEml(resultado, "#emlInfo"); });
   $("#bEmlRes").addEventListener("click", function () { baixarEml(resumido, "#emlResInfo"); });
-
-  /* ---------- prévia ---------- */
-  function mostrarPrevia() {
-    var h = previas[qualPrev];
-    $("#prev").srcdoc = h || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">O e-mail-resumo aparece aqui depois que o arquivo for lido.</p>';
-  }
+  function mostrarPrevia() { $("#prev").srcdoc = previas[qualPrev] || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">A prévia aparece quando o report estiver aberto.</p>'; }
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (b) {
-    b.addEventListener("click", function () {
-      Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (x) { x.setAttribute("aria-pressed", x === b); });
-      qualPrev = b.dataset.qual; mostrarPrevia();
-    });
+    b.addEventListener("click", function () { Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (x) { x.setAttribute("aria-pressed", x === b); }); qualPrev = b.dataset.qual; mostrarPrevia(); });
   });
-
-  /* ---------- escolher o arquivo ---------- */
-  function comecar(file, h) {
-    handle = h || null; nomeArquivo = file.name; ultimaVersao = file.lastModified;
-    vigiaTexto();
-    converter(file);
-  }
-  $("#arquivo").addEventListener("change", function () { if (this.files[0]) comecar(this.files[0], null); this.value = ""; });
-  /* Com o seletor moderno (Chrome e Edge), a página guarda o "endereço" do arquivo e consegue reler quando você salva. */
-  if (window.showOpenFilePicker) {
-    $("#escolher").addEventListener("click", async function (ev) {
-      ev.preventDefault();
-      try {
-        var hs = await window.showOpenFilePicker({ types: [{ description: "Página HTML", accept: { "text/html": [".html", ".htm"] } }] });
-        comecar(await hs[0].getFile(), hs[0]);
-      } catch (e) { if (e.name !== "AbortError") $("#arquivo").click(); }
-    });
-  }
-  var drop = $("#drop");
-  ["dragenter", "dragover"].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
-  ["dragleave", "drop"].forEach(function (t) { drop.addEventListener(t, function () { drop.classList.remove("over"); }); });
-  drop.addEventListener("drop", async function (e) {
-    e.preventDefault();
-    var it = e.dataTransfer.items && e.dataTransfer.items[0], h = null;
-    if (it && it.getAsFileSystemHandle) { try { h = await it.getAsFileSystemHandle(); } catch (x) { h = null; } }
-    var f = h && h.kind === "file" ? await h.getFile() : e.dataTransfer.files[0];
-    if (f) comecar(f, h && h.kind === "file" ? h : null);
+  Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (b) {
+    b.addEventListener("click", function () { Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (x) { x.setAttribute("aria-pressed", x === b); }); $("#prev").style.width = b.dataset.w; });
   });
   $("#pasta").addEventListener("change", function () {
-    pastaArquivos = {};
-    Array.prototype.forEach.call(this.files, function (f) { pastaArquivos[f.name] = f; });
-    log("Pasta das imagens: " + this.files.length + " arquivo(s).");
-    $("#pastaInfo").textContent = "Pasta escolhida: " + this.files.length + " arquivo(s).";
-    if (handle) handle.getFile().then(converter); else if (ultimoArquivo) converter(ultimoArquivo);
+    pastaArquivos = {}; Array.prototype.forEach.call(this.files, function (f) { pastaArquivos[f.name] = f; });
+    $("#pastaInfo").textContent = this.files.length + " arquivo(s)."; if (ultimo) converter(ultimo);
   });
-
-  /* ---------- acompanhar o arquivo (tempo real) ---------- */
-  function vigiaTexto(extra) {
-    var on = !!handle && $("#acompanhar").checked;
-    $("#ponto").classList.toggle("on", on);
-    $("#vigiaTxt").textContent = !nomeArquivo ? "Sem arquivo acompanhado." :
-      on ? "Acompanhando " + nomeArquivo + " · última versão salva às " + new Date(ultimaVersao).toLocaleTimeString("pt-BR") + (extra ? " · " + extra : "") :
-      handle ? "Acompanhamento desligado." : "Para acompanhar o arquivo, escolha-o pelo botão ou arraste-o (Chrome ou Edge).";
-  }
-  $("#acompanhar").addEventListener("change", function () { vigiaTexto(); });
-  setInterval(async function () {
-    if (!handle || !$("#acompanhar").checked) return;
-    try {
-      var f = await handle.getFile();
-      if (f.lastModified !== ultimaVersao) {
-        ultimaVersao = f.lastModified; log("O arquivo foi salvo de novo: convertendo a nova versão.");
-        vigiaTexto(); converter(f);
-      } else vigiaTexto("conferido às " + hora());
-    } catch (e) { vigiaTexto("sem acesso ao arquivo; escolha-o de novo"); }
-  }, 1500);
-
-  /* ---------- prévia ---------- */
-  Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (b) {
-    b.addEventListener("click", function () {
-      Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (x) { x.setAttribute("aria-pressed", x === b); });
-      $("#prev").style.width = b.dataset.w;
-    });
-  });
-
   montarEtapas();
 })();
 </script>

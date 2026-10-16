@@ -4,10 +4,10 @@
 
 | O que proteger | Backup | Onde |
 |---|---|---|
-| **O mês enviado** | `reports/AAAA-MM.html` (página com imagens dentro) + `dados/AAAA-MM.txt` | Ambiente do banco (repositório corporativo ou pasta da área) |
+| **O mês enviado** | `report-AAAA-MM.html` salvo pelo emulador (com imagens dentro) e o `.eml` enviado | Ambiente corporativo autorizado (pasta da área) |
 | **O projeto** (template, motor, guias) | Histórico do **Git** | Repositório corporativo |
 | **O layout aprovado** | `report_backup.html` | Raiz do projeto |
-| **Uma edição de hoje** | **Local History** do PyCharm | Só no computador onde foi feita |
+| **Uma edição de hoje** | Cópia da edição guardada pelo emulador, até salvar ("Recuperar a edição") | Só no navegador do computador onde foi feita |
 
 ## report_backup.html
 
@@ -40,12 +40,11 @@ Nunca altere um mês já enviado: `reports/` e `dados/` são o histórico.
 
 | Situação | Como |
 |---|---|
-| Digitei errado agora | **Ctrl+Z** no PyCharm |
-| Quero o arquivo como estava hoje cedo | Botão direito no arquivo → **Local History → Show History** → escolha o horário → **Revert** |
-| Apaguei um arquivo | Botão direito na pasta → **Local History → Show History** → **Revert** |
-| Quero desfazer tudo o que não foi para o *commit* | Botão direito no arquivo → **Git → Rollback** |
-| Quero a versão de um mês atrás | Botão direito no arquivo → **Git → Show History** → clique na versão → **Get** → *commit* |
-| Quero ver o projeto inteiro numa data | **Git → Show Git Log** → botão direito no *commit* → **Checkout Revision** (só para olhar; para voltar: **Git → Branches → main → Checkout**) |
+| Digitei errado agora (emulador) | **Ctrl+Z** (texto) ou **Desfazer** (imagem, link, cor, item) |
+| Fechei o emulador sem salvar | Abra o emulador: **Recuperar a edição** |
+| Quero o report de um mês anterior | Abra o `report-AAAA-MM.html` da pasta daquele mês |
+| Apaguei um arquivo | Lixeira do Windows › botão direito › **Restaurar** |
+| Ferramenta (template, motor): versão anterior | Histórico do repositório corporativo (manutenção) |
 | O template quebrou e não sei o que mudou | Compare a prévia com `report_backup.html`; depois **Git → Show History** em `template/report.html` |
 
 Na dúvida, não force nada (*reset*, *force push*): peça ajuda.

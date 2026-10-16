@@ -1,207 +1,430 @@
-# Prompts para o Microsoft Copilot
+# Biblioteca de prompts do Microsoft Copilot
 
-Prompts prontos para analisar os resultados do mês no **Microsoft Copilot** (a IA aprovada no ambiente corporativo) e decidir o que entra no report.
+**Do dado à informação, com mais clareza.** São 12 prompts prontos para o **Microsoft Copilot corporativo** transformar os documentos e resultados do mês em conteúdo estruturado para o report:
+
+**Documentos e resultados → Microsoft Copilot → Conteúdo estruturado → Report**
+
+Os prompts 5 a 11 devolvem o conteúdo no **formato de blocos** do report (`[NUMERO 1]`, `valor: 12,5%`…). Esse formato pode ser colado no emulador, em **Importar conteúdo (Copilot)**, que preenche os campos correspondentes da página. O Copilot ajuda a organizar e a escrever. **Quem responde pelos números é a área: confira cada um com a fonte antes de salvar.**
 
 ## Como usar
 
-1. Use **só o Copilot corporativo**, com a sua conta do banco. Dados internos não vão para ferramentas externas.
-2. Anexe ou cole a base do mês (planilha, painel exportado, resumo das campanhas).
-3. Copie o prompt, troque os campos `[ENTRE COLCHETES]` e envie.
-4. **Confira cada número com a fonte original antes de colocar no report.** O Copilot ajuda a priorizar e a escrever; quem responde pelos dados é a área.
-5. Os textos finais vão para `dados/AAAA-MM.txt` ([COMO_ATUALIZAR_O_MES.md](COMO_ATUALIZAR_O_MES.md)).
+1. Use **só o Copilot corporativo**, com a sua conta do banco. Dados internos não vão para ferramentas externas nem para IAs públicas.
+2. Abra uma conversa nova por mês. Envie primeiro o **Prompt 0 (regras)**, uma vez só.
+3. Anexe ou cole a base do mês (planilha, painel exportado, resumo das campanhas, mensagens do time).
+4. Copie o prompt, troque o que está `[ENTRE COLCHETES]` e envie.
+5. Confira a resposta (veja **Validação** em cada prompt) e só então leve para o report.
 
-| Momento | Prompt |
+| Momento do mês | Prompts |
 |---|---|
-| Recebi os dados do mês | 1 → 2 → 3 |
-| Vou escrever a capa | 4 |
-| Vou escrever aprendizados e foco | 5 → 6 |
-| Vou preencher o arquivo do mês | 7 |
-| Antes de enviar | 8 |
+| Recebi os dados | 1 → 2 → 3 → 4 |
+| Vou escrever o report | 5 → 6 → 7 → 8 → 9 → 10 |
+| Vou preencher a página no emulador | 11 |
+| Antes de salvar e enviar | 12 |
 
-## Regras que todos os prompts seguem
+### Como importar no emulador
 
-Cole este bloco no início da conversa (uma vez). Os prompts abaixo assumem que ele foi enviado.
+1. No emulador, com o report aberto, clique em **Importar conteúdo (Copilot)**.
+2. Cole a resposta do Copilot (só os blocos, de `[` até o último campo) e clique em **Aplicar na página**.
+3. O emulador preenche os campos que existem na página e lista o que ficou de fora (bloco que não existe no layout, por exemplo).
+4. Confira campo a campo na página. Para desfazer, use **Desfazer**.
+
+O que a importação **não** faz: não traz imagens, links nem PDFs (esses são trocados na página: passe o mouse e use "Trocar imagem" ou "Trocar link"); não cria item novo (se a página tem 3 lançamentos, o bloco `[LANCAMENTO 4]` fica de fora); não confere se o número está certo.
+
+### Formato de blocos (referência)
 
 ```text
-Você vai me ajudar a analisar os resultados mensais de comunicação da área
-[NOME DA ÁREA] para um report executivo de uma página.
-
-Regras obrigatórias:
-1. Use SOMENTE os dados que eu fornecer. Não invente, não estime e não complete
-   números. Se faltar um dado, escreva "DADO AUSENTE: [o que falta]".
-2. Sempre informe a base de comparação (período anterior, meta, média ou grupo
-   de controle). Sem base, não chame um número de "melhora" ou "piora".
-3. Respeite a unidade de cada indicador (%, R$, quantidade, pontos).
-4. Diferencie:
-   - variação percentual (relativa): de 40% para 52% = +30%;
-   - pontos percentuais (p.p.): de 40% para 52% = +12 p.p.
-   Nunca troque um pelo outro. Mostre a conta quando calcular.
-5. Não atribua causa sem evidência. Explicação não comprovada pelos dados deve
-   ser marcada como HIPÓTESE.
-6. Não destaque variações pequenas ou sem relevância prática. Considere o volume
-   da base: uma variação grande sobre poucos casos pode ser ruído.
-7. Para cada indicador, diga se SUBIR é bom ou ruim (ex.: CPC e custo: cair é bom).
-8. Ordem de prioridade dos destaques:
-   1) principais resultados relevantes; 2) evoluções mais expressivas;
-   3) resultados positivos; 4) mudanças importantes frente ao período anterior;
-   5) indicadores que ajudam a explicar o desempenho; 6) aprendizados;
-   7) pontos que exigem acompanhamento.
-9. Linguagem corporativa, clara e direta. Frases curtas. Sem exageros
-   ("incrível", "explosão") e sem jargão desnecessário.
-10. Período analisado: [MÊS/ANO]. Período de comparação: [MÊS/ANO ANTERIOR
-    OU OUTRA BASE].
+[EDICAO]            mes · ano · proximo_mes
+[ABERTURA]          frase · frase_final
+[PROJETO PRINCIPAL] nome · resumo
+[NUMERO 1] a [3]    valor · titulo · detalhe · variacao · variacao_cor
+[LANCAMOS]          titulo
+[DESTAQUE]          categoria · titulo · texto · nota
+[RESULTADO 1] a [3] valor · titulo · detalhe · variacao · variacao_cor
+[LANCAMENTO 1] a [6] status · status_cor · nome · texto
+[CREATIVE X]        subtitulo · anterior · atual · variacao · periodo · referencia · significado
+[FOI BEM 1] a [4]   texto
+[A MELHORAR 1] a [4] texto
+[TRANSFORMATION]    titulo
+[TRANSFORMATION 1] a [3] status · status_cor · nome · texto · resultado
+[APRENDIZADO 1] a [3] titulo · texto · levamos
+[FOCO]              prioridade · texto
+[AGENDA 1] a [6]    data · titulo · detalhe
 ```
+
+- `variacao`: com sinal (`+25%`, `-20%`, `+3 p.p.`). O emulador põe a seta (▲ ou ▼).
+- `variacao_cor` e `status_cor`: `verde` (resultado positivo; custo que caiu também é positivo) ou `ambar` (atenção, previsto, aguardando).
+- Campo sem dado: **não escreva o campo**. Nunca complete com estimativa.
 
 ---
 
-## Prompt 1 · Análise geral dos resultados
+## Prompt 0 · Regras da conversa (enviar uma vez)
+
+| | |
+|---|---|
+| **Objetivo** | Combinar as regras que valem para todos os prompts: só dados fornecidos, base de comparação, % × p.p., hipótese × causa |
+| **Quando usar** | No início de cada conversa nova |
+| **Entradas** | Nome da área, mês analisado e período de comparação |
+| **Formato de saída** | O Copilot confirma que entendeu (não precisa de mais nada) |
+| **Validação** | Se ele "resumir" as regras de outro jeito, reenvie o bloco |
+| **Onde entra no report** | Em nenhum lugar: prepara a conversa |
 
 ```text
-Analise os dados de [MÊS/ANO] em anexo. Siga as regras combinadas.
+Você vai me ajudar a transformar os resultados mensais da área
+[NOME DA ÁREA] em um report executivo.
+
+Regras obrigatórias:
+1. Use SOMENTE os dados e documentos que eu fornecer. Não invente, não estime
+   e não complete números. Se faltar um dado, escreva "DADO AUSENTE: [o que
+   falta]".
+2. Sempre informe a base de comparação (período anterior, meta, média ou grupo
+   de controle). Sem base, não chame um número de "melhora" ou "piora".
+3. Respeite a unidade de cada indicador (%, R$, quantidade, pontos).
+4. Diferencie variação percentual (relativa: de 40% para 52% = +30%) de pontos
+   percentuais (de 40% para 52% = +12 p.p.). Nunca troque um pelo outro.
+   Mostre a conta quando calcular.
+5. Não atribua causa sem evidência. Explicação não comprovada pelos dados deve
+   ser marcada como HIPÓTESE.
+6. Não destaque variações pequenas ou sobre base pequena.
+7. Para cada indicador, diga se SUBIR é bom ou ruim (custo e CPC: cair é bom).
+8. Linguagem corporativa, clara e direta. Frases curtas. Sem exageros.
+9. Período analisado: [MÊS/ANO]. Comparação: [MÊS/ANO ANTERIOR OU OUTRA BASE].
+Responda apenas "Regras entendidas." agora.
+```
+
+## Prompt 1 · Organizar a base do mês
+
+| | |
+|---|---|
+| **Objetivo** | Juntar todos os indicadores do mês numa tabela única, sem conclusões |
+| **Quando usar** | Assim que os dados do mês chegarem (planilhas, painéis, e-mails) |
+| **Entradas** | Arquivos ou textos com os resultados do mês e do período de comparação |
+| **Formato de saída** | Tabela: projeto, indicador, unidade, valor atual, valor de comparação, base, fonte |
+| **Validação** | Sorteie 3 linhas e confira com a fonte original. Quantidade de linhas = quantidade de indicadores enviados |
+| **Onde entra no report** | Base de trabalho dos prompts 2 a 11 (não vai para a página) |
+
+```text
+Organize os dados de [MÊS/ANO] que anexei. Siga as regras combinadas.
 
 Entregue uma tabela com TODOS os indicadores, nesta ordem de colunas:
 Projeto/campanha | Indicador | Unidade | Valor atual | Valor de comparação |
-Base de comparação | Variação (relativa e/ou p.p., com a conta) |
-Subir é bom? | Relevância (alta/média/baixa) e por quê | Volume da base
+Base de comparação | Subir é bom? | Fonte (arquivo e aba/página)
 
-Depois da tabela:
-- liste os indicadores com DADO AUSENTE ou base de comparação ausente;
-- liste inconsistências que encontrou (unidades diferentes, períodos que não
-  batem, totais que não fecham).
-Não escreva conclusões ainda.
+Não calcule variações e não escreva conclusões nesta etapa.
+No fim, liste os indicadores com DADO AUSENTE.
 ```
 
-## Prompt 2 · Principais destaques positivos
+## Prompt 2 · Conferir a base (consistência)
+
+| | |
+|---|---|
+| **Objetivo** | Encontrar erros antes de escrever: períodos que não batem, unidades misturadas, totais que não fecham |
+| **Quando usar** | Logo depois do Prompt 1 |
+| **Entradas** | A tabela do Prompt 1 (já está na conversa) |
+| **Formato de saída** | Lista de problemas, cada um com indicador, o que está errado e o que pedir à fonte |
+| **Validação** | Resolva cada problema com quem enviou o dado. Não siga com número em dúvida |
+| **Onde entra no report** | Em nenhum lugar: evita número errado no report |
 
 ```text
-Com base na tabela anterior, escolha no MÁXIMO [3 A 5] destaques para o report,
-na ordem de prioridade combinada.
-
-Para cada destaque:
-- projeto/campanha e indicador;
-- número no formato do report (até 10 caracteres, ex.: "X,X%", "R$ X mi", "Xx");
-- base de comparação em até 5 palavras (ex.: "era X,X%");
-- por que ele é mais relevante do que os que ficaram de fora.
-
-Indique qual deve ser o PROJETO PRINCIPAL do mês (o resultado mais importante)
-e qual deve ser o NÚMERO 1 dele (o mais relevante, que aparece em destaque).
-
-Liste também os resultados que você DESCARTOU por serem pequenos, sem base de
-comparação ou com volume baixo, e o motivo.
+Revise a tabela anterior e liste somente problemas:
+- período diferente do combinado;
+- unidades misturadas no mesmo indicador (ex.: % e p.p.);
+- totais que não fecham com as partes;
+- valores duplicados ou fora do padrão dos meses anteriores;
+- indicador sem base de comparação.
+Para cada problema: indicador | o que está errado | pergunta para a fonte.
+Se não houver problema, escreva "Base consistente".
 ```
 
-## Prompt 3 · Evolução mensal
+## Prompt 3 · Calcular as variações (com a conta)
+
+| | |
+|---|---|
+| **Objetivo** | Calcular cada variação do jeito certo (relativa ou p.p.), mostrando a conta |
+| **Quando usar** | Depois que a base estiver consistente |
+| **Entradas** | Tabela conferida; critério de relevância da área (se houver) |
+| **Formato de saída** | Tabela: indicador, anterior, atual, variação, tipo (relativa ou p.p.), conta, classificação |
+| **Validação** | Refaça 2 contas na calculadora. Confira se indicador em % usa p.p. |
+| **Onde entra no report** | Etiquetas de variação dos números (`variacao`) e Creative X |
 
 ```text
-Compare [MÊS/ANO] com [MÊS/ANO ANTERIOR] para os indicadores abaixo:
-[LISTA DE INDICADORES OU "TODOS"]
+Para cada indicador da tabela, calcule a variação de [MÊS/ANO] contra
+[BASE DE COMPARAÇÃO]:
+- valores absolutos (R$, quantidade): variação relativa em %;
+- indicadores que já são percentuais (CTR, taxa, score): diferença em p.p.
+Mostre a conta de cada linha.
 
-Para cada um: valor anterior, valor atual, variação (relativa para valores
-absolutos; p.p. para indicadores que já são percentuais), e classificação:
-"evolução relevante", "estável" ou "piora relevante".
-
-Critério de relevância: [EX.: VARIAÇÃO ACIMA DE X% OU X P.P., OU O CRITÉRIO DA
-ÁREA]. Se não houver critério definido, explique qual usou.
-
-Não explique causas nesta etapa. Aponte apenas o que mudou e quanto.
-Para o Creative X: anterior [SCORE ANTERIOR], atual [SCORE ATUAL]. Informe a
-diferença em p.p.
+Classifique cada um como "evolução relevante", "estável" ou "piora relevante",
+com o critério: [CRITÉRIO DA ÁREA, EX.: VARIAÇÃO ACIMA DE 10% OU 2 P.P.].
+Se não houver critério, diga qual usou. Não explique causas.
 ```
 
-## Prompt 4 · Resumo executivo
+## Prompt 4 · Escolher os destaques do mês
+
+| | |
+|---|---|
+| **Objetivo** | Escolher o projeto principal, os 3 números da capa e o que fica de fora |
+| **Quando usar** | Depois das variações calculadas |
+| **Entradas** | Tabelas dos prompts 1 e 3 |
+| **Formato de saída** | Projeto principal + número 1 a 3; destaque de "O que lançamos"; lista do que foi descartado e por quê |
+| **Validação** | A área aprova a escolha antes de escrever os textos |
+| **Onde entra no report** | Capa (projeto principal e números), "O que lançamos" e e-mail-resumo (até 3 indicadores) |
 
 ```text
-Escreva o resumo executivo de [MÊS/ANO] para a capa do report, usando só os
-destaques aprovados: [COLE OS DESTAQUES APROVADOS].
-
-Entregue:
-1. "Frase do mês": até 8 palavras, dividida em duas partes (início + final),
-   ex.: "[INÍCIO DA FRASE]" / "[FINAL DA FRASE]". Sem número na frase.
-2. "Prévia" da caixa de entrada: até 110 caracteres, com a frase e o principal
-   resultado.
-3. "Resumo do projeto principal": 1 a 2 linhas: o que foi feito e o resultado.
-Dê 3 opções para cada item. Não use dados que não estejam nos destaques.
+Com base nas tabelas anteriores, proponha:
+1. PROJETO PRINCIPAL do mês (o resultado mais importante) e os 3 números que
+   o representam, do mais para o menos relevante;
+2. PROJETO EM DESTAQUE de "O que lançamos" e até 3 resultados dele;
+3. até 6 lançamentos do mês, do mais para o menos relevante.
+Ordem de prioridade: resultados relevantes; evoluções expressivas; resultados
+positivos; mudanças importantes frente ao período anterior.
+Liste também o que você DESCARTOU (pequeno, sem base, base pequena) e o motivo.
 ```
 
-## Prompt 5 · Aprendizados
+## Prompt 5 · Frase do mês e projeto principal
+
+| | |
+|---|---|
+| **Objetivo** | Escrever a capa: frase do mês, projeto principal e os 3 números |
+| **Quando usar** | Depois que a área aprovar os destaques (Prompt 4) |
+| **Entradas** | Destaques aprovados; mês e próximo mês |
+| **Formato de saída** | Blocos `[EDICAO]`, `[ABERTURA]`, `[PROJETO PRINCIPAL]`, `[NUMERO 1]` a `[NUMERO 3]` |
+| **Validação** | Cada `valor` igual ao da tabela; frase sem número; nenhum campo inventado |
+| **Onde entra no report** | Capa vermelha e e-mail-resumo (frase e indicadores) |
 
 ```text
-Com base nos resultados de [MÊS/ANO], proponha até 3 aprendizados.
+Escreva a capa do report de [MÊS/ANO] usando só os destaques aprovados.
+Limites (o layout tem espaço fixo):
+- frase + frase_final: juntas, até 8 palavras, sem número;
+- nome do projeto: até 40 caracteres; resumo: 1 a 2 frases;
+- valor: até 10 caracteres (ex.: 12,5% · R$ 1,20 · 2,5x);
+- titulo: 1 a 3 palavras; detalhe: base de comparação, até 5 palavras;
+- variacao: com sinal (+25%, -20%, +3 p.p.); variacao_cor: verde ou ambar.
+Responda SOMENTE neste formato, sem comentários:
+[EDICAO]
+mes: [MÊS]
+ano: [ANO]
+proximo_mes: [PRÓXIMO MÊS]
 
-Cada aprendizado precisa:
-- título curto (até 5 palavras);
-- 1 frase: o que aconteceu (com o dado que sustenta) e o que isso ensina;
-- "levamos": 1 ação curta para os próximos meses;
-- classificação: COMPROVADO PELOS DADOS ou HIPÓTESE (e o que seria preciso para
-  comprovar).
+[ABERTURA]
+frase: ...
+frase_final: ...
 
-Não transforme correlação em causa. Se dois fatos aconteceram juntos, diga que
-"coincidiram" ou que "podem estar relacionados", não que um causou o outro.
-```
+[PROJETO PRINCIPAL]
+nome: ...
+resumo: ...
 
-## Prompt 6 · Pontos de atenção
-
-```text
-Identifique os indicadores de [MÊS/ANO] que merecem acompanhamento:
-piora relevante, queda de tendência, meta não atingida, base pequena demais
-para concluir, ou dado ausente.
-
-Para cada ponto: indicador, valor atual e de comparação, por que merece atenção,
-e o que acompanhar no próximo mês.
-Diferencie "ponto de atenção" (precisa de ação) de "oscilação normal" (não
-precisa). Não dramatize variações pequenas.
-
-Por fim, sugira o FOCO do próximo mês em 1 frase, ligado a um aprendizado ou a
-um ponto de atenção.
-```
-
-## Prompt 7 · Textos para o report
-
-```text
-Transforme os destaques aprovados em textos prontos para o arquivo do report.
-Respeite os limites de tamanho, porque o layout tem espaço fixo:
-
-[ABERTURA]      frase: até ~28 caracteres · frase_final: até ~28 caracteres
-                previa: até 110 caracteres
-[PROJETO PRINCIPAL] nome: até ~40 caracteres · resumo: 1 a 2 linhas
-[NUMERO 1..4]   valor: até 10 caracteres · titulo: 1 a 3 palavras ·
-                detalhe: base de comparação, até 5 palavras ·
-                variacao: ex. "+58%" ou "-12%" (vazio se não houver)
-[DESTAQUE]      titulo: até ~60 caracteres · texto: 2 linhas
-[LANCAMENTO]    nome: até ~30 caracteres · texto: 1 frase
-[APRENDIZADO]   titulo: até 5 palavras · texto: 1 frase · levamos: ação curta
-[FOCO]          prioridade: até ~60 caracteres · texto: 1 frase
-
-Entregue no formato "campo: valor", bloco por bloco, como no exemplo:
 [NUMERO 1]
-valor: [VALOR]
-titulo: [INDICADOR]
-detalhe: era [VALOR ANTERIOR]
-variacao: [VARIAÇÃO]
-
-Use somente os dados aprovados. Onde faltar dado, mantenha o conteúdo de
-exemplo do modelo (X%, R$ X, Lorem ipsum) em vez de inventar.
+valor: ...
+titulo: ...
+detalhe: ...
+variacao: ...
+variacao_cor: ...
+(repita para NUMERO 2 e NUMERO 3; campo sem dado: não escreva a linha)
 ```
 
-## Prompt 8 · Auditoria da análise
+## Prompt 6 · O que lançamos
+
+| | |
+|---|---|
+| **Objetivo** | Escrever o projeto em destaque, os resultados dele e os lançamentos |
+| **Quando usar** | Depois do Prompt 5 |
+| **Entradas** | Destaque e lançamentos aprovados; status de cada lançamento |
+| **Formato de saída** | Blocos `[LANCAMOS]`, `[DESTAQUE]`, `[RESULTADO 1]` a `[3]`, `[LANCAMENTO 1]` a `[6]` |
+| **Validação** | Números iguais à tabela; status verdadeiro (no ar, em teste, resultado em data X) |
+| **Onde entra no report** | Seção "O que lançamos" |
 
 ```text
-Revise o report de [MÊS/ANO] abaixo como um analista crítico:
-[COLE O CONTEÚDO DO ARQUIVO dados/AAAA-MM.txt OU OS TEXTOS FINAIS]
+Escreva a seção "O que lançamos" de [MÊS/ANO] com os itens aprovados.
+Limites: titulo da seção até 60 caracteres; destaque: titulo até 60 caracteres
+e texto de 2 linhas; lançamento: nome até 30 caracteres e texto de 1 frase;
+status: até 25 caracteres; status_cor: verde (no ar, implementado) ou ambar
+(previsto, em teste, aguardando resultado).
+Responda SOMENTE neste formato, sem comentários:
+[LANCAMOS]
+titulo: ...
 
-Base de dados original: [ANEXO OU RESUMO DOS DADOS]
+[DESTAQUE]
+categoria: ...
+titulo: ...
+texto: ...
 
-Verifique e liste:
-1. Algum número do report não bate com a base? (indicador, valor, período)
+[RESULTADO 1]
+valor: ...
+titulo: ...
+detalhe: ...
+variacao: ...
+
+[LANCAMENTO 1]
+status: ...
+status_cor: ...
+nome: ...
+texto: ...
+(repita os blocos numerados conforme os itens aprovados)
+```
+
+## Prompt 7 · Creative X e resumo das campanhas
+
+| | |
+|---|---|
+| **Objetivo** | Escrever o Creative X (score) e o que foi bem / o que melhorar |
+| **Quando usar** | Com o score do mês e do mês anterior em mãos |
+| **Entradas** | Score anterior e atual; tabela de variações |
+| **Formato de saída** | Blocos `[CREATIVE X]`, `[FOI BEM 1]` a `[4]`, `[A MELHORAR 1]` a `[4]` |
+| **Validação** | Variação do score em p.p. (não em %); cada frase com o dado que a sustenta |
+| **Onde entra no report** | Seções "Creative X" e "Resumo das campanhas" |
+
+```text
+Creative X: anterior [SCORE ANTERIOR], atual [SCORE ATUAL], período
+[EX.: SET VS. OUT]. Calcule a diferença em p.p. e escreva o significado em
+1 frase. Depois, escreva até 4 frases de "foi bem" e até 4 de "a melhorar"
+(até 90 caracteres cada, com o número que sustenta).
+Responda SOMENTE neste formato, sem comentários:
+[CREATIVE X]
+subtitulo: Score criativo · ...
+anterior: ...
+atual: ...
+variacao: ...
+periodo: ...
+significado: ...
+
+[FOI BEM 1]
+texto: ...
+
+[A MELHORAR 1]
+texto: ...
+(repita os blocos numerados)
+```
+
+## Prompt 8 · Transformation Hub
+
+| | |
+|---|---|
+| **Objetivo** | Transformar mensagens e documentos do time do Transformation Hub em texto curto e padronizado |
+| **Quando usar** | Quando o time enviar as novidades dos projetos (agentes, ferramentas) |
+| **Entradas** | Mensagens, apresentações ou documentos do time; previsões de lançamento confirmadas |
+| **Formato de saída** | Blocos `[TRANSFORMATION]` e `[TRANSFORMATION 1]` a `[3]` |
+| **Validação** | Data de lançamento só se confirmada pelo time; nome do projeto exatamente como o time escreve |
+| **Onde entra no report** | Seção "Transformation Hub" (logo, links e PDF são colocados na página, no emulador) |
+
+```text
+Com base nas mensagens e documentos que anexei, escreva até 3 projetos do
+Transformation Hub. Use o nome do projeto exatamente como está no material.
+Para cada um: o que o projeto faz (1 frase, até 120 caracteres) e o status.
+Previsão de lançamento: só se estiver escrita no material; senão, deixe o
+status vazio. Não invente datas, resultados nem citações.
+Responda SOMENTE neste formato, sem comentários:
+[TRANSFORMATION]
+titulo: Como estamos transformando<br>a forma de criar.
+
+[TRANSFORMATION 1]
+status: ...
+status_cor: ...
+nome: ...
+texto: ...
+(repita para 2 e 3; status_cor: verde se já implementado, ambar se previsto)
+```
+
+## Prompt 9 · Aprendizados
+
+| | |
+|---|---|
+| **Objetivo** | Escrever até 3 aprendizados, separando o comprovado da hipótese |
+| **Quando usar** | Depois dos resultados escritos (prompts 5 a 7) |
+| **Entradas** | Tabelas de resultados e variações |
+| **Formato de saída** | Blocos `[APRENDIZADO 1]` a `[3]`; antes deles, a classificação de cada um |
+| **Validação** | Nenhuma causa afirmada sem dado; hipótese escrita como "pode indicar", "sugere" |
+| **Onde entra no report** | Seção "O que aprendemos" |
+
+```text
+Proponha até 3 aprendizados de [MÊS/ANO]. Para cada um, diga antes se é
+COMPROVADO PELOS DADOS ou HIPÓTESE. Hipótese deve ser escrita com "pode
+indicar" ou "sugere". Não transforme correlação em causa.
+Limites: titulo até 5 palavras; texto: 1 frase com o dado que sustenta;
+levamos: 1 ação curta para os próximos meses (começando com minúscula).
+Depois da classificação, responda neste formato:
+[APRENDIZADO 1]
+titulo: ...
+texto: ...
+levamos: ...
+(repita para 2 e 3)
+```
+
+## Prompt 10 · Foco e agenda do próximo mês
+
+| | |
+|---|---|
+| **Objetivo** | Escrever a prioridade do próximo mês e a agenda ("Também vem aí") |
+| **Quando usar** | Com o calendário do próximo mês em mãos |
+| **Entradas** | Planejamento e calendário do próximo mês; pontos de atenção |
+| **Formato de saída** | Blocos `[FOCO]` e `[AGENDA 1]` a `[6]` |
+| **Validação** | Datas iguais ao calendário; data incerta como "A DEFINIR" |
+| **Onde entra no report** | Seções "Foco do próximo mês" e "Também vem aí" |
+
+```text
+Com base no planejamento de [PRÓXIMO MÊS] que anexei, escreva:
+- o foco do próximo mês: prioridade (até 60 caracteres) e texto (1 frase);
+- até 6 itens de agenda, na ordem das datas: data no formato "12 NOV" (ou
+  "A DEFINIR"), titulo (até 30 caracteres) e detalhe (até 40 caracteres).
+Não invente datas: use só as do material.
+Responda SOMENTE neste formato, sem comentários:
+[FOCO]
+prioridade: ...
+texto: ...
+
+[AGENDA 1]
+data: ...
+titulo: ...
+detalhe: ...
+(repita os blocos numerados)
+```
+
+## Prompt 11 · Conteúdo completo para importar no emulador
+
+| | |
+|---|---|
+| **Objetivo** | Juntar tudo o que foi aprovado num único bloco de texto, pronto para **Importar conteúdo (Copilot)** |
+| **Quando usar** | Quando todos os textos estiverem aprovados pela área |
+| **Entradas** | As respostas aprovadas dos prompts 5 a 10 (já estão na conversa) |
+| **Formato de saída** | Blocos `[EDICAO]` a `[AGENDA n]`, na ordem do report, sem comentários |
+| **Validação** | Depois de aplicar no emulador: a mensagem "N campo(s) preenchido(s)" e a conferência na página, campo a campo |
+| **Onde entra no report** | Em toda a página, pelo emulador (passo 2 → Importar conteúdo) |
+
+```text
+Junte as versões APROVADAS dos blocos desta conversa num único texto, na
+ordem: EDICAO, ABERTURA, PROJETO PRINCIPAL, NUMERO 1 a 3, LANCAMOS, DESTAQUE,
+RESULTADO 1 a 3, LANCAMENTO 1 a 6, CREATIVE X, FOI BEM, A MELHORAR,
+TRANSFORMATION, TRANSFORMATION 1 a 3, APRENDIZADO 1 a 3, FOCO, AGENDA 1 a 6.
+Regras:
+- copie os textos exatamente como aprovados (não reescreva);
+- um campo por linha, no formato "campo: valor";
+- campo sem dado: não escreva a linha;
+- não acrescente comentários, títulos, marcadores nem explicações.
+```
+
+## Prompt 12 · Revisão final antes de enviar
+
+| | |
+|---|---|
+| **Objetivo** | Revisar o report como um analista crítico antes do envio |
+| **Quando usar** | Depois de salvar o report no emulador, antes de gerar o e-mail |
+| **Entradas** | Os textos finais (copie da página ou do Prompt 11) e a base original |
+| **Formato de saída** | Lista numerada: 1 a 7, cada item "OK" ou o problema com a correção sugerida |
+| **Validação** | Corrija no emulador o que for problema real; não aceite correção que mude número sem conferir a fonte |
+| **Onde entra no report** | Revisão de todas as seções |
+
+```text
+Revise o conteúdo final do report de [MÊS/ANO] abaixo, comparando com a base
+original que está nesta conversa:
+[COLE O CONTEÚDO FINAL]
+Verifique e responda item a item (OK ou o problema e a correção):
+1. Algum número não bate com a base (indicador, valor, período)?
 2. Algum destaque é menos relevante do que um resultado que ficou de fora?
-3. Há confusão entre variação percentual e pontos percentuais?
+3. Há troca entre variação percentual e pontos percentuais?
 4. Há causa afirmada sem evidência (deveria ser hipótese)?
-5. Alguma variação destacada é pequena ou tem base de comparação fraca?
-6. A ordem de leitura conta a história: o que aconteceu → principal resultado
-   → o que evoluiu → o que explica → o que aprendemos?
+5. Alguma variação destacada é pequena ou tem base fraca?
+6. A leitura conta a história: o que aconteceu, o principal resultado, o que
+   evoluiu, o que aprendemos, o que vem a seguir?
 7. Algum texto passou do limite de tamanho ou está ambíguo?
-Para cada problema: onde está, por que é um problema e a correção sugerida.
-Se não houver problema num item, escreva "OK".
 ```
 
 ---
@@ -209,5 +432,6 @@ Se não houver problema num item, escreva "OK".
 ## Cuidados
 
 - **Não cole dados no Copilot pessoal** nem em outras IAs públicas. Use só o ambiente aprovado pela empresa.
-- O Copilot pode errar contas. Confira toda variação calculada.
-- Guarde a versão final dos textos no arquivo do mês, não na conversa.
+- O Copilot pode errar contas e trocar % por p.p. Confira toda variação calculada.
+- Indicador sem dado no mês: oculte o item no emulador ("Ocultar item"). Não deixe o número do mês anterior nem ponha zero no lugar.
+- Guarde a versão final no report salvo (`.html`), não na conversa.

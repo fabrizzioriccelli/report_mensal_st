@@ -43,7 +43,7 @@ Content-Type: multipart/alternative
 2. **Selecionar a pasta do projeto** → escolha a pasta principal. O navegador pergunta se quer "carregar" os arquivos: confirme. Nada sai do seu computador.
 3. O mês mais recente de `dados/` é escolhido sozinho.
 4. Leia a **Conferência** (erros, pendências, avisos), teste os links e veja a **Prévia**.
-5. **Baixar e-mail completo (.eml)** (o e-mail que a área recebe é o e-mail-resumo, gerado no `converter-html-eml.html`: veja [CONVERTER_HTML_EML.md](CONVERTER_HTML_EML.md)). Com pendências, só dá para gerar o **RASCUNHO** (marque a opção).
+5. **Baixar e-mail completo (.eml)** (o e-mail que a área recebe é o e-mail-resumo, gerado no emulador: veja [EMULADOR.md](EMULADOR.md)). Com pendências, só dá para gerar o **RASCUNHO** (marque a opção).
 6. **Baixar página do mês (.html)** e guarde em `reports/`: é o arquivo histórico, com as imagens dentro, que abre em qualquer navegador.
 
 ### 2. Abrir e enviar
