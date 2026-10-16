@@ -19,7 +19,8 @@ O suporte de cada cliente muda com as atualizações da Microsoft. A tabela refl
 | **Link em texto** (`<a href>`) | ✓ | ✓ | ✓ | **Usado**: "Ver peça →", "▶ Assistir" |
 | **Imagem clicável** (imagem dentro de `<a>`) | ✓ | ✓ | ✓ | **Usado**: miniaturas abrem o mesmo link do botão |
 | Sublinhado ao passar o mouse (`:hover`) | ✕ ignora | △ geralmente aceita | — (sem mouse) | Usado como melhoria; sem ele nada muda |
-| Cantos arredondados | ✕ cantos retos | ✓ | ✓ | Usado; o canto reto é o fallback |
+| Cantos arredondados | ✕ cantos retos (e o envio pelo Outlook tira para todos) | ✓ | ✓ | E-mail completo: usado, o canto reto é o fallback. E-mail-resumo: cantos retos de propósito (4.5) |
+| Botão desenhado em VML | △ aparece no rascunho, mas o envio pelo Outlook o transforma em imagem sem link | ✕ | ✕ | **Não usado** (4.5): o botão é célula com fundo + link de texto |
 | Colunas que empilham no celular (`@media`) | — | △ | ✓ | Usado |
 | JavaScript | ✕ | ✕ removido | ✕ | **Não usado** |
 | Modal / lightbox (janela por cima) | ✕ | ✕ | ✕ (só alguns apps não Microsoft) | **Não usado**: o clique abre o SharePoint |

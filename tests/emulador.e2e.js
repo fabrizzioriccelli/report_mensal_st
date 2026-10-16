@@ -240,7 +240,7 @@ function salvarComo() {
   /* link de arquivo (caminho do Windows, como "Copiar como caminho"): libera o e-mail, com aviso */
   await p.fill("#link", "\"C:\\Users\\Fulano\\Downloads\\report-2099-01.html\"");
   await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
-  var hrefRes = ((await p.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta" href="([^"]*)"/) || [])[1], infoRes = await p.$eval("#linkInfo", function (e) { return e.textContent; });
+  var hrefRes = ((await p.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1], infoRes = await p.$eval("#linkInfo", function (e) { return e.textContent; });
   confere(hrefRes === "file:///C:/Users/Fulano/Downloads/report-2099-01.html" && /Atenção/.test(infoRes), "link de arquivo (C:\\…) aceito: vira file:///… no botão, com aviso · " + hrefRes + " · " + infoRes.slice(0, 60));
   var LINK = "https://www.example.com/report-ficticio";
   await p.fill("#link", LINK);
@@ -257,7 +257,8 @@ function salvarComo() {
   confere(/^X-Unsent: 1\r\n/.test(eml) && /^MIME-Version: 1\.0\r\n/m.test(eml) && /multipart\/related/.test(eml), "MIME válido: abre como mensagem nova (X-Unsent), multipart/related");
   confere(/^Subject: Creative Strategy PF \| Report de Janeiro 2099\r\n/m.test(eml), "assunto: Creative Strategy PF | Report de Janeiro 2099");
   var hrefs = html.match(/href="[^"]*"/g) || [];
-  confere(hrefs.length >= 1 && hrefs.every(function (h) { return h === 'href="' + LINK + '"'; }), "um único destino: o botão do report completo (" + hrefs.length + " href)");
+  confere(hrefs.length === 1 && hrefs[0] === 'href="' + LINK + '"', "um único link: o botão do report completo (" + hrefs.length + " href)");
+  confere(!/<v:roundrect|<w:anchorlock/.test(html) && /<td align="center" bgcolor="#EC0000"[^>]*><a class="cta fx" href="/.test(html), "botão sem VML (célula vermelha + link de texto): continua clicável depois que o Outlook envia");
   confere(/Acessar report completo/.test(html), "botão: \"Acessar report completo\"");
   confere(/12,5%/.test(html) && /R\$ 1,20/.test(html) && /Indicador fictício A/.test(html), "indicadores escolhidos estão no resumo");
   confere(!/<script|data-campo|contenteditable/.test(html), "resumo estático, sem marcas");

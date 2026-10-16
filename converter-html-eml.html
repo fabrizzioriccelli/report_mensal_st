@@ -168,7 +168,7 @@
   <!-- 3 · LINK -->
   <section aria-labelledby="s3" id="secLink" hidden>
     <h2 id="s3"><b>3</b>Link do report completo</h2>
-    <p class="muted">O botão do e-mail-resumo leva quem lê para o report completo (o arquivo salvo no passo 2). Vale o <b>link do ambiente corporativo autorizado</b> (<code>https://…</code>), para quem recebe o e-mail, ou o <b>caminho do arquivo</b> (<code>C:\…</code>, <code>\\servidor\…</code> ou <code>file:///…</code>), que abre só onde esse caminho existe: bom para testar no seu computador ou para uma pasta de rede da área.</p>
+    <p class="muted">O botão do e-mail-resumo leva quem lê para o report completo (o arquivo salvo no passo 2). Vale o <b>link do ambiente corporativo autorizado</b> (<code>https://…</code>), para quem recebe o e-mail, ou o <b>caminho do arquivo</b> (<code>C:\…</code>, <code>\\servidor\…</code> ou <code>file:///…</code>), que abre só onde esse caminho existe: bom para testar no seu computador ou para uma pasta de rede da área (no Outlook na Web e no celular, link de arquivo não abre).</p>
     <div class="campo">
       <label for="link">Link do report completo</label>
       <input type="text" id="link" inputmode="url" placeholder="https://…  ou  C:\…\report-AAAA-MM.html" autocomplete="off">
@@ -233,7 +233,7 @@
 
   <section aria-labelledby="s7" id="secPrev" hidden>
     <h2 id="s7">Prévia do e-mail</h2>
-    <p class="muted">É o que vai dentro do .eml: estático, sem vídeo nem animação (e-mail não roda script).</p>
+    <p class="muted">É o que vai dentro do .eml: estático, sem vídeo nem animação (e-mail não roda script). No e-mail-resumo, cantos retos e botão de texto são de propósito: é assim que ele chega depois que o Outlook envia.</p>
     <div class="row tabs" role="group" aria-label="Qual e-mail">
       <button type="button" data-qual="resumido" aria-pressed="true">E-mail-resumo</button>
       <button type="button" data-qual="completo" aria-pressed="false">E-mail completo</button>

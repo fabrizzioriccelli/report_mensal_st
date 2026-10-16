@@ -604,8 +604,13 @@ teste("emailResumo: curto, até 3 indicadores, um único destino (o botão \"Ace
   var r = M.emailResumo(html, { link: LINK });
   assert.deepStrictEqual(r.indicadores, ["numero-1", "numero-2", "numero-3"], "padrão: os números do projeto principal");
   var hrefs = r.html.match(/href="[^"]*"/g) || [];
-  assert.ok(hrefs.length === 2 && hrefs.every(function (h) { return h === 'href="' + LINK + '"'; }), hrefs.join(" "));
-  assert.ok(/Acessar report completo/.test(r.html) && /<v:roundrect\b/.test(r.html), "botão (também no Outlook para Windows)");
+  assert.ok(hrefs.length === 1 && hrefs[0] === 'href="' + LINK + '"', hrefs.join(" "));
+  /* Botão que sobrevive ao envio pelo Outlook: célula com fundo e link de texto, sem VML (o Outlook vira imagem sem link). */
+  assert.ok(/Acessar report completo/.test(r.html) && !/<v:|\bvml\b|\[if mso\]><v/i.test(r.html.replace(/xmlns:v="[^"]*"/, "")), "botão sem VML");
+  assert.ok(/<td align="center" bgcolor="#EC0000"[^>]*><a class="cta fx" href="/.test(r.html), "botão: célula vermelha com o link no texto");
+  /* Cantos retos de propósito: o que a prévia mostra é o que chega depois que o Outlook reescreve o e-mail. */
+  assert.ok(!/border-radius/.test(r.html), "sem cantos arredondados no resumo");
+  assert.ok(!/<p[^>]*line-height:\d+px;(?!mso-line-height-rule)/.test(r.html), "altura de linha exata também no Outlook");
   assert.ok(/12,5%/.test(r.html) && /R\$ 1,00/.test(r.html) && /3x/.test(r.html) && /Projeto Alfa/.test(r.html));
   assert.ok(!/data-campo|data-tom|secao:|<script|&#9654;|Ver peça|Documento modelo|Evento um|Aprendizado A|Lançamento Um/.test(r.html), "estático, sem links das peças e sem o detalhe das seções");
   assert.ok(!/\{\{|\}\}/.test(r.html));
@@ -678,7 +683,7 @@ teste("normalizarLink: https, http (aviso) e caminho do arquivo (C:\\, \\\\servi
   assert.deepStrictEqual(n(""), { url: "", tipo: "", avisos: [], erro: "" });
   /* o botão do e-mail-resumo aceita o link de arquivo; a conferência avisa, sem bloquear */
   var r = M.emailResumo(montar(COMPLETO).html, { link: "C:\\Users\\Fulano\\report.html" });
-  assert.ok(r.temLink && (r.html.match(/href="file:\/\/\/C:\/Users\/Fulano\/report\.html"/g) || []).length === 2 && !/FALTA O LINK/.test(r.html));
+  assert.ok(r.temLink && (r.html.match(/href="file:\/\/\/C:\/Users\/Fulano\/report\.html"/g) || []).length === 1 && !/FALTA O LINK/.test(r.html));
   var conf = M.conferirHtml(r.html).filter(function (x) { return /arquivo local/.test(x.msg); });
   assert.ok(conf.length === 1 && conf[0].nivel === "aviso");
 });
