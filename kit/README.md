@@ -7,6 +7,7 @@ A pasta que o time recebe. **Mantenha os arquivos juntos, na mesma pasta:** as c
 | `emulador-report.html` | **O emulador**: abrir, editar, salvar o report e gerar o e-mail-resumo. Dois cliques (Chrome ou Edge). Funciona sozinho, em qualquer pasta |
 | `guia-operacional.pdf` | O guia passo a passo, com telas reais e a biblioteca de 12 prompts do Copilot. `.pptx` editável ao lado |
 | `apresentacao-executiva.pdf` | A nova experiência em 10 slides. Chamadas: **Acessar emulador** › `emulador-report.html` · **Baixar guia operacional** › `guia-operacional.pdf` · **Explorar report completo** › `report-exemplo.html` |
+| `apresentacao-executiva-canva.pdf` | A mesma apresentação, para importar no **Canva**: cada slide é uma imagem em alta resolução, então o Canva não troca a fonte nem mexe no layout. O texto não fica editável no Canva; para mudar um texto, edite o `.pptx` e gere o PDF de novo |
 | `report-exemplo.html` | Um report completo de exemplo, com conteúdo fictício (Janeiro 2099) |
 | `report-coringa.html` | O modelo em branco (o mesmo que o emulador abre em "Começar do modelo em branco") |
 

@@ -11,6 +11,11 @@ A versão atual aparece na página `gerar-report.html`, no topo de `report_backu
 - Testes: 67 no motor (links de arquivo); o teste do emulador cobre adicionar e ocultar com a grade refeita, o celular sem vazar e o link de arquivo no `.eml`.
 - **Guia operacional e apresentação executiva** (kit) mostram adicionar e ocultar itens: no guia, "O mês em 8 passos", "A tela de edição" (botão "+ Adicionar …" marcado), "Adicionar um item", "Item novo: a grade se ajusta", campanhas ("+ Adicionar lançamento"), problemas comuns (botão cinza no máximo, item adicionado sem querer) e checklist; na apresentação, o slide do emulador traz a tela com "+ Adicionar" e o mesmo item no celular, e o slide do guia mostra a página "Adicionar um item".
 
+## Kit · 2026-10-16 · Apresentação executiva no grid e PDF para o Canva
+
+- **Apresentação executiva rediagramada** num grid de 12 colunas: margens e espaços iguais, uma escala de tamanhos (32 · 18 · 16 · 13 · 11), cada texto medido e quebrado em linhas fixas com folga dentro do bloco (nada encosta na borda nem se sobrepõe), sem redução automática de fonte, chamadas sem sublinhado. Mesmo conteúdo e mesmas 3 chamadas.
+- **`kit/apresentacao-executiva-canva.pdf`**: cada slide como imagem (3840 × 2160), com os links das chamadas. Ao importar um PDF com texto, o Canva troca a fonte e reorganiza as caixas de texto (tamanhos mudam, linhas se sobrepõem); com o slide em imagem, ele importa como está.
+
 ## 4.3 · 2026-10-16 · Emulador como centro da operação: edição na própria página, e-mail-resumo curto, kit do time
 
 - **Edição persistente no emulador** (`converter-html-eml.html`; versão avulsa em `kit/emulador-report.html`): abre o **modelo em branco** (embutido) ou um **report salvo**, e edita na própria página, no Chrome ou no Edge: textos e números (clique e escreva; o exemplo [entre colchetes] fica selecionado), cor das etiquetas (verde/âmbar), **Trocar imagem** (recorte e redução no navegador, com aviso de imagem pequena), **Descrição**, **Colocar / Trocar / Tirar vídeo**, **Tirar imagem** (selo, logo, prints), **Colocar / Trocar / Tirar link** (só `https://`), **Anexar PDF**, **Texto do link**, **Ocultar item**, mostrar/ocultar **seções** (numeração se ajusta) e **Desfazer**.
