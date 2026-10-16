@@ -54,10 +54,10 @@ Curto de propósito, na identidade do report (vermelho Santander, Lisboa, chama)
 |---|---|
 | Abertura (vermelha) | Chama, "Creative Strategy PF", REPORT MENSAL · período, a frase do mês e uma linha de contexto |
 | Principais resultados | **Até 3 indicadores**, cada um com valor, título, base e variação. Quando todos vêm do mesmo projeto, uma linha diz qual |
-| Chamada | "Acesse o report completo." e o botão **Acessar report completo**, o **único link** do e-mail (também no Outlook para Windows, em VML) |
+| Chamada | "Acesse o report completo." e o botão **Acessar report completo**, o **único link** do e-mail: célula vermelha com link de texto, que continua clicável depois que o Outlook envia |
 | Assinatura | CUSTOMER INTERACTIONS · RESUMO DO REPORT MENSAL |
 
-Sem vídeo, carrossel, botões secundários nem script.
+Sem vídeo, carrossel, botões secundários nem script. **Cantos retos de propósito** (4.5): ao enviar, o Outlook para Windows tira os cantos arredondados para todos que recebem, então a prévia já mostra o e-mail como ele chega.
 
 **Indicadores:** os candidatos são os números da página (projeto principal, resultados do destaque e Creative X); vêm marcados os do projeto principal. A pessoa escolhe até 3 (o 4º fica bloqueado). Nenhum número é criado: sem indicador na página, o e-mail sai só com a frase e a chamada.
 

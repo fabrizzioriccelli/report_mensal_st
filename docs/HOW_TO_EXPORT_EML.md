@@ -73,7 +73,7 @@ Content-Type: multipart/alternative
 
 | Ponto | Por que importa | O que fazer |
 |---|---|---|
-| **O Outlook reescreve o HTML ao enviar.** Ao clicar em Enviar, o Outlook para Windows passa o corpo pelo editor do Word | Pode simplificar parte do CSS (por exemplo, regras de celular e cantos arredondados) no e-mail que os outros recebem | **Sempre confira o e-mail recebido**, não só o rascunho. Por isso o teste é "enviar para você e abrir no celular" |
+| **O Outlook reescreve o HTML ao enviar.** Ao clicar em Enviar, o Outlook para Windows passa o corpo pelo editor do Word | Pode simplificar parte do CSS (por exemplo, regras de celular e cantos arredondados) no e-mail que os outros recebem, e transforma botão desenhado (VML) em imagem sem link. Por isso o botão do e-mail-resumo é célula + link de texto e os cantos são retos (4.5) | **Sempre confira o e-mail recebido**, não só o rascunho. Por isso o teste é "enviar para você e abrir no celular" |
 | Não edite o texto no Outlook | Qualquer edição passa pelo Word e pode desalinhar o layout | Corrija no arquivo de dados e gere de novo |
 | **Safe Links** | O Microsoft 365 pode reescrever os links para verificação | Normal. O destino continua o mesmo |
 | Tamanho | Mensagens grandes demoram e podem ser barradas | O report fica em ~200–600 KB. A página avisa acima de 3 MB. VALIDAR COM TI o limite interno |

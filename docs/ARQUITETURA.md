@@ -102,7 +102,7 @@ O ▶ faz parte da imagem: aparece em qualquer cliente, inclusive no Outlook par
 
 ## E-mail-resumo: campos marcados e regras de seleção (4.2)
 
-O e-mail-resumo **não corta** o report: ele tem template próprio (`RESUMO_TPL` em `tools/motor.js`), estático, com um único link (o botão "Ver report completo", em VML no Outlook para Windows e link com fundo nos demais).
+O e-mail-resumo **não corta** o report: ele tem template próprio (`RESUMO_TPL` em `tools/motor.js`), estático, com um único link: o botão "Acessar report completo", uma célula vermelha com link de texto. Desde a 4.5 não usa VML nem cantos arredondados: ao enviar, o Outlook para Windows reescreve o e-mail pelo Word, transforma o desenho VML em imagem sem link (quem recebe não consegue clicar) e tira os cantos arredondados de todos. Com célula, link de texto e cantos retos, a prévia do emulador mostra o que chega.
 
 - **De onde vêm os dados:** cada texto e número do template do report tem um atributo `data-campo` (ex.: `numero-1.valor`, `lancamento-2.nome`, `transformation-3.status`, `cx.atual`, `agenda-1.data`). Etiquetas guardam o tom em `data-tom` (verde/âmbar). `dadosDoResumo(html)` lê esses campos da página, na ordem; `emailResumo(html, {link, botao, blocos})` monta o e-mail.
 - **Por que da página, e não do arquivo de dados:** o conversor recebe só o `.html` (que pode ter sido editado no Chrome). Lendo a página, o resumo sempre reflete o que está publicado. Como a página sai do arquivo de dados, continua havendo uma única fonte.
@@ -133,7 +133,7 @@ O e-mail-resumo **não corta** o report: ele tem template próprio (`RESUMO_TPL`
 |---|---|---|
 | Base | Texto + link escrito por extenso | **Todos**, inclusive quem lê só texto: o `.eml` leva uma versão em texto puro com os links |
 | Padrão | Layout, imagens, miniaturas, "Ver peça →" e "▶ Assistir" | Todos os Outlooks |
-| Melhoria | Cantos arredondados, colunas empilhadas no celular, sublinhado ao passar o mouse | Outlook na Web, novo Outlook, Mac, iOS, Android |
+| Melhoria | Cantos arredondados (só no e-mail completo; o e-mail-resumo usa cantos retos), colunas empilhadas no celular, sublinhado ao passar o mouse | Outlook na Web, novo Outlook, Mac, iOS, Android |
 
 O conteúdo nunca depende da camada de melhoria.
 

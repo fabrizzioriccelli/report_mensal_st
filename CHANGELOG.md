@@ -2,6 +2,19 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.5 · 2026-10-16 · E-mail-resumo chega como a prévia: botão clicável e cantos retos
+
+Teste do time: no Outlook, o e-mail-resumo saiu "quadrado" e diferente da prévia do emulador, e quem recebeu não conseguiu clicar no botão (apareceu como imagem).
+
+- **Causa provável** (comportamento conhecido do Outlook): o `.eml` abre no Outlook para Windows como mensagem nova e, ao enviar, o Outlook reescreve o e-mail pelo Word. O botão era um desenho VML: no envio ele vira **imagem sem link**. O Word também tira os **cantos arredondados** para todos que recebem.
+- **Botão:** agora é uma célula vermelha com o **link no texto** ("Acessar report completo →"), sem VML. Passa pelo envio sem mudar e é o único link do e-mail. A coluna do botão reserva a largura do texto, para ele não quebrar.
+- **Cantos retos de propósito** no e-mail-resumo (abertura, chamada, assinatura, selo e etiquetas): a prévia do emulador mostra o e-mail como ele chega.
+- **Etiquetas de variação** (▲ +25%) em célula de tabela: o Outlook ignorava a margem interna e a etiqueta ficava espremida.
+- **Altura de linha exata no Outlook** (`mso-line-height-rule:exactly`) em todos os textos do resumo, e a fonte de reserva do Outlook (Arial) também nas etiquetas e no botão.
+- **Link de arquivo:** o aviso diz que o Outlook na Web e o celular não abrem link de arquivo (`C:\…`, `\\servidor\…`). Para enviar à área, use o link `https://` do ambiente autorizado.
+- O report (página e e-mail completo) não mudou. Testes: 67 no motor (botão sem VML, um único link, sem cantos arredondados) e o teste do emulador confere o `.eml` baixado nas duas versões (pasta do projeto e avulsa).
+- **Ainda não testado num Outlook de verdade** (este ambiente não tem Outlook). Teste: abrir o `.eml`, enviar para você e para uma pessoa do time, e clicar no botão no computador e no celular.
+
 ## 4.4 · 2026-10-16 · Link de arquivo no e-mail-resumo, adicionar itens com a grade ajustada
 
 - **Link do report completo aceita o caminho do arquivo** (passo 3 do emulador e "Colocar link"): além de `https://`, vale `C:\…`, `\\servidor\…` e `file:///…`, com ou sem aspas ("Copiar como caminho" do Windows); vira `file:///…` no botão. O emulador avisa que esse link abre só onde o arquivo está, mas não bloqueia o `.eml` (`Motor.normalizarLink`). Link inválido continua recusado.
