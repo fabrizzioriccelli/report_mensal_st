@@ -9,6 +9,7 @@ A versão atual aparece na página `gerar-report.html`, no topo de `report_backu
 - Agenda: célula vazia da última linha não aparece mais no celular.
 - As mensagens de ação ("Imagem trocada", aviso de imagem pequena, "PDF anexado") ficam visíveis na linha de estado (antes eram trocadas na hora por "Alterações não salvas").
 - Testes: 67 no motor (links de arquivo); o teste do emulador cobre adicionar e ocultar com a grade refeita, o celular sem vazar e o link de arquivo no `.eml`.
+- **Guia operacional e apresentação executiva** (kit) mostram adicionar e ocultar itens: no guia, "O mês em 8 passos", "A tela de edição" (botão "+ Adicionar …" marcado), "Adicionar um item", "Item novo: a grade se ajusta", campanhas ("+ Adicionar lançamento"), problemas comuns (botão cinza no máximo, item adicionado sem querer) e checklist; na apresentação, o slide do emulador traz a tela com "+ Adicionar" e o mesmo item no celular, e o slide do guia mostra a página "Adicionar um item".
 
 ## 4.3 · 2026-10-16 · Emulador como centro da operação: edição na própria página, e-mail-resumo curto, kit do time
 
