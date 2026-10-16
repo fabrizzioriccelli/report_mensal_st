@@ -168,16 +168,15 @@
   <!-- 3 · LINK -->
   <section aria-labelledby="s3" id="secLink" hidden>
     <h2 id="s3"><b>3</b>Link do report completo</h2>
-    <p class="muted">O e-mail-resumo leva quem lê para o report completo. Para isso, o report salvo no passo 2 precisa estar <b>publicado no ambiente corporativo autorizado</b>, com permissão para quem vai receber o e-mail. Cole aqui o endereço que esse ambiente fornecer.</p>
+    <p class="muted">O botão do e-mail-resumo leva quem lê para o report completo (o arquivo salvo no passo 2). Vale o <b>link do ambiente corporativo autorizado</b> (<code>https://…</code>), para quem recebe o e-mail, ou o <b>caminho do arquivo</b> (<code>C:\…</code>, <code>\\servidor\…</code> ou <code>file:///…</code>), que abre só onde esse caminho existe: bom para testar no seu computador ou para uma pasta de rede da área.</p>
     <div class="campo">
       <label for="link">Link do report completo</label>
-      <input type="text" id="link" inputmode="url" placeholder="https://…" autocomplete="off">
+      <input type="text" id="link" inputmode="url" placeholder="https://…  ou  C:\…\report-AAAA-MM.html" autocomplete="off">
       <p class="muted" id="linkInfo"></p>
     </div>
     <ol class="passos">
-      <li>Publique o arquivo salvo (<span id="nomeSalvo">report do mês</span>) no ambiente autorizado da área.</li>
-      <li>Copie o endereço de compartilhamento e cole aqui em cima. Ele precisa começar com <code>https://</code>.</li>
-      <li>Abra o endereço numa aba anônima ou peça para alguém de outra equipe: o report precisa abrir.</li>
+      <li><b>Para enviar à área:</b> publique o arquivo salvo (<span id="nomeSalvo">report do mês</span>) no ambiente autorizado, copie o link de compartilhamento e cole aqui. Teste numa aba anônima (Ctrl+Shift+N): o report precisa abrir.</li>
+      <li><b>Para testar no seu computador:</b> abra o report salvo no Chrome ou no Edge e copie o endereço da barra (<code>file:///…</code>), ou, no Explorador de Arquivos, botão direito no arquivo › <b>Copiar como caminho</b>, e cole aqui.</li>
     </ol>
   </section>
 
@@ -322,10 +321,14 @@
     "#ed-barra button{all:unset;background:#EC0000;color:#fff;border-radius:999px;padding:7px 11px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.28);font:700 12px/1 Arial,sans-serif}" +
     "#ed-barra button.cinza{background:#222}#ed-barra button.verde{background:#21634F}#ed-barra button.ambar{background:#945400}" +
     "#ed-barra button:hover{filter:brightness(1.12)}" +
+    ".ed-mais{margin:12px 0 0 0;text-align:left;line-height:1}" +
+    ".ed-mais button{all:unset;cursor:pointer;display:inline-block;font:700 12px/1 Arial,sans-serif;color:#EC0000;background:#FFFFFF;border:1.5px dashed #EC0000;border-radius:999px;padding:8px 13px}" +
+    ".ed-mais button:hover{background:#FFF1F1}.ed-mais button[disabled]{color:#767676;border-color:#BBBBBB;cursor:default;background:#FFFFFF}" +
     ".show-m{}";
-  function marcarSujo() {
+  /* msg: o que acabou de acontecer (fica na linha de estado, antes do lembrete de salvar). */
+  function marcarSujo(msg) {
     ED.sujo = true;
-    $("#estado").className = "estado sujo"; $("#estado").textContent = "Alterações não salvas (a edição fica guardada neste navegador até salvar).";
+    $("#estado").className = "estado sujo"; $("#estado").textContent = (msg ? msg + " · " : "") + "Alterações não salvas (a edição fica guardada neste navegador até salvar).";
     clearTimeout(ED.timer); ED.timer = setTimeout(function () { guardarRascunho({ nome: ED.nome, origem: ED.origem, periodoInicial: ED.periodoInicial, html: htmlEdicao(), quando: Date.now() }); reconverter(); }, 1200);
   }
   function camposDe(chave) { return Array.prototype.slice.call(ED.doc.querySelectorAll('[data-campo="' + chave + '"]')); }
@@ -363,12 +366,8 @@
       el.insertBefore(sp, el.firstChild); el.removeAttribute("data-campo");
     });
     /* textos e números */
-    Array.prototype.forEach.call(d.querySelectorAll("[data-campo]"), function (el) {
-      if (el.tagName === "IMG" || el.getAttribute("data-campo") === "previa") return;
-      if (el.parentElement && el.parentElement.closest("[data-ed-campo]")) { return; }
-      el.setAttribute("contenteditable", "true"); el.setAttribute("spellcheck", "true"); el.setAttribute("data-ed-campo", "");
-      Array.prototype.forEach.call(el.querySelectorAll("a"), function (a) { a.setAttribute("contenteditable", "false"); });
-    });
+    editavel(d.body);
+    localizarGrupos();
     d.addEventListener("focusin", function (e) {
       var el = e.target.closest && e.target.closest("[data-ed-campo]"); if (!el) return;
       /* "[Texto do modelo]": a marca âmbar some ao clicar e o texto fica selecionado; o que se digita entra no lugar. */
@@ -401,31 +400,59 @@
       e.preventDefault(); d.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text/plain").replace(/\s*\n\s*/g, " "));
     });
     /* links não navegam durante a edição */
-    d.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a"); if (a) e.preventDefault(); }, true);
+    d.addEventListener("click", function (e) {
+      if (!e.target.closest) return;
+      var mais = e.target.closest(".ed-mais button"); if (mais) { e.preventDefault(); if (!mais.disabled) adicionarItem(mais.getAttribute("data-grupo")); return; }
+      if (e.target.closest("a")) e.preventDefault();
+    }, true);
     /* barra flutuante: imagem, link ou item */
     var barra = d.createElement("div"); barra.id = "ed-barra"; barra.setAttribute("data-editor", ""); barra.hidden = true; d.body.appendChild(barra);
     var esconder = null;
+    /* Um temporizador só: agendar de novo cancela o anterior (dois ao mesmo tempo deixavam um órfão, que escondia a barra do próximo item). */
+    function agendarEsconder(ms) { clearTimeout(esconder); esconder = setTimeout(function () { barra.hidden = true; }, ms); }
     barra.addEventListener("mouseenter", function () { clearTimeout(esconder); });
-    barra.addEventListener("mouseleave", function () { esconder = setTimeout(function () { barra.hidden = true; }, 500); });
+    /* Saindo da barra para outro item, imagem ou link: quem decide é o mouseover dele (senão a barra do próximo item some). */
+    var ALVOS_BARRA = 'img[data-img], a.cta, a[data-anexo], span[title="Link ainda não definido"], [data-item]';
+    barra.addEventListener("mouseleave", function (e) {
+      if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(ALVOS_BARRA)) return;
+      agendarEsconder(500);
+    });
     d.addEventListener("mouseover", function (e) {
       var t = e.target; if (!t.closest || t.closest("#ed-barra")) return;
       var img = t.closest("img[data-img]"), a = t.closest('a.cta, a[data-anexo], span[title="Link ainda não definido"]'), item = t.closest("[data-item]");
       if (img) mostrarBarra(img, ferramentasImagem(img), img.getBoundingClientRect().width < 200 ? "abaixo" : "");
       else if (a) mostrarBarra(a, ferramentasLink(a));
       else if (d.activeElement && d.activeElement.hasAttribute("data-ed-campo") && d.activeElement.contains(t)) return;
-      else if (item) mostrarBarra(item, [["Ocultar item", function () { ocultarItem(item); }, "cinza"]], "direita");
+      else if (item) {
+        var gi = grupoDe(item), bi = [["Ocultar item", function () { ocultarItem(item); }, "cinza"]];
+        if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
+        mostrarBarra(item, bi, item.getBoundingClientRect().width < 320 ? "acima" : "direita");
+      }
       else return;
       clearTimeout(esconder);
     });
-    d.addEventListener("mouseout", function (e) { if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest("#ed-barra")) { clearTimeout(esconder); esconder = setTimeout(function () { barra.hidden = true; }, 700); } });
+    d.addEventListener("mouseout", function (e) {
+      var rt = e.relatedTarget;
+      if (rt && rt.closest && (rt.closest("#ed-barra") || rt.closest(ALVOS_BARRA))) return;
+      agendarEsconder(700);
+    });
   }
   /* onde: (padrão) dentro, no canto de cima à esquerda · "acima" · "abaixo" (imagem pequena) · "direita" (dentro, no canto de cima à direita, longe do começo do texto) */
+  /* Campos de texto e número (data-campo) ficam editáveis no lugar. */
+  function editavel(raiz) {
+    Array.prototype.forEach.call(raiz.querySelectorAll("[data-campo]"), function (el) {
+      if (el.tagName === "IMG" || el.getAttribute("data-campo") === "previa") return;
+      if (el.parentElement && el.parentElement.closest("[data-ed-campo]")) { return; }
+      el.setAttribute("contenteditable", "true"); el.setAttribute("spellcheck", "true"); el.setAttribute("data-ed-campo", "");
+      Array.prototype.forEach.call(el.querySelectorAll("a"), function (a) { a.setAttribute("contenteditable", "false"); });
+    });
+  }
   function mostrarBarra(alvo, botoes, onde) {
     var d = ED.doc, barra = d.getElementById("ed-barra"), r = alvo.getBoundingClientRect(), w = d.defaultView;
     barra.textContent = "";
     botoes.forEach(function (b) { var x = d.createElement("button"); x.type = "button"; x.textContent = b[0]; if (b[2]) x.className = b[2]; x.addEventListener("mousedown", function (e) { e.preventDefault(); }); x.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); b[1](); }); barra.appendChild(x); });
     barra.hidden = false;
-    var top = r.top + w.scrollY + (onde === "acima" ? -38 : onde === "direita" ? 4 : onde === "abaixo" ? r.height + 4 : 8);
+    var top = r.top + w.scrollY + (onde === "acima" ? -33 : onde === "direita" ? 4 : onde === "abaixo" ? r.height + 4 : 8);
     var left = onde === "direita" ? r.right + w.scrollX - barra.offsetWidth - 4 : r.left + w.scrollX + 8;
     left = Math.max(4, Math.min(left, w.scrollX + d.documentElement.clientWidth - barra.offsetWidth - 4));
     barra.style.top = Math.max(w.scrollY + 4, top) + "px"; barra.style.left = left + "px";
@@ -442,7 +469,7 @@
     marcarSujo();
   }
   function pilha(fn) { ED.desfazer.push(fn); $("#bDesfazer").disabled = false; }
-  $("#bDesfazer").addEventListener("click", function () { var f = ED.desfazer.pop(); if (f) { f(); marcarSujo(); } $("#bDesfazer").disabled = !ED.desfazer.length; });
+  $("#bDesfazer").addEventListener("click", function () { var f = ED.desfazer.pop(); if (f) { f(); marcarSujo("Desfeito."); } $("#bDesfazer").disabled = !ED.desfazer.length; });
 
   /* ---------- imagens ---------- */
   function ferramentasImagem(img) {
@@ -495,8 +522,7 @@
       if (!h) i.removeAttribute("height");
       pilha(function () { i.setAttribute("src", antes.src); if (antes.thumb !== null) i.setAttribute("data-thumb", antes.thumb); if (antes.zoom !== null) i.setAttribute("data-ampliar", antes.zoom); });
     });
-    $("#estado").textContent = "Imagem trocada: " + file.name + (pequenas.length ? ". Atenção: ela é menor que o ideal (" + Math.max.apply(null, pequenas) + " px de largura) e pode ficar borrada." : ".");
-    marcarSujo();
+    marcarSujo("Imagem trocada: " + file.name + (pequenas.length ? ". Atenção: ela é menor que o ideal (" + Math.max.apply(null, pequenas) + " px de largura) e pode ficar borrada." : "."));
   }
   async function trocarVideo(chave, file, novo) {
     if (!/\.(mp4|webm)$/i.test(file.name)) { await perguntar("Formato de vídeo", "<p>Use um vídeo <b>.mp4</b> (ou .webm).</p>", "Entendi"); return; }
@@ -513,8 +539,7 @@
       i.setAttribute("data-video", dados); i.setAttribute("data-legenda", i.alt.replace(/^Vídeo: /, ""));
       (function (i, antes) { pilha(function () { ["video", "thumb"].forEach(function (k2) { var v = antes[k2], at = "data-" + k2; if (v === null) i.removeAttribute(at); else i.setAttribute(at, v); }); i.setAttribute("src", antes.src); i.alt = antes.alt; if (antes.zoom !== null) i.setAttribute("data-ampliar", antes.zoom); }); })(i, antes);
     }
-    $("#estado").textContent = "Vídeo colocado: " + file.name + " (" + kb(file.size) + "). Ele toca no report completo; no e-mail vai só a imagem.";
-    marcarSujo();
+    marcarSujo("Vídeo colocado: " + file.name + " (" + kb(file.size) + "). Ele toca no report completo; no e-mail vai só a imagem.");
   }
   /* Imagem opcional (selo, logo e prints do Transformation Hub): sai com o espaço dela. */
   function tirarImagem(chave) {
@@ -534,7 +559,7 @@
     });
     pilha(function () { tirados.reverse().forEach(function (t) { t[1].insertBefore(t[0], t[2]); }); });
     ED.doc.getElementById("ed-barra").hidden = true;
-    $("#estado").textContent = "Imagem tirada. Para voltar: Desfazer."; marcarSujo();
+    marcarSujo("Imagem tirada. Para voltar: Desfazer.");
   }
   function tirarVideo(chave) {
     mesmasImagens(chave).forEach(function (i) {
@@ -568,17 +593,16 @@
   }
   async function trocarLink(a) {
     var atual = a.tagName !== "A" || a.hasAttribute("data-anexo") ? "" : a.getAttribute("href");
-    var u = prompt("Endereço (link) que este botão abre. Ele precisa começar com https://", atual || "https://");
-    if (u === null) return; u = u.trim();
-    var p = Motor.conferirLinkSimples(u).filter(function (x) { return x.nivel === "erro"; });
-    if (!/^https:\/\//i.test(u)) p.unshift({ msg: "precisa começar com https://" });
-    if (p.length) { await perguntar("Link não aceito", "<p>Este endereço " + esc(p[0].msg) + "</p><p>Use o link de compartilhamento do ambiente autorizado. Um caminho do computador (C:\\…) não abre para mais ninguém.</p>", "Entendi"); return; }
+    var resp = prompt("Endereço (link) que este botão abre: https://… ou o caminho do arquivo (C:\\…, \\\\servidor\\… ou file:///…)", atual || "https://");
+    if (resp === null) return;
+    var lk = Motor.normalizarLink(resp), u = lk.url;
+    if (lk.erro || !u) { await perguntar("Link não aceito", "<p>Este endereço " + esc(lk.erro || "está vazio.") + "</p><p>Use o link de compartilhamento do ambiente autorizado (https://…) ou o caminho do arquivo.</p>", "Entendi"); return; }
     a = virarLink(a);
     var antigo = a.getAttribute("href"), anexo = a.getAttribute("data-anexo");
     var mesmos = Array.prototype.filter.call(ED.doc.querySelectorAll("a"), function (x) { return x === a || (!anexo && antigo && antigo !== "#" && x.getAttribute("href") === antigo); });
     mesmos.forEach(function (x) { x.setAttribute("href", u); x.setAttribute("target", "_blank"); x.removeAttribute("data-anexo"); });
     pilha(function () { mesmos.forEach(function (x) { x.setAttribute("href", antigo); if (anexo) x.setAttribute("data-anexo", anexo); }); });
-    $("#estado").textContent = "Link trocado."; marcarSujo();
+    marcarSujo("Link trocado." + (lk.avisos.length ? " Atenção: " + lk.avisos.join(" ") : ""));
   }
   async function anexarPdf(a, file) {
     if (!/\.pdf$/i.test(file.name)) { await perguntar("Formato", "<p>Escolha um arquivo <b>.pdf</b>.</p>", "Entendi"); return; }
@@ -587,7 +611,7 @@
     var antes = { href: a.getAttribute("href"), anexo: a.getAttribute("data-anexo") };
     a.setAttribute("href", "#"); a.setAttribute("data-anexo", dados); a.setAttribute("title", "Abre o documento (PDF) em nova aba");
     pilha(function () { a.setAttribute("href", antes.href); if (antes.anexo === null) a.removeAttribute("data-anexo"); else a.setAttribute("data-anexo", antes.anexo); });
-    $("#estado").textContent = "PDF anexado: " + file.name + ". No report completo, o link abre o PDF em nova aba; no e-mail, vira texto."; marcarSujo();
+    marcarSujo("PDF anexado: " + file.name + ". No report completo, o link abre o PDF em nova aba; no e-mail, vira texto.");
   }
   function tirarLink(a) {
     var pai = a.parentNode, prox = a.nextSibling, sep = a.previousElementSibling && /·/.test(a.previousElementSibling.textContent) && !a.previousElementSibling.matches("a") ? a.previousElementSibling : null;
@@ -597,13 +621,140 @@
     marcarSujo();
   }
 
-  /* ---------- ocultar item e seção ---------- */
+  /* ---------- itens: adicionar e ocultar, com a grade refeita como o motor faz ---------- */
+  /* Cores da grade (as mesmas de config/marca.txt): 1º número da capa em vermelho; filete e separadores. */
+  var COR = { marca: "#EC0000", texto: "#000000", linha: "#E2E2E2", transf_linha: "#F5DECF" };
+  var GRUPOS = {
+    numero: { max: 4, nome: "indicador" }, resultado: { max: 3, nome: "resultado" }, lancamento: { max: 6, nome: "lançamento" },
+    bem: { max: 4, nome: "\"foi bem\"" }, melhorar: { max: 4, nome: "\"a melhorar\"" }, transformation: { max: 3, nome: "projeto" },
+    aprendizado: { max: 3, nome: "aprendizado" }, agenda: { max: 6, nome: "item na agenda" }
+  };
+  function grupoDe(el) { var m = /^([a-z]+)-\d+$/.exec(el.getAttribute("data-item") || ""); return m && GRUPOS[m[1]] ? m[1] : ""; }
+  function itensDo(g) { var re = new RegExp("^" + g + "-\\d+$"); return Array.prototype.filter.call(ED.doc.querySelectorAll('[data-item^="' + g + '-"]'), function (x) { return re.test(x.getAttribute("data-item")); }); }
+  /* Onde cada grupo mora: a linha (tr), o corpo da tabela (tbody) ou a coluna (td). Guardado ao abrir. */
+  function localizarGrupos() {
+    ED.grupos = {};
+    Object.keys(GRUPOS).forEach(function (g) {
+      var it = itensDo(g); if (!it.length) return;
+      var f = it[0], cont = /^(numero|aprendizado)$/.test(g) ? f.parentNode : /^(bem|melhorar)$/.test(g) ? f.parentNode : g === "transformation" ? f.parentNode : f.parentNode.parentNode;
+      var total = 600;
+      if (g === "resultado") total = it.reduce(function (s2, x) { return s2 + (+x.getAttribute("width") || 0); }, 0) + 24 * (it.length - 1);
+      ED.grupos[g] = { cont: cont, total: total };
+      var div = ED.doc.createElement("div"); div.className = "ed-mais"; div.setAttribute("data-editor", ""); div.setAttribute("contenteditable", "false");
+      div.innerHTML = '<button type="button" data-grupo="' + g + '"></button>';
+      if (/^(bem|melhorar)$/.test(g)) cont.appendChild(div); else { var tab = cont.closest("table"); tab.parentNode.insertBefore(div, tab.nextSibling); }
+    });
+    atualizarMais();
+  }
+  function atualizarMais() {
+    Array.prototype.forEach.call(ED.doc.querySelectorAll(".ed-mais button"), function (b) {
+      var g = b.getAttribute("data-grupo"), n = itensDo(g).length, max = GRUPOS[g].max;
+      b.disabled = n >= max; b.textContent = n >= max ? "Máximo de " + max + " (" + GRUPOS[g].nome + ")" : "+ Adicionar " + GRUPOS[g].nome;
+    });
+  }
+  function celula(attrs) { var x = ED.doc.createElement("td"); Object.keys(attrs).forEach(function (k) { x.setAttribute(k, attrs[k]); }); x.innerHTML = "&nbsp;"; return x; }
+  function espaco(w, extra) { return celula({ "class": "hide-m", width: String(w), style: "width:" + w + "px;font-size:0;line-height:0;" + (extra || "") }); }
+  function separador() { var f = ED.doc.createDocumentFragment(); f.appendChild(espaco(12)); f.appendChild(espaco(11, "border-left:1px solid " + COR.linha + ";")); return f; }
+  function divide(total, n) { var base = Math.floor((total - 24 * (n - 1)) / n), resto = total - 24 * (n - 1) - base * n, r2 = []; for (var i = 0; i < n; i++) r2.push(base + (i < resto ? 1 : 0)); return r2; }
+  function trocaCor(estilo, cor) { return (estilo || "").replace(/(^|;)\s*color:\s*#[0-9a-f]{3,6}/i, "$1color:" + cor); }
+  function trocaFilete(estilo, cor) { return (estilo || "").replace(/border-top:\s*(\d+px)\s+solid\s+#[0-9a-f]{3,6}/i, "border-top:$1 solid " + cor); }
+  /* Chaves em sequência (agenda-1, agenda-2…): o e-mail-resumo e a importação do Copilot seguem a ordem da página. */
+  function renumerar(g) {
+    var re = new RegExp("^" + g + "-\\d+");
+    itensDo(g).forEach(function (it, i) {
+      var nova = g + "-" + (i + 1);
+      it.setAttribute("data-item", nova);
+      [it].concat(Array.prototype.slice.call(it.querySelectorAll("[data-campo],[data-img],[data-bloco]"))).forEach(function (x) {
+        ["data-campo", "data-img", "data-bloco"].forEach(function (at) { var v = x.getAttribute(at); if (v && re.test(v)) x.setAttribute(at, v.replace(re, nova)); });
+      });
+      if (g === "aprendizado") { var num = it.querySelector("p.ft"); if (num && /^\d+$/.test(num.textContent.trim())) num.textContent = String(i + 1); }
+    });
+  }
+  /* A grade de cada grupo, com as mesmas regras do motor (tools/motor.js): larguras, espaços, classes do celular. */
+  function refazer(g) {
+    var G = ED.grupos[g]; if (!G) return;
+    var cont = G.cont, it = itensDo(g), n = it.length;
+    if (g === "numero" || g === "aprendizado" || g === "resultado") {
+      var row = g === "resultado" ? cont.lastElementChild : cont;
+      Array.prototype.slice.call(row.children).forEach(function (c) { if (it.indexOf(c) < 0) c.remove(); });
+      var larg = g === "numero" ? (n <= 3 ? it.map(function () { return 184; }) : divide(600, n)) : divide(G.total, Math.max(n, 1));
+      it.forEach(function (x, i) {
+        if (i) row.insertBefore(g === "numero" ? espaco(24) : separador(), x);
+        x.setAttribute("width", String(larg[i]));
+        if (g === "numero") {
+          x.setAttribute("class", n === 3 ? "third" : "half"); x.setAttribute("style", "width:" + larg[i] + "px;");
+          var c = i === 0 ? COR.marca : COR.texto, fil = x.querySelector("td"), val = x.querySelector('[data-campo$=".valor"]');
+          if (fil) fil.setAttribute("style", trocaFilete(fil.getAttribute("style"), c));
+          if (val) val.setAttribute("style", trocaCor(val.getAttribute("style"), c));
+        } else if (g === "resultado") { x.setAttribute("class", n === 3 ? "third" : "half"); x.setAttribute("style", "width:" + larg[i] + "px;padding:14px 0 0 0;"); }
+        else { x.setAttribute("class", i === n - 1 ? "col" : "col gap"); x.setAttribute("style", "width:" + larg[i] + "px;"); }
+      });
+      if (g === "numero" && n && n < 3) row.appendChild(espaco(600 - n * 184 - (n - 1) * 24));
+      if (g === "resultado") { var cab = cont.firstElementChild.querySelector("td[colspan]"); if (cab) cab.setAttribute("colspan", String(Math.max(1, n * 3 - 2))); }
+    } else if (g === "lancamento" || g === "agenda") {
+      var cabeca = g === "lancamento" ? cont.firstElementChild : null;
+      it.forEach(function (x) { x.remove(); });
+      Array.prototype.slice.call(cont.children).forEach(function (tr) { if (tr !== cabeca) tr.remove(); });
+      var porLinha = g === "agenda" || n > 3 ? 3 : Math.max(n, 1), larguras = g === "lancamento" && n <= 3 ? divide(600, Math.max(n, 1)) : null;
+      for (var k = 0; k < Math.max(n, 1); k += porLinha) {
+        var tr = ED.doc.createElement("tr"), filete = k === 0 ? COR.texto : COR.linha;
+        for (var j = 0; j < porLinha; j++) {
+          var idx = k + j, x = it[idx];
+          if (j) tr.appendChild(g === "agenda" ? espaco(24, "border-top:1px solid " + filete + ";") : espaco(24));
+          if (g === "agenda") {
+            var est = "width:184px;padding:12px 0;border-top:1px solid " + filete + ";";
+            if (x) { x.setAttribute("class", "col"); x.setAttribute("width", "184"); x.setAttribute("valign", "top"); x.setAttribute("style", est); tr.appendChild(x); }
+            else tr.appendChild(celula({ "class": "hide-m", width: "184", valign: "top", style: est }));
+          } else {
+            var w = larguras ? larguras[j] : 184;
+            if (x) { x.setAttribute("class", (idx === n - 1 ? "col" : "col gap") + (idx >= 3 ? " pt0" : "")); x.setAttribute("width", String(w)); x.setAttribute("style", "width:" + w + "px;" + (idx >= 3 ? "padding-top:28px;" : "")); tr.appendChild(x); }
+            else if (n > 3) tr.appendChild(celula({ "class": "hide-m", width: "184", style: "width:184px;" }));
+          }
+        }
+        cont.appendChild(tr);
+      }
+      if (cabeca) { var cc = cabeca.querySelector("td[colspan]"); if (cc) cc.setAttribute("colspan", String(Math.min(Math.max(n, 1), 3) * 2 - 1)); }
+    } else if (g === "transformation") {
+      it.forEach(function (x, i) {
+        var b = x.querySelector("td[data-bloco]"); if (!b) return;
+        b.setAttribute("style", (b.getAttribute("style") || "").replace(/border-bottom:1px solid #[0-9a-f]{3,6};?/i, "") + (i < n - 1 ? "border-bottom:1px solid " + COR.transf_linha + ";" : ""));
+      });
+    }
+  }
+  /* Item novo: o do modelo em branco (textos [entre colchetes], imagem neutra), no fim do grupo ou depois do item escolhido. */
+  function modeloDoItem(g) {
+    if (!window.CORINGA_HTML) return null;
+    if (!ED.coringa) ED.coringa = new DOMParser().parseFromString(window.CORINGA_HTML, "text/html");
+    var el = ED.coringa.querySelector('[data-item="' + g + '-1"]');
+    return el ? ED.doc.importNode(el, true) : null;
+  }
+  function desfazGrupo(G) { var antes = G.cont.innerHTML; return function () { G.cont.innerHTML = antes; atualizarMais(); }; }
+  async function adicionarItem(g, depois) {
+    var G = ED.grupos[g], it = itensDo(g); if (!G) return;
+    if (it.length >= GRUPOS[g].max) { $("#estado").textContent = "Este grupo já tem o máximo de " + GRUPOS[g].max + " (" + GRUPOS[g].nome + ")."; return; }
+    var novo = modeloDoItem(g);
+    if (!novo) { await perguntar("Modelo não encontrado", "<p>O modelo em branco não está junto deste emulador. Use a versão avulsa (kit/emulador-report.html).</p>", "Entendi"); return; }
+    var volta = desfazGrupo(G), ref = depois || it[it.length - 1];
+    if (ref) ref.parentNode.insertBefore(novo, ref.nextSibling);
+    else if (/^(bem|melhorar)$/.test(g)) G.cont.insertBefore(novo, G.cont.querySelector(".ed-mais"));
+    else if (/^(numero|aprendizado|transformation)$/.test(g)) G.cont.appendChild(novo);
+    else (g === "resultado" ? G.cont.lastElementChild : G.cont.appendChild(ED.doc.createElement("tr"))).appendChild(novo);
+    editavel(novo); renumerar(g); refazer(g); atualizarMais();
+    /* "[Item da agenda 1]" do modelo vira "[Item da agenda 3]": o número da posição nova */
+    var pos = (novo.getAttribute("data-item").match(/\d+$/) || [""])[0], tw = ED.doc.createTreeWalker(novo, NodeFilter.SHOW_TEXT), tn;
+    while ((tn = tw.nextNode())) tn.nodeValue = tn.nodeValue.replace(/\[([^\[\]]*?) \d+(\.?)\]/g, "[$1 " + pos + "$2]");
+    pilha(volta);
+    ED.doc.getElementById("ed-barra").hidden = true;
+    novo.scrollIntoView({ block: "center" });
+    marcarSujo("Item adicionado (" + GRUPOS[g].nome + "): troque os textos [entre colchetes]" + (novo.querySelector("img[data-img]") ? " e a imagem" : "") + ". Para tirar: Desfazer ou Ocultar item.");
+  }
   function ocultarItem(item) {
-    var antes = item.innerHTML;
-    if (item.tagName === "TD") { item.innerHTML = "&nbsp;"; item.removeAttribute("data-item"); pilha(function () { item.innerHTML = antes; item.setAttribute("data-item", ""); }); }
+    var g = grupoDe(item), G = g && ED.grupos[g];
+    if (G) { var volta = desfazGrupo(G); item.remove(); renumerar(g); refazer(g); atualizarMais(); pilha(volta); }
+    else if (item.tagName === "TD") { var antes = item.innerHTML; item.innerHTML = "&nbsp;"; item.removeAttribute("data-item"); pilha(function () { item.innerHTML = antes; item.setAttribute("data-item", ""); }); }
     else { var pai = item.parentNode, prox = item.nextSibling; item.remove(); pilha(function () { pai.insertBefore(item, prox); }); }
     ED.doc.getElementById("ed-barra").hidden = true;
-    $("#estado").textContent = "Item ocultado. Para voltar: Desfazer."; marcarSujo();
+    marcarSujo("Item ocultado: a grade se ajustou. Para voltar: Desfazer.");
   }
   var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
   function nosDaSecao(id) {
@@ -694,7 +845,7 @@
     /* Report do mês anterior com período novo: números que ninguém mexeu podem ser do mês passado. */
     var NUM = /\.(valor|detalhe|variacao|anterior|atual)$/, lista = [];
     Array.prototype.forEach.call(ED.doc.querySelectorAll("[data-campo]"), function (el) {
-      var k = el.getAttribute("data-campo"); if (!NUM.test(k) || ED.alterados[k] || el.closest("[data-ed-oculta]")) return;
+      var k = el.getAttribute("data-campo"); if (!NUM.test(k) || el.closest("[data-ed-alterado], [data-ed-oculta]")) return;
       var t = el.textContent.replace(/\s+/g, " ").trim(), r = rotuloNumero(k) + ": " + t; if (t && lista.indexOf(r) < 0) lista.push(r);
     });
     if (!lista.length) return true;
@@ -849,7 +1000,9 @@
     var saiu = limpo.saiu.map(function (s) { return s.item + (s.n > 1 ? " (" + s.n + ")" : ""); });
     etapa("limpar", "ok", saiu.length ? "Saiu dos e-mails:" : "Nada para tirar.", saiu); progresso(26); await respira(); if (parou()) return;
 
-    var link = $("#link").value.trim(), botao = $("#botao").value.trim() || "Acessar report completo", linkOk = /^https:\/\/[^\s]+$/i.test(link), resErro = "";
+    var lk = Motor.normalizarLink($("#link").value), link = lk.url, botao = $("#botao").value.trim() || "Acessar report completo", linkOk = !!link && !lk.erro, resErro = "";
+    if (!$("#link").dataset.auto) $("#linkInfo").textContent = lk.erro ? "" : lk.avisos.length ? "Atenção: " + lk.avisos.join(" ") : link ? "Link conferido." : "";
+    $("#linkInfo").style.color = lk.avisos.length ? "#945400" : "";
     etapa("resumir", "rodando", "Escolhendo os indicadores…"); await respira();
     var marcados = Array.prototype.filter.call(document.querySelectorAll("#indicadores input"), function (c) { return c.checked; }).map(function (c) { return c.value; });
     var res = Motor.emailResumo(html, { link: linkOk ? link : "", botao: botao, indicadores: marcados, assunto: titulo }), itens = [];
@@ -859,9 +1012,11 @@
       res.indicadores.forEach(function (k) { var x = res.candidatos.filter(function (c) { return c.chave === k; })[0]; itens.push(x.valor + " · " + x.titulo + " (" + x.grupo + ")"); });
       if (!res.indicadores.length) itens.push("Nenhum indicador na página: o e-mail sai só com a frase do mês e a chamada.");
       if (res.pendencias.length) { itens.push("Ainda é texto do modelo: " + res.pendencias.slice(0, 3).join(" | ") + (res.pendencias.length > 3 ? " (+" + (res.pendencias.length - 3) + ")" : "")); avisos.push("pendencias"); }
-      if (!link) resErro = "Falta o link do report completo (passo 3).";
-      else if (!linkOk) resErro = "O link precisa começar com https://.";
-      etapa("resumir", resErro || res.pendencias.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + hostDe(link) + " (o único link do e-mail).", itens);
+      if (lk.erro) resErro = "O link do report completo " + lk.erro;
+      else if (!link) resErro = "Falta o link do report completo (passo 3).";
+      if (linkOk && lk.avisos.length) { itens.push("Link: " + lk.avisos.join(" ")); avisos.push("link"); }
+      if (!resErro && !res.temLink) resErro = "O botão ficou sem o link: confira o endereço no passo 3.";
+      etapa("resumir", resErro || res.pendencias.length || lk.avisos.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURI(link.split("/").pop()) : hostDe(link)) + " (o único link do e-mail).", itens);
     }
     var completo = { html: limpo.html };
     progresso(32); await respira(); if (parou()) return;

@@ -665,6 +665,24 @@ teste("importarDados: todos os blocos da biblioteca de prompts (docs/PROMPTS_COP
   assert.deepStrictEqual(faltam, [], "campos sem lugar no modelo em branco");
 });
 
+teste("normalizarLink: https, http (aviso) e caminho do arquivo (C:\\, \\\\servidor, file:///) viram link; o resto é recusado", function () {
+  var n = M.normalizarLink;
+  assert.deepStrictEqual([n("https://empresa.sharepoint.com/x").url, n("https://empresa.sharepoint.com/x").avisos.length], ["https://empresa.sharepoint.com/x", 0]);
+  assert.ok(n("http://intranet/x").url && n("http://intranet/x").avisos.length === 1);
+  assert.strictEqual(n('"C:\\Users\\Fulano Silva\\Downloads\\report-2026-10.html"').url, "file:///C:/Users/Fulano%20Silva/Downloads/report-2026-10.html");
+  assert.strictEqual(n("C:\\Pasta\\Relatório #1.html").url, "file:///C:/Pasta/Relat%C3%B3rio%20%231.html");
+  assert.strictEqual(n("\\\\servidor\\area\\report.html").url, "file://servidor/area/report.html");
+  assert.strictEqual(n("file:///C:/Users/x/report%202026.html").url, "file:///C:/Users/x/report%202026.html");
+  assert.ok(n("C:\\x.html").tipo === "arquivo" && /só onde esse caminho existe/.test(n("C:\\x.html").avisos[0]));
+  ["abc", "javascript:alert(1)", "https://tem espaço.com"].forEach(function (x) { assert.ok(n(x).erro && !n(x).url, x); });
+  assert.deepStrictEqual(n(""), { url: "", tipo: "", avisos: [], erro: "" });
+  /* o botão do e-mail-resumo aceita o link de arquivo; a conferência avisa, sem bloquear */
+  var r = M.emailResumo(montar(COMPLETO).html, { link: "C:\\Users\\Fulano\\report.html" });
+  assert.ok(r.temLink && (r.html.match(/href="file:\/\/\/C:\/Users\/Fulano\/report\.html"/g) || []).length === 2 && !/FALTA O LINK/.test(r.html));
+  var conf = M.conferirHtml(r.html).filter(function (x) { return /arquivo local/.test(x.msg); });
+  assert.ok(conf.length === 1 && conf[0].nivel === "aviso");
+});
+
 teste("PDF anexo no Transformation Hub: vai dentro da página, abre em nova aba; no e-mail vira texto", function () {
   var r = montar(COMPLETO.replace("links: Agente Dois | [INSERIR LINK]", "links: Documento fictício (PDF) | one-brief.pdf"), { existe: function (c) { return c === "assets/icones/one-brief.pdf" || existe(c); } });
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
