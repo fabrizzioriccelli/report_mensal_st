@@ -3,9 +3,9 @@
  * Simula o caso real: a página do mês aberta no Chrome (com a ampliação e o vídeo
  * ativos), editada à mão (texto pelo designMode e um print colado pelo Inspecionar,
  * com o bloco que o próprio conversor oferece) e salva como "Página da Web, completa".
- * Depois converte e confere: e-mail completo, e-mail resumido (com o link da versão
- * interativa, miniatura de vídeo sem ▶), versão interativa (print embutido, botão
- * "Assistir ao vídeo") e o "Acompanhar o arquivo".
+ * Depois converte e confere: e-mail-resumo (diagramação própria, estático, um único
+ * link: o botão do report completo), e-mail completo, versão interativa (print
+ * embutido, botão "Assistir ao vídeo") e o "Acompanhar o arquivo".
  *   Requer Node.js + Playwright:  node tests/conversor.e2e.js [pasta-de-saida]
  */
 "use strict";
@@ -93,8 +93,9 @@ async function esperaFim(c) {
     return l.map(function (x) { return x.dataset.estado.toUpperCase() + " · " + x.querySelector(".et").innerText.replace(/\n/g, " / "); });
   })).join("\n  "));
   confere(await c.$eval("#barra", function (e) { return e.getAttribute("aria-valuenow"); }) === "100", "barra de progresso chegou a 100%");
-  confere(!(await c.$eval("#bEml", function (b) { return b.disabled; })) && await c.$eval("#bEmlRes", function (b) { return b.disabled; }), "sem link: completo liberado, resumido espera o link");
-  confere(/Para o resumido, falta o link/.test(await c.$eval("#banner", function (e) { return e.textContent; })), "status explica que falta o link");
+  confere(!(await c.$eval("#bEml", function (b) { return b.disabled; })) && await c.$eval("#bEmlRes", function (b) { return b.disabled; }), "sem link: completo liberado, e-mail-resumo espera o link");
+  confere(/falta o link do report completo/.test(await c.$eval("#banner", function (e) { return e.textContent; })), "status explica que falta o link");
+  confere(/FALTA O LINK DO REPORT COMPLETO/.test(await c.$eval("#prev", function (e) { return e.srcdoc; })), "prévia do resumo: aviso no lugar do botão enquanto não há link");
   confere(/reduzida para 1200 px/.test(await c.$eval("#et-imagens", function (e) { return e.textContent; })), "print de 1600 px reduzido para 1200 px");
 
   var d = await Promise.all([c.waitForEvent("download"), c.click("#bEml")]);
@@ -130,29 +131,35 @@ async function esperaFim(c) {
   confere(await pi.evaluate(function () { var v = document.querySelector("#amp video"); return document.getElementById("amp").hasAttribute("open") && v.style.display !== "none" && /^data:video/.test(v.getAttribute("src")); }), "versão interativa: \"Assistir ao vídeo\" abre o vídeo");
   await pi.close();
 
-  /* 5. Com o link: sai o resumido. */
+  /* 5. Com o link: sai o e-mail-resumo (porta de entrada, diagramação própria, um único link). */
   var LINK = "https://empresa.sharepoint.com/sites/creative/report.html";
   await c.fill("#link", LINK);
   await c.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
   console.log("STATUS COM LINK: " + await c.$eval("#banner", function (e) { return e.textContent; }));
-  confere((await c.$$eval("#secoes input:checked", function (l) { return l.map(function (x) { return x.value; }); })).join(",") === "capa,resumo,foco,rodape", "seções do resumido marcadas por padrão");
-  confere(/1 miniatura\(s\) de vídeo sem ▶/.test(await c.$eval("#et-resumir", function (e) { return e.textContent; })), "status: miniatura de vídeo sem ▶ no resumido");
+  confere((await c.$$eval("#secoes input:checked", function (l) { return l.map(function (x) { return x.value; }); })).join(",") === "visao,resultados,campanhas,aprendizados,andamento,proximos", "os 6 blocos do resumo marcados por padrão");
+  confere(/Ainda não preenchido/.test(await c.$eval("#et-resumir", function (e) { return e.textContent; })), "status: avisa o que ainda é modelo (Lorem, X)");
   d = await Promise.all([c.waitForEvent("download"), c.click("#bEmlRes")]);
   var arqRes = path.join(SAIDA, d[0].suggestedFilename());
   await d[0].saveAs(arqRes);
   var emlRes = fs.readFileSync(arqRes, "latin1"), htmlRes = htmlDoEml(emlRes);
-  console.log("EML RESUMIDO: " + d[0].suggestedFilename() + " (" + Math.round(emlRes.length / 1024) + " KB)");
-  confere(htmlRes.indexOf('href="' + LINK + '"') > 0 && /Ver o report completo \(interativo\)/.test(htmlRes), "resumido: botão com o link da versão interativa");
-  confere(!/secao:(lancamos|cx|transformation|aprendizados|agenda)-->/.test(htmlRes) && /secao:foco-->/.test(htmlRes), "resumido: só as seções escolhidas");
-  confere(htmlRes.indexOf("TEXTO EDITADO NO CHROME") >= 0, "resumido: a edição do navegador continua");
-  confere(/alt="vídeo de teste"/.test(htmlRes) && !/alt="Vídeo:/.test(htmlRes) && !/<a\b[^>]*>\s*<img\b[^>]*alt="vídeo de teste"/.test(htmlRes), "resumido: miniatura do vídeo sem \"Vídeo:\" e sem link");
-  /* A miniatura do vídeo no resumido é a versão sem ▶ (data-thumb), idêntica byte a byte. */
-  var cidThumb = /<img\b[^>]*src="cid:([^"]+)"[^>]*alt="vídeo de teste"|<img\b[^>]*alt="vídeo de teste"[^>]*src="cid:([^"]+)"/.exec(htmlRes);
-  var idT = cidThumb && (cidThumb[1] || cidThumb[2]);
-  var parteT = idT && new RegExp("Content-ID: <" + idT.replace(/[.@]/g, "\\$&") + ">\\r\\nContent-Disposition: inline;\\r\\n filename=\"[^\"]+\"\\r\\n\\r\\n([\\s\\S]*?)\\r\\n--").exec(emlRes);
-  confere(parteT && parteT[1].replace(/\r\n/g, "") === srcs[2].split(",")[1], "resumido: a miniatura é a versão sem ▶");
-  confere(emlRes.length < eml.length, "resumido menor que o completo (" + Math.round(emlRes.length / 1024) + " KB vs " + Math.round(eml.length / 1024) + " KB)");
-  confere(Motor.conferirHtml(htmlRes).filter(function (x) { return x.nivel === "erro"; }).length === 0, "resumido: conferência do Outlook sem erros");
+  console.log("EML RESUMO: " + d[0].suggestedFilename() + " (" + Math.round(emlRes.length / 1024) + " KB)");
+  confere(/-resumo\.eml$/.test(d[0].suggestedFilename()), "arquivo -resumo.eml");
+  var hrefs = htmlRes.match(/href="[^"]*"/g) || [];
+  confere(hrefs.length === 2 && hrefs.every(function (h) { return h === 'href="' + LINK + '"'; }) && /Ver report completo/.test(htmlRes), "resumo: um único destino, o botão do report completo (VML do Outlook + link)");
+  confere(/<v:roundrect\b/.test(htmlRes), "resumo: botão arredondado também no Outlook para Windows (VML)");
+  ["VISÃO GERAL", "RESULTADOS E EVOLUÇÃO", "CAMPANHAS EM DESTAQUE", "APRENDIZADOS", "EM ANDAMENTO", "PRÓXIMOS PASSOS", "REPORT COMPLETO"].forEach(function (t) { confere(htmlRes.indexOf(t) >= 0, "resumo: bloco " + t); });
+  confere(htmlRes.indexOf("TEXTO EDITADO NO CHROME") >= 0, "resumo: a edição feita no navegador entrou");
+  confere(!/secao:|data-campo|data-tom|data-(ampliar|video|thumb)=|<script|vidpill|&#9654;|▶/.test(htmlRes), "resumo: estático (sem marcas, script, vídeo nem ▶)");
+  confere(!/Tela do agente de teste/.test(htmlRes) && !/<img\b[^>]*data-ampliar/.test(htmlRes), "resumo: os prints ficam só no report completo");
+  confere(emlRes.length < eml.length, "resumo menor que o completo (" + Math.round(emlRes.length / 1024) + " KB vs " + Math.round(eml.length / 1024) + " KB)");
+  confere(Motor.conferirHtml(htmlRes).filter(function (x) { return x.nivel === "erro"; }).length === 0, "resumo: conferência do Outlook sem erros");
+  /* Desmarcar um bloco: some do resumo. */
+  await c.uncheck('#secoes input[value="aprendizados"]');
+  await c.waitForFunction(function () { return !/APRENDIZADOS/.test(document.querySelector("#prev").srcdoc) && /banner (ok|warn)/.test(document.querySelector("#banner").className); }, null, { timeout: 30000 });
+  confere(true, "bloco desmarcado sai do resumo (Aprendizados)");
+  await c.check('#secoes input[value="aprendizados"]');
+  await c.waitForFunction(function () { return /APRENDIZADOS/.test(document.querySelector("#prev").srcdoc) && !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
+  await c.setViewportSize({ width: 1200, height: 900 });
   await c.screenshot({ path: path.join(SAIDA, "conversor.png"), fullPage: true });
 
   /* 6. Acompanhar o arquivo: escolhe pelo seletor moderno e "salva" de novo. */

@@ -101,13 +101,13 @@
   <section aria-labelledby="s4" id="secGerar" hidden>
     <h2 id="s4"><b>4</b>Gere os arquivos</h2>
     <div class="row">
-      <button type="button" class="pri" id="bEml">Baixar e-mail final (.eml)</button>
-      <button type="button" id="bHtml">Baixar página do mês (.html)</button>
+      <button type="button" class="pri" id="bHtml">Baixar página do mês (.html)</button>
+      <button type="button" id="bEml">Baixar e-mail completo (.eml)</button>
       <button type="button" id="bZip" hidden>Baixar imagens otimizadas (.zip)</button>
     </div>
     <p class="draft" id="draftRow" hidden><input type="checkbox" id="rascunho"><label for="rascunho">Ainda há pendências. Gerar um <b>RASCUNHO</b> só para teste (o assunto começa com [RASCUNHO]).</label></p>
     <p id="gerarInfo" class="muted" style="margin-top:10px"></p>
-    <p class="muted" style="margin-top:6px">Editou a página do mês direto no navegador? Converta o .html salvo em .eml pela página <a href="converter-html-eml.html">converter-html-eml.html</a>.</p>
+    <p class="muted" style="margin-top:6px"><b>Próximo passo:</b> guarde a página do mês em <code>reports/</code>, confira no Chrome e abra <a href="converter-html-eml.html">converter-html-eml.html</a> para gerar o <b>e-mail-resumo</b> (o e-mail que a área recebe) e a <b>versão interativa</b> para o SharePoint. O e-mail completo é opcional.</p>
     <details style="margin-top:12px">
       <summary>Depois de baixar: como abrir e enviar</summary>
       <ol class="muted">
@@ -298,7 +298,7 @@
     $("#draftRow").hidden = !temPend;
     $("#rascunho").checked = false;
     $("#bEml").disabled = temPend;
-    $("#bEml").textContent = "Baixar e-mail final (.eml)";
+    $("#bEml").textContent = "Baixar e-mail completo (.eml)";
     $("#bZip").hidden = r.config.modo !== "hospedadas";
     $("#gerarInfo").textContent = "";
 
@@ -313,7 +313,7 @@
   }
   $("#rascunho").addEventListener("change", function () {
     $("#bEml").disabled = !this.checked;
-    $("#bEml").textContent = this.checked ? "Baixar RASCUNHO para teste (.eml)" : "Baixar e-mail final (.eml)";
+    $("#bEml").textContent = this.checked ? "Baixar RASCUNHO para teste (.eml)" : "Baixar e-mail completo (.eml)";
   });
 
   /* ---------- imagens: reduzir, recortar, desenhar o play ---------- */
@@ -430,7 +430,7 @@
       .then(function (dados) { baixarPagina(Motor.trocarVideos(html, function (id) { return dados[id - 1]; })); });
   });
   function baixarPagina(html) {
-    html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html (versão " + Motor.VERSAO + ") a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Não edite: edite o arquivo de dados e gere de novo. -->");
+    html = html.replace("<head>", "<head>\n<!-- Arquivo gerado por gerar-report.html (versão " + Motor.VERSAO + ") a partir de " + $("#mes").value + " em " + new Date().toLocaleString("pt-BR") + ". Para mudar o conteúdo, edite o arquivo de dados e gere de novo. Para achar um texto aqui, procure EDITAR AQUI. Próximo passo: converter-html-eml.html (e-mail-resumo e versão interativa). -->");
     var nome = atual.nomeArquivo.replace(/^report-/, "") + ".html";
     baixar(nome, html, "text/html");
     $("#gerarInfo").textContent = "Baixado: " + nome + ". Guarde na pasta reports/ do projeto." + ((atual.videos || []).length ? " Os vídeos tocam ao clicar na peça (só nesta página; no e-mail, a peça abre o link)." : "");

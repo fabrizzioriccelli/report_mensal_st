@@ -11,7 +11,8 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 - [ ] Nenhum conteúdo de exemplo restante: Lorem Ipsum, `X`, "Mês", "AAAA"
 - [ ] Métricas atualizadas e conferidas com a fonte (painel ou planilha)
 - [ ] Creative X atualizado (anterior, atual, período)
-- [ ] Transformation Hub atualizado (status, resultado, prints)
+- [ ] Transformation Hub atualizado (status/previsão, logo, links, prints), conferido com a área
+- [ ] `link_report_completo` preenchido (link do SharePoint, não caminho do computador) ou link em mãos
 - [ ] Aprendizados e foco do próximo mês escritos
 - [ ] Agenda atualizada
 
@@ -26,17 +27,32 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 - [ ] Nenhum placeholder restante (`[...]`, Lorem Ipsum, `X`)
 - [ ] Prévia no **Celular**: a peça do destaque aparece (na horizontal) e nada sai da tela
 
+**No Chrome (página do mês)**
+
+- [ ] Página do mês salva em `reports/` e aberta no Chrome
+- [ ] Movimento: seções aparecem, números contam até o valor certo, barra do Creative X cresce
+- [ ] Vídeo toca no clique; peças abrem maiores; Esc fecha
+- [ ] Celular (F12 → Ctrl+Shift+M): nada sai da tela
+
+**No conversor (`converter-html-eml.html`)**
+
+- [ ] Versão interativa baixada e enviada ao SharePoint; link copiado e colado
+- [ ] Status sem ✕; "Ainda não preenchido" não aparece
+- [ ] Prévia do **e-mail-resumo** conferida em Computador e Celular: período, números, campanhas, aprendizados, Transformation Hub, próximos passos
+- [ ] Um único botão ("Ver report completo") no fim; nenhuma imagem com ▶
+
 **Envio de teste (só para você)**
 
-- [ ] `.eml` final gerado (o nome **não** tem "RASCUNHO")
+- [ ] `-resumo.eml` baixado (e o completo, só se for usar)
 - [ ] Outlook Desktop revisado: layout, imagens e links
 - [ ] Outlook Web revisado (se a área usa)
 - [ ] Celular revisado: tudo legível, sem rolar para o lado, botões funcionam
 - [ ] Assunto e pré-visualização corretos na caixa de entrada
+- [ ] O botão "Ver report completo" abre o report (no computador e no celular); uma pessoa de outra equipe também conseguiu abrir
 
 **Envio para a área**
 
-- [ ] `.eml` final aberto de novo, destinatários preenchidos, enviado
+- [ ] `-resumo.eml` aberto de novo, destinatários autorizados preenchidos, enviado pelo Outlook corporativo
 - [ ] `.html` do mês guardado em `reports/`
 
 ## Permissões (quando houver peça ou vídeo novo)
@@ -57,7 +73,9 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 
 | Verificação | Status |
 |---|---|
-| Motor: 31 testes automáticos (inclui estado vazio e paleta do Brand Guide) | Passam |
+| Motor: 62 testes automáticos (inclui estado vazio, paleta do Brand Guide, e-mail-resumo e regras de seleção) | Passam |
+| Conversor de ponta a ponta (e-mail-resumo com um único destino, versão interativa, e-mail completo, acompanhar o arquivo) | Passa |
+| Movimento na versão interativa (contagem, barra, reduzir movimento, edição) | Passa |
 | Página de geração de ponta a ponta no Chromium, sem vazar para o lado de 320 a 1440 px | Passa |
 | Fonte `.otf` de teste em `assets/fonts/` | Carrega na prévia e no `.html`; fora do `.eml` |
 | E-mail gerado com o layout aprovado e os ajustes do Brand Guide | Conferido |

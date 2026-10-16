@@ -52,6 +52,10 @@ ano: AAAA
 proximo_mes: Próximo mês
 pasta_imagens: assets/AAAA-MM
 contato: lorem.ipsum@empresa.com
+# link_report_completo: link de compartilhamento da versão interativa no
+# SharePoint (destino do botão "Ver report completo" do e-mail-resumo).
+# Vazio = o conversor pede na hora. Nunca um caminho do computador (C:\…).
+link_report_completo:
 
 
 # ----------------------------------------------------------------------
@@ -246,6 +250,12 @@ texto: Lorem ipsum dolor sit amet.
 #          um embaixo do outro). Na página do mês, abrem maiores no clique.
 #  descricao_prints: o que cada print mostra, separados por "|", na
 #          mesma ordem (ex.: Tela do agente | Resultado do teste).
+#  logo:   (opcional) o PNG original do logo do projeto (ex.: logo do
+#          agente), na pasta do mês. Aparece com 56 px, no lugar dos
+#          ícones. descricao_logo: o que o logo é (texto alternativo).
+#  links:  (opcional) links extras, "Texto | endereço", vários separados
+#          por ";" (ex.: Documento One Brief | https://… ; Briefing Agent | https://…).
+#  status: use para a previsão (ex.: Previsão de lançamento: nov/26).
 # ----------------------------------------------------------------------
 [TRANSFORMATION]
 titulo: Como estamos transformando<br>a forma de criar.
@@ -258,6 +268,9 @@ texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 citacao:
 resultado: Lorem ipsum: X%
 icones: icone-prancheta, icone-lupa
+logo:
+descricao_logo:
+links: Lorem ipsum | [INSERIR LINK]
 imagem:
 descricao_imagem:
 prints: [INSERIR PRINT]

@@ -9,6 +9,8 @@
 <meta name="color-scheme" content="light only">
 <meta name="supported-color-schemes" content="light only">
 <title>{{assunto}}</title>
+{{#link_report_completo}}<meta name="report-completo" content="{{link_report_completo}}">
+{{/link_report_completo}}
 <!--
   ======================================================================
   TEMPLATE DO REPORT · CÓDIGO TÉCNICO
@@ -25,6 +27,14 @@
   diz o bloco e o campo de dados/AAAA-MM.txt que preenche aquele trecho.
   O texto é trocado LÁ, não aqui: assim o layout nunca quebra e o mês
   seguinte começa de uma cópia do arquivo de dados.
+  Os comentários "EDITAR AQUI" também vão para a página gerada (.html),
+  para quem precisar achar um texto direto nela; os e-mails não os levam.
+
+  CAMPOS DO RESUMO (atributos data-campo e data-tom): marcam cada texto e
+  número que o converter-html-eml.html usa para montar o e-mail-resumo
+  (período, frase, números, campanhas, aprendizados, Transformation Hub,
+  foco e agenda). Ficam só na página; os e-mails não os levam.
+  NÃO APAGUE esses atributos: sem eles, o item some do e-mail-resumo.
   NÃO ALTERAR A ESTRUTURA (tabelas, larguras, classes) sem testar no
   computador e no celular (docs/ARQUITETURA.md).
 
@@ -44,6 +54,8 @@
       é por ela que o Outlook para Windows recebe a fonte de
       config/marca.txt (bloco [if mso] abaixo);
     · toda imagem tem width, height e alt; nenhum recurso externo.
+  Link do report completo: {{link_report_completo}} vira a meta
+  "report-completo" (dados › [EDICAO] link_report_completo).
 
   GRADE (computador): área de conteúdo de 600 px (margens de 40 px),
   3 colunas de 184 px separadas por espaços de 24 px:
@@ -140,7 +152,7 @@
               <tr>
                 {{#logo}}
                 <td valign="middle" style="padding-right:14px;">
-                  {{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#FFFFFF;">{{/img}}{{placeholder}}
+                  {{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="logo" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#FFFFFF;">{{/img}}{{placeholder}}
                 </td>
                 {{/logo}}
                 <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid {{cor.capa_filete}};{{/logo}}">
@@ -151,12 +163,12 @@
               </tr>
             </table>
           </td>
-          <!-- EDITAR AQUI → dados/AAAA-MM.txt › [EDICAO] mes, ano (selo do mês) -->
+          <!-- EDITAR AQUI: PERÍODO → dados/AAAA-MM.txt › [EDICAO] mes, ano (selo do mês) -->
           <td class="hide-m" valign="middle" align="right">
             <table role="presentation" class="selo" align="right" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td bgcolor="{{cor.capa_selo}}" style="background:{{cor.capa_selo}};border-radius:999px;padding:6px 12px;">
-                  <p class="fx wrap-m" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:12px;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;white-space:nowrap;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;{{edicao}}</p>
+                  <p class="fx wrap-m" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:12px;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;white-space:nowrap;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
                 </td>
               </tr>
             </table>
@@ -168,19 +180,19 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td class="col gap" width="356" valign="middle" style="width:356px;">
-                  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [ABERTURA] frase, frase_final · [PROJETO PRINCIPAL] nome, resumo, link -->
+                  <!-- EDITAR AQUI: FRASE DO MÊS E PROJETO PRINCIPAL → dados/AAAA-MM.txt › [ABERTURA] frase, frase_final · [PROJETO PRINCIPAL] nome, resumo, link -->
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O MÊS EM UMA FRASE</p>
-                  <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:36px;line-height:40px;color:#FFFFFF;letter-spacing:-1px;">{{frase}}{{#frase_final}}<br><span style="font-weight:normal;color:{{cor.capa_destaque}};">{{frase_final}}</span>{{/frase_final}}</p>
+                  <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:36px;line-height:40px;color:#FFFFFF;letter-spacing:-1px;" data-campo="frase">{{frase}}{{#frase_final}}<br><span data-campo="frase_final" style="font-weight:normal;color:{{cor.capa_destaque}};">{{frase_final}}</span>{{/frase_final}}</p>
                   <p class="fx" style="margin:18px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;">PROJETO PRINCIPAL</p>
-                  <p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:15px;line-height:20px;font-weight:bold;color:#FFFFFF;">{{nome}}</p>
-                  {{#resumo_cta}}<p class="fx tm" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">{{resumo_cta}}</p>{{/resumo_cta}}
+                  <p class="fx" data-campo="principal.nome" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:15px;line-height:20px;font-weight:bold;color:#FFFFFF;">{{nome}}</p>
+                  {{#resumo_cta}}<p class="fx tm" data-campo="principal.resumo" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">{{resumo_cta}}</p>{{/resumo_cta}}
                 </td>
 <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-                <!-- SUBSTITUIR IMAGEM AQUI → dados/AAAA-MM.txt › [PROJETO PRINCIPAL] imagem, descricao_imagem
+                <!-- EDITAR AQUI: IMAGEM DO PROJETO PRINCIPAL → dados/AAAA-MM.txt › [PROJETO PRINCIPAL] imagem, descricao_imagem (vídeo: tipo video + video)
                      Foto da capa: 220 x 220 px (20% maior que a coluna de 184 px), quadrada, cantos de 20 px.
                      No celular: 216 px, centralizada (classe himg). -->
                 <td class="col" width="220" valign="middle" align="center" style="width:220px;">
-                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-campo="principal.imagem" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
                 </td>
               </tr>
             </table>
@@ -195,7 +207,7 @@
     <td class="px rb" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:0 0 34px 34px;padding:24px 40px 28px 40px;">
       <!-- Faixa dos números do projeto principal, na grade de 3 colunas (184 + 24 + 184 + 24 + 184):
            cada número tem o seu filete no topo, como a agenda. A foto da capa (220 px) é 36 px mais larga que a coluna 3. -->
-      <!-- EDITAR AQUI: INDICADORES → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 3] (até 4) valor, titulo, detalhe, variacao -->
+      <!-- EDITAR AQUI: RESULTADO PRINCIPAL (INDICADORES) → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 3] (até 4) valor, titulo, detalhe, variacao -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           {{#numeros}}
@@ -203,9 +215,9 @@
           <td class="{{classe_m}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr><td style="border-top:2px solid {{cor_filete}};padding-top:12px;">
-                <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>
-                <p class="fx ts" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><b style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br>{{detalhe}}{{/detalhe}}</p>
-                {{#variacao}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
+                <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;" data-campo="numero-{{idx}}.valor">{{valor}}</p>
+                <p class="fx ts" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><b data-campo="numero-{{idx}}.titulo" style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br><span data-campo="numero-{{idx}}.detalhe">{{detalhe}}</span>{{/detalhe}}</p>
+                {{#variacao}}<p class="fx" data-campo="numero-{{idx}}.variacao" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
               </td></tr>
             </table>
           </td>
@@ -220,7 +232,7 @@
   {{#lancamos}}
   <!--secao:lancamos-->
   <!-- 02 · O QUE LANÇAMOS · 1 projeto em destaque + compactos -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [LANCAMOS] titulo · [DESTAQUE] · [RESULTADO 1..3] · [LANCAMENTO 1..3] -->
+  <!-- EDITAR AQUI: CAMPANHAS → dados/AAAA-MM.txt › [LANCAMOS] titulo · [DESTAQUE] · [RESULTADO 1..3] · [LANCAMENTO 1..6] (imagem da campanha: campo imagem) -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O QUE LANÇAMOS</p>
@@ -248,9 +260,9 @@
               {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
               <div style="font-size:16px;line-height:16px;">&nbsp;</div>
             </div>{{/img_m}}{{#placeholder_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{placeholder_m}}<div style="font-size:16px;line-height:16px;">&nbsp;</div></div>{{/placeholder_m}}{{/peca}}
-            {{#categoria}}<p class="fx" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
-            <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:21px;line-height:26px;color:{{cor.titulo}};">{{titulo}}</p>
-            {{#texto_cta}}<p class="fx tm" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
+            {{#categoria}}<p class="fx" data-campo="destaque.categoria" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
+            <p class="ft" data-campo="destaque.titulo" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:21px;line-height:26px;color:{{cor.titulo}};">{{titulo}}</p>
+            {{#texto_cta}}<p class="fx tm" data-campo="destaque.texto" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
             {{#tem_resultados}}
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr><td colspan="{{colunas}}" height="16" style="height:16px;font-size:0;line-height:0;border-bottom:1px solid {{cor.linha}};">&nbsp;</td></tr>
@@ -258,15 +270,15 @@
                 {{#resultados}}
                 {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
                 <td class="{{classe_m}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
-                  <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.texto}};">{{valor}}</p>
-                  <p class="fx ts" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_corpo}};"><b style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br>{{detalhe}}{{/detalhe}}</p>
-                  {{#variacao}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
+                  <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.texto}};" data-campo="resultado-{{idx}}.valor">{{valor}}</p>
+                  <p class="fx ts" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_corpo}};"><b data-campo="resultado-{{idx}}.titulo" style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br><span data-campo="resultado-{{idx}}.detalhe">{{detalhe}}</span>{{/detalhe}}</p>
+                  {{#variacao}}<p class="fx" data-campo="resultado-{{idx}}.variacao" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
                 </td>
                 {{/resultados}}
               </tr>
             </table>
             {{/tem_resultados}}
-            {{#nota}}<p class="fx" style="margin:12px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;color:{{cor.texto_apoio}};">{{nota}}</p>{{/nota}}
+            {{#nota}}<p class="fx" data-campo="destaque.nota" style="margin:12px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;color:{{cor.texto_apoio}};">{{nota}}</p>{{/nota}}
           </td>
         </tr>
       </table>
@@ -292,9 +304,9 @@
           {{^vazio}}
           <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{estilo}}">
             {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
-            {{#status}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
-            <p class="ft" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
-            {{#texto_cta}}<p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
+            {{#status}}<p class="fx" data-campo="lancamento-{{idx}}.status" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
+            <p class="ft" data-campo="lancamento-{{idx}}.nome" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
+            {{#texto_cta}}<p class="fx tm" data-campo="lancamento-{{idx}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
           </td>
           {{/vazio}}
           {{/itens}}
@@ -309,7 +321,7 @@
   {{#cx}}
   <!--secao:cx-->
   <!-- 03 · CREATIVE X · anterior → atual, variação, barra e uma frase -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [CREATIVE X] anterior, atual, variacao, periodo, referencia, significado -->
+  <!-- EDITAR AQUI: CREATIVE X → dados/AAAA-MM.txt › [CREATIVE X] anterior, atual, variacao, periodo, referencia, significado -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -319,12 +331,12 @@
               <tr>
                 <td class="col gap" width="184" valign="middle" style="width:184px;">
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_evolucao}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;CREATIVE X</p>
-                  {{#subtitulo}}<p class="fx ts" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{subtitulo}}</p>{{/subtitulo}}
-                  <p class="ft wrap-m" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:58px;color:{{cor.creative_x_anterior}};white-space:nowrap;">{{#anterior}}{{anterior}} <span style="color:{{cor.marca}};">&#8594;</span> {{/anterior}}<span style="font-size:54px;color:{{cor.marca}};letter-spacing:-2px;">{{atual}}</span></p>
+                  {{#subtitulo}}<p class="fx ts" data-campo="cx.subtitulo" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{subtitulo}}</p>{{/subtitulo}}
+                  <p class="ft wrap-m" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:58px;color:{{cor.creative_x_anterior}};white-space:nowrap;">{{#anterior}}<span data-campo="cx.anterior">{{anterior}}</span> <span style="color:{{cor.marca}};">&#8594;</span> {{/anterior}}<span data-campo="cx.atual" style="font-size:54px;color:{{cor.marca}};letter-spacing:-2px;">{{atual}}</span></p>
                 </td>
                 <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
                 <td class="col" width="392" valign="middle" style="width:392px;">
-                  <p class="fx tm" style="margin:0;font-family:{{fonte.texto}};font-size:12px;line-height:26px;color:{{cor.texto_corpo}};">{{#variacao_pendente}}{{variacao}}{{/variacao_pendente}}{{^variacao_pendente}}<span class="ft" style="display:inline-block;background:{{variacao_fundo}};color:{{variacao_cor}};font-family:{{fonte.titulos}};font-size:18px;line-height:26px;font-weight:bold;padding:0 10px;border-radius:999px;white-space:nowrap;">{{variacao}}</span>{{/variacao_pendente}}{{#periodo}}&nbsp; {{periodo}}{{/periodo}}</p>
+                  <p class="fx tm" style="margin:0;font-family:{{fonte.texto}};font-size:12px;line-height:26px;color:{{cor.texto_corpo}};">{{#variacao_pendente}}{{variacao}}{{/variacao_pendente}}{{^variacao_pendente}}<span class="ft" data-campo="cx.variacao" data-tom="{{variacao_tom}}" style="display:inline-block;background:{{variacao_fundo}};color:{{variacao_cor}};font-family:{{fonte.titulos}};font-size:18px;line-height:26px;font-weight:bold;padding:0 10px;border-radius:999px;white-space:nowrap;">{{variacao}}</span>{{/variacao_pendente}}{{#periodo}}&nbsp; <span data-campo="cx.periodo">{{periodo}}</span>{{/periodo}}</p>
                   <div style="font-size:12px;line-height:12px;mso-line-height-rule:exactly;">&nbsp;</div>
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
@@ -335,8 +347,8 @@
                       {{^tem_barra}}<td width="100%" height="8" bgcolor="{{cor.linha}}" style="height:8px;background:{{cor.linha}};font-size:0;line-height:0;border-radius:4px;">&nbsp;</td>{{/tem_barra}}
                     </tr>
                   </table>
-                  {{#referencia}}<p class="fx ts" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};">{{referencia}}</p>{{/referencia}}
-                  {{#significado}}<p class="fx tm" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto}};">{{significado}}</p>{{/significado}}
+                  {{#referencia}}<p class="fx ts" data-campo="cx.referencia" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};">{{referencia}}</p>{{/referencia}}
+                  {{#significado}}<p class="fx tm" data-campo="cx.significado" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto}};">{{significado}}</p>{{/significado}}
                 </td>
               </tr>
             </table>
@@ -351,7 +363,7 @@
   <!--secao:resumo-->
   <!-- RESUMO DAS CAMPANHAS · o que foi bem (verde do guia) e o que precisa melhorar (âmbar), na grade: 288 + 24 + 288.
        Cada coluna tem o filete no topo, como os números e a agenda. No celular, uma embaixo da outra. -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOI BEM 1..3] e [A MELHORAR 1..3] texto -->
+  <!-- EDITAR AQUI: RESUMO DAS CAMPANHAS → dados/AAAA-MM.txt › [FOI BEM 1..4] e [A MELHORAR 1..4] texto -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <p class="fx" style="margin:0 0 14px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;">RESUMO DAS CAMPANHAS</p>
@@ -360,14 +372,14 @@
           {{#bem}}
           <td class="col{{#dois}} gap{{/dois}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.positivo}};padding-top:12px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.positivo_fundo}};color:{{cor.positivo}};border-radius:999px;padding:0 8px;">&#9650; FOI BEM</span></p>
-            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}
+            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="bem-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
           </td>
           {{/bem}}
           {{#dois}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/dois}}
           {{#melhorar}}
           <td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.atencao}};padding-top:12px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.atencao_fundo}};color:{{cor.atencao}};border-radius:999px;padding:0 8px;">&#9660; A MELHORAR</span></p>
-            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}
+            {{#itens}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="melhorar-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
           </td>
           {{/melhorar}}
         </tr>
@@ -379,7 +391,7 @@
   {{#transformation}}
   <!--secao:transformation-->
   <!-- 04 · TRANSFORMATION HUB · superfície Lisboa com cartão branco -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] (prints: até 3 por projeto) -->
+  <!-- EDITAR AQUI: TRANSFORMATION HUB → dados/AAAA-MM.txt › [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] nome, texto, status, logo, links (prints: até 3 por projeto) -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.transformation_fundo}}" class="ra" style="background:{{cor.transformation_fundo}};border-radius:34px;">
@@ -389,7 +401,7 @@
               <tr>
                 <td valign="bottom" style="padding-bottom:18px;">
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_evolucao}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;TRANSFORMATION HUB</p>
-                  {{#titulo}}<p class="ft h2" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:29px;color:{{cor.transformation_titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
+                  {{#titulo}}<p class="ft h2" data-campo="transformation.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:29px;color:{{cor.transformation_titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
                 </td>
               </tr>
             </table>
@@ -405,14 +417,16 @@
                     <tr>
                       {{#tem_visual}}
                       <td width="70" valign="top" style="width:70px;padding-right:14px;">
+                        {{#logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/logo}}{{#logo_placeholder}}<table role="presentation" width="56" cellpadding="0" cellspacing="0" border="0" style="width:56px;"><tr><td height="56" align="center" valign="middle" bgcolor="{{cor.transformation_placeholder_fundo}}" style="height:56px;background:{{cor.transformation_placeholder_fundo}};border:2px dashed {{cor.transformation_placeholder_borda}};border-radius:28px;"><p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:8px;line-height:11px;font-weight:bold;color:{{cor.transformation}};letter-spacing:1px;">LOGO</p></td></tr></table>{{/logo_placeholder}}
                         {{#icones}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}" style="display:inline-block;border:0;width:{{w}}px;height:auto;{{margem}}">{{/icones}}
                         {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:8px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{#placeholder}}<table role="presentation" width="68" cellpadding="0" cellspacing="0" border="0" style="width:68px;"><tr><td height="52" align="center" valign="middle" bgcolor="{{cor.transformation_placeholder_fundo}}" style="height:52px;background:{{cor.transformation_placeholder_fundo}};border:2px dashed {{cor.transformation_placeholder_borda}};border-radius:8px;"><p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:8px;line-height:11px;font-weight:bold;color:{{cor.transformation}};letter-spacing:1px;">IMAGEM</p></td></tr></table>{{/placeholder}}{{/peca}}
                       </td>
                       {{/tem_visual}}
                       <td valign="top">
-                        {{#status}}<p class="fx" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
-                        <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:17px;line-height:22px;color:{{cor.transformation_titulo}};">{{nome}}</p>
-                        {{#texto_cta}}<p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
+                        {{#status}}<p class="fx" data-campo="transformation-{{numero}}.status" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
+                        <p class="ft" data-campo="transformation-{{numero}}.nome" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:17px;line-height:22px;color:{{cor.transformation_titulo}};">{{nome}}</p>
+                        {{#texto_cta}}<p class="fx tm" data-campo="transformation-{{numero}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
+                        {{#links}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;">{{links}}</p>{{/links}}
                         {{#citacao}}<p class="fx tm" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.transformation}};">&#8220;{{citacao}}&#8221;</p>{{/citacao}}
                         {{#resultado}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};"><b style="color:{{cor.texto}};">Resultado:</b> {{resultado}}</p>{{/resultado}}
                       </td>
@@ -445,7 +459,7 @@
   {{#aprendizados}}
   <!--secao:aprendizados-->
   <!-- 05 · O QUE APRENDEMOS · até 3 colunas, sem caixas -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [APRENDIZADO 1..3] titulo, texto, levamos -->
+  <!-- EDITAR AQUI: APRENDIZADO → dados/AAAA-MM.txt › [APRENDIZADO 1..3] titulo, texto, levamos -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_aprendizado_fundo}};color:{{cor.grupo_aprendizado}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O QUE APRENDEMOS</p>
@@ -456,9 +470,9 @@
           {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
           <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
             <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:36px;line-height:38px;color:{{cor.grupo_aprendizado}};">{{numero}}</p>
-            <p class="ft" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{titulo}}</p>
-            {{#texto}}<p class="fx tm" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
-            {{#levamos}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto}};"><b style="color:{{cor.grupo_aprendizado}};">&#8594; Levamos:</b> {{levamos}}</p>{{/levamos}}
+            <p class="ft" data-campo="aprendizado-{{numero}}.titulo" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{titulo}}</p>
+            {{#texto}}<p class="fx tm" data-campo="aprendizado-{{numero}}.texto" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+            {{#levamos}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto}};"><b style="color:{{cor.grupo_aprendizado}};">&#8594; Levamos:</b> <span data-campo="aprendizado-{{numero}}.levamos">{{levamos}}</span></p>{{/levamos}}
           </td>
           {{/itens}}
         </tr>
@@ -470,7 +484,7 @@
   {{#foco}}
   <!--secao:foco-->
   <!-- 06 · FOCO DO PRÓXIMO MÊS · bloco vermelho -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [FOCO] prioridade, texto, selo (opcional), descricao_selo
+  <!-- EDITAR AQUI: FOCO DO PRÓXIMO MÊS → dados/AAAA-MM.txt › [FOCO] prioridade, texto, selo (opcional), descricao_selo
        Selo da campanha: o PNG original (versão para fundo vermelho). No computador, à direita do título,
        na coluna 3 (184 px). No celular, acima do título, com 160 px. Sem sobreposição: funciona no Outlook. -->
   <tr>
@@ -480,10 +494,10 @@
           <td class="px" valign="middle" style="padding:26px 28px 28px 28px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
           <td class="col" width="{{largura_texto}}" valign="middle" style="width:{{largura_texto}}px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;FOCO DE {{mes}}</p>
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;FOCO DE <span data-campo="foco.mes">{{mes}}</span></p>
             {{#selo}}{{#img_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></div>{{/img_m}}{{/selo}}
-            <p class="ft h2" style="margin:10px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">{{prioridade}}</p>
-            {{#texto}}<p class="fx tm" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
+            <p class="ft h2" data-campo="foco.prioridade" style="margin:10px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">{{prioridade}}</p>
+            {{#texto}}<p class="fx tm" data-campo="foco.texto" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
           </td>
           {{#selo}}{{#img}}
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
@@ -500,7 +514,7 @@
   {{#agenda}}
   <!--secao:agenda-->
   <!-- 07 · TAMBÉM VEM AÍ · agenda em linhas de 3 -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [AGENDA 1..6] data, titulo, detalhe -->
+  <!-- EDITAR AQUI: PRÓXIMAS INICIATIVAS (AGENDA) → dados/AAAA-MM.txt › [AGENDA 1..6] data, titulo, detalhe -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_aprendizado_fundo}};color:{{cor.grupo_aprendizado}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;TAMBÉM VEM AÍ</p>
@@ -512,10 +526,10 @@
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;border-top:1px solid {{filete}};">&nbsp;</td>{{/primeiro}}
           <td class="col" width="184" valign="top" style="width:184px;padding:12px 0;border-top:1px solid {{filete}};">
             {{^vazio}}
-            {{#dia}}<p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:22px;line-height:24px;color:{{cor.grupo_aprendizado}};">{{dia}} <span class="fx" style="font-family:{{fonte.texto}};font-size:10px;font-weight:bold;letter-spacing:1.5px;">{{mes}}</span></p>{{/dia}}
-            {{^dia}}<p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:28px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{rotulo}}</p>{{/dia}}
-            <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:17px;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>
-            {{#detalhe}}<p class="fx ts" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{detalhe}}</p>{{/detalhe}}
+            {{#dia}}<p class="ft" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:22px;line-height:24px;color:{{cor.grupo_aprendizado}};">{{dia}} <span class="fx" style="font-family:{{fonte.texto}};font-size:10px;font-weight:bold;letter-spacing:1.5px;">{{mes}}</span></p>{{/dia}}
+            {{^dia}}<p class="fx" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:28px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{rotulo}}</p>{{/dia}}
+            <p class="fx tm" data-campo="agenda-{{idx}}.titulo" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:17px;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>
+            {{#detalhe}}<p class="fx ts" data-campo="agenda-{{idx}}.detalhe" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{detalhe}}</p>{{/detalhe}}
             {{/vazio}}
             {{#vazio}}&nbsp;{{/vazio}}
           </td>
@@ -532,7 +546,7 @@
        1. faixa clara (Rio): despedida e informações (colunas 1 e 2) e a formiguinha
           em pé sobre a faixa vermelha, alinhada à direita, sobre a chama (coluna 3);
        2. faixa vermelha: assinatura da área e a chama no canto inferior direito (Brand Guide 3.10). -->
-  <!-- EDITAR AQUI → dados/AAAA-MM.txt › [EDICAO] proximo_mes, contato. A assinatura é fixa (NÃO ALTERAR). -->
+  <!-- EDITAR AQUI: ENCERRAMENTO → dados/AAAA-MM.txt › [EDICAO] proximo_mes, contato. A assinatura é fixa (NÃO ALTERAR). -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
     <td class="px rt" bgcolor="{{cor.rodape_claro}}" style="background:{{cor.rodape_claro}};border-radius:34px 34px 0 0;padding:32px 40px 0 40px;">
@@ -547,20 +561,20 @@
                 {{#contato}}
                 <td class="col gap" width="184" valign="top" style="width:184px;padding-top:12px;border-top:1px solid {{cor.abertura_linha}};">
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:1.5px;">DÚVIDAS E SUGESTÕES</p>
-                  <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};word-break:break-word;">{{contato}}</p>
+                  <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};word-break:break-word;" data-campo="contato">{{contato}}</p>
                 </td>
                 <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;border-top:1px solid {{cor.abertura_linha}};">&nbsp;</td>
                 {{/contato}}
                 <td class="col" width="184" valign="top" style="width:184px;padding-top:12px;border-top:1px solid {{cor.abertura_linha}};">
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:1.5px;">PRÓXIMA EDIÇÃO</p>
-                  <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};">{{proximo_mes}}</p>
+                  <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};" data-campo="proximo_mes">{{proximo_mes}}</p>
                 </td>
               </tr>
             </table>
           </td>
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
           <td class="fant" width="184" valign="bottom" align="right" style="width:184px;">
-            {{#rodape_formiga}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/rodape_formiga}}
+            {{#rodape_formiga}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="formiguinha" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/rodape_formiga}}
           </td>
         </tr>
       </table>

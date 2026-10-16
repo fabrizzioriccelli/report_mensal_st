@@ -1,8 +1,13 @@
 # Report Mensal · Creative Strategy PF
 
-Modelo do report mensal da Creative Strategy PF (Customer Interactions): um e-mail executivo de uma página, enviado pelo Outlook, com peças e vídeos clicáveis. Ele é gerado a partir de **um arquivo de texto por mês**. Ninguém precisa editar HTML.
+Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas experiências que saem do **mesmo arquivo de texto por mês**:
 
-**Versão 4.1 (2026-10-15).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+- **o report completo** (HTML, no SharePoint): movimento ao rolar, vídeos e peças que abrem maiores;
+- **o e-mail-resumo** (Outlook): a porta de entrada, estático, com os destaques do mês e um único botão, "Ver report completo".
+
+Ninguém precisa editar HTML.
+
+**Versão 4.2 (2026-10-16).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -21,8 +26,11 @@ Modelo do report mensal da Creative Strategy PF (Customer Interactions): um e-ma
 Uma ferramenta simples para montar o report mensal:
 
 - **você escreve** o conteúdo do mês num arquivo de texto (`dados/AAAA-MM.txt`);
-- **uma página no navegador** (`gerar-report.html`) confere tudo, prepara as imagens e gera o e-mail;
-- **o Outlook** abre o e-mail pronto para enviar.
+- **uma página no navegador** (`gerar-report.html`) confere tudo, prepara as imagens e gera a página do mês;
+- **o conversor** (`converter-html-eml.html`) gera o **e-mail-resumo** (`.eml`) e a **versão interativa** para o SharePoint;
+- **o Outlook** abre o e-mail-resumo pronto para enviar; o botão dele leva ao report completo.
+
+Passo a passo do mês: [docs/COMO_ATUALIZAR_O_MES.md](docs/COMO_ATUALIZAR_O_MES.md). Guia ilustrado para quem nunca mexeu no projeto: [apresentacoes/guia-operacional.pdf](apresentacoes/guia-operacional.pdf).
 
 ## 2. Para que serve
 
@@ -43,8 +51,11 @@ Contar o mês da área em uma página, sempre na mesma ordem:
 ```text
   VOCÊ EDITA                        ABRE NO NAVEGADOR          RESULTADO
   dados/AAAA-MM.txt  (texto)   ─┐
-  assets/AAAA-MM/    (imagens)  ─┼──►  gerar-report.html  ──►  report-AAAA-MM.eml  → Outlook → enviar
-  config/marca.txt   (raro)    ─┘     (confere e monta)  └──►  AAAA-MM.html        → reports/ (arquivo do mês)
+  assets/AAAA-MM/    (imagens)  ─┼──►  gerar-report.html  ──►  AAAA-MM.html (página do mês) → reports/ → Chrome
+  config/marca.txt   (raro)    ─┘     (confere e monta)              │
+                                                                     ▼
+                                       converter-html-eml.html ──►  AAAA-MM-interativo.html → SharePoint (report completo)
+                                                               └──►  AAAA-MM-resumo.eml      → Outlook → enviar
 ```
 
 - **Lorem Ipsum, `X` e `[INSERIR …]` = ainda não preenchido.** A página lista cada um, com a linha. Enquanto houver algum, só sai um RASCUNHO.
@@ -56,22 +67,25 @@ Contar o mês da área em uma página, sempre na mesma ordem:
 ```text
 report_mensal_st/
 ├── gerar-report.html        ← ABRA ESTE para gerar o e-mail
-├── converter-html-eml.html  ← .html (editado ou não) → e-mail completo + resumido + versão interativa
+├── converter-html-eml.html  ← página do mês → e-mail-resumo + versão interativa (+ e-mail completo, opcional)
 ├── report_backup.html       ← backup: o layout aprovado num arquivo só (veja docs/BACKUP.md)
 ├── README.md                ← este guia
 ├── CHANGELOG.md             ← histórico de versões
 ├── dados/                   ← O QUE VOCÊ EDITA TODO MÊS
-│   └── MODELO.txt           modelo em branco (copie para AAAA-MM.txt)
+│   ├── MODELO.txt           modelo em branco (copie para AAAA-MM.txt)
+│   └── EXEMPLO-treinamento.txt  exemplo 100% fictício, para praticar
 ├── assets/                  ← IMAGENS
 │   ├── marca/               chama do Santander (oficial) e paleta de cores
 │   ├── formiguinha/         a personagem (arquivo original)
 │   ├── icones/              ícones do Transformation Hub
+│   ├── exemplo/             imagens neutras do exemplo de treinamento
 │   ├── fonts/               fontes Santander: CSS pronto, arquivos .otf entram aqui
 │   └── fotos/               fotos do banco de imagens (só no ambiente do banco)
 ├── config/
 │   └── marca.txt            fontes, cores, chama, formiguinha, links (raramente)
 ├── reports/                 página de cada mês, gerada (histórico, no ambiente do banco)
 ├── docs/                    guias
+├── apresentacoes/           apresentação executiva e guia operacional (PowerPoint e PDF)
 ├── template/report.html     layout aprovado com {{campos}} (técnico, não editar)
 ├── tools/motor.js           motor que monta o e-mail (técnico, não editar)
 └── tests/                   testes automáticos (técnico, opcional)
@@ -166,9 +180,9 @@ Erros comuns e soluções: [docs/FAQ.md](docs/FAQ.md).
 
 ## 16. Como exportar
 
-Na página: **Baixar e-mail final (.eml)** (vai para o Outlook) e **Baixar página do mês (.html)** (guarde em `reports/`). Como abrir o `.eml` em cada Outlook: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
+Na página: **Baixar página do mês (.html)** (guarde em `reports/` e confira no Chrome). O e-mail que a área recebe é o **e-mail-resumo**, gerado a seguir no conversor; **Baixar e-mail completo (.eml)** é opcional. Como abrir o `.eml` em cada Outlook: [docs/HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md).
 
-Editou a página no Chrome ou no Edge (até pelo Inspecionar) ou quer um e-mail **curto**? Abra **`converter-html-eml.html`** e escolha o `.html` do mês: ele gera, de uma vez, o **e-mail completo**, o **e-mail resumido** (com o botão "Ver o report completo") e a **versão interativa** (vídeos e peças ampliáveis) para o SharePoint. A página mostra o status de cada etapa em tempo real e converte de novo sozinha quando você salva o arquivo ou muda uma opção. Passo a passo: [docs/CONVERTER_HTML_EML.md](docs/CONVERTER_HTML_EML.md).
+Depois de gerar a página do mês, abra **`converter-html-eml.html`** e escolha o `.html` do mês (editado ou não no Chrome): ele gera, de uma vez, o **e-mail-resumo** (destaques do mês, estático, com um único botão "Ver report completo"), a **versão interativa** (o report completo, com movimento, vídeos e peças ampliáveis) para o SharePoint e, se precisar, o **e-mail completo**. A página mostra o status de cada etapa em tempo real e converte de novo sozinha quando você salva o arquivo ou muda uma opção. Passo a passo: [docs/CONVERTER_HTML_EML.md](docs/CONVERTER_HTML_EML.md).
 
 ## 17. Como fazer backup
 
@@ -194,7 +208,7 @@ Passo a passo: [docs/BACKUP.md](docs/BACKUP.md#restaurar).
 | "imagem não encontrada" | Confira o nome do arquivo: maiúsculas, acentos e extensão |
 | Acentos estranhos (`Ã©`) | Salve o `.txt` em **UTF-8** (o PyCharm já salva assim) |
 | Editei, mas a página não mudou | Salve e clique em **Selecionar a pasta** de novo |
-| O botão "Baixar e-mail final" está cinza | Ainda há itens em **falta**. Preencha ou gere um RASCUNHO para teste |
+| O botão "Baixar e-mail completo" está cinza | Ainda há itens em **falta**. Preencha ou gere um RASCUNHO para teste |
 | O `.eml` abre como mensagem recebida | Use **Encaminhar** ([HOW_TO_EXPORT_EML.md](docs/HOW_TO_EXPORT_EML.md)) |
 | O e-mail corporativo bloqueou o `.zip` | É a política de segurança. Não tente contornar: use o caminho aprovado pela TI ([CORPORATE_SETUP.md](docs/CORPORATE_SETUP.md)) |
 

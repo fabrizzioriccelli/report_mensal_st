@@ -52,7 +52,7 @@ Na dúvida, não force nada (*reset*, *force push*): peça ajuda.
 
 ## Histórico do Git e dados antigos
 
-**Situação verificada nas versões 3.0 a 4.1:**
+**Situação verificada nas versões 3.0 a 4.2:**
 
 - Os arquivos atuais **não têm dados reais**: só o modelo (Lorem Ipsum e `X`), a chama, a formiguinha e os ícones.
 - Busca por credenciais (senhas, tokens, chaves) em **todo** o histórico: **nada encontrado**.

@@ -10,12 +10,13 @@
   ----------------------------------------------------------------------
   Para quando você editou a página do mês direto no navegador (Chrome ou
   Edge, inclusive pelo Inspecionar) e quer mandar por e-mail. Gera, de uma vez:
-    · o e-mail COMPLETO (.eml);
-    · o e-mail RESUMIDO (.eml): só as seções escolhidas e o botão "Ver o
-      report completo", que abre a versão interativa. A miniatura de vídeo
-      aparece sem ▶ e sem link (o vídeo só toca na versão interativa);
-    · a VERSÃO INTERATIVA (.html, com vídeos e peças ampliáveis) para
-      subir no SharePoint e usar como destino do botão.
+    · o E-MAIL-RESUMO (.eml): a porta de entrada. Diagramação própria,
+      estática, com os destaques do mês (lidos da página: campos
+      data-campo do template) e UM ÚNICO link, o botão final "Ver report
+      completo". Sem vídeo, sem ampliação, sem nada que pareça clicável;
+    · a VERSÃO INTERATIVA (.html, o report completo com movimento, vídeos
+      e peças ampliáveis) para subir no SharePoint: é o destino do botão;
+    · o e-mail COMPLETO (.eml), opcional: o report inteiro no e-mail.
 
   Abra este arquivo no Edge ou no Chrome (dois cliques) ou pelo endereço
   local (ex.: http://localhost:8000/converter-html-eml.html). Não precisa
@@ -27,8 +28,8 @@
     2. reconhece o report (versão e mês);
     3. tira o que o e-mail não aceita (script, ampliação, vídeo,
        marcas da edição);
-       3b. no resumido, corta as seções (marcas "secao:" do template)
-           e põe o botão para a versão interativa;
+       3b. monta o e-mail-resumo com os destaques (regras fixas de
+           seleção: tools/motor.js, RESUMO_REGRAS) e o botão final;
     4. coloca as imagens dentro do e-mail (anexos embutidos, cid:);
     5. confere o HTML para o Outlook;
     6. monta os dois .eml (mensagem nova no Outlook, pronta para enviar);
@@ -107,7 +108,7 @@
 <body>
 <header><div>
   <h1>Converter HTML em e-mail (.eml)</h1>
-  <p>Lê a página do mês (.html, editada ou não no navegador) e gera, de uma vez, o <b>e-mail completo</b>, o <b>e-mail resumido</b> (com o botão "Ver o report completo") e a <b>versão interativa</b> (vídeos e peças ampliáveis) para o SharePoint. <span id="versao"></span></p>
+  <p>Lê a página do mês (.html, editada ou não) e gera, de uma vez, o <b>e-mail-resumo</b> (os destaques do mês e um único botão "Ver report completo"), a <b>versão interativa</b> (o report completo, com movimento, vídeos e peças ampliáveis) para o SharePoint e, se precisar, o <b>e-mail completo</b>. <span id="versao"></span></p>
 </div></header>
 
 <main>
@@ -126,25 +127,30 @@
   </section>
 
   <section aria-labelledby="s5">
-    <h2 id="s5"><b>2</b>E-mail resumido e versão interativa</h2>
-    <p class="muted">A página sempre gera os <b>dois e-mails</b>: o <b>completo</b> e o <b>resumido</b> (só o essencial e um botão "Ver o report completo", que abre a versão interativa, com vídeos e peças ampliáveis). Mudou alguma opção? A conversão se refaz sozinha.</p>
+    <h2 id="s5"><b>2</b>E-mail-resumo e link do report completo</h2>
+    <p class="muted">O <b>e-mail-resumo</b> é a porta de entrada: uma leitura rápida dos destaques do mês, estática, com <b>um único botão</b> no fim ("Ver report completo"), que abre a versão interativa no SharePoint. Os destaques saem da própria página, sempre pelas mesmas regras (veja abaixo). Mudou alguma opção? A conversão se refaz sozinha.</p>
     <div class="campo" id="campoSecoes">
-      <label>Seções que vão no e-mail resumido</label>
-      <div class="secoes" id="secoes"><span class="muted">Escolha o arquivo para ver as seções.</span></div>
+      <label>Blocos do e-mail-resumo</label>
+      <div class="secoes" id="secoes"><span class="muted">Escolha o arquivo para ver os blocos.</span></div>
+      <details>
+        <summary>Como o resumo escolhe os destaques</summary>
+        <ul class="passos" id="regras"></ul>
+      </details>
     </div>
     <div class="campo">
-      <label for="link">Link da versão interativa <span class="muted">(o resumido só sai com ele)</span></label>
+      <label for="link">Link do report completo (versão interativa) <span class="muted">(o e-mail-resumo só sai com ele)</span></label>
       <input type="text" id="link" inputmode="url" placeholder="https://empresa.sharepoint.com/…/report-outubro.html" autocomplete="off">
+      <p class="muted" id="linkInfo"></p>
       <ol class="passos">
         <li>Baixe a versão interativa: <button type="button" id="bInterativa" disabled>Baixar versão interativa (.html)</button> <span id="interInfo" class="muted"></span></li>
         <li>Suba esse arquivo numa pasta do SharePoint (ou OneDrive) que o público do e-mail consiga abrir. Em muitos SharePoint, o .html baixa em vez de abrir direto: quem clicar abre o arquivo baixado e ele funciona igual. Teste o link com alguém de outra equipe.</li>
-        <li>Copie o link de compartilhamento e cole aqui em cima.</li>
+        <li>Copie o link de compartilhamento e cole aqui em cima. Para não colar todo mês, guarde-o no arquivo de dados (<code>[EDICAO] link_report_completo:</code>): a página já vem com ele e este campo se preenche sozinho.</li>
       </ol>
-      <label class="check" style="margin-top:8px;font-weight:normal"><input type="checkbox" id="botaoNoCompleto"> Pôr o botão "Ver o report completo" também no e-mail completo</label>
+      <label class="check" style="margin-top:8px;font-weight:normal"><input type="checkbox" id="botaoNoCompleto"> Pôr o botão "Ver report completo" também no e-mail completo (opcional)</label>
     </div>
     <div class="campo">
       <label for="botao">Texto do botão</label>
-      <input type="text" id="botao" value="Ver o report completo (interativo)">
+      <input type="text" id="botao" value="Ver report completo">
     </div>
     <details>
       <summary>Como colocar prints no HTML (Inspecionar do Chrome)</summary>
@@ -179,22 +185,22 @@
   </section>
 
   <section aria-labelledby="s3" id="secBaixar" hidden>
-    <h2 id="s3"><b>4</b>Baixe os e-mails</h2>
+    <h2 id="s3"><b>4</b>Baixe o e-mail</h2>
     <p class="muted" style="margin-bottom:6px"><label for="assunto"><b>Assunto</b></label> (vem do título da página; pode mudar aqui):</p>
     <input type="text" id="assunto">
     <div class="row">
-      <button type="button" class="pri" id="bEml" disabled>Baixar e-mail completo (.eml)</button>
-      <span id="emlInfo" class="muted"></span>
+      <button type="button" class="pri" id="bEmlRes" disabled>Baixar e-mail-resumo (.eml)</button>
+      <span id="emlResInfo" class="muted"></span>
     </div>
     <div class="row">
-      <button type="button" class="pri" id="bEmlRes" disabled>Baixar e-mail resumido (.eml)</button>
-      <span id="emlResInfo" class="muted"></span>
+      <button type="button" id="bEml" disabled>Baixar e-mail completo (.eml, opcional)</button>
+      <span id="emlInfo" class="muted"></span>
     </div>
     <details>
       <summary>Depois de baixar: como abrir e enviar</summary>
       <ol class="muted">
         <li>Na pasta Downloads, dê dois cliques no <code>.eml</code>. O Outlook abre uma <b>mensagem nova</b> com o report e o assunto.</li>
-        <li>Envie primeiro <b>só para você</b> e confira no computador e no celular (e o botão do resumido).</li>
+        <li>Envie primeiro <b>só para você</b> e confira no computador e no celular. Clique no botão "Ver report completo" e veja se o report abre.</li>
         <li>Tudo certo? Abra o <code>.eml</code> de novo, coloque os destinatários e envie.</li>
       </ol>
       <p class="muted">As edições feitas no navegador não voltam para o arquivo de dados. Para não perdê-las no próximo mês, passe as mesmas mudanças para <code>dados/AAAA-MM.txt</code>.</p>
@@ -203,10 +209,10 @@
 
   <section aria-labelledby="s4" id="secPrev" hidden>
     <h2 id="s4">Prévia dos e-mails</h2>
-    <p class="muted">É o que vai dentro do .eml: sem ampliação nem vídeo (o e-mail não roda script).</p>
+    <p class="muted">É o que vai dentro do .eml: estático, sem ampliação nem vídeo (o e-mail não roda script).</p>
     <div class="row tabs" role="group" aria-label="Qual e-mail">
-      <button type="button" data-qual="completo" aria-pressed="true">E-mail completo</button>
-      <button type="button" data-qual="resumido" aria-pressed="false">E-mail resumido</button>
+      <button type="button" data-qual="resumido" aria-pressed="true">E-mail-resumo</button>
+      <button type="button" data-qual="completo" aria-pressed="false">E-mail completo</button>
     </div>
     <div class="row tabs" role="group" aria-label="Tamanho da prévia">
       <button type="button" data-w="100%" aria-pressed="true">Computador</button>
@@ -227,17 +233,17 @@
     { id: "ler", nome: "Ler o arquivo" },
     { id: "origem", nome: "Reconhecer o report" },
     { id: "limpar", nome: "Tirar o que o e-mail não aceita" },
-    { id: "resumir", nome: "Escolher as seções do resumido" },
+    { id: "resumir", nome: "Montar o e-mail-resumo (destaques do mês)" },
     { id: "imagens", nome: "Colocar as imagens dentro dos e-mails" },
     { id: "completo", nome: "Montar o e-mail completo (.eml)" },
-    { id: "resumido", nome: "Montar o e-mail resumido (.eml)" },
+    { id: "resumido", nome: "Montar o e-mail-resumo (.eml)" },
     { id: "interativa", nome: "Preparar a versão interativa (.html)" }
   ];
   /* Na prévia, imagem que falta aparece como um bloco cinza (em vez de um link quebrado). */
   var FALTA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120"><rect width="100%" height="100%" fill="#E3DFDC"/><text x="50%" y="54%" font-family="Arial" font-size="13" fill="#5F5F5F" text-anchor="middle">imagem faltando</text></svg>');
   var ICONE = { espera: "", rodando: "", ok: "✓", aviso: "!", erro: "✕" };
   var pastaArquivos = {};      /* imagens da pasta "_files", por nome */
-  var interativa = null, handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, resumido = null, previas = {}, qualPrev = "completo", urls = [];
+  var interativa = null, handle = null, ultimoArquivo = null, ultimaVersao = 0, nomeArquivo = "", execucao = 0, resultado = null, resumido = null, previas = {}, qualPrev = "resumido", urls = [];
   var inicio = 0, relogioTimer = null;
 
   /* ---------- status em tempo real ---------- */
@@ -318,7 +324,6 @@
     });
   }
   function dataUri(bytes, ext) { return "data:" + Motor.tipoMime("x." + ext) + ";base64," + Motor.base64(bytes); }
-  function nomes(ids) { return ids.map(function (i) { return Motor.SECOES[i] || i; }).join(", "); }
 
   /* ---------- conversão ---------- */
   async function converter(file) {
@@ -352,34 +357,52 @@
     var pg = Motor.paginaInterativa(html);
     interativa = { html: pg.html, nome: file.name.replace(/\.(html?|htm)$/i, "") + "-interativo.html", ok: pg.interativa };
     $("#bInterativa").disabled = false; $("#interInfo").textContent = interativa.nome + " · " + kb(Motor.utf8(pg.html).length);
-    atualizarSecoes(html);
     progresso(18); await respira();
 
     /* 3. limpar */
     etapa("limpar", "rodando", "Tirando script, ampliação, vídeo e marcas da edição…"); await respira();
     var limpo = Motor.limparHtmlEditado(html);
-    var semPlay = Motor.miniaturasSemPlay(html), limpoRes = Motor.limparHtmlEditado(semPlay.html);
     var saiu = limpo.saiu.map(function (s) { return s.item + (s.n > 1 ? " (" + s.n + ")" : ""); });
     etapa("limpar", "ok", saiu.length ? "Saiu dos e-mails:" : "Nada para tirar: o HTML já estava pronto para e-mail.", saiu);
     log(saiu.length ? "Removido: " + saiu.join(", ") + "." : "Nada para remover.");
     progresso(26); await respira(); if (parou()) return;
 
-    /* 4. seções do resumido */
-    var link = $("#link").value.trim(), botao = $("#botao").value.trim(), linkOk = /^https:\/\/[^\s]+$/i.test(link), resErro = "";
-    etapa("resumir", "rodando", "Escolhendo as seções…"); await respira();
-    var manter = Array.prototype.filter.call(document.querySelectorAll("#secoes input"), function (c) { return c.checked; }).map(function (c) { return c.value; });
-    var res = Motor.emailResumido(limpoRes.html, { manter: manter, link: linkOk ? link : "", botao: botao });
-    var itens = [];
-    if (res.erro) { resErro = res.erro; etapa("resumir", "aviso", res.erro); avisos.push("secoes"); }
-    else {
-      itens.push("Ficam no resumido: " + nomes(res.mantidas), "Só no completo e na versão interativa: " + (res.fora.length ? nomes(res.fora) : "nada (todas marcadas)"));
-      if (semPlay.trocadas) itens.push(semPlay.trocadas + " miniatura(s) de vídeo sem ▶ e sem link no resumido (o vídeo só toca na versão interativa)");
-      if (semPlay.comPlay) itens.push(semPlay.comPlay + " miniatura(s) de vídeo continuam com ▶: a página é de antes da versão 4.0; gere de novo pelo gerar-report.html");
-      if (!link) resErro = "Falta o link da versão interativa (passo 2).";
+    /* 4. e-mail-resumo: destaques lidos dos campos da página (data-campo), diagramação própria e um único botão */
+    var meta = /<meta name="report-completo" content="([^"]*)"/.exec(html);
+    if (meta && (!$("#link").value.trim() || $("#link").dataset.auto === "1")) { $("#link").value = desfaz(meta[1]); $("#link").dataset.auto = "1"; $("#linkInfo").textContent = "Veio da página (dados › [EDICAO] link_report_completo)."; }
+    var link = $("#link").value.trim(), botao = $("#botao").value.trim() || "Ver report completo", linkOk = /^https:\/\/[^\s]+$/i.test(link), resErro = "";
+    etapa("resumir", "rodando", "Lendo os destaques da página…"); await respira();
+    var blocos = {};
+    Array.prototype.forEach.call(document.querySelectorAll("#secoes input"), function (c) { blocos[c.value] = c.checked; });
+    var res = Motor.emailResumo(html, { link: linkOk ? link : "", botao: botao, blocos: blocos, assunto: titulo });
+    var itens = [], antigo = false;
+    if (res.erro) {
+      /* Página de antes da 4.2 (sem os campos): resumo no formato antigo (seções cortadas), para não parar o trabalho. */
+      antigo = true;
+      var semPlay = Motor.miniaturasSemPlay(html);
+      res = Motor.emailResumido(Motor.limparHtmlEditado(semPlay.html).html, { manter: Motor.SECOES_RESUMO, link: linkOk ? link : "", botao: botao });
+      if (res.erro) { resErro = res.erro; etapa("resumir", "erro", res.erro); erros.push("resumo"); }
+      else { itens.push("Página de antes da versão 4.2: o resumo saiu no formato antigo (capa, resumo das campanhas, foco e encerramento). Gere a página de novo pelo gerar-report.html para ter o e-mail-resumo novo."); avisos.push("antigo"); }
+    } else {
+      atualizarBlocos(res);
+      var d = res.dados;
+      if (res.blocos.indexOf("visao") >= 0) itens.push("Visão geral: " + (d.principal ? d.principal.nome : "sem projeto principal") + (d.numeros.length ? " · " + d.numeros.length + " número(s): " + d.numeros.map(function (n) { return n.valor; }).join(" · ") : ""));
+      if (res.blocos.indexOf("resultados") >= 0) itens.push("Resultados e evolução: " + [d.cx ? "Creative X " + (d.cx.anterior ? d.cx.anterior + " → " : "") + d.cx.atual : "", d.bem.length ? d.bem.length + " \"foi bem\"" : "", d.melhorar.length ? d.melhorar.length + " \"a melhorar\"" : ""].filter(Boolean).join(" · "));
+      if (res.blocos.indexOf("campanhas") >= 0) itens.push("Campanhas em destaque: " + [d.destaque ? d.destaque.titulo : "", d.lancamentos.map(function (l) { return l.nome; }).join(", ")].filter(Boolean).join(" · "));
+      if (res.blocos.indexOf("aprendizados") >= 0) itens.push("Aprendizados: " + d.aprendizados.map(function (a) { return a.titulo; }).join(" · "));
+      if (res.blocos.indexOf("andamento") >= 0) itens.push("Em andamento (Transformation Hub): " + d.transformation.itens.map(function (a) { return a.nome; }).join(" · "));
+      if (res.blocos.indexOf("proximos") >= 0) itens.push("Próximos passos: " + [d.foco ? d.foco.prioridade : "", d.agenda.map(function (a) { return a.titulo; }).join(" · ")].filter(Boolean).join(" · "));
+      if (res.fora.length) itens.push("Desmarcados (só no report completo): " + res.fora.map(function (b) { return nomeBloco(b); }).join("; "));
+      if (res.vazios.length) itens.push("Sem conteúdo nesta edição (não aparecem): " + res.vazios.map(function (b) { return nomeBloco(b); }).join("; "));
+      if (res.pendencias.length) { itens.push("Ainda não preenchido na página: " + res.pendencias.slice(0, 3).join(" | ") + (res.pendencias.length > 3 ? " (+" + (res.pendencias.length - 3) + ")" : "")); avisos.push("pendencias"); }
+      if (d.principal && !d.principal.imagem) itens.push("Projeto principal sem imagem no resumo (miniatura de vídeo antiga, com ▶, ou sem imagem).");
+    }
+    if (!resErro) {
+      if (!link) resErro = "Falta o link do report completo (passo 2).";
       else if (!linkOk) resErro = "O link precisa começar com https:// (copie o link de compartilhamento do SharePoint).";
-      etapa("resumir", resErro || semPlay.comPlay ? "aviso" : "ok", resErro ? resErro + " A prévia do resumido já aparece; o botão entra quando o link estiver certo." : "Botão \"" + (botao || "Ver o report completo") + "\" levando para " + hostDe(link) + ".", itens);
-      if (semPlay.comPlay) avisos.push("thumb");
-      log("Resumido: ficam " + res.mantidas.join(", ") + "; saem " + (res.fora.join(", ") || "nenhuma") + ".");
+      etapa("resumir", resErro || antigo || (res.pendencias || []).length ? "aviso" : "ok", resErro ? resErro + " A prévia já aparece, com o aviso no lugar do botão." :
+        (antigo ? "Resumo no formato antigo. " : res.blocos.length + " bloco(s) · ") + "botão \"" + botao + "\" levando para " + hostDe(link) + " (o único link do e-mail).", itens);
+      log("E-mail-resumo: " + (antigo ? "formato antigo" : res.blocos.join(", ")) + ".");
     }
     /* E-mail completo: o report inteiro; com o link e a opção marcada, ganha o botão e as miniaturas de vídeo levam à versão interativa. */
     var completo = { html: limpo.html };
@@ -391,7 +414,7 @@
 
     /* 5. imagens (uma vez só, para os dois e-mails) */
     var lista = Motor.imagensDoHtml(completo.html);
-    if (!res.erro) Motor.imagensDoHtml(res.html).forEach(function (x) { if (lista.indexOf(x) < 0) lista.push(x); });
+    if (res.html) Motor.imagensDoHtml(res.html).forEach(function (x) { if (lista.indexOf(x) < 0) lista.push(x); });
     var mapa = {}, mapaPrev = {}, porSrc = {}, total = 0, faltam = [], probs = [], deArquivo = {};
     etapa("imagens", "rodando", lista.length ? "Imagem 0 de " + lista.length + "…" : "Procurando imagens…"); await respira();
     for (var i = 0; i < lista.length; i++) {
@@ -453,15 +476,17 @@
     log("E-mail completo: " + kb(resultado.tam) + ".");
     progresso(82); await respira(); if (parou()) return;
 
-    etapa("resumido", "rodando", "Montando o e-mail resumido…"); await respira();
-    if (res.erro) etapa("resumido", "aviso", "Sem o resumido: " + res.erro);
+    etapa("resumido", "rodando", "Montando o e-mail-resumo…"); await respira();
+    if (!res.html) etapa("resumido", "erro", "Sem o e-mail-resumo: " + resErro);
     else {
       previas.resumido = Motor.trocarSrc(res.html, mapaPrev);
-      var rr = montar("resumido", res.html, base + "-resumido.eml");
+      var rr = montar("resumido", res.html, base + "-resumo.eml");
+      var links = (res.html.match(/<a\b[^>]*href=/gi) || []).length;
+      if (!antigo && links > 1) rr.notas.push("O e-mail-resumo tem " + links + " links; o esperado é um (o botão).");
       if (erros.length) etapa("resumido", "erro", "Não montei: há imagens com problema (veja acima).");
       else if (resErro) etapa("resumido", "aviso", resErro + " (prévia pronta: " + kb(rr.tam) + ").");
       else { resumido = rr; etapa("resumido", rr.notas.length ? "aviso" : "ok", "Mensagem de " + kb(rr.tam) + " · " + rr.imagens.length + " imagens · " + Math.round(100 * rr.tam / resultado.tam) + "% do tamanho do completo", rr.notas); if (rr.notas.length) avisos.push("resumido"); }
-      log("E-mail resumido: " + kb(rr.tam) + (resErro ? " (sem link)" : "") + ".");
+      log("E-mail-resumo: " + kb(rr.tam) + (resErro ? " (sem link)" : "") + ".");
     }
     progresso(90); await respira(); if (parou()) return;
 
@@ -493,37 +518,51 @@
     }
     progresso(100, true);
     var r = !!resumido;
-    banner(r && !avisos.length ? "ok" : "warn", (r ? "Pronto: e-mail completo e e-mail resumido." : "Pronto: e-mail completo. Para o resumido, falta o link da versão interativa (passo 2).") +
+    banner(r && !avisos.length ? "ok" : "warn", (r ? "Pronto: e-mail-resumo (e o completo, se precisar)." : "Quase: falta o link do report completo (passo 2) para liberar o e-mail-resumo.") +
       (avisos.length && r ? " Há pontos para olhar (marcados com !)." : "") + (handle && $("#acompanhar").checked ? " Se salvar o .html de novo, a conversão se repete sozinha." : ""));
     $("#bEml").disabled = !resultado; $("#bEmlRes").disabled = !resumido;
     $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(resultado.tam) + " · " + resultado.imagens.length + " imagens" : "";
-    $("#emlResInfo").textContent = resumido ? resumido.nome + " · " + kb(resumido.tam) + " · " + resumido.imagens.length + " imagens" : "Precisa do link da versão interativa (passo 2).";
+    $("#emlResInfo").textContent = resumido ? resumido.nome + " · " + kb(resumido.tam) + " · " + resumido.imagens.length + " imagens" : "Precisa do link do report completo (passo 2).";
     log("Fim: pronto.");
   }
 
   /* ---------- opções: mudou, converte de novo ---------- */
   function hostDe(u) { try { return new URL(u).host; } catch (e) { return u; } }
-  function atualizarSecoes(html) {
-    var achadas = Motor.secoesDoHtml(html), box = $("#secoes"), marcadas = {};
+  function nomeBloco(id) { return (Motor.BLOCOS_RESUMO[id] || id).split(":")[0]; }
+  function desfaz(x) { var t = document.createElement("textarea"); t.innerHTML = x; return t.value; }
+  /* Caixas dos blocos do e-mail-resumo: bloco sem conteúdo na página fica desligado (não aparece). */
+  function atualizarBlocos(res) {
+    var box = $("#secoes"), marcadas = {};
     Array.prototype.forEach.call(box.querySelectorAll("input"), function (c) { marcadas[c.value] = c.checked; });
-    var ids = achadas.map(function (x) { return x.id; }).join(",");
-    if (box.dataset.ids === ids) return;
-    box.dataset.ids = ids; box.textContent = "";
-    if (!achadas.length) { box.innerHTML = '<span class="muted">Este arquivo não tem as marcas de seção (gerado antes da versão 3.9). Gere a página de novo pelo <code>gerar-report.html</code> para ter o e-mail resumido.</span>'; return; }
-    achadas.forEach(function (x) {
-      var l = document.createElement("label"), c = document.createElement("input");
-      l.className = "check"; c.type = "checkbox"; c.value = x.id;
-      c.checked = x.id in marcadas ? marcadas[x.id] : Motor.SECOES_RESUMO.indexOf(x.id) >= 0;
-      l.appendChild(c); l.appendChild(document.createTextNode(" " + x.nome)); box.appendChild(l);
+    var chave = Object.keys(Motor.BLOCOS_RESUMO).map(function (id) { return id + (res.vazios.indexOf(id) >= 0 ? "-" : "+"); }).join(",");
+    if (box.dataset.ids === chave) return;
+    box.dataset.ids = chave; box.textContent = "";
+    Object.keys(Motor.BLOCOS_RESUMO).forEach(function (id) {
+      var l = document.createElement("label"), c = document.createElement("input"), vazio = res.vazios.indexOf(id) >= 0;
+      l.className = "check"; c.type = "checkbox"; c.value = id; c.disabled = vazio;
+      c.checked = !vazio && (id in marcadas ? marcadas[id] : true);
+      l.appendChild(c); l.appendChild(document.createTextNode(" " + Motor.BLOCOS_RESUMO[id] + (vazio ? " (sem conteúdo nesta edição)" : ""))); box.appendChild(l);
     });
   }
+  (function regras() {
+    var R = Motor.RESUMO_REGRAS, ul = $("#regras");
+    ["Os textos e números saem da própria página (os mesmos do report completo). Editou a página ou o arquivo de dados? O resumo acompanha.",
+     "Ordem: a mesma do report. A ordem dos blocos no arquivo de dados é a ordem de prioridade: o 1º item é o que entra primeiro.",
+     "Visão geral: o projeto principal (nome, resumo e a imagem; vídeo vira só a miniatura, sem ▶) e até " + R.numeros + " números da capa.",
+     "Resultados e evolução: o Creative X (anterior → atual, variação e barra) e os " + R.bem + " primeiros \"foi bem\" e " + R.melhorar + " primeiros \"a melhorar\".",
+     "Campanhas em destaque: o destaque do mês (com até " + R.resultados + " resultados) e os " + R.lancamentos + " primeiros lançamentos.",
+     "Aprendizados: até " + R.aprendizados + ", com o \"levamos\". Em andamento: até " + R.andamento + " projetos do Transformation Hub, com o status.",
+     "Próximos passos: o foco do próximo mês e os " + R.agenda + " primeiros itens da agenda (\"Também vem aí\").",
+     "Item vazio ou apagado não aparece; bloco sem conteúdo some. Nada é inventado nem resumido por máquina.",
+     "Um único link: o botão \"Ver report completo\". Imagens não clicam e não há ▶."].forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+  })();
   var adiar = null;
   function reconverter() {
     clearTimeout(adiar);
     adiar = setTimeout(function () { if (ultimoArquivo) { log("Opções mudaram: convertendo de novo."); (handle ? handle.getFile() : Promise.resolve(ultimoArquivo)).then(converter); } }, 500);
   }
   $("#secoes").addEventListener("change", reconverter);
-  $("#link").addEventListener("input", reconverter);
+  $("#link").addEventListener("input", function () { this.dataset.auto = ""; $("#linkInfo").textContent = ""; reconverter(); });
   $("#botao").addEventListener("input", reconverter);
   $("#botaoNoCompleto").addEventListener("change", reconverter);
 
@@ -570,7 +609,7 @@
   /* ---------- prévia ---------- */
   function mostrarPrevia() {
     var h = previas[qualPrev];
-    $("#prev").srcdoc = h || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">O e-mail resumido aparece aqui quando a página tiver as marcas de seção (versão 3.9 ou mais nova).</p>';
+    $("#prev").srcdoc = h || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">O e-mail-resumo aparece aqui depois que o arquivo for lido.</p>';
   }
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (b) {
     b.addEventListener("click", function () {

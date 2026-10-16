@@ -1,127 +1,106 @@
-# Converter a página do mês em e-mail (.eml): completo, resumido e versão interativa
+# Conversor (o "emulador"): e-mail-resumo, versão interativa e e-mail completo
 
-A página `converter-html-eml.html` lê a página do mês (`.html`, editada ou não no navegador) e gera, **de uma vez**:
+A página `converter-html-eml.html` lê a página do mês (`.html`, editada ou não) e gera, **de uma vez**:
 
 | Arquivo | O que é | Para onde vai |
 |---|---|---|
-| **E-mail completo** (`.eml`) | O report inteiro | Outlook |
-| **E-mail resumido** (`-resumido.eml`) | Só o essencial e um botão **"Ver o report completo (interativo)"** | Outlook |
-| **Versão interativa** (`-interativo.html`) | O report inteiro, com os vídeos tocando e as peças abrindo maiores no clique | SharePoint (é para lá que o botão leva) |
+| **E-mail-resumo** (`-resumo.eml`) | A **porta de entrada**: os destaques do mês em uma leitura rápida, estático, com **um único link** (o botão "Ver report completo") | Outlook (é o e-mail que a área recebe) |
+| **Versão interativa** (`-interativo.html`) | O **report completo**: movimento ao rolar, vídeos que tocam, peças que abrem maiores | SharePoint (é para lá que o botão leva) |
+| **E-mail completo** (`.eml`, opcional) | O report inteiro no corpo do e-mail | Outlook, só se precisar |
 
-Por que três arquivos: nenhum e-mail roda vídeo ou script (o Outlook bloqueia por segurança). O e-mail leva a mensagem para todo mundo; a versão interativa fica a um clique.
+Por que assim: nenhum e-mail roda vídeo, animação ou script (o Outlook bloqueia por segurança). O e-mail desperta o interesse e dá o panorama; o HTML aprofunda.
 
-> O caminho normal continua sendo editar `dados/AAAA-MM.txt` e gerar pelo `gerar-report.html`.
-> Edições feitas no navegador **não voltam** para o arquivo de dados: passe as mesmas mudanças para lá, senão elas somem quando o report for gerado de novo.
+> O conteúdo vem sempre de `dados/AAAA-MM.txt` (gerado pelo `gerar-report.html`). O conversor não pede para digitar nada de novo: o resumo sai da própria página.
 
-## 1. Editar no navegador (opcional)
+## Passo a passo
 
-1. Abra a página do mês (`.html`) no Chrome ou no Edge.
-2. **Textos:** aperte **F12**, aba **Console**, digite `document.designMode = "on"` e Enter. Feche o F12 e clique no texto que quer mudar.
-3. **Código (Inspecionar):** botão direito no ponto da página → **Inspecionar**. No painel, botão direito no elemento → **Edit as HTML**.
-4. Salve com **Ctrl+S** → tipo **"Página da Web, completa"** (pode salvar por cima do mesmo arquivo). "Somente HTML" **perde as edições**.
+1. Abra `converter-html-eml.html` (dois cliques, Chrome ou Edge). Não instala nada e nada sai do computador.
+2. **Escolher o arquivo .html** → a página do mês (`reports/AAAA-MM.html`). Ou arraste o arquivo para a página.
+3. **Baixar versão interativa (.html)** → suba no SharePoint numa pasta que o público do e-mail consiga abrir → **Copiar link**.
+4. Cole em **Link do report completo**. Se o link já estiver no arquivo de dados (`[EDICAO] link_report_completo`), o campo vem preenchido ("Veio da página").
+5. Confira o **Status** (✓ pronto · ! olhar · ✕ problema) e a **Prévia** → aba **E-mail-resumo** → **Computador** e **Celular**.
+6. **Baixar e-mail-resumo (.eml)** → abra na pasta Downloads: o Outlook abre uma mensagem nova, com assunto e imagens. Envie primeiro só para você, clique no botão e confira se o report abre.
 
-## 2. Prints no Transformation Hub
+## O e-mail-resumo
 
-### Pelo arquivo de dados (o jeito normal)
+Diagramação própria, na identidade do report (vermelho Santander, Lisboa, Rio, chama e formiguinha), em leitura vertical simples:
 
-No bloco do projeto, em `dados/AAAA-MM.txt`:
+| Bloco | O que mostra |
+|---|---|
+| Abertura | Período, a frase do mês e uma linha de contexto |
+| Visão geral | Projeto principal (nome, resumo e a imagem; vídeo vira só a miniatura, **sem ▶**) e os números do mês |
+| Resultados e evolução | Creative X (anterior → atual, variação e barra) e o que foi bem / o que melhorar |
+| Campanhas em destaque | O destaque do mês (com seus resultados) e os lançamentos, em lista |
+| Aprendizados | Título, texto e "Levamos" |
+| Em andamento | Os projetos do Transformation Hub, com o status (ex.: previsão de lançamento) |
+| Próximos passos | Foco do próximo mês e a agenda ("Também vem aí") |
+| Encerramento | "Veja o report completo." e o botão **Ver report completo** (o único link) |
 
-```text
-[TRANSFORMATION 1]
-nome: Copy & Agent
-texto: Em testes.
-prints: print-copy-agent-1.png, print-copy-agent-2.png
-descricao_prints: Tela do agente | Resultado do primeiro teste
-```
+Sem abas, carrossel, menus, animação, ▶ ou imagem clicável. O botão funciona também no Outlook para Windows (botão arredondado em VML).
 
-- Até **3 prints** por projeto, na pasta do mês. Ficam abaixo do texto, na largura do cartão: 1 print = 504 px; 2 = 240 px cada; 3 = 152 px cada. No celular, um embaixo do outro.
-- `descricao_prints`: o que cada print mostra, separados por `|`, na mesma ordem.
-- Na página do mês e na versão interativa, o print abre inteiro e maior no clique.
+### Como o resumo escolhe os destaques
 
-### Pelo Inspecionar (direto no .html)
+Regras fixas, iguais todo mês (em `tools/motor.js`, `RESUMO_REGRAS`). Nada é resumido por máquina nem inventado:
 
-1. Coloque os prints (`.png` ou `.jpg`, nomes sem espaço) na **mesma pasta** do `.html`.
-2. Abra o `.html` no Chrome, botão direito no projeto do Transformation Hub → **Inspecionar**. No painel, **Ctrl+F** e procure `transformation-1` (ou `-2`, `-3`): é o projeto 1, 2 ou 3.
-3. Dentro dele, ache o último parágrafo do texto (`<p …>`), botão direito → **Edit as HTML**, vá até o fim e cole o bloco que o conversor oferece em **"Como colocar prints no HTML"** (botão **Copiar o bloco**, para 1, 2 ou 3 prints). Troque `NOME-DO-PRINT-1.png` pelo nome do arquivo e `DESCREVA O PRINT 1` pela descrição.
-4. Salve (Ctrl+S, "Página da Web, completa").
-5. No conversor, escolha o `.html` e, no passo 1, **Escolher a pasta das imagens** (a pasta onde estão os prints).
+- Os textos e números saem dos **campos marcados** da página (atributo `data-campo` do template). Editou a página ou o arquivo de dados? O resumo acompanha.
+- **A ordem do arquivo de dados é a ordem de prioridade:** o 1º item de cada lista é o primeiro a entrar.
+- Visão geral: projeto principal e até **4** números da capa.
+- Resultados e evolução: Creative X e os **2** primeiros "foi bem" e **2** primeiros "a melhorar".
+- Campanhas: o destaque (com até **3** resultados) e os **3** primeiros lançamentos.
+- Aprendizados: até **3**. Em andamento: até **3** projetos do Transformation Hub.
+- Próximos passos: o foco e os **3** primeiros itens da agenda.
+- Item vazio ou apagado não aparece; bloco sem conteúdo some (a caixa dele fica desligada, com "sem conteúdo nesta edição").
+- Em **Blocos do e-mail-resumo**, dá para desmarcar um bloco: ele fica só no report completo.
 
-O bloco para 1 print fica assim (largura 420 px, a coluna do texto):
+Ainda tem Lorem Ipsum, `X` ou `[INSERIR …]` na página? O Status avisa em **"Ainda não preenchido"**.
 
-```html
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>
-  <td class="col" width="420" valign="top" style="width:420px;"><img src="NOME-DO-PRINT-1.png" width="420" alt="DESCREVA O PRINT 1" data-ampliar="" data-legenda="DESCREVA O PRINT 1" class="fluid" style="display:block;border:1px solid #F5DECF;width:420px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#5F5F5F;"></td>
-</tr></table>
-```
+## A versão interativa (report completo)
 
-O que cada parte faz:
-- **tabela:** é o que funciona no Outlook (ele ignora layout moderno);
-- **`class="fluid"`:** no celular, o print ocupa a largura da tela;
-- **`data-ampliar=""`:** na versão interativa, abre maior no clique. O e-mail tira esse atributo sozinho;
-- **borda `#F5DECF` e cantos de 12 px:** são as cores e o raio do Transformation Hub (guia da marca).
+É a página do mês com o movimento e os cliques: barra de leitura, seções aparecendo ao rolar, números contando até o valor, barra do Creative X crescendo, "▶ Assistir ao vídeo" e peças que abrem maiores. Quem usa "reduzir movimento" no sistema vê tudo parado. Prints colocados à mão (pasta das imagens) vão embutidos.
 
-O conversor reduz prints grandes para 1200 px de largura, coloca-os como anexo nos e-mails e os embute na versão interativa. Por isso o arquivo sobe sozinho para o SharePoint.
+> **SharePoint e arquivos .html:** em muitos SharePoint, por segurança da Microsoft, o `.html` **baixa** em vez de abrir direto. Quem clicar abre o arquivo baixado (Chrome ou Edge) e ele funciona igual. Teste o link com uma pessoa de outra equipe antes do envio geral.
 
-## 3. Gerar os e-mails
+## Editar no navegador (opcional)
 
-1. Abra `converter-html-eml.html` (dois cliques) e escolha o `.html` do mês. Ou arraste o arquivo para a página.
-2. **E-mail completo:** sai na hora → **Baixar e-mail completo (.eml)**.
-3. **E-mail resumido:**
-   1. Marque as seções que vão nele. O padrão é capa e números, resumo das campanhas, foco do próximo mês e encerramento.
-   2. Clique em **Baixar versão interativa (.html)** e suba o arquivo numa pasta do SharePoint (ou OneDrive) que o público do e-mail consiga abrir.
-   3. Copie o **link de compartilhamento** e cole em **Link da versão interativa**. O resumido se monta sozinho → **Baixar e-mail resumido (.eml)**.
-4. Confira as prévias (**E-mail completo** / **E-mail resumido**, no computador e no celular) e o **Assunto**.
+1. Abra a página do mês no Chrome. **Textos:** F12 → aba **Console** → `document.designMode = "on"` → Enter. Clique no texto e edite (o movimento fica parado durante a edição).
+2. **Código (Inspecionar):** botão direito no ponto da página → **Inspecionar** → no painel, botão direito no elemento → **Edit as HTML**.
+3. Salve com **Ctrl+S** → **"Página da Web, completa"**. "Somente HTML" perde as edições.
+4. Não apague os atributos `data-campo` (levam o texto para o resumo). E passe a mesma mudança para o arquivo de dados, senão ela some na próxima geração.
 
-No e-mail resumido:
-- o bloco **"Este e-mail é o resumo do mês"** fica antes do encerramento. Ele lista o que está só na versão completa e tem o botão (funciona no Outlook);
-- as etiquetas das seções são renumeradas (01, 02…);
-- **a miniatura do vídeo aparece sem ▶ e sem link**. É só a imagem, para não dar a entender que o vídeo toca ali; ele só toca na versão interativa;
-- quer o botão também no completo? Marque **"Pôr o botão também no e-mail completo"**.
+### Prints no Transformation Hub pelo Inspecionar
 
-Na versão interativa, cada vídeo ganha, abaixo da miniatura, o botão **"▶ Assistir ao vídeo"**, que abre o vídeo por cima do report.
+O jeito normal é o arquivo de dados (`prints:` e `descricao_prints:`). Pelo Inspecionar:
 
-**Movimento na versão interativa** (no estilo das páginas de produto):
-- uma barra vermelha fina no topo cresce conforme a rolagem;
-- cada seção aparece suave ao entrar na tela;
-- os números grandes contam do zero até o valor;
-- a barra do Creative X cresce até o valor.
+1. Coloque os prints (`.png`/`.jpg`, nomes sem espaço) na **mesma pasta** do `.html`.
+2. Botão direito no projeto → **Inspecionar** → Ctrl+F → `transformation-1` (ou `-2`, `-3`).
+3. No último parágrafo do texto, **Edit as HTML** → cole, no fim, o bloco de **"Como colocar prints no HTML"** (botão **Copiar o bloco**) e troque o nome do arquivo e a descrição.
+4. Salve e, no conversor, **Escolher a pasta das imagens** (a pasta dos prints).
 
-Quem tem "reduzir movimento" ligado no sistema vê tudo parado. Durante a edição no navegador, nada se mexe. O e-mail não muda.
+O conversor reduz prints grandes para 1200 px, coloca-os como anexo no e-mail completo e embutidos na versão interativa. No e-mail-resumo, prints não entram (ficam no report completo).
 
-> **SharePoint e arquivos .html:** em muitos SharePoint, por segurança da Microsoft, o `.html` **baixa** em vez de abrir direto no navegador. Quem clicar abre o arquivo baixado (Chrome ou Edge) e ele funciona igual, com vídeo e ampliação. Teste o link com uma pessoa de outra equipe antes do envio geral.
-
-A página precisa ter sido gerada pela **versão 4.0** ou mais nova: ela marca as seções e guarda a miniatura do vídeo sem ▶. Se o conversor avisar, gere a página de novo pelo `gerar-report.html`.
-
-## 4. Status (tempo real)
+## Status (tempo real)
 
 | Etapa | O que acontece |
 |---|---|
-| Ler o arquivo | Lê o `.html` (nome e tamanho) |
+| Ler o arquivo | Nome e tamanho do `.html` |
 | Reconhecer o report | Versão da ferramenta e arquivo de dados que geraram a página |
-| Tirar o que o e-mail não aceita | Remove script, janela de ampliação, vídeo, botão "Assistir ao vídeo", marcas do clique e da edição. Lista o que saiu |
-| Escolher as seções do resumido | Quais seções ficam, quais vão só para a versão completa, miniaturas de vídeo sem ▶, link do botão |
-| Colocar as imagens dentro dos e-mails | Cada imagem vira anexo embutido (`cid:`), com contador "Imagem 3 de 11"; prints grandes são reduzidos |
-| Montar o e-mail completo / resumido | Conferência do Outlook e tamanho final de cada um |
-| Preparar a versão interativa | O arquivo para o SharePoint, com os prints embutidos |
+| Tirar o que o e-mail não aceita | Script, ampliação, vídeo, "Assistir ao vídeo", marcas do movimento, da edição e dos campos do resumo |
+| Montar o e-mail-resumo | O que entrou em cada bloco, o que ficou de fora, o que ainda é modelo e o link do botão |
+| Colocar as imagens dentro dos e-mails | Cada imagem vira anexo embutido (`cid:`), com contador; prints grandes são reduzidos |
+| Montar o e-mail completo / o e-mail-resumo | Conferência do Outlook e tamanho final |
+| Preparar a versão interativa | O arquivo para o SharePoint |
 
-✓ = pronto · ! = ponto para olhar (deixa baixar) · ✕ = problema (não deixa baixar).
-
-## 5. Acompanhar o arquivo
-
-Com **Acompanhar o arquivo** marcado (Chrome ou Edge, arquivo escolhido pelo botão ou arrastado), a página confere o arquivo a cada 1,5 s.
-Ela converte sozinha quando você salva o `.html` de novo, ou quando muda as seções, o link ou o texto do botão. O ponto verde mostra a hora da última versão salva.
-Deixe a página editada numa aba e o conversor em outra: edite, Ctrl+S, volte e baixe.
-
-Também funciona por um endereço local: na pasta do projeto, rode `python -m http.server 8000` e abra `http://localhost:8000/converter-html-eml.html`.
+Com **Acompanhar o arquivo** marcado (Chrome/Edge, arquivo escolhido pelo botão ou arrastado), a página confere o arquivo a cada 1,5 s e converte de novo sozinha quando você salva o `.html`.
 
 ## Problemas comuns
 
 | Status | O que fazer |
 |---|---|
-| "Faltam N imagens que estão em arquivo ao lado do .html" | **Escolher a pasta das imagens** (passo 1): a pasta dos prints ou a que o Chrome cria ao salvar (`_files`/`_arquivos`) |
-| "Para o resumido, falta o link" | Baixe a versão interativa, suba no SharePoint e cole o link |
-| "miniatura(s) de vídeo continuam com ▶" | A página é de antes da 4.0: gere de novo pelo `gerar-report.html` |
-| "não tem as marcas de seção" | A página é de antes da 3.9: gere de novo pelo `gerar-report.html` |
-| "endereço temporário da prévia (blob:)" | Você salvou a prévia da página de geração. Baixe a página pelo botão **Baixar página do mês (.html)** |
-| "Acima de 10 MB" | Alguma imagem grande entrou. Troque por uma menor |
-| "vem da internet" | A imagem fica como link; o Outlook pode pedir para baixar as imagens |
+| "Falta o link do report completo" | Suba a versão interativa no SharePoint e cole o link (passo 4). A prévia mostra o aviso no lugar do botão |
+| "O link precisa começar com https://" | Copie o link de compartilhamento do SharePoint, não o caminho da pasta |
+| "Esta página não tem os campos do resumo" | A página é de antes da versão 4.2: o resumo sai no formato antigo. Gere a página de novo pelo `gerar-report.html` |
+| "Ainda não preenchido na página" | Há Lorem Ipsum, `X` ou `[INSERIR …]`. Corrija no arquivo de dados e gere de novo |
+| "Faltam N imagens que estão em arquivo ao lado do .html" | **Escolher a pasta das imagens** (a pasta dos prints ou a `_files` que o Chrome cria) |
+| "endereço temporário da prévia (blob:)" | Você salvou a prévia da página de geração. Use **Baixar página do mês (.html)** |
+| "Acima de 10 MB" | Alguma imagem grande entrou no e-mail completo. Troque por uma menor |
+| O resumo deixou um item de fora | É a regra de seleção (os primeiros de cada lista). Mude a ordem dos blocos no arquivo de dados |
