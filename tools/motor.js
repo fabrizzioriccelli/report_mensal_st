@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.3 (2026-10-16)";
+  var VERSAO = "4.4 (2026-10-16)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -194,6 +194,31 @@
     if (/(^|\.)microsoftstream\.com$/i.test(host)) p.push({ nivel: "aviso", msg: "é do Stream (Clássico), que a Microsoft desativou. Use o link do vídeo no novo Stream (SharePoint/OneDrive)." });
     if (tipo === "video" && /\.(mp4|mov|m4v|webm)(\?|$)/i.test(u.pathname)) p.push({ nivel: "aviso", msg: "aponta direto para o arquivo de vídeo. Prefira o link de compartilhamento do Stream: abre o player com som, legendas e as permissões do arquivo." });
     return p;
+  }
+
+  /*
+   * normalizarLink(texto) → { url, tipo: "web" | "arquivo", avisos: [msg], erro }
+   *   O link que a pessoa cola no emulador (botão do e-mail-resumo, links da página).
+   *   Aceita https:// (http://, com aviso) e o caminho de um arquivo: file:///…, C:\… ou \\servidor\pasta\…
+   *   (com ou sem aspas, como o Windows copia em "Copiar como caminho"); o caminho vira file:///….
+   *   Link de arquivo só abre onde o caminho existe: o aviso diz isso, mas não bloqueia.
+   */
+  function normalizarLink(entrada) {
+    var s = String(entrada || "").trim().replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, "").trim(), url = "", tipo = "", avisos = [];
+    if (!s) return { url: "", tipo: "", avisos: [], erro: "" };
+    if (/^(javascript|data|vbscript):/i.test(s)) return { url: "", tipo: "", avisos: [], erro: "esse tipo de endereço não é permitido." };
+    function semEspeciais(x) { return encodeURI(x).replace(/#/g, "%23").replace(/\?/g, "%3F"); }
+    if (/^https?:\/\//i.test(s)) {
+      if (/\s/.test(s)) return { url: "", tipo: "", avisos: [], erro: "o link tem espaço. Copie de novo o link de compartilhamento." };
+      url = s; tipo = "web";
+      if (/^http:/i.test(s)) avisos.push("começa com http:// (sem segurança). Prefira o endereço https://.");
+    } else if (/^file:\/\//i.test(s)) { url = s.replace(/\\/g, "/").replace(/ /g, "%20"); tipo = "arquivo"; }
+    else if (/^[a-z]:[\\/]/i.test(s)) { url = "file:///" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
+    else if (/^\\\\[^\\/]+[\\/]/.test(s)) { url = "file:" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
+    else return { url: "", tipo: "", avisos: [], erro: "não é um endereço. Cole o link do ambiente autorizado (https://…) ou o caminho do arquivo (C:\\…, \\\\servidor\\… ou file:///…)." };
+    try { new URL(url); } catch (e) { return { url: "", tipo: "", avisos: [], erro: "não é um endereço válido." }; }
+    if (tipo === "arquivo") avisos.push("é um arquivo: abre só onde esse caminho existe (neste computador, ou na pasta de rede para quem tem acesso a ela). Para enviar à área, use o link do ambiente autorizado.");
+    return { url: url, tipo: tipo, avisos: avisos, erro: "" };
   }
 
   /* =================================================================== */
@@ -819,7 +844,7 @@
     [/src="data:/i, "erro", "Imagem em base64 dentro do HTML: o Outlook bloqueia."],
     [/@import|<link\b|@font-face/i, "erro", "Fonte ou CSS externo: o Outlook não carrega. Use fontes instaladas (config/marca.txt)."],
     [/src="(file:|\\\\|[a-z]:\\)/i, "erro", "Imagem apontando para arquivo local ou caminho de rede: o destinatário não vê e o Outlook bloqueia."],
-    [/href="(file:|\\\\|[a-z]:\\)/i, "erro", "Link para arquivo local ou caminho de rede: não abre para o destinatário."],
+    [/href="(file:|\\\\|[a-z]:\\)/i, "aviso", "Link para arquivo local ou de rede: só abre onde esse caminho existe (para enviar à área, use o link do ambiente autorizado)."],
     [/<img(?![^>]*\bwidth=")[^>]*>/i, "erro", "Imagem sem o atributo width: o Outlook pode mostrar no tamanho original."],
     [/<img(?![^>]*\balt=")[^>]*>/i, "erro", "Imagem sem alt: quem bloqueia imagens não vê nada no lugar."],
     [/href="#/i, "pendencia", "Link ainda sem endereço (#…)."]
@@ -1511,7 +1536,7 @@
     var partes = [d.tem.campanhas ? "as campanhas" : "", d.tem.aprendizados ? "os aprendizados" : "", d.tem.transformation ? "o Transformation Hub" : "", d.tem.proximos ? "os próximos passos" : ""].filter(Boolean);
     var lista = partes.length > 1 ? partes.slice(0, -1).join(", ") + " e " + partes[partes.length - 1] : partes[0] || "";
     var temVideo = /data-video="/.test(html) || /alt="Vídeo: /.test(html);
-    var link = op.link && /^https:\/\/\S+$/i.test(op.link) ? op.link : "", txtBotao = op.botao || "Acessar report completo";
+    var nl = normalizarLink(op.link), link = !nl.erro && nl.url ? nl.url : "", txtBotao = op.botao || "Acessar report completo";
     var botao = link ? botaoResumo(link, txtBotao, fx) :
       '<span style="display:inline-block;background:' + CR.atencao_fundo + ";color:" + CR.atencao + ";font-family:" + fx + ';font-size:12px;line-height:16px;font-weight:bold;padding:12px 18px;border-radius:999px;border:1px dashed ' + CR.atencao + ';">FALTA O LINK DO REPORT COMPLETO</span>';
     var m = {
@@ -1603,7 +1628,7 @@
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
-    RESUMO_REGRAS: RESUMO_REGRAS, importarDados: importarDados, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
+    RESUMO_REGRAS: RESUMO_REGRAS, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

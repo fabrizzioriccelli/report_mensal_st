@@ -59,8 +59,8 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 
 | Verificação | Status |
 |---|---|
-| Motor: 66 testes automáticos (estado vazio, paleta do Brand Guide, e-mail-resumo, indicadores, importação do Copilot, PDF anexo) | Passam |
-| Emulador de ponta a ponta, como uma pessoa faria, com conteúdo fictício: abrir o modelo, editar texto, número e cor, trocar imagem, colocar link (e recusar caminho do computador), ocultar item e seção, tirar imagem opcional, importar conteúdo, salvar, reabrir, aviso do mês anterior, recuperar a edição, e-mail-resumo (3 indicadores, um único destino, sem link bloqueado), `.eml` MIME; também na versão avulsa | Passa |
+| Motor: 67 testes automáticos (estado vazio, paleta do Brand Guide, e-mail-resumo, indicadores, importação do Copilot, PDF anexo, link de arquivo) | Passam |
+| Emulador de ponta a ponta, como uma pessoa faria, com conteúdo fictício: abrir o modelo, editar texto, número e cor, trocar imagem, colocar link (e recusar caminho do computador), ocultar e adicionar itens com a grade refeita (agenda, lançamentos, indicadores; celular sem vazar), ocultar seção, tirar imagem opcional, link de arquivo no `.eml`, importar conteúdo, salvar, reabrir, aviso do mês anterior, recuperar a edição, e-mail-resumo (3 indicadores, um único destino, sem link bloqueado), `.eml` MIME; também na versão avulsa | Passa |
 | Chamadas da apresentação (PDF) abrindo o emulador, o guia e o report no visualizador do Chromium | Passa |
 | Movimento na versão interativa (contagem, barra, reduzir movimento, edição) | Passa |
 | Página de geração de ponta a ponta no Chromium, sem vazar para o lado de 320 a 1440 px | Passa |

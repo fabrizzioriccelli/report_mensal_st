@@ -2,6 +2,14 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.4 · 2026-10-16 · Link de arquivo no e-mail-resumo, adicionar itens com a grade ajustada
+
+- **Link do report completo aceita o caminho do arquivo** (passo 3 do emulador e "Colocar link"): além de `https://`, vale `C:\…`, `\\servidor\…` e `file:///…`, com ou sem aspas ("Copiar como caminho" do Windows); vira `file:///…` no botão. O emulador avisa que esse link abre só onde o arquivo está, mas não bloqueia o `.eml` (`Motor.normalizarLink`). Link inválido continua recusado.
+- **+ Adicionar** em cada grupo (indicadores, resultados, lançamentos, "foi bem", "a melhorar", projetos do Transformation Hub, aprendizados, agenda): botão sempre visível embaixo do grupo e "+ Adicionar depois" ao passar o mouse num item. O item novo vem do modelo em branco (textos [entre colchetes] com o número da posição, imagem neutra) e a grade é refeita com as regras do motor: linhas de 3, larguras, espaços, filetes, 1º indicador em vermelho e as classes do celular. **Ocultar item** também refaz a grade (antes deixava um buraco). Chaves em sequência, para o e-mail-resumo e a importação do Copilot.
+- Agenda: célula vazia da última linha não aparece mais no celular.
+- As mensagens de ação ("Imagem trocada", aviso de imagem pequena, "PDF anexado") ficam visíveis na linha de estado (antes eram trocadas na hora por "Alterações não salvas").
+- Testes: 67 no motor (links de arquivo); o teste do emulador cobre adicionar e ocultar com a grade refeita, o celular sem vazar e o link de arquivo no `.eml`.
+
 ## 4.3 · 2026-10-16 · Emulador como centro da operação: edição na própria página, e-mail-resumo curto, kit do time
 
 - **Edição persistente no emulador** (`converter-html-eml.html`; versão avulsa em `kit/emulador-report.html`): abre o **modelo em branco** (embutido) ou um **report salvo**, e edita na própria página, no Chrome ou no Edge: textos e números (clique e escreva; o exemplo [entre colchetes] fica selecionado), cor das etiquetas (verde/âmbar), **Trocar imagem** (recorte e redução no navegador, com aviso de imagem pequena), **Descrição**, **Colocar / Trocar / Tirar vídeo**, **Tirar imagem** (selo, logo, prints), **Colocar / Trocar / Tirar link** (só `https://`), **Anexar PDF**, **Texto do link**, **Ocultar item**, mostrar/ocultar **seções** (numeração se ajusta) e **Desfazer**.

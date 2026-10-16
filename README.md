@@ -7,7 +7,7 @@ Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas
 
 O time atualiza tudo no **emulador**: um arquivo só, que abre no Chrome ou no Edge, sem instalar nada.
 
-**Versão 4.3 (2026-10-16).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 4.4 (2026-10-16).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -37,10 +37,10 @@ Tudo o que o time usa está em **[`kit/`](kit/)**:
 
 1. **Organizar:** imagens do mês numa pasta, com nomes no padrão (`black_friday_selo.png`, `one_brief_icone.png`).
 2. **Abrir** o `emulador-report.html` no Chrome ou no Edge.
-3. **Editar** na própria página: clique no texto e escreva; passe o mouse na imagem e "Trocar imagem"; "Ocultar item" no que não vale no mês. Ou cole o conteúdo organizado pelo Copilot em **Importar conteúdo**.
+3. **Editar** na própria página: clique no texto e escreva; passe o mouse na imagem e "Trocar imagem"; **+ Adicionar** (embaixo de cada grupo) para mais um item e "Ocultar item" no que não vale no mês (a grade se ajusta no computador e no celular). Ou cole o conteúdo organizado pelo Copilot em **Importar conteúdo**.
 4. **Salvar** o report do mês (`report-AAAA-MM.html`).
 5. **Conferir:** reabrir o arquivo salvo, no computador e no celular.
-6. **Publicar** no ambiente corporativo autorizado e colar o link no emulador.
+6. **Publicar** no ambiente corporativo autorizado e colar o link no emulador (para testar no seu computador, vale também o caminho do arquivo: `C:\…` ou `file:///…`).
 7. **E-mail-resumo:** escolher até 3 indicadores e baixar o `.eml`.
 8. **Enviar** pelo Outlook: primeiro para você, depois para a área.
 

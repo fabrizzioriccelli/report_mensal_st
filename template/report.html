@@ -524,7 +524,7 @@
         <tr>
           {{#celulas}}
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;border-top:1px solid {{filete}};">&nbsp;</td>{{/primeiro}}
-          <td class="col"{{^vazio}} data-item="agenda-{{idx}}"{{/vazio}} width="184" valign="top" style="width:184px;padding:12px 0;border-top:1px solid {{filete}};">
+          <td class="{{#vazio}}hide-m{{/vazio}}{{^vazio}}col{{/vazio}}"{{^vazio}} data-item="agenda-{{idx}}"{{/vazio}} width="184" valign="top" style="width:184px;padding:12px 0;border-top:1px solid {{filete}};">
             {{^vazio}}
             {{#dia}}<p class="ft" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:22px;line-height:24px;color:{{cor.grupo_aprendizado}};">{{dia}} <span class="fx" style="font-family:{{fonte.texto}};font-size:10px;font-weight:bold;letter-spacing:1.5px;">{{mes}}</span></p>{{/dia}}
             {{^dia}}<p class="fx" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:28px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{rotulo}}</p>{{/dia}}

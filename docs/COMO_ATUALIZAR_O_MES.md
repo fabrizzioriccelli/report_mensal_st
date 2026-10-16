@@ -60,7 +60,8 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 | Mudar um texto | Clico no texto (contorno tracejado) e escrevo. O exemplo [entre colchetes] fica selecionado: o que eu digito entra no lugar. **Enter** confirma; **Shift+Enter** quebra a linha |
 | Mudar um indicador | Clico no valor, no título e na base de comparação e escrevo. Na variação: `▲ +25%` ou `▼ −20%`. Ao clicar na etiqueta aparecem **Cor: verde** (positivo; custo que caiu também é positivo) e **Cor: âmbar** (atenção) |
 | Mudar o período | Clico no período (ex.: `NOVEMBRO 2026`): ele muda em todos os lugares |
-| Tirar um item sem dado | Passo o mouse no item › **Ocultar item** (canto de cima, à direita). Nunca deixo o número do mês anterior nem escrevo 0 |
+| Pôr mais um item | Embaixo do grupo (indicadores, resultados, lançamentos, foi bem/a melhorar, projetos, aprendizados, agenda), clico em **+ Adicionar …**; ou passo o mouse num item › **+ Adicionar depois**. O item novo vem com textos [entre colchetes] (e imagem neutra) para trocar. A grade se ajusta sozinha, no computador e no celular |
+| Tirar um item sem dado | Passo o mouse no item › **Ocultar item** (canto de cima, à direita). A grade se ajusta. Nunca deixo o número do mês anterior nem escrevo 0 |
 | Tirar uma seção inteira | **Seções do report** › desmarco a seção. A numeração se ajusta |
 | Voltar atrás | **Desfazer** (imagem, link, cor, item); **Ctrl+Z** (texto) |
 
@@ -82,11 +83,11 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 
 **Imagens opcionais:** selo, logo e prints do Transformation Hub têm **Tirar imagem** (o espaço sai junto). **Vídeo:** no projeto principal, no destaque e nos lançamentos, **Colocar vídeo** (`.mp4`); depois, **Trocar vídeo** ou **Tirar o vídeo**. No report completo o vídeo toca; no e-mail vai só a capa.
 
-**Links:** passe o mouse no link › **Colocar link** / **Trocar link** (endereço com `https://`; caminho do computador, como `C:\…`, é recusado), **Anexar PDF** (o documento vai dentro do report e abre em nova aba) ou **Tirar link**. No Transformation Hub, **Texto do link** muda o nome do link.
+**Links:** passe o mouse no link › **Colocar link** / **Trocar link** (endereço `https://` ou o caminho do arquivo, `C:\…`, `\\servidor\…` ou `file:///…`, que abre só onde o arquivo está), **Anexar PDF** (o documento vai dentro do report e abre em nova aba) ou **Tirar link**. No Transformation Hub, **Texto do link** muda o nome do link.
 
 ### Campanhas (O que lançamos)
 
-Destaque do mês (categoria, título, texto, imagem e até 3 resultados) e até 6 lançamentos (status, nome, texto, imagem). Status em verde (no ar) ou âmbar (em teste, previsto). Lançamentos a menos no mês: **Ocultar item** nos que sobrarem.
+Destaque do mês (categoria, título, texto, imagem e até 3 resultados) e até 6 lançamentos (status, nome, texto, imagem). Status em verde (no ar) ou âmbar (em teste, previsto). Mais lançamentos: **+ Adicionar lançamento** (o 4º abre uma linha nova). Menos: **Ocultar item** nos que sobrarem.
 
 ### Importar conteúdo do Copilot
 
@@ -118,6 +119,8 @@ Imagens, links e PDF não vêm pelo Copilot: troque na página.
 3. No emulador, passo 3, cole em **Link do report completo**.
 4. Teste numa janela anônima (Chrome) ou InPrivate (Edge): **Ctrl+Shift+N**, cole e aperte Enter. O report precisa abrir.
 
+**Para testar no seu computador** (antes de publicar): no passo 3 vale o caminho do arquivo. Abra o report salvo no Chrome ou no Edge e copie o endereço da barra (`file:///…`), ou, no Explorador, botão direito no arquivo › **Copiar como caminho** (`C:\…`). O emulador avisa: esse link abre só onde o arquivo está (no seu computador ou numa pasta de rede, para quem tem acesso). Para enviar à área, troque pelo link do ambiente autorizado.
+
 ## 4. E-mail-resumo e envio
 
 1. **Sem o link**, o botão "Baixar e-mail-resumo" fica bloqueado e a prévia mostra "FALTA O LINK DO REPORT COMPLETO".
@@ -137,7 +140,8 @@ Imagens, links e PDF não vêm pelo Copilot: troque na página.
 | Não consigo escrever no texto | Clique dentro do contorno tracejado. Rótulos fixos (ex.: "O QUE LANÇAMOS") não mudam |
 | "A imagem não abriu" | Use `.png` ou `.jpg` |
 | "pode ficar borrada" | A imagem é menor que o espaço: peça a versão em alta |
-| "Link não aceito" | O endereço precisa começar com `https://` |
+| "Link não aceito" | Cole um endereço `https://` ou o caminho do arquivo (`C:\…`, `\\servidor\…`, `file:///…`) |
+| "é um arquivo: abre só onde esse caminho existe" | Normal para testar no seu computador. Para enviar à área, use o link do ambiente autorizado |
 | Fechei sem salvar | Abra o emulador: **Recuperar a edição** |
 | Não acho o arquivo salvo | Downloads ou a pasta escolhida; pesquise `report-` no Explorador |
 | "Confira os números antes de salvar" | O período mudou e há números iguais ao mês anterior: atualize ou oculte |

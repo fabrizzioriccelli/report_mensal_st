@@ -112,15 +112,59 @@ function salvarComo() {
   p.__resposta = "https://www.example.com/peca-ficticia";
   await ferramenta(p, f, '[data-item="lancamento-1"] span[title="Link ainda não definido"]', "Colocar link");
   confere(await noQuadro(p, function (d) { return d.querySelector('[data-item="lancamento-1"] a.cta').getAttribute("href"); }) === "https://www.example.com/peca-ficticia", "link colocado no lançamento 1");
-  p.__resposta = "C:\\Users\\fulano\\peca.png";
+  p.__resposta = "\"C:\\Users\\fulano\\peça 2.png\"";
   await ferramenta(p, f, '[data-item="lancamento-2"] span[title="Link ainda não definido"]', "Colocar link");
+  var hrefArq = await noQuadro(p, function (d) { var a2 = d.querySelector('[data-item="lancamento-2"] a.cta'); return a2 ? a2.getAttribute("href") : "(sem link)"; }), estArq = await p.$eval("#estado", function (e) { return e.textContent; });
+  confere(hrefArq === "file:///C:/Users/fulano/pe%C3%A7a%202.png" && /Atenção/.test(estArq), "caminho do computador (com aspas, espaço e acento) aceito como link de arquivo, com aviso · " + hrefArq);
+  p.__resposta = "abc";
+  await ferramenta(p, f, '[data-item="lancamento-3"] span[title="Link ainda não definido"]', "Colocar link");
   await p.waitForSelector("#modal:not([hidden])");
-  confere(/Link não aceito/.test(await p.$eval("#modalTit", function (e) { return e.textContent; })), "caminho do computador recusado como link");
+  confere(/Link não aceito/.test(await p.$eval("#modalTit", function (e) { return e.textContent; })), "texto que não é endereço nem caminho é recusado");
   await p.click("#modalOk");
 
-  /* 4. Ocultar itens e uma seção. */
+  /* 4. Ocultar e adicionar itens (a grade se refaz como o motor monta) e ocultar uma seção. */
+  async function grade(g) {
+    return noQuadro(p, function (d, g2) {
+      var it = Array.prototype.filter.call(d.querySelectorAll('[data-item^="' + g2 + '-"]'), function (x) { return /^[a-z]+-\d+$/.test(x.getAttribute("data-item")); });
+      if (!it.length) return { n: 0 };
+      var corpo = it[0].tagName === "TD" ? it[0].parentNode.parentNode : it[0].parentNode;
+      return { n: it.length, chaves: it.map(function (x) { return x.getAttribute("data-item"); }).join(","), larguras: it.map(function (x) { return x.getAttribute("width"); }).join(","),
+        classes: it.map(function (x) { return x.getAttribute("class"); }).join("|"), linhas: Array.prototype.filter.call(corpo.children, function (tr) { return !tr.querySelector("td[colspan]"); }).map(function (tr) { return Array.prototype.filter.call(tr.children, function (c) { return c.hasAttribute("data-item"); }).length + "+" + Array.prototype.filter.call(tr.children, function (c) { return !c.hasAttribute("data-item") && c.getAttribute("width") === "184"; }).length; }).join(" "),
+        mais: (function () { var b = d.querySelector('.ed-mais button[data-grupo="' + g2 + '"]'); return b ? (b.disabled ? "bloqueado: " : "") + b.textContent : ""; })(),
+        cab: (function () { var c = corpo.querySelector("td[colspan]"); return c ? c.getAttribute("colspan") : ""; })(),
+        cores: it.map(function (x) { var v = x.querySelector('[data-campo$=".valor"]'); return v ? (/color:#EC0000/i.test(v.getAttribute("style")) ? "vermelho" : "preto") : ""; }).join(",") };
+    }, g);
+  }
   await ferramenta(p, f, '[data-item="agenda-6"]', "Ocultar item");
-  confere(await noQuadro(p, function (d) { return d.querySelector('[data-item="agenda-6"]'); }) === null, "item da agenda ocultado");
+  var ga = await grade("agenda");
+  confere(ga.n === 5 && ga.linhas === "3+0 2+1", "agenda: item ocultado e a grade refeita (3 + 2 e um espaço vazio) · " + ga.linhas);
+  confere(ga.mais === "+ Adicionar item na agenda", "agenda: botão visível \"+ Adicionar item na agenda\"");
+  await ferramenta(p, f, '[data-item="agenda-1"]', "+ Adicionar depois");
+  ga = await grade("agenda");
+  confere(ga.n === 6 && ga.linhas === "3+0 3+0" && ga.chaves === "agenda-1,agenda-2,agenda-3,agenda-4,agenda-5,agenda-6" && /^bloqueado: Máximo de 6/.test(ga.mais), "agenda: item adicionado depois do 1º, chaves em sequência, máximo de 6 · " + ga.mais);
+  confere(await noQuadro(p, function (d) { return d.querySelector('[data-campo="agenda-2.titulo"]').textContent.trim(); }) === "[Item da agenda 2]", "item novo vem do modelo, com o número da posição");
+  await ferramenta(p, f, '[data-item="agenda-6"]', "Ocultar item");
+  for (var lk of ["lancamento-6", "lancamento-5", "lancamento-4"]) await ferramenta(p, f, '[data-item="' + lk + '"]', "Ocultar item");
+  var gl = await grade("lancamento");
+  confere(gl.n === 3 && gl.linhas === "3+0" && gl.larguras === "184,184,184" && gl.classes === "col gap|col gap|col" && gl.cab === "5", "lançamentos: 3 numa linha, como o motor monta · " + gl.larguras + " · " + gl.classes);
+  await noQuadro(p, function (d) { d.querySelector('.ed-mais button[data-grupo="lancamento"]').scrollIntoView({ block: "center" }); });
+  var cMais = await noQuadro(p, function (d) { var q = document.querySelector("#edFrame").getBoundingClientRect(), b = d.querySelector('.ed-mais button[data-grupo="lancamento"]').getBoundingClientRect(); return { x: q.left + b.left + b.width / 2, y: q.top + b.top + b.height / 2 }; });
+  await p.mouse.click(cMais.x, cMais.y);
+  gl = await grade("lancamento");
+  confere(gl.n === 4 && gl.linhas === "3+0 1+2" && gl.larguras === "184,184,184,184" && /pt0/.test(gl.classes.split("|")[3]) && gl.cab === "5", "lançamentos: o 4º abre uma linha nova, com 2 espaços vazios · " + gl.linhas);
+  await noQuadro(p, function (d) { d.querySelector('.ed-mais button[data-grupo="numero"]').scrollIntoView({ block: "center" }); });
+  cMais = await noQuadro(p, function (d) { var q = document.querySelector("#edFrame").getBoundingClientRect(), b = d.querySelector('.ed-mais button[data-grupo="numero"]').getBoundingClientRect(); return { x: q.left + b.left + b.width / 2, y: q.top + b.top + b.height / 2 }; });
+  await p.mouse.click(cMais.x, cMais.y);
+  var gn = await grade("numero");
+  confere(gn.n === 4 && gn.larguras === "132,132,132,132" && gn.classes === "half|half|half|half" && gn.cores === "vermelho,preto,preto,preto", "capa: 4 indicadores em 4 colunas iguais (1º em vermelho) · " + gn.larguras);
+  /* no celular: nada sai para o lado e os itens empilham */
+  await p.click('[data-ew="400px"]'); await p.waitForTimeout(400);
+  var cel = await noQuadro(p, function (d) { var w = d.defaultView; return { vaza: d.documentElement.scrollWidth - d.documentElement.clientWidth, agenda: w.getComputedStyle(d.querySelector('[data-item="agenda-1"]')).display, num: w.getComputedStyle(d.querySelector('[data-item="numero-4"]')).display }; });
+  confere(cel.vaza <= 0 && cel.agenda === "block" && cel.num === "inline-block", "celular: sem vazar para o lado; agenda empilhada; indicadores 2 a 2 · " + JSON.stringify(cel));
+  await p.click('[data-ew="100%"]'); await p.waitForTimeout(300);
+  await ferramenta(p, f, '[data-item="numero-4"]', "Ocultar item");
+  gn = await grade("numero");
+  confere(gn.n === 3 && gn.larguras === "184,184,184" && gn.classes === "third|third|third", "capa: de volta a 3 indicadores na grade de 184 px");
   /* Imagens opcionais do modelo (selo, logo e print do Transformation Hub): saem com o espaço delas. */
   for (var alvo of ['img[data-img="selo"]', 'img[data-img="transformation-3-logo"]', 'img[data-img="transformation-3-print-1"]']) {
     await noQuadro(p, function (d, s) { var i = Array.prototype.find.call(d.querySelectorAll(s), function (x) { return x.getBoundingClientRect().width > 0; }); i.scrollIntoView({ block: "center" }); }, alvo);
@@ -148,7 +192,8 @@ function salvarComo() {
   confere(salvo.html.indexOf("Teste fictício") >= 0 && salvo.html.indexOf("12,5%") >= 0 && salvo.html.indexOf("R$ 1,20") >= 0, "textos, números e importação estão no arquivo");
   confere(!/contenteditable|data-ed-|id="ed-barra"|id="ed-css"/.test(salvo.html), "nenhum controle de edição no arquivo (quem recebe não vê)");
   confere(/<script/.test(salvo.html) && /data-campo=/.test(salvo.html), "arquivo salvo é a versão interativa e continua editável no emulador");
-  confere(!/data-item="agenda-6"/.test(salvo.html) && !/secao:aprendizados-->\s*<tr/.test(salvo.html), "item e seção ocultados ficaram de fora");
+  confere(!/data-item="agenda-6"/.test(salvo.html) && !/data-item="lancamento-5"/.test(salvo.html) && /data-item="lancamento-4"/.test(salvo.html) && !/secao:aprendizados-->\s*<tr/.test(salvo.html), "itens ocultados e seção ficaram de fora; item adicionado ficou");
+  confere(!/ed-mais|data-grupo=/.test(salvo.html), "botões \"+ Adicionar\" não vão para o arquivo");
   confere(/href="https:\/\/www\.example\.com\/peca-ficticia"/.test(salvo.html), "link salvo");
   await p.close();
 
@@ -192,6 +237,11 @@ function salvarComo() {
   confere(marcados.join(",") === "numero-1,numero-2,numero-3", "indicadores: os 3 números do projeto principal por padrão");
   confere(await p.$$eval("#indicadores input:disabled", function (l) { return l.length; }) > 0, "no máximo 3 indicadores (os outros ficam bloqueados)");
   confere(await p.$eval("#bEmlRes", function (b) { return b.disabled; }) && /FALTA O LINK DO REPORT COMPLETO/.test(await p.$eval("#prev", function (e) { return e.srcdoc; })), "sem o link: e-mail-resumo bloqueado e a prévia avisa");
+  /* link de arquivo (caminho do Windows, como "Copiar como caminho"): libera o e-mail, com aviso */
+  await p.fill("#link", "\"C:\\Users\\Fulano\\Downloads\\report-2099-01.html\"");
+  await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
+  var hrefRes = ((await p.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta" href="([^"]*)"/) || [])[1], infoRes = await p.$eval("#linkInfo", function (e) { return e.textContent; });
+  confere(hrefRes === "file:///C:/Users/Fulano/Downloads/report-2099-01.html" && /Atenção/.test(infoRes), "link de arquivo (C:\\…) aceito: vira file:///… no botão, com aviso · " + hrefRes + " · " + infoRes.slice(0, 60));
   var LINK = "https://www.example.com/report-ficticio";
   await p.fill("#link", LINK);
   await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
