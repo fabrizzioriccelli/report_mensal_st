@@ -2,6 +2,19 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.2 · 2026-10-16 · E-mail-resumo como porta de entrada, Transformation Hub da área, campos editáveis identificados
+
+- **E-mail-resumo novo, com diagramação própria** (não é mais um corte do report): abertura com o período e a frase do mês, visão geral (projeto principal e números), resultados e evolução (Creative X, foi bem / a melhorar), campanhas em destaque, aprendizados, em andamento (Transformation Hub), próximos passos e o encerramento com **um único link**, o botão **"Ver report completo"** (arredondado também no Outlook para Windows, em VML). Estático: sem vídeo, ▶, ampliação ou imagem clicável.
+- **Uma fonte só:** o resumo lê os textos e números da própria página, pelos atributos `data-campo` do template. Editou o arquivo de dados ou a página? O resumo acompanha. Item apagado some; bloco sem conteúdo não aparece.
+- **Regras de seleção fixas e documentadas** (`RESUMO_REGRAS` em `tools/motor.js`): até 4 números, Creative X, 2 "foi bem" e 2 "a melhorar", destaque com até 3 resultados, 3 lançamentos, 3 aprendizados, 3 projetos do Transformation Hub, foco e 3 itens da agenda, sempre na ordem do arquivo de dados. Nada é resumido por máquina nem inventado.
+- **Conversor:** caixas por bloco do resumo (bloco sem conteúdo fica desligado), as regras na própria tela, o status lista o que entrou em cada bloco e o que ainda é modelo; o e-mail-resumo vira o download principal (`-resumo.eml`) e o completo fica opcional. Páginas de antes da 4.2 ainda geram o resumo no formato antigo, com aviso.
+- **Link do report completo no arquivo de dados:** `[EDICAO] link_report_completo` vira a meta `report-completo` da página e preenche sozinho o campo do conversor. Caminho local (`C:\…`, `\\servidor\…`) não é aceito.
+- **Transformation Hub:** campos novos `logo:` (PNG original do logo do projeto, 56 px, no lugar dos ícones), `descricao_logo:` e `links:` (vários links por projeto, "Texto | endereço", separados por `;`). Link ainda não preenchido aparece sem clique e conta como pendência.
+- **Campos editáveis identificados na página gerada:** os comentários `EDITAR AQUI: PERÍODO`, `RESULTADO PRINCIPAL`, `IMAGEM DO PROJETO PRINCIPAL`, `CAMPANHAS`, `APRENDIZADO`… agora ficam também na página do mês (`reports/AAAA-MM.html`), para quem abrir no PyCharm. Os e-mails não os levam.
+- **Exemplo de treinamento:** `dados/EXEMPLO-treinamento.txt` com conteúdo 100% fictício (Janeiro 2099) e imagens neutras em `assets/exemplo/` (peças, vídeo curto, print e ícone). Base das capturas do guia operacional.
+- **Apresentações:** `apresentacoes/` com a apresentação executiva e o guia operacional (PowerPoint editável e PDF), feitos com capturas reais do projeto em execução e conteúdo fictício.
+- Testes: 62 no motor (resumo, regras de seleção, edição refletida, logo e links, meta do link); o teste do conversor cobre o e-mail-resumo (um único destino, blocos, estático, bloco desmarcado).
+
 ## 4.1 · 2026-10-15 · Movimento na versão interativa
 
 Só na página do navegador (versão interativa e página do mês); o e-mail não muda (nenhum cliente de e-mail roda script).

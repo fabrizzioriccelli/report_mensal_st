@@ -127,7 +127,7 @@ O nome entre colchetes foi alterado. Use os nomes do modelo (`[NUMERO 1]`, `[LAN
 ### Os acentos viraram `Ã©`.
 O arquivo foi salvo fora do UTF-8. No PyCharm já é UTF-8; no Bloco de Notas: *Salvar como → Codificação: UTF-8*.
 
-### O botão "Baixar e-mail final" está cinza.
+### O botão "Baixar e-mail completo" está cinza.
 Ainda há itens em **falta**. Preencha ou, para testar, marque **Gerar um RASCUNHO**.
 
 ### Editei, mas a página não mudou.

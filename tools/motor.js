@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.1 (2026-10-15)";
+  var VERSAO = "4.2 (2026-10-16)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -79,7 +79,7 @@
   function junta() { var o = {}; for (var i = 0; i < arguments.length; i++) for (var k in arguments[i]) o[k] = arguments[i][k]; return o; }
 
   var ESQUEMA_DADOS = [
-    { bloco: "EDICAO", obrigatorio: true, campos: { mes: 1, ano: 1, proximo_mes: 1, pasta_imagens: 1, contato: 0 } },
+    { bloco: "EDICAO", obrigatorio: true, campos: { mes: 1, ano: 1, proximo_mes: 1, pasta_imagens: 1, contato: 0, link_report_completo: 0 } },
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
     { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
@@ -91,7 +91,7 @@
     { bloco: "LANCAMENTO", max: 6, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0 }, PECA) },
     { bloco: "CREATIVE X", campos: { subtitulo: 0, anterior: 0, atual: 1, variacao: 0, periodo: 0, referencia: 0, significado: 0 } },
     { bloco: "TRANSFORMATION", campos: { titulo: 0 } },
-    { bloco: "TRANSFORMATION", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, citacao: 0, resultado: 0, icones: 0, prints: 0, descricao_prints: 0 }, PECA) },
+    { bloco: "TRANSFORMATION", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, citacao: 0, resultado: 0, icones: 0, logo: 0, descricao_logo: 0, links: 0, prints: 0, descricao_prints: 0 }, PECA) },
     { bloco: "APRENDIZADO", max: 3, campos: { titulo: 1, texto: 0, levamos: 0 } },
     { bloco: "FOCO", campos: { prioridade: 1, texto: 0, selo: 0, descricao_selo: 0 } },
     { bloco: "AGENDA", max: 6, campos: { data: 0, titulo: 1, detalhe: 0 } }
@@ -274,7 +274,8 @@
   /* Remove comentários de edição, mantendo os condicionais do Outlook (<!--[if mso]>). */
   /* Tira os comentários do template, menos os condicionais do Outlook e as marcas de seção
      (<!--secao:nome-->), que o converter-html-eml.html usa para montar o e-mail resumido. */
-  function semComentarios(html) { return html.replace(/<!--(?!\[if|<!\[endif\]|>|secao:)[\s\S]*?-->/g, ""); }
+  /* Ficam: comentários condicionais do Outlook, marcas de seção ("secao:") e os "EDITAR AQUI" (guia para quem abre a página no editor). */
+  function semComentarios(html) { return html.replace(/<!--(?!\[if|<!\[endif\]|>|secao:| EDITAR AQUI)[\s\S]*?-->/g, ""); }
 
   /* =================================================================== */
   /* 6. MODELO DO E-MAIL                                                  */
@@ -450,7 +451,7 @@
     function etiqueta(texto_, corNome, simbolo) {
       var verde = chaveCampo(corNome || "verde") !== "ambar";
       /* Etiqueta: não quebra no computador; no celular pode quebrar (classe wrap-m) para nunca vazar da tela. */
-      return seguro('<span class="wrap-m" style="display:inline-block;background:' + (verde ? cor.positivo_fundo : cor.atencao_fundo) + ";color:" + (verde ? cor.positivo : cor.atencao) +
+      return seguro('<span class="wrap-m" data-tom="' + (verde ? "verde" : "ambar") + '" style="display:inline-block;background:' + (verde ? cor.positivo_fundo : cor.atencao_fundo) + ";color:" + (verde ? cor.positivo : cor.atencao) +
         ';font-weight:bold;padding:0 7px;border-radius:999px;white-space:' + (ehPendencia(texto_) ? "normal" : "nowrap") + ';">' + simbolo + " " + texto(texto_).s + "</span>");
     }
     function variacao(v, nomeBloco) {
@@ -460,7 +461,7 @@
       var desce = /^[-−]/.test(v.variacao);
       var t = v.variacao.replace(/^[-−]\s*/, "");
       var verde = chaveCampo(v.variacao_cor || "verde") !== "ambar";
-      return seguro('<span style="display:inline-block;background:' + (verde ? cor.positivo_fundo : cor.atencao_fundo) + ";color:" + (verde ? cor.positivo : cor.atencao) +
+      return seguro('<span data-tom="' + (verde ? "verde" : "ambar") + '" style="display:inline-block;background:' + (verde ? cor.positivo_fundo : cor.atencao_fundo) + ";color:" + (verde ? cor.positivo : cor.atencao) +
         ';font-weight:bold;padding:0 7px;border-radius:999px;white-space:nowrap;">' + (desce ? "&#9660; " + (/^\d/.test(t) ? "&minus;" : "") : "&#9650; ") + esc(t) + "</span>");
     }
     function status(v, nomeBloco) {
@@ -519,7 +520,7 @@
         curto(v, "valor", 11, "NUMERO " + (i + 1));
         return {
           valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "NUMERO " + (i + 1)),
-          largura: larg[i], principal: i === 0, primeiro: i === 0,
+          idx: i + 1, largura: larg[i], principal: i === 0, primeiro: i === 0,
           cor_valor: i === 0 ? cor.marca : cor.texto, cor_filete: i === 0 ? cor.marca : cor.texto,
           classe_m: nums.length === 3 ? "third" : "half",
           estilo: "padding:0 0 20px 0;"
@@ -533,7 +534,7 @@
     var fb = L["FOI BEM"] || [], am = L["A MELHORAR"] || [], balanco = null;
     if (fb.length || am.length) {
       var lb = fb.length && am.length ? colunas(LARGURA, 2) : [LARGURA, LARGURA];
-      function itensBalanco(lista, nome) { return lista.map(function (v, i) { curto(v, "texto", 90, nome + " " + (i + 1)); return { texto: texto(v.texto) }; }); }
+      function itensBalanco(lista, nome) { return lista.map(function (v, i) { curto(v, "texto", 90, nome + " " + (i + 1)); return { idx: i + 1, texto: texto(v.texto) }; }); }
       balanco = {
         bem: fb.length ? { itens: itensBalanco(fb, "FOI BEM"), largura: lb[0] } : null,
         melhorar: am.length ? { itens: itensBalanco(am, "A MELHORAR"), largura: fb.length ? lb[1] : lb[0] } : null,
@@ -560,7 +561,7 @@
             /* No celular os resultados ficam em terços (~110 px): número longo (ex.: "R$ 1.234,56") invade a coluna ao lado. */
             curto(v, "valor", res.length === 3 ? 7 : 11, "RESULTADO " + (i + 1));
             return {
-              valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)),
+              idx: i + 1, valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)),
               largura: lr[i], primeiro: i === 0, estilo: "padding:14px 0 0 0;", classe_m: res.length === 3 ? "third" : "half"
             };
           })
@@ -569,7 +570,7 @@
         linhas_compactos: (function () {
           var itens = lanc.map(function (v, i) {
             var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, COL, 72, 20, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
-            return { status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lanc.length > 3 ? COL : lc[i], classe: (ult ? "col" : "col gap") + (i >= 3 ? " pt0" : ""), vazio: false, estilo: i >= 3 ? "padding-top:28px;" : "" };
+            return { idx: i + 1, status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lanc.length > 3 ? COL : lc[i], classe: (ult ? "col" : "col gap") + (i >= 3 ? " pt0" : ""), vazio: false, estilo: i >= 3 ? "padding-top:28px;" : "" };
           }), linhas = [];
           for (var k = 0; k < itens.length; k += 3) {
             var linha = itens.slice(k, k + 3);
@@ -596,20 +597,39 @@
       cx = {
         n: proxSecao(), subtitulo: texto(CX.subtitulo), anterior: numero(CX.anterior), atual: numero(CX.atual),
         variacao: pend ? chip(vari) : seguro(esc(vari).replace(/^[-−]\s*/, "&minus;")), variacao_pendente: pend,
-        variacao_cor: queda ? cor.atencao : cor.positivo, variacao_fundo: queda ? cor.atencao_fundo : cor.positivo_fundo,
+        variacao_cor: queda ? cor.atencao : cor.positivo, variacao_fundo: queda ? cor.atencao_fundo : cor.positivo_fundo, variacao_tom: queda ? "ambar" : "verde",
         periodo: texto(CX.periodo), referencia: texto(CX.referencia), significado: texto(CX.significado),
         tem_barra: barra > 0, barra: barra + "%", resto: (100 - barra) + "%"
       };
     }
 
     /* 04 · Transformation Hub */
-    var tr = L.TRANSFORMATION || [], transformation = null;
+    var tr = L.TRANSFORMATION || [], transformation = null, linksReport = [];
     if (tr.length) {
       transformation = {
         n: proxSecao(), titulo: texto((D.simples.TRANSFORMATION || {}).titulo || ""),
         projetos: tr.map(function (v, i) {
           var nb = "TRANSFORMATION " + (i + 1), p = peca(v, nb, 68, 52, 8, { dica: "136 x 104 px", semAmpliar: true }, "projeto");
-          var icones = (v.icones || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean).map(function (ic, j) {
+          /* Logo do projeto (ex.: logo do agente): PNG original na pasta do mês, 56 px de largura, sem recorte.
+             Com logo, os ícones não aparecem (o logo ocupa o lugar deles). */
+          var logo = null, logoPend = false;
+          if (v.logo && ehPendencia(v.logo)) { logoPend = true; problema(prob, "pendencia", arqD, v._linhas.logo, "[" + nb + "] logo: " + v.logo); }
+          else if (v.logo) {
+            var camL = caminhoImagem(v.logo);
+            if (!existe(camL)) problema(prob, "erro", arqD, v._linhas.logo, "[" + nb + "] logo não encontrado: " + camL + ". Confira o nome do arquivo.");
+            logo = imagem(camL, 56, 0, { alt: v.descricao_logo || "Logo: " + semBr(v.nome || ""), papel: nb + " (logo)" });
+          }
+          /* Links extras (ex.: documento e agente): "Texto | https://…", vários separados por ";". */
+          var links = (v.links || "").split(";").map(function (x) { return x.trim(); }).filter(Boolean).map(function (par, j) {
+            var k = par.lastIndexOf("|"), rot = k > 0 ? par.slice(0, k).trim() : "", url = k > 0 ? par.slice(k + 1).trim() : par;
+            if (!rot) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: escreva \"Texto do link | endereço\" (ex.: Briefing Agent | https://…). Vários, separados por ;"); return ""; }
+            conferirLink(url, "projeto", dominios).forEach(function (x) { problema(prob, x.nivel, arqD, v._linhas.links, "[" + nb + "] links (" + rot + "): " + x.msg); });
+            var ok = url && !ehPendencia(url) && /^https?:\/\//i.test(url) && !/\s/.test(url);
+            if (ok) linksReport.push({ onde: "Transformation " + (i + 1) + " · " + rot, tipo: "projeto", rotulo: rot, url: url });
+            return ok ? '<a href="' + esc(url) + '" target="_blank" class="cta" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>"
+              : '<span title="Link ainda não definido" style="color:' + cor.texto_apoio.s + ';font-weight:bold;">' + esc(rot) + "&nbsp;&#8594;</span>";
+          }).filter(Boolean);
+          var icones = logo || logoPend ? [] : (v.icones || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean).map(function (ic, j) {
             var cam = "assets/icones/" + ic.replace(/\.png$/i, "") + ".png";
             if (!existe(cam)) problema(prob, "erro", arqD, v._linhas.icones, "[" + nb + "] ícone não encontrado: " + cam);
             var im = imagem(cam, 32, 32, { alt: "", papel: "icone" });
@@ -638,7 +658,8 @@
           return {
             numero: i + 1, prints: prints, tem_prints: prints.length > 0,
             status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), citacao: texto(v.citacao), resultado: texto(v.resultado),
-            icones: icones, peca: p, tem_visual: icones.length > 0 || !!p.img || !!p.placeholder,
+            icones: icones, logo: logo, logo_placeholder: logoPend, links: seguro(links.join('<span style="color:' + cor.texto_apoio.s + ';">&nbsp;&nbsp;·&nbsp;&nbsp;</span>')),
+            peca: p, tem_visual: icones.length > 0 || !!logo || logoPend || !!p.img || !!p.placeholder,
             borda: i < tr.length - 1 ? "border-bottom:1px solid " + cor.transformation_linha.s + ";" : ""
           };
         })
@@ -680,7 +701,7 @@
         var celulas = ag.slice(i, i + 3).map(function (v, j) {
           var m = String(v.data || "").trim().match(/^(\d{1,2}|XX?)\s+(\S.*)$/);
           return {
-            dia: m ? m[1] : "", mes: m ? maiusculas(m[2]) : "", rotulo: m ? "" : texto(maiusculas(v.data || "")),
+            idx: i + j + 1, dia: m ? m[1] : "", mes: m ? maiusculas(m[2]) : "", rotulo: m ? "" : texto(maiusculas(v.data || "")),
             titulo: texto(v.titulo), detalhe: texto(v.detalhe), vazio: false, primeiro: j === 0
           };
         });
@@ -690,9 +711,17 @@
       agenda = { n: proxSecao(), linhas: linhas };
     }
 
+    /* Link do report completo (versão interativa no SharePoint): vira a meta "report-completo" da página,
+       e o converter-html-eml.html já abre com ele no campo do botão do e-mail-resumo. */
+    var linkRC = (E.link_report_completo || "").trim();
+    if (linkRC) {
+      var pl = conferirLink(linkRC, "projeto", dominios);
+      pl.forEach(function (x) { problema(prob, x.nivel === "erro" ? "aviso" : x.nivel, arqD, E._linhas.link_report_completo, "[EDICAO] link_report_completo: " + x.msg); });
+      if (ehPendencia(linkRC) || !/^https:\/\/\S+$/i.test(linkRC)) linkRC = "";
+    }
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
-      assunto: assunto, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
+      assunto: assunto, link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
@@ -713,6 +742,7 @@
       lanc.forEach(function (v, i) { regLink("Lançamento " + (i + 1) + " · " + semBr(v.nome), lancamos.linhas_compactos[Math.floor(i / 3)].itens[i % 3].peca); });
     }
     if (transformation) tr.forEach(function (v, i) { regLink("Transformation " + (i + 1) + " · " + semBr(v.nome), transformation.projetos[i].peca); });
+    links = links.concat(linksReport);
 
     /* Nome do arquivo: report-AAAA-MM (no modelo em branco, report-MODELO). */
     var slug = periodoOk ? ano + "-" + String(mesNumero(mes)).padStart(2, "0") : "MODELO";
@@ -756,7 +786,10 @@
     if (S["CREATIVE X"]) { var c = S["CREATIVE X"]; o.push("", "CREATIVE X: " + (c.anterior ? t(c.anterior) + " -> " : "") + t(c.atual) + (c.periodo ? " (" + t(c.periodo) + ")" : ""), t(c.referencia), t(c.significado)); }
     if ((L.TRANSFORMATION || []).length) {
       o.push("", "TRANSFORMATION HUB");
-      L.TRANSFORMATION.forEach(function (v) { o.push("", t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto)); if (v.resultado) o.push("Resultado: " + t(v.resultado)); l = lk(v); if (l) o.push(l); });
+      L.TRANSFORMATION.forEach(function (v) {
+        o.push("", t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto)); if (v.resultado) o.push("Resultado: " + t(v.resultado)); l = lk(v); if (l) o.push(l);
+        (v.links || "").split(";").forEach(function (par) { var k = par.lastIndexOf("|"), u = k > 0 ? par.slice(k + 1).trim() : ""; if (u && !ehPendencia(u)) o.push("  " + par.slice(0, k).trim() + ": " + u); });
+      });
     }
     if ((L.APRENDIZADO || []).length) { o.push("", "O QUE APRENDEMOS"); L.APRENDIZADO.forEach(function (v, i) { o.push((i + 1) + ". " + t(v.titulo) + ": " + t(v.texto) + (v.levamos ? " Levamos: " + t(v.levamos) : "")); }); }
     if (S.FOCO) o.push("", "FOCO DE " + maiusculas(E.proximo_mes) + ": " + t(S.FOCO.prioridade), t(S.FOCO.texto));
@@ -874,7 +907,9 @@
   function trocarImagens(html, fn) { return html.replace(/@@IMG(\d+)@@/g, function (m, id) { return fn(+id); }); }
 
   /* E-mail: sem ampliação (nenhum cliente de e-mail roda script). A peça só clica quando tem link. */
-  function paraEmail(html) { return html.replace(/ data-(ampliar|legenda|video|thumb)="[^"]*"/g, ""); }
+  function paraEmail(html) {
+    return html.replace(/ data-(ampliar|legenda|video|thumb|campo|tom)="[^"]*"/g, "").replace(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "").replace(/<meta name="report-completo"[^>]*>\n?/, "");
+  }
   /* Troca os marcadores @@VIDn@@ pelo endereço do vídeo (só na página do navegador). */
   function trocarVideos(html, fn) { return html.replace(/@@VID(\d+)@@/g, function (m, id) { return fn(+id); }); }
 
@@ -1004,6 +1039,9 @@
     tira(/<div\b[^>]*\bid="leitura"[^>]*><\/div>\s*/g, "barra de leitura");
     tira(/ data-(?:rv|motion|barra|conta)(?:="[^"]*")?(?=[\s>\/])/g, "marca do movimento");
     tira(/ data-(?:ampliar|legenda|video|thumb)="[^"]*"/g, "atributo de ampliação ou vídeo");
+    tira(/ data-(?:campo|tom)="[^"]*"/g, "marca dos campos do resumo");
+    tira(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "comentário \"EDITAR AQUI\"");
+    tira(/<meta name="report-completo"[^>]*>\n?/g, "endereço do report completo (meta)");
     tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
     tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
     return { html: html, saiu: saiu };
@@ -1063,6 +1101,8 @@
   }
 
   function desfazEntidades(s) {
+    var NOMES = { minus: "\u2212", rarr: "\u2192", larr: "\u2190", middot: "\u00b7", ndash: "\u2013", mdash: "\u2014", hellip: "\u2026", ldquo: "\u201c", rdquo: "\u201d", lsquo: "\u2018", rsquo: "\u2019", bull: "\u2022", times: "\u00d7" };
+    s = s.replace(/&([a-z]+);/g, function (m, n) { return NOMES[n] || m; });
     return s.replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
       .replace(/&#(\d+);/g, function (m, n) { return String.fromCodePoint(+n); })
       .replace(/&#x([0-9a-f]+);/gi, function (m, n) { return String.fromCodePoint(parseInt(n, 16)); })
@@ -1219,6 +1259,424 @@
     return { html: html, saiu: saiu, interativa: (/data-(ampliar|video)="/.test(html) || /<!--secao:/.test(html)) && /<script/i.test(html) };
   }
 
+  /* =================================================================== */
+  /* 12. E-MAIL-RESUMO: PORTA DE ENTRADA PARA O REPORT COMPLETO           */
+  /* =================================================================== */
+  /*
+   * O e-mail-resumo NÃO é um corte do report: tem diagramação própria, estática (sem vídeo, sem
+   * ampliação, sem cartão que pareça clicável) e UM ÚNICO link, o botão final "Ver report completo".
+   * O conteúdo vem da página do mês (mesma fonte do HTML completo): cada texto e número marcado no
+   * template com data-campo="…". Editou a página ou o arquivo de dados? O resumo acompanha.
+   *
+   * REGRAS DE SELEÇÃO (sempre as mesmas, na ordem em que os itens aparecem no report; a ordem do
+   * arquivo de dados é a ordem de prioridade). Item vazio ou seção apagada não aparece; nada é inventado.
+   */
+  var RESUMO_REGRAS = { numeros: 4, resultados: 3, bem: 2, melhorar: 2, lancamentos: 3, aprendizados: 3, andamento: 3, agenda: 3 };
+  var BLOCOS_RESUMO = {
+    visao: "Visão geral: projeto principal e os números do mês",
+    resultados: "Resultados e evolução: Creative X, o que foi bem e o que melhorar",
+    campanhas: "Campanhas em destaque: destaque do mês e lançamentos",
+    aprendizados: "Aprendizados",
+    andamento: "Em andamento: Transformation Hub",
+    proximos: "Próximos passos: foco do próximo mês e agenda"
+  };
+  /* Paleta do Brand Guide (a mesma de config/marca.txt). */
+  var CR = {
+    marca: "#EC0000", branco: "#FFFFFF", lisboa: "#FBF1EA", rio: "#F5DECF", mexico: "#F0B998", texto: "#000000", apoio: "#767676", linha: "#E2E2E2",
+    positivo: "#21634F", positivo_fundo: "#A3E0CE", atencao: "#945400", atencao_fundo: "#FFE1B9",
+    turquesa: "#127277", turquesa_fundo: "#CDECEE", roxo: "#803262", roxo_fundo: "#F0CAE1", rosa: "#A6112F", rosa_fundo: "#FFC3CF"
+  };
+
+  /* Todos os elementos com data-campo, na ordem: [{ campo, tag, atributos, interno }]. */
+  function elementosComCampo(html) {
+    var re = /<([a-z0-9]+)\b([^>]*?)\sdata-campo="([^"]+)"([^>]*)>/gi, r = [], m;
+    while ((m = re.exec(html))) {
+      var tag = m[1].toLowerCase(), attrs = m[2] + " " + m[4], ini = re.lastIndex, interno = "";
+      if (tag !== "img") {
+        var abre = new RegExp("<" + tag + "\\b|</" + tag + "\\s*>", "gi"), prof = 1, x;
+        abre.lastIndex = ini;
+        while (prof && (x = abre.exec(html))) { prof += x[0][1] === "/" ? -1 : 1; if (!prof) interno = html.slice(ini, x.index); }
+      }
+      r.push({ campo: m[3], tag: tag, atributos: attrs, interno: interno });
+    }
+    return r;
+  }
+  function atributo(attrs, nome) { var m = new RegExp("\\s" + nome + '="([^"]*)"').exec(" " + attrs); return m ? desfazEntidades(m[1]) : ""; }
+  /* Texto visível de um campo: sem o botão "Ver peça" (o resumo não tem links), sem tags, entidades desfeitas. */
+  function textoDoCampo(h) {
+    /* Um campo dentro de outro (ex.: frase_final dentro da frase) conta só no dele. */
+    h = String(h).replace(/<([a-z0-9]+)\b[^>]*\sdata-campo="[^"]*"[^>]*>[\s\S]*?<\/\1>/gi, "");
+    return desfazEntidades(String(h).replace(/<a\b[^>]*class="cta"[\s\S]*?<\/a>/gi, "").replace(/<span title="Link ainda não definido"[\s\S]*?<\/span>/gi, "")
+      .replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "")).replace(/[\s\u00a0]+/g, " ").trim();
+  }
+
+  /*
+   * dadosDoResumo(html) → { ok, d, pendencias } ou { erro }
+   *   Lê da página os campos marcados (data-campo) e devolve os dados já organizados por bloco.
+   */
+  function dadosDoResumo(html) {
+    var els = elementosComCampo(html);
+    if (!els.length) return { erro: "Esta página não tem os campos do resumo (foi gerada antes da versão 4.2). Gere a página de novo pelo gerar-report.html." };
+    var c = {}, img = {}, tom = {}, pend = [];
+    els.forEach(function (e) {
+      if (e.tag === "img") { if (!img[e.campo]) img[e.campo] = { src: atributo(e.atributos, "src"), thumb: atributo(e.atributos, "data-thumb"), alt: atributo(e.atributos, "alt"), w: +atributo(e.atributos, "width") || 0 }; return; }
+      if (e.campo in c) return;
+      var t = textoDoCampo(e.interno);
+      if (!t) return;
+      c[e.campo] = t;
+      var tm = /data-tom="(verde|ambar)"/.exec(e.atributos + e.interno);
+      if (tm) tom[e.campo] = tm[1];
+      if (/\[[^\]]*\]|\blorem\b|\bipsum\b/i.test(t) || (/\.(valor|detalhe|variacao|atual|anterior|data)$|^periodo$/.test(e.campo) && /(^|[^A-Za-zÀ-ÿ])X{1,2}(?![A-Za-zÀ-ÿ])|AAAA/.test(t))) pend.push(e.campo + ": " + t);
+    });
+    function lista(prefixo, campos, max) {
+      var r = [];
+      for (var i = 1; i <= 12 && r.length < max; i++) {
+        var it = {}, tem = false;
+        campos.forEach(function (k) { var v = c[prefixo + "-" + i + "." + k]; it[k] = v || ""; if (v) tem = true; it["tom_" + k] = tom[prefixo + "-" + i + "." + k] || ""; });
+        if (tem) r.push(it);
+      }
+      return r;
+    }
+    var p = img["principal.imagem"];
+    /* Miniatura de vídeo: só a versão sem ▶ (data-thumb). Página antiga, com ▶ desenhado: fica sem imagem. */
+    var imPrincipal = p ? (p.thumb ? { src: p.thumb, alt: p.alt.replace(/^Vídeo: /, "").replace(/ \([^)]*\)$/, "") } : /^Vídeo: /.test(p.alt) ? null : { src: p.src, alt: p.alt.replace(/ \([^)]*\)$/, "") }) : null;
+    var d = {
+      periodo: c.periodo || "", frase: c.frase || "", frase_final: c.frase_final || "",
+      logo: img.logo || null, formiga: img.formiguinha || null,
+      principal: c["principal.nome"] ? { nome: c["principal.nome"], resumo: c["principal.resumo"] || "", imagem: imPrincipal } : null,
+      numeros: lista("numero", ["valor", "titulo", "detalhe", "variacao"], RESUMO_REGRAS.numeros).filter(function (n) { return n.valor; }),
+      cx: c["cx.atual"] ? { anterior: c["cx.anterior"] || "", atual: c["cx.atual"], variacao: c["cx.variacao"] || "", tom: tom["cx.variacao"] || "", periodo: c["cx.periodo"] || "", subtitulo: c["cx.subtitulo"] || "", significado: c["cx.significado"] || "" } : null,
+      bem: lista("bem", ["texto"], RESUMO_REGRAS.bem), melhorar: lista("melhorar", ["texto"], RESUMO_REGRAS.melhorar),
+      destaque: c["destaque.titulo"] ? { categoria: c["destaque.categoria"] || "", titulo: c["destaque.titulo"], texto: c["destaque.texto"] || "",
+        resultados: lista("resultado", ["valor", "titulo", "detalhe", "variacao"], RESUMO_REGRAS.resultados).filter(function (n) { return n.valor; }) } : null,
+      lancamentos: lista("lancamento", ["status", "nome", "texto"], RESUMO_REGRAS.lancamentos).filter(function (n) { return n.nome; }),
+      aprendizados: lista("aprendizado", ["titulo", "texto", "levamos"], RESUMO_REGRAS.aprendizados).filter(function (n) { return n.titulo; }),
+      transformation: { titulo: c["transformation.titulo"] || "", itens: lista("transformation", ["status", "nome", "texto"], RESUMO_REGRAS.andamento).filter(function (n) { return n.nome; }) },
+      foco: c["foco.prioridade"] ? { mes: c["foco.mes"] || "", prioridade: c["foco.prioridade"], texto: c["foco.texto"] || "" } : null,
+      agenda: lista("agenda", ["data", "titulo", "detalhe"], RESUMO_REGRAS.agenda).filter(function (n) { return n.titulo; }),
+      proximo_mes: c.proximo_mes || "", contato: c.contato || ""
+    };
+    return { ok: true, d: d, pendencias: pend };
+  }
+
+  /* Etiqueta (▲ +12% / ● Em teste), com o tom verde ou âmbar que veio da página. */
+  function etiquetaResumo(texto, tomCampo, fx) {
+    if (!texto) return "";
+    var ambar = tomCampo === "ambar", corT = ambar ? CR.atencao : CR.positivo, corF = ambar ? CR.atencao_fundo : CR.positivo_fundo;
+    return seguro('<span style="display:inline-block;background:' + corF + ";color:" + corT + ";font-family:" + fx + ';font-size:10px;line-height:16px;font-weight:bold;padding:0 7px;border-radius:999px;">' + esc(texto) + "</span>");
+  }
+
+  var RESUMO_TPL = [
+    '<!DOCTYPE html>',
+    '<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">',
+    '<head>',
+    '<meta charset="utf-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
+    '<meta name="x-apple-disable-message-reformatting">',
+    '<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">',
+    '<meta name="color-scheme" content="light only">',
+    '<meta name="supported-color-schemes" content="light only">',
+    '<title>{{assunto}}</title>',
+    '{{mso}}',
+    '<style>',
+    '  body{margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}',
+    '  table{border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;}',
+    '  img{border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;}',
+    '  a[x-apple-data-detectors]{color:inherit !important;text-decoration:none !important;}',
+    '  @media screen and (max-width:620px){',
+    '    .container{width:100% !important;}',
+    '    .px{padding-left:20px !important;padding-right:20px !important;}',
+    '    .col{display:block !important;width:100% !important;box-sizing:border-box !important;padding-left:0 !important;padding-right:0 !important;}',
+    '    .gap{padding-bottom:20px !important;}',
+    '    .hide-m{display:none !important;}',
+    '    .half{display:inline-block !important;width:49% !important;box-sizing:border-box !important;padding:12px 8px 16px 0 !important;vertical-align:top !important;}',
+    '    .al-l{text-align:left !important;}',
+    '    .h1{font-size:30px !important;line-height:34px !important;}',
+    '    .num{font-size:24px !important;line-height:28px !important;}',
+    '    .ra{border-radius:20px !important;}',
+    '    .rt{border-radius:20px 20px 0 0 !important;}',
+    '    .rb{border-radius:0 0 20px 20px !important;}',
+    '    .fluid{width:100% !important;max-width:100% !important;height:auto !important;}',
+    '    .thumb{width:120px !important;}',
+    '    .selo{float:none !important;margin-top:14px !important;}',
+    '  }',
+    '</style>',
+    '</head>',
+    '<body style="margin:0;padding:0;background:{{cor.lisboa}};" bgcolor="{{cor.lisboa}}">',
+    '<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:{{cor.lisboa}};">{{previa}}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>',
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" style="background:{{cor.lisboa}};"><tr><td align="center" style="padding:24px 0;">',
+    '<!--[if mso]><table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->',
+    '<table role="presentation" class="container ra" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.branco}}" style="width:680px;max-width:680px;background:{{cor.branco}};border-radius:34px;">',
+    '',
+    '  <!-- ABERTURA: período, frase do mês e uma linha de contexto -->',
+    '  <tr><td class="px ra" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:34px;padding:24px 40px 32px 40px;">',
+    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>',
+    '      <td class="col" valign="middle">',
+    '        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>',
+    '          {{#logo}}<td valign="middle" style="padding-right:14px;"><img src="{{src}}" width="{{w}}" alt="Santander" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#FFFFFF;"></td>{{/logo}}',
+    '          <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid #FFFFFF;{{/logo}}"><p class="ft" style="margin:0;font-family:{{ft}};font-size:19px;line-height:22px;font-weight:bold;color:#FFFFFF;">Creative Strategy PF</p></td>',
+    '        </tr></table>',
+    '      </td>',
+    '      <td class="col al-l" valign="middle" align="right"><table role="presentation" class="selo" align="right" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#FFFFFF" style="background:#FFFFFF;border-radius:999px;padding:6px 12px;"><p class="fx" style="margin:0;font-family:{{fx}};font-size:9px;line-height:12px;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;">RESUMO{{#periodo}}&nbsp;&nbsp;·&nbsp;&nbsp;{{periodo}}{{/periodo}}</p></td></tr></table></td>',
+    '    </tr>',
+    '    <tr><td colspan="2" style="padding:18px 0 22px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="#FFFFFF" style="height:1px;background:#FFFFFF;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>',
+    '    <tr><td colspan="2">',
+    '      <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:#FFFFFF;letter-spacing:2px;">O MÊS EM UMA FRASE</p>',
+    '      <p class="ft h1" style="margin:10px 0 0 0;font-family:{{fti}};font-size:36px;line-height:40px;font-weight:bold;color:#FFFFFF;letter-spacing:-1px;">{{frase}}{{#frase_final}}<br><span style="font-weight:normal;">{{frase_final}}</span>{{/frase_final}}</p>',
+    '      <p class="fx" style="margin:14px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;color:#FFFFFF;">{{intro}}</p>',
+    '    </td></tr></table>',
+    '  </td></tr>',
+    '',
+    '  {{#visao}}',
+    '  <!-- VISÃO GERAL: projeto principal e os números do mês -->',
+    '  <tr><td class="px" style="padding:36px 40px 0 40px;">',
+    '    <p class="fx" style="margin:0 0 14px 0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">VISÃO GERAL</p>',
+    '    {{#principal}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>',
+    '      {{#imagem}}<td class="col gap" width="132" valign="top" style="width:132px;"><img src="{{src}}" width="132" alt="{{alt}}" class="thumb" style="display:block;border:0;width:132px;height:auto;border-radius:16px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:{{cor.apoio}};"></td><td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/imagem}}',
+    '      <td class="col" valign="top">',
+    '        <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.apoio}};letter-spacing:1.5px;">PROJETO PRINCIPAL</p>',
+    '        <p class="ft" style="margin:4px 0 0 0;font-family:{{ft}};font-size:21px;line-height:26px;font-weight:bold;color:{{cor.marca}};">{{nome}}</p>',
+    '        {{#resumo}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:13px;line-height:20px;color:{{cor.texto}};">{{resumo}}</p>{{/resumo}}',
+    '      </td>',
+    '    </tr></table>{{/principal}}',
+    '    {{#tem_numeros}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;"><tr>',
+    '      {{#numeros}}{{^primeiro}}<td class="hide-m" width="{{espaco}}" style="width:{{espaco}}px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}',
+    '      <td class="half" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor_valor}};padding-top:12px;">',
+    '        <p class="ft num" style="margin:0;font-family:{{ft}};font-size:28px;line-height:32px;font-weight:bold;color:{{cor_valor}};white-space:nowrap;">{{valor}}</p>',
+    '        <p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>',
+    '        {{#detalhe}}<p class="fx" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;color:{{cor.apoio}};">{{detalhe}}</p>{{/detalhe}}',
+    '        {{#variacao}}<p style="margin:8px 0 0 0;">{{variacao}}</p>{{/variacao}}',
+    '      </td>{{/numeros}}',
+    '    </tr></table>{{/tem_numeros}}',
+    '  </td></tr>',
+    '  {{/visao}}',
+    '',
+    '  {{#resultados}}',
+    '  <!-- RESULTADOS E EVOLUÇÃO: Creative X e o que foi bem / o que melhorar -->',
+    '  <tr><td class="px" style="padding:36px 40px 0 40px;">',
+    '    <p class="fx" style="margin:0 0 14px 0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.roxo}};letter-spacing:2px;">RESULTADOS E EVOLUÇÃO</p>',
+    '    {{#cx}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid {{cor.texto}};border-bottom:1px solid {{cor.texto}};padding:16px 0 18px 0;">',
+    '      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>',
+    '        <td class="col gap" width="184" valign="middle" style="width:184px;">',
+    '          <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.roxo}};letter-spacing:1.5px;">CREATIVE X</p>',
+    '          {{#subtitulo}}<p class="fx" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;color:{{cor.apoio}};">{{subtitulo}}</p>{{/subtitulo}}',
+    '          <p class="ft" style="margin:4px 0 0 0;font-family:{{ft}};font-size:20px;line-height:44px;font-weight:bold;color:{{cor.apoio}};white-space:nowrap;">{{#anterior}}{{anterior}} <span style="color:{{cor.marca}};">&#8594;</span> {{/anterior}}<span style="font-size:40px;color:{{cor.marca}};">{{atual}}</span></p>',
+    '        </td>',
+    '        <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>',
+    '        <td class="col" width="392" valign="middle" style="width:392px;">',
+    '          <p class="fx" style="margin:0;font-family:{{fx}};font-size:12px;line-height:22px;color:{{cor.texto}};">{{variacao}}{{#periodo}}&nbsp; {{periodo}}{{/periodo}}</p>',
+    '          {{#tem_barra}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px;"><tr>',
+    '            <td width="{{barra}}" height="8" bgcolor="{{cor.roxo}}" style="height:8px;background:{{cor.roxo}};font-size:0;line-height:0;border-radius:4px 0 0 4px;">&nbsp;</td>',
+    '            <td width="{{resto}}" height="8" bgcolor="{{cor.linha}}" style="height:8px;background:{{cor.linha}};font-size:0;line-height:0;border-radius:0 4px 4px 0;">&nbsp;</td>',
+    '          </tr></table>{{/tem_barra}}',
+    '          {{#significado}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;color:{{cor.texto}};">{{significado}}</p>{{/significado}}',
+    '        </td>',
+    '      </tr></table>',
+    '    </td></tr></table>{{/cx}}',
+    '    {{#balanco}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr>',
+    '      {{#bem}}<td class="col{{#dois}} gap{{/dois}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">',
+    '        <p style="margin:0;"><span style="display:inline-block;background:{{cor.positivo_fundo}};color:{{cor.positivo}};font-family:{{fx}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;padding:0 8px;border-radius:999px;">&#9650; FOI BEM</span></p>',
+    '        {{#itens}}<p class="fx" style="margin:8px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}',
+    '      </td>{{/bem}}',
+    '      {{#dois}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/dois}}',
+    '      {{#melhorar}}<td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;">',
+    '        <p style="margin:0;"><span style="display:inline-block;background:{{cor.atencao_fundo}};color:{{cor.atencao}};font-family:{{fx}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;padding:0 8px;border-radius:999px;">&#9660; A MELHORAR</span></p>',
+    '        {{#itens}}<p class="fx" style="margin:8px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; {{texto}}</p>{{/itens}}',
+    '      </td>{{/melhorar}}',
+    '    </tr></table>{{/balanco}}',
+    '  </td></tr>',
+    '  {{/resultados}}',
+    '',
+    '  {{#campanhas}}',
+    '  <!-- CAMPANHAS EM DESTAQUE: o destaque do mês e os lançamentos, em lista -->',
+    '  <tr><td class="px" style="padding:36px 40px 0 40px;">',
+    '    <p class="fx" style="margin:0 0 14px 0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">CAMPANHAS EM DESTAQUE</p>',
+    '    {{#destaque}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:2px solid {{cor.texto}};padding-top:12px;">',
+    '      {{#categoria}}<p class="fx" style="margin:0 0 4px 0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}',
+    '      <p class="ft" style="margin:0;font-family:{{ft}};font-size:19px;line-height:24px;font-weight:bold;color:{{cor.marca}};">{{titulo}}</p>',
+    '      {{#texto}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;color:{{cor.texto}};">{{texto}}</p>{{/texto}}',
+    '      {{#tem_resultados}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:12px;"><tr>',
+    '        {{#resultados}}{{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}',
+    '        <td class="half" width="{{largura}}" valign="top" style="width:{{largura}}px;">',
+    '          <p class="ft" style="margin:0;font-family:{{ft}};font-size:22px;line-height:26px;font-weight:bold;color:{{cor.texto}};white-space:nowrap;">{{valor}}</p>',
+    '          <p class="fx" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;color:{{cor.texto}};"><b>{{titulo}}</b>{{#detalhe}}<br><span style="color:{{cor.apoio}};">{{detalhe}}</span>{{/detalhe}}</p>',
+    '          {{#variacao}}<p style="margin:6px 0 0 0;">{{variacao}}</p>{{/variacao}}',
+    '        </td>{{/resultados}}',
+    '      </tr></table>{{/tem_resultados}}',
+    '    </td></tr></table>{{/destaque}}',
+    '    {{#tem_lancamentos}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">',
+    '      {{#lancamentos}}<tr><td style="border-top:1px solid {{cor.linha}};padding:12px 0;">',
+    '        <p class="fx" style="margin:0;font-family:{{fx}};font-size:15px;line-height:20px;font-weight:bold;color:{{cor.texto}};">{{nome}}{{#status}}&nbsp;&nbsp;{{status}}{{/status}}</p>',
+    '        {{#texto}}<p class="fx" style="margin:3px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;color:{{cor.texto}};">{{texto}}</p>{{/texto}}',
+    '      </td></tr>{{/lancamentos}}',
+    '    </table>{{/tem_lancamentos}}',
+    '  </td></tr>',
+    '  {{/campanhas}}',
+    '',
+    '  {{#aprendizados}}',
+    '  <!-- APRENDIZADOS: título e o que levamos para frente -->',
+    '  <tr><td class="px" style="padding:36px 40px 0 40px;">',
+    '    <p class="fx" style="margin:0 0 6px 0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.rosa}};letter-spacing:2px;">APRENDIZADOS</p>',
+    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">',
+    '      {{#itens}}<tr>',
+    '        <td width="44" valign="top" style="width:44px;padding:12px 0;{{borda}}"><p class="ft" style="margin:0;font-family:{{ft}};font-size:28px;line-height:30px;font-weight:bold;color:{{cor.rosa}};">{{numero}}</p></td>',
+    '        <td valign="top" style="padding:12px 0;{{borda}}">',
+    '          <p class="ft" style="margin:0;font-family:{{ft}};font-size:16px;line-height:21px;font-weight:bold;color:{{cor.marca}};">{{titulo}}</p>',
+    '          {{#texto}}<p class="fx" style="margin:3px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;color:{{cor.texto}};">{{texto}}</p>{{/texto}}',
+    '          {{#levamos}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;color:{{cor.texto}};"><b style="color:{{cor.rosa}};">&#8594; Levamos:</b> {{levamos}}</p>{{/levamos}}',
+    '        </td>',
+    '      </tr>{{/itens}}',
+    '    </table>',
+    '  </td></tr>',
+    '  {{/aprendizados}}',
+    '',
+    '  {{#andamento}}',
+    '  <!-- EM ANDAMENTO: Transformation Hub, em superfície Lisboa -->',
+    '  <tr><td class="px" style="padding:36px 40px 0 40px;">',
+    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" class="ra" style="background:{{cor.lisboa}};border-radius:34px;"><tr><td class="px" style="padding:22px 28px 10px 28px;">',
+    '      <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.roxo}};letter-spacing:2px;">EM ANDAMENTO&nbsp;&nbsp;·&nbsp;&nbsp;TRANSFORMATION HUB</p>',
+    '      {{#titulo}}<p class="ft" style="margin:6px 0 4px 0;font-family:{{ft}};font-size:19px;line-height:24px;font-weight:bold;color:{{cor.marca}};">{{titulo}}</p>{{/titulo}}',
+    '      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">',
+    '        {{#itens}}<tr><td style="padding:12px 0;{{borda}}">',
+    '          <p class="fx" style="margin:0;font-family:{{fx}};font-size:15px;line-height:20px;font-weight:bold;color:{{cor.texto}};">{{nome}}{{#status}}&nbsp;&nbsp;{{status}}{{/status}}</p>',
+    '          {{#texto}}<p class="fx" style="margin:3px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;color:{{cor.texto}};">{{texto}}</p>{{/texto}}',
+    '        </td></tr>{{/itens}}',
+    '      </table>',
+    '    </td></tr></table>',
+    '  </td></tr>',
+    '  {{/andamento}}',
+    '',
+    '  {{#proximos}}',
+    '  <!-- PRÓXIMOS PASSOS: foco do próximo mês e agenda (sem resultados futuros) -->',
+    '  <tr><td class="px" style="padding:36px 40px 0 40px;">',
+    '    <p class="fx" style="margin:0 0 14px 0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.rosa}};letter-spacing:2px;">PRÓXIMOS PASSOS</p>',
+    '    {{#foco}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.marca}}" class="ra" style="background:{{cor.marca}};border-radius:34px;"><tr><td class="px" style="padding:22px 28px 24px 28px;">',
+    '      <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:#FFFFFF;letter-spacing:2px;">FOCO{{#mes}} DE {{mes}}{{/mes}}</p>',
+    '      <p class="ft" style="margin:8px 0 0 0;font-family:{{ft}};font-size:22px;line-height:27px;font-weight:bold;color:#FFFFFF;">{{prioridade}}</p>',
+    '    </td></tr></table>{{/foco}}',
+    '    {{#tem_agenda}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;">',
+    '      {{#agenda}}<tr>',
+    '        <td class="col" width="184" valign="top" style="width:184px;padding:12px 0 0 0;{{borda}}"><p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:20px;font-weight:bold;color:{{cor.rosa}};letter-spacing:1.5px;">{{data}}</p></td>',
+    '        <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;{{borda}}">&nbsp;</td>',
+    '        <td class="col" valign="top" style="padding:12px 0 12px 0;{{borda_m}}">',
+    '          <p class="fx" style="margin:0;font-family:{{fx}};font-size:14px;line-height:20px;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>',
+    '          {{#detalhe}}<p class="fx" style="margin:2px 0 0 0;font-family:{{fx}};font-size:12px;line-height:17px;color:{{cor.apoio}};">{{detalhe}}</p>{{/detalhe}}',
+    '        </td>',
+    '      </tr>{{/agenda}}',
+    '    </table>{{/tem_agenda}}',
+    '  </td></tr>',
+    '  {{/proximos}}',
+    '',
+    '  <!-- ENCERRAMENTO: a única chamada do e-mail, para o report completo -->',
+    '  <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>',
+    '  <tr><td class="px rt" bgcolor="{{cor.rio}}" style="background:{{cor.rio}};border-radius:34px 34px 0 0;padding:30px 40px 0 40px;">',
+    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>',
+    '      <td class="col" valign="top" style="padding-bottom:28px;">',
+    '        <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.rosa}};letter-spacing:2px;">REPORT COMPLETO</p>',
+    '        <p class="ft" style="margin:8px 0 0 0;font-family:{{ft}};font-size:24px;line-height:29px;font-weight:bold;color:{{cor.marca}};">{{cta_titulo}}</p>',
+    '        <p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;color:{{cor.texto}};">{{cta_texto}}</p>',
+    '        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr><td>',
+    '          {{botao_html}}',
+    '        </td></tr></table>',
+    '        <p class="fx" style="margin:10px 0 0 0;font-family:{{fx}};font-size:11px;line-height:16px;color:{{cor.apoio}};">Abre no navegador (Chrome ou Edge).{{#contato}} Dúvidas e sugestões: {{contato}}.{{/contato}}</p>',
+    '      </td>',
+    '      {{#formiga}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="96" valign="bottom" align="right" style="width:96px;"><img src="{{src}}" width="72" alt="{{alt}}" style="display:block;border:0;width:72px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.apoio}};"></td>{{/formiga}}',
+    '    </tr></table>',
+    '  </td></tr>',
+    '  <tr><td class="rb" bgcolor="{{cor.rio}}" style="background:{{cor.rio}};border-radius:0 0 34px 34px;">',
+    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="px ra" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:34px;padding:24px 40px 26px 40px;">',
+    '      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>',
+    '        <td valign="bottom" style="padding-right:16px;">',
+    '          <p class="ft" style="margin:0;font-family:{{ft}};font-size:15px;line-height:19px;font-weight:bold;color:#FFFFFF;">Creative Strategy PF</p>',
+    '          <p class="fx" style="margin:3px 0 0 0;font-family:{{fx}};font-size:9px;line-height:13px;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;">CUSTOMER INTERACTIONS&nbsp;&nbsp;·&nbsp;&nbsp;RESUMO DO REPORT MENSAL{{#periodo}}&nbsp;&nbsp;·&nbsp;&nbsp;{{periodo}}{{/periodo}}</p>',
+    '        </td>',
+    '        {{#logo}}<td valign="bottom" align="right" width="{{w}}"><img src="{{src}}" width="{{w}}" alt="Santander" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#FFFFFF;"></td>{{/logo}}',
+    '      </tr></table>',
+    '    </td></tr></table>',
+    '  </td></tr>',
+    '</table>',
+    '<!--[if mso]></td></tr></table><![endif]-->',
+    '</td></tr></table>',
+    '</body>',
+    '</html>'
+  ].join("\n");
+
+  /* Botão "à prova de Outlook": VML arredondado no Outlook para Windows, link com fundo nos demais. É o único link do e-mail. */
+  function botaoResumo(link, texto, fx) {
+    var w = Math.max(240, Math.round(texto.length * 9.2) + 76), t = esc(texto) + " &#8594;", l = esc(link);
+    return '<!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="' + l + '" style="height:48px;v-text-anchor:middle;width:' + w + 'px;" arcsize="50%" stroke="f" fillcolor="' + CR.marca + '"><w:anchorlock/>' +
+      '<center style="color:#FFFFFF;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;">' + t + "</center></v:roundrect><![endif]-->" +
+      '<!--[if !mso]><!--><a class="cta" href="' + l + '" target="_blank" style="display:inline-block;background:' + CR.marca + ";color:#FFFFFF;font-family:" + fx + ';font-size:15px;line-height:20px;font-weight:bold;text-decoration:none;padding:14px 28px;border-radius:999px;">' + t + "</a><!--<![endif]-->";
+  }
+
+  /*
+   * emailResumo(html, { link, botao, blocos: {visao, resultados, …} }) → { html, blocos: [ids], fora: [ids], vazios: [ids], imagens, pendencias, temVideo } ou { erro }
+   *   blocos: o que entra (padrão: todos os que têm conteúdo). Sem link, o botão aparece como aviso
+   *   na prévia ("FALTA O LINK") e o converter não deixa baixar o .eml.
+   */
+  function emailResumo(html, op) {
+    op = op || {};
+    var lido = dadosDoResumo(html);
+    if (lido.erro) return lido;
+    var d = lido.d, quer = op.blocos || {}, ft = fonteDaClasse(html, "ft", "Arial, Helvetica, sans-serif"), fx = fonteDaClasse(html, "fx", "Arial, Helvetica, sans-serif");
+    var fti = (/class="ft h1"[^>]*?font-family:([^;"]+)/.exec(html) || [])[1] || ft;
+    var mso = (/<!--\[if mso\]>\s*<noscript>[\s\S]*?<!\[endif\]-->/.exec(html) || [""])[0];
+    function liga(id) { return quer[id] !== false; }
+    var vazios = [], blocos = [], fora = [];
+    function bloco(id, conteudo) { if (!conteudo) { vazios.push(id); return null; } if (!liga(id)) { fora.push(id); return null; } blocos.push(id); return conteudo; }
+    function chip(texto, tm) { var x = String(texto || ""); return x ? etiquetaResumo(x, tm, fx) : ""; }
+    var n4 = d.numeros.length, wN = n4 ? colunas(LARGURA, n4) : [];
+    var visao = bloco("visao", d.principal || n4 ? {
+      principal: d.principal, tem_numeros: n4 > 0,
+      numeros: d.numeros.map(function (v, i) {
+        return { valor: v.valor, titulo: v.titulo, detalhe: v.detalhe, variacao: chip(v.variacao, v.tom_variacao), primeiro: i === 0, espaco: ESP, largura: wN[i], cor_valor: i === 0 ? CR.marca : CR.texto };
+      })
+    } : null);
+    var cx = null;
+    if (d.cx) {
+      var at = lerNumero(d.cx.atual), barra = at === null ? 0 : Math.max(1, Math.min(99, Math.round(at)));
+      cx = { anterior: d.cx.anterior, atual: d.cx.atual, subtitulo: d.cx.subtitulo, periodo: d.cx.periodo, significado: d.cx.significado,
+        variacao: d.cx.variacao ? seguro('<span style="display:inline-block;background:' + (d.cx.tom === "ambar" ? CR.atencao_fundo : CR.positivo_fundo) + ";color:" + (d.cx.tom === "ambar" ? CR.atencao : CR.positivo) + ";font-family:" + ft + ';font-size:15px;line-height:22px;font-weight:bold;padding:0 9px;border-radius:999px;white-space:nowrap;">' + esc(d.cx.variacao) + "</span>") : "",
+        tem_barra: barra > 0, barra: barra + "%", resto: (100 - barra) + "%" };
+    }
+    var dois = d.bem.length && d.melhorar.length, lb = dois ? colunas(LARGURA, 2) : [LARGURA, LARGURA];
+    var balanco = d.bem.length || d.melhorar.length ? { dois: !!dois, bem: d.bem.length ? { itens: d.bem, largura: lb[0] } : null, melhorar: d.melhorar.length ? { itens: d.melhorar, largura: dois ? lb[1] : lb[0] } : null } : null;
+    var resultados = bloco("resultados", cx || balanco ? { cx: cx, balanco: balanco } : null);
+    var nr = d.destaque ? d.destaque.resultados.length : 0, wr = nr ? colunas(LARGURA, nr) : [];
+    var campanhas = bloco("campanhas", d.destaque || d.lancamentos.length ? {
+      destaque: d.destaque ? { categoria: d.destaque.categoria, titulo: d.destaque.titulo, texto: d.destaque.texto, tem_resultados: nr > 0,
+        resultados: d.destaque.resultados.map(function (v, i) { return { valor: v.valor, titulo: v.titulo, detalhe: v.detalhe, variacao: chip(v.variacao, v.tom_variacao), primeiro: i === 0, largura: wr[i] }; }) } : null,
+      tem_lancamentos: d.lancamentos.length > 0,
+      lancamentos: d.lancamentos.map(function (v) { return { nome: v.nome, texto: v.texto, status: chip(v.status, v.tom_status) }; })
+    } : null);
+    var aprendizados = bloco("aprendizados", d.aprendizados.length ? { itens: d.aprendizados.map(function (v, i) { return { numero: i + 1, titulo: v.titulo, texto: v.texto, levamos: v.levamos, borda: i ? "border-top:1px solid " + CR.linha + ";" : "" }; }) } : null);
+    var andamento = bloco("andamento", d.transformation.itens.length ? { titulo: d.transformation.titulo, itens: d.transformation.itens.map(function (v, i) { return { nome: v.nome, texto: v.texto, status: chip(v.status, v.tom_status), borda: i ? "border-top:1px solid " + CR.rio + ";" : "" }; }) } : null);
+    var proximos = bloco("proximos", d.foco || d.agenda.length ? {
+      foco: d.foco, tem_agenda: d.agenda.length > 0,
+      agenda: d.agenda.map(function (v, i) { var b = i ? "border-top:1px solid " + CR.linha + ";" : ""; return { data: v.data, titulo: v.titulo, detalhe: v.detalhe, borda: b, borda_m: b }; })
+    } : null);
+    var temVideo = /data-video="/.test(html) || /alt="Vídeo: /.test(html);
+    var link = op.link && /^https:\/\/\S+$/i.test(op.link) ? op.link : "", txtBotao = op.botao || "Ver report completo";
+    var botao = link ? botaoResumo(link, txtBotao, fx) :
+      '<span style="display:inline-block;background:' + CR.atencao_fundo + ";color:" + CR.atencao + ";font-family:" + fx + ';font-size:13px;line-height:18px;font-weight:bold;padding:12px 22px;border-radius:999px;border:1px dashed ' + CR.atencao + ';">FALTA O LINK DO REPORT COMPLETO</span>';
+    var periodo = d.periodo, mesTxt = periodo ? periodo.charAt(0) + periodo.slice(1).toLocaleLowerCase("pt-BR") : "";
+    var m = {
+      assunto: op.assunto || assuntoDoHtml(html), mso: seguro(mso), cor: CR, ft: ft, fx: fx, fti: fti,
+      periodo: periodo, frase: d.frase, frase_final: d.frase_final,
+      previa: "Resumo" + (mesTxt ? " de " + mesTxt : "") + ": " + [d.frase, d.frase_final].filter(Boolean).join(" "),
+      intro: "Os principais resultados " + (mesTxt ? "de " + mesTxt + " " : "") + "em uma leitura rápida. Todos os detalhes estão no report completo, no link ao final.",
+      logo: d.logo && d.logo.src ? { src: d.logo.src, w: Math.min(d.logo.w || 32, 40) } : null,
+      formiga: d.formiga && d.formiga.src ? { src: d.formiga.src, alt: d.formiga.alt || "Formiguinha" } : null,
+      visao: visao, resultados: resultados, campanhas: campanhas, aprendizados: aprendizados, andamento: andamento, proximos: proximos,
+      cta_titulo: op.titulo || "Veja o report completo.",
+      cta_texto: op.chamada || ("Este e-mail é o resumo" + (mesTxt ? " de " + mesTxt : "") + ". No report completo estão todas as seções, com as peças em tamanho maior" + (temVideo ? " e os vídeos das campanhas" : "") + "."),
+      botao_html: seguro(botao), contato: d.contato
+    };
+    var out = aplicar(RESUMO_TPL, m).replace(/\n[ \t]*\n(\s*\n)+/g, "\n\n");
+    return { html: out, blocos: blocos, fora: fora, vazios: vazios, pendencias: lido.pendencias, temVideo: temVideo, temLink: !!link, dados: d };
+  }
+
   return {
     VERSAO: VERSAO, ler: ler, montar: montar, aplicar: aplicar, conferirLink: conferirLink, conferirHtml: conferirHtml,
     gerarEml: gerarEml, trocarImagens: trocarImagens, trocarVideos: trocarVideos, semComentarios: semComentarios, paraEmail: paraEmail, paraNavegador: paraNavegador,
@@ -1226,6 +1684,7 @@
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
+    RESUMO_REGRAS: RESUMO_REGRAS, BLOCOS_RESUMO: BLOCOS_RESUMO, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

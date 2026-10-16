@@ -420,7 +420,10 @@ teste("o report sai com as marcas de seção, na ordem do template", function ()
   assert.deepStrictEqual(M.secoesDoHtml(modeloHtml()).map(function (x) { return x.id; }),
     ["capa", "lancamos", "cx", "resumo", "transformation", "aprendizados", "foco", "agenda", "rodape"]);
   assert.ok(/<!--secao:fim-->/.test(modeloHtml()));
-  assert.ok(!/<!-- EDITAR AQUI/.test(modeloHtml()), "os outros comentários continuam saindo");
+  /* Os "EDITAR AQUI" ficam na página (guia para quem abre no editor), mas não vão para o e-mail. */
+  assert.ok(/<!-- EDITAR AQUI: PERÍODO/.test(modeloHtml()) && /<!-- EDITAR AQUI: APRENDIZADO/.test(modeloHtml()), "EDITAR AQUI na página");
+  assert.ok(!/<!-- EDITAR AQUI|data-campo=|data-tom=/.test(M.paraEmail(modeloHtml())), "o e-mail não leva EDITAR AQUI nem as marcas do resumo");
+  assert.ok(!/<!--(?!\[if|<!\[endif\]|secao:| EDITAR AQUI)/.test(modeloHtml()), "os outros comentários continuam saindo");
 });
 
 teste("emailResumido: só as seções escolhidas, botão com o link antes do encerramento, seções renumeradas", function () {
@@ -528,6 +531,105 @@ teste("movimento: só na página, script injetado uma vez (de novo troca, não d
   assert.ok(!/data-(rv|motion|conta)|id="leitura"|<script/.test(limpo), limpo);
   assert.ok(/12,5%/.test(limpo));
   assert.ok(!/leitura|data-motion/.test(M.paraEmail(h)));
+});
+
+/* ---------- 4.2: e-mail-resumo editorial, Transformation Hub (logo e links), link do report completo ---------- */
+/* Mês SINTÉTICO completo (números de teste, não são resultados reais). */
+var COMPLETO = [
+  "[EDICAO]", "mes: Março", "ano: 2027", "proximo_mes: Abril", "pasta_imagens: assets/icones", "contato: time@empresa.com",
+  "link_report_completo: https://empresa.sharepoint.com/sites/cs/report-atual.html",
+  "[ABERTURA]", "frase: Mês de teste,", "frase_final: tudo sintético.",
+  "[PROJETO PRINCIPAL]", "nome: Projeto Alfa", "resumo: Resumo do projeto alfa.", "imagem: icone-prancheta.png", "tipo: peca", "link: https://empresa.sharepoint.com/:i:/s/site/abc",
+  "[NUMERO 1]", "valor: 12,5%", "titulo: Taxa A", "detalhe: era 10%", "variacao: +25%",
+  "[NUMERO 2]", "valor: R$ 1,00", "titulo: Custo B", "variacao: -Menos", "variacao_cor: verde",
+  "[NUMERO 3]", "valor: 3x", "titulo: Índice C", "detalhe: base 1x", "variacao: Acima", "variacao_cor: ambar",
+  "[DESTAQUE]", "categoria: Grupo · Teste", "titulo: Destaque Beta", "texto: Texto do destaque.", "imagem: icone-lupa.png", "link: https://empresa.sharepoint.com/:i:/s/site/d",
+  "[RESULTADO 1]", "valor: 40", "titulo: Itens", "detalhe: base 30",
+  "[LANCAMENTO 1]", "status: No ar", "status_cor: verde", "nome: Lançamento Um", "texto: Texto um.", "imagem: icone-lupa.png", "link: https://empresa.sharepoint.com/:i:/s/site/l1",
+  "[LANCAMENTO 2]", "status: Em teste", "status_cor: ambar", "nome: Lançamento Dois", "texto: Texto dois.", "imagem: icone-lupa.png",
+  "[LANCAMENTO 3]", "nome: Lançamento Três", "imagem: icone-lupa.png",
+  "[LANCAMENTO 4]", "nome: Lançamento Quatro", "imagem: icone-lupa.png",
+  "[CREATIVE X]", "anterior: 70%", "atual: 75%", "periodo: fev vs. mar", "significado: Frase do CX.",
+  "[FOI BEM 1]", "texto: Bem um.", "[FOI BEM 2]", "texto: Bem dois.", "[FOI BEM 3]", "texto: Bem três.",
+  "[A MELHORAR 1]", "texto: Melhorar um.",
+  "[TRANSFORMATION]", "titulo: Como estamos transformando<br>a forma de criar.",
+  "[TRANSFORMATION 1]", "nome: Agente Um", "texto: Apoio aos pedidos.", "logo: icone-prancheta.png", "descricao_logo: Logo do Agente Um",
+  "links: Documento modelo | https://empresa.sharepoint.com/:w:/s/site/doc ; Agente | https://empresa.sharepoint.com/sites/agente",
+  "[TRANSFORMATION 2]", "status: Previsão: abr/27", "status_cor: ambar", "nome: Agente Dois", "texto: Textos alinhados.", "icones: icone-lupa", "links: Agente Dois | [INSERIR LINK]",
+  "[APRENDIZADO 1]", "titulo: Aprendizado A", "texto: Texto A.", "levamos: levar A.",
+  "[APRENDIZADO 2]", "titulo: Aprendizado B",
+  "[FOCO]", "prioridade: Foco do teste.", "texto: Texto do foco.",
+  "[AGENDA 1]", "data: 12 ABR", "titulo: Evento um", "detalhe: Detalhe um.",
+  "[AGENDA 2]", "data: A DEFINIR", "titulo: Evento dois"
+].join("\n");
+
+teste("Transformation Hub: logo no lugar dos ícones, links extras com seta e link pendente sem clique", function () {
+  var r = montar(COMPLETO);
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  var t = r.html.slice(r.html.indexOf("<!--secao:transformation-->"), r.html.indexOf("<!--secao:aprendizados-->"));
+  assert.ok(/alt="Logo do Agente Um"/.test(t) && r.imagens.some(function (i) { return /Agente|TRANSFORMATION 1 \(logo\)/.test(i.papel) && i.w === 56; }), "logo de 56 px");
+  assert.ok(/href="https:\/\/empresa\.sharepoint\.com\/:w:\/s\/site\/doc"[^>]*>Documento modelo&nbsp;&#8594;<\/a>/.test(t) && /Agente&nbsp;&#8594;<\/a>/.test(t), "dois links no projeto 1");
+  assert.ok(/<span title="Link ainda não definido"[^>]*>Agente Dois&nbsp;&#8594;<\/span>/.test(t), "link pendente aparece sem clique");
+  assert.ok(niveis(r, "pendencia").some(function (p) { return /TRANSFORMATION 2\] links \(Agente Dois\)/.test(p.msg); }), "pendência do link");
+  assert.ok(r.links.some(function (l) { return l.rotulo === "Documento modelo"; }), "links extras entram na lista de conferência");
+  assert.ok(/Documento modelo: https:\/\/empresa\.sharepoint\.com\/:w:/.test(r.texto), "texto puro leva o link");
+  var semIcone = t.split('data-bloco="transformation-2"')[0];
+  assert.ok(!/icone-prancheta|@@IMG\d+@@" width="32"/.test(semIcone.split('data-bloco="transformation-1"')[1] || ""), "com logo, sem ícones");
+});
+
+teste("link_report_completo vira a meta da página e sai do e-mail; caminho local não vale", function () {
+  var r = montar(COMPLETO);
+  assert.ok(/<meta name="report-completo" content="https:\/\/empresa\.sharepoint\.com\/sites\/cs\/report-atual\.html">/.test(r.html));
+  assert.ok(!/report-completo/.test(M.paraEmail(r.html)));
+  var local = montar(COMPLETO.replace("link_report_completo: https://empresa.sharepoint.com/sites/cs/report-atual.html", "link_report_completo: C:\\Users\\eu\\report.html"));
+  assert.ok(!/report-completo/.test(local.html) && niveis(local, "aviso").some(function (p) { return /link_report_completo/.test(p.msg); }));
+});
+
+teste("dadosDoResumo: lê da página cada campo, na ordem, com as regras de seleção", function () {
+  var d = M.dadosDoResumo(montar(COMPLETO).html).d;
+  assert.strictEqual(d.periodo, "MARÇO 2027");
+  assert.strictEqual(d.frase, "Mês de teste,"); assert.strictEqual(d.frase_final, "tudo sintético.");
+  assert.strictEqual(d.principal.nome, "Projeto Alfa"); assert.strictEqual(d.principal.resumo, "Resumo do projeto alfa.", "sem o \"Ver peça\"");
+  assert.deepStrictEqual(d.numeros.map(function (n) { return n.valor + "|" + n.tom_variacao; }), ["12,5%|verde", "R$ 1,00|verde", "3x|ambar"]);
+  assert.strictEqual(d.numeros[1].detalhe, "", "número sem detalhe não desalinha os outros");
+  assert.deepStrictEqual(d.bem.map(function (b) { return b.texto; }), ["Bem um.", "Bem dois."], "até 2 \"foi bem\"");
+  assert.deepStrictEqual(d.lancamentos.map(function (b) { return b.nome; }), ["Lançamento Um", "Lançamento Dois", "Lançamento Três"], "os 3 primeiros lançamentos");
+  assert.strictEqual(d.lancamentos[1].tom_status, "ambar");
+  assert.deepStrictEqual(d.transformation.itens.map(function (b) { return b.nome + "|" + b.status; }), ["Agente Um|", "Agente Dois|○ Previsão: abr/27"]);
+  assert.strictEqual(d.transformation.titulo, "Como estamos transformando a forma de criar.");
+  assert.strictEqual(d.cx.anterior + ">" + d.cx.atual + " " + d.cx.variacao + " " + d.cx.tom, "70%>75% +5 p.p. verde");
+  assert.strictEqual(d.foco.mes, "ABRIL");
+  assert.deepStrictEqual(d.agenda.map(function (a) { return a.data + "|" + a.titulo; }), ["12 ABR|Evento um", "A DEFINIR|Evento dois"]);
+  assert.strictEqual(d.contato, "time@empresa.com");
+});
+
+teste("emailResumo: diagramação própria, estática, um único destino (o botão), blocos sem conteúdo somem", function () {
+  var html = montar(COMPLETO).html, LINK = "https://empresa.sharepoint.com/sites/cs/report-atual.html";
+  var r = M.emailResumo(html, { link: LINK });
+  assert.deepStrictEqual(r.blocos, ["visao", "resultados", "campanhas", "aprendizados", "andamento", "proximos"]);
+  var hrefs = r.html.match(/href="[^"]*"/g) || [];
+  assert.ok(hrefs.length === 2 && hrefs.every(function (h) { return h === 'href="' + LINK + '"'; }), hrefs.join(" "));
+  assert.ok(!/data-campo|data-tom|secao:|<script|&#9654;|Ver peça|Documento modelo/.test(r.html), "estático e sem os links das peças");
+  assert.ok(!/\{\{|\}\}/.test(r.html));
+  assert.ok(/12,5%/.test(r.html) && /Agente Dois/.test(r.html) && /Evento um/.test(r.html) && /Aprendizado A/.test(r.html));
+  assert.ok(!/Bem três|Lançamento Quatro/.test(r.html), "regras de seleção: só os primeiros");
+  assert.strictEqual(M.conferirHtml(r.html).filter(function (x) { return x.nivel === "erro"; }).length, 0);
+  /* Sem link: aviso no lugar do botão, nenhum link. */
+  var s = M.emailResumo(html, {});
+  assert.ok(!/href=/.test(s.html) && /FALTA O LINK DO REPORT COMPLETO/.test(s.html) && !s.temLink);
+  /* Seção apagada (sem Creative X nem balanço) some; bloco desmarcado vai para "fora". */
+  var sem = montar(COMPLETO.replace(/\[CREATIVE X\][\s\S]*?\[TRANSFORMATION\]/, "[TRANSFORMATION]")).html;
+  var t = M.emailResumo(sem, { link: LINK, blocos: { aprendizados: false } });
+  assert.ok(t.vazios.indexOf("resultados") >= 0 && t.fora.indexOf("aprendizados") >= 0 && !/RESULTADOS E EVOLUÇÃO|APRENDIZADOS/.test(t.html));
+});
+
+teste("emailResumo acompanha a edição: texto trocado na página, item apagado e página antiga", function () {
+  var html = montar(COMPLETO).html;
+  var editado = html.replace(">Evento um<", ">Evento editado<").replace(/<p class="ft" data-campo="aprendizado-2\.titulo"[^>]*>Aprendizado B<\/p>/, "");
+  var r = M.emailResumo(editado, { link: "https://empresa.sharepoint.com/x" });
+  assert.ok(/Evento editado/.test(r.html) && !/Evento um/.test(r.html) && !/Aprendizado B/.test(r.html));
+  assert.ok(M.emailResumo(html.replace(/ data-campo="[^"]*"/g, ""), {}).erro, "página sem os campos: avisa para gerar de novo");
+  assert.ok(M.dadosDoResumo(montar(MODELO).html).pendencias.length > 10, "modelo: Lorem e X viram pendências do resumo");
 });
 
 console.log("\n" + (testes - falhas) + " de " + testes + " testes passaram.");

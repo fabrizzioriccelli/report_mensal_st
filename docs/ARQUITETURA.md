@@ -100,6 +100,16 @@ O clique abre o destino corporativo; o e-mail não tenta simular uma janela.
 
 O ▶ faz parte da imagem: aparece em qualquer cliente, inclusive no Outlook para Windows, que não sobrepõe elementos.
 
+## E-mail-resumo: campos marcados e regras de seleção (4.2)
+
+O e-mail-resumo **não corta** o report: ele tem template próprio (`RESUMO_TPL` em `tools/motor.js`), estático, com um único link (o botão "Ver report completo", em VML no Outlook para Windows e link com fundo nos demais).
+
+- **De onde vêm os dados:** cada texto e número do template do report tem um atributo `data-campo` (ex.: `numero-1.valor`, `lancamento-2.nome`, `transformation-3.status`, `cx.atual`, `agenda-1.data`). Etiquetas guardam o tom em `data-tom` (verde/âmbar). `dadosDoResumo(html)` lê esses campos da página, na ordem; `emailResumo(html, {link, botao, blocos})` monta o e-mail.
+- **Por que da página, e não do arquivo de dados:** o conversor recebe só o `.html` (que pode ter sido editado no Chrome). Lendo a página, o resumo sempre reflete o que está publicado. Como a página sai do arquivo de dados, continua havendo uma única fonte.
+- **Regras de seleção:** `RESUMO_REGRAS` (quantos itens de cada lista entram, sempre os primeiros). Nada é resumido por máquina.
+- **Onde os atributos vivem:** só na página. `paraEmail` e `limparHtmlEditado` tiram `data-campo`, `data-tom`, os comentários `EDITAR AQUI` e a meta `report-completo` dos e-mails.
+- **Movimento independente do conteúdo:** o script do movimento reconhece a estrutura (marcas de seção, números com fonte grande, a barra do Creative X), não os textos de um mês. Trocar texto, número ou imagem não exige mexer em código.
+
 ## Progressive enhancement
 
 | Camada | O que é | Onde funciona |

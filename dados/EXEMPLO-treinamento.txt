@@ -1,0 +1,230 @@
+# ======================================================================
+#  EXEMPLO DE TREINAMENTO · CONTEÚDO 100% FICTÍCIO
+# ======================================================================
+#  Para praticar e para as capturas do guia operacional
+#  (apresentacoes/guia-operacional). NÃO é um report real:
+#  nomes, números e imagens são inventados de propósito, e o período
+#  (Janeiro 2099) deixa isso claro em qualquer captura.
+#  As imagens ficam em assets/exemplo/ (peças neutras, sem pessoas e
+#  sem logotipos).
+#  Para um mês de verdade, copie dados/MODELO.txt (ou o mês anterior).
+# ======================================================================
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: PERÍODO
+# ----------------------------------------------------------------------
+[EDICAO]
+mes: Janeiro
+ano: 2099
+proximo_mes: Fevereiro
+pasta_imagens: assets/exemplo
+contato: time.exemplo@empresa.com
+link_report_completo: https://empresa.sharepoint.com/sites/exemplo/report-atual.html
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 01 · O MÊS EM UMA FRASE (capa)
+# ----------------------------------------------------------------------
+[ABERTURA]
+frase: Exemplo fictício
+frase_final: para treinamento.
+previa: Report de exemplo, com conteúdo fictício, para treinar a atualização mensal.
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: PROJETO PRINCIPAL (capa)
+# ----------------------------------------------------------------------
+[PROJETO PRINCIPAL]
+nome: Campanha Exemplo A
+resumo: Texto de exemplo: aqui entra, em uma ou duas frases, o resultado mais importante do mês.
+imagem: video-exemplo.png
+descricao_imagem: Capa do vídeo de exemplo
+enquadramento: centro
+tipo: video
+video: video-exemplo.webm
+link:
+
+# EDITAR AQUI: RESULTADO PRINCIPAL (INDICADORES)
+[NUMERO 1]
+valor: 12,5%
+titulo: Indicador A
+detalhe: Referência: 10,0%
+variacao: +25%
+
+[NUMERO 2]
+valor: R$ 1,20
+titulo: Indicador B
+detalhe: Referência: R$ 1,50
+variacao: -20%
+
+[NUMERO 3]
+valor: 340
+titulo: Indicador C
+detalhe: Referência: 400
+variacao: -15%
+variacao_cor: ambar
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 02 · O QUE LANÇAMOS
+# ----------------------------------------------------------------------
+[LANCAMOS]
+titulo:
+
+[DESTAQUE]
+categoria: Exemplo · Campanha fictícia
+titulo: Campanha Exemplo B: título do destaque
+texto: Texto de exemplo do destaque do mês: o que foi feito, onde e quando.
+imagem: peca-exemplo-destaque.png
+descricao_imagem: Peça de exemplo do destaque
+enquadramento: centro
+tipo: peca
+link:
+nota: Nota de exemplo: contexto ou ressalva sobre os números.
+
+[RESULTADO 1]
+valor: 48
+titulo: Indicador D
+detalhe: Referência: 40
+
+[RESULTADO 2]
+valor: R$ 2,10
+titulo: Indicador E
+detalhe: Referência: R$ 2,50
+variacao: -16%
+
+[RESULTADO 3]
+valor: +8%
+titulo: Indicador F
+detalhe: Comparado ao mês anterior
+variacao: Atenção
+variacao_cor: ambar
+
+[LANCAMENTO 1]
+status: No ar
+status_cor: verde
+nome: Lançamento Exemplo 1
+texto: Texto de exemplo do lançamento, em uma frase.
+imagem: peca-exemplo-1.png
+descricao_imagem: Peça de exemplo 1
+enquadramento: centro
+tipo: peca
+link:
+
+[LANCAMENTO 2]
+status: Em teste
+status_cor: ambar
+nome: Lançamento Exemplo 2
+texto: Texto de exemplo do lançamento, em uma frase.
+imagem: peca-exemplo-2.png
+descricao_imagem: Peça de exemplo 2
+enquadramento: centro
+tipo: peca
+link:
+
+[LANCAMENTO 3]
+status: Finalizado
+status_cor: verde
+nome: Lançamento Exemplo 3
+texto: Texto de exemplo do lançamento, em uma frase.
+imagem: peca-exemplo-3.png
+descricao_imagem: Peça de exemplo 3
+enquadramento: centro
+tipo: peca
+link:
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 03 · CREATIVE X
+# ----------------------------------------------------------------------
+[CREATIVE X]
+subtitulo: Qualidade criativa · exemplo
+anterior: 70%
+atual: 74%
+variacao:
+periodo: dezembro vs. janeiro
+referencia: Texto de exemplo: o que explica a variação.
+significado: Texto de exemplo: o que fazer com essa informação.
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: RESUMO DAS CAMPANHAS
+# ----------------------------------------------------------------------
+[FOI BEM 1]
+texto: Exemplo: o que foi bem na campanha A.
+
+[FOI BEM 2]
+texto: Exemplo: o que foi bem na campanha B.
+
+[A MELHORAR 1]
+texto: Exemplo: o que precisa melhorar na campanha A.
+
+[A MELHORAR 2]
+texto: Exemplo: o que precisa melhorar na campanha B.
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 04 · TRANSFORMATION HUB
+# ----------------------------------------------------------------------
+[TRANSFORMATION]
+titulo: Como estamos transformando<br>a forma de criar.
+
+[TRANSFORMATION 1]
+status:
+status_cor:
+nome: Agente de Exemplo 1
+texto: Texto de exemplo: o que o projeto faz.
+citacao:
+resultado:
+icones:
+logo: icone-exemplo.png
+descricao_logo: Ícone de exemplo
+links: Documento de exemplo | https://empresa.sharepoint.com/sites/exemplo/documento ; Agente de exemplo | https://empresa.sharepoint.com/sites/exemplo/agente
+prints: print-exemplo.png
+descricao_prints: Tela fictícia de um agente
+imagem:
+descricao_imagem:
+tipo: projeto
+link:
+
+[TRANSFORMATION 2]
+status: Previsão: fev/99
+status_cor: ambar
+nome: Agente de Exemplo 2
+texto: Texto de exemplo: o que o projeto faz.
+citacao:
+resultado:
+icones: icone-lupa
+imagem:
+descricao_imagem:
+tipo: projeto
+link:
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 05 · O QUE APRENDEMOS
+# ----------------------------------------------------------------------
+[APRENDIZADO 1]
+titulo: Aprendizado de exemplo 1
+texto: Texto de exemplo: o que os dados mostraram.
+levamos: exemplo do que fazer a partir disso.
+
+[APRENDIZADO 2]
+titulo: Aprendizado de exemplo 2
+texto: Texto de exemplo: o que os dados mostraram.
+levamos: exemplo do que fazer a partir disso.
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 06 · FOCO DO PRÓXIMO MÊS
+# ----------------------------------------------------------------------
+[FOCO]
+prioridade: Foco de exemplo para o próximo mês.
+texto: Texto de exemplo: as prioridades em uma ou duas frases.
+selo:
+descricao_selo:
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 07 · TAMBÉM VEM AÍ
+# ----------------------------------------------------------------------
+[AGENDA 1]
+data: 10 FEV
+titulo: Iniciativa de exemplo 1
+detalhe: Detalhe de exemplo.
+
+[AGENDA 2]
+data: EM DESENVOLVIMENTO
+titulo: Iniciativa de exemplo 2
+detalhe: Detalhe de exemplo.

@@ -4,11 +4,27 @@ Guia para quem não programa. Leva de 30 a 60 minutos por mês, quase tudo para 
 
 | O quê | Para quê | Onde editar |
 |---|---|---|
-| **`dados/AAAA-MM.txt`** | Textos, números, imagens e links do mês | PyCharm ou Bloco de Notas |
-| **`assets/AAAA-MM/`** | As imagens do mês | Explorador de Arquivos |
-| **`gerar-report.html`** | Conferir e gerar o e-mail (`.eml`) | Dois cliques (abre no Edge) |
+| **`dados/AAAA-MM.txt`** | Textos, números, imagens e links do mês: **a única fonte** do report completo e do e-mail-resumo | PyCharm ou Bloco de Notas |
+| **`assets/AAAA-MM/`** | As imagens (e vídeos) do mês | Explorador de Arquivos |
+| **`gerar-report.html`** | Conferir e gerar a página do mês (`.html`) | Dois cliques (abre no Chrome ou no Edge) |
+| **`converter-html-eml.html`** | Gerar o **e-mail-resumo** (`.eml`) e a **versão interativa** (`.html`, para o SharePoint) | Dois cliques |
 
-Você **não** abre nem edita HTML. Como usar o PyCharm: [GUIA_PYCHARM.md](GUIA_PYCHARM.md).
+Você **não** precisa editar HTML. Como usar o PyCharm: [GUIA_PYCHARM.md](GUIA_PYCHARM.md).
+
+## O fluxo definitivo
+
+```text
+dados/AAAA-MM.txt ─► gerar-report.html ─► página do mês (.html) ─► Chrome (conferir, ver o movimento)
+   (PyCharm)            (conferência)                                  │
+                                                                       ▼
+          Outlook ◄── e-mail-resumo (.eml) ◄── converter-html-eml.html ──► versão interativa (.html) ─► SharePoint
+       (porta de entrada,                       (o "emulador")                (report completo:            │
+        1 botão) ───────────────────────────── link "Ver report completo" ────── movimento, vídeos) ◄────────┘
+```
+
+- **Report completo (HTML):** a experiência inteira, com movimento ao rolar, vídeos e peças que abrem maiores. Fica no SharePoint.
+- **E-mail-resumo:** a porta de entrada. Estático, leitura rápida dos destaques e **um único link**, o botão "Ver report completo".
+- **Uma fonte só:** os dois saem do mesmo arquivo de dados. Você nunca digita o mesmo conteúdo duas vezes.
 
 ---
 
@@ -38,7 +54,9 @@ ano: 2026
 proximo_mes: Novembro
 pasta_imagens: assets/2026-10
 contato: [INSERIR E-MAIL OU CANAL DO TIME]
+link_report_completo: https://empresa.sharepoint.com/…/report-atual.html
 ```
+`link_report_completo` é o link de compartilhamento da versão interativa no SharePoint (o destino do botão do e-mail-resumo). Se a área usar sempre o **mesmo arquivo** no SharePoint (substituído todo mês, mesmo nome), o link não muda e você preenche uma vez só. Ainda não tem? Deixe vazio: o conversor pede o link na hora. Nunca use um caminho do computador (`C:\…`, `\\servidor\…`): ele não abre para mais ninguém.
 
 **4. Insira os resultados.** Antes de digitar, escolha **o que** destacar. Use o [Prompt 1 e o Prompt 2 do Copilot](PROMPTS_COPILOT.md) com a planilha do mês. Regras:
 - O **projeto principal** é o resultado mais importante do mês. O **1º número** dele aparece em vermelho: use o indicador mais relevante.
@@ -96,13 +114,25 @@ Corrigiu algo? **Salve** e clique em **Selecionar a pasta** de novo. Depois, na 
 
 Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt 8](PROMPTS_COPILOT.md#prompt-8--auditoria-da-análise).
 
-### Entregar (passos 13 a 15)
+### Entregar (passos 13 a 20)
 
-**13. Exporte a versão final.** **Baixar e-mail final (.eml)**. Abra o `.eml` (pasta Downloads), envie primeiro **só para você**, confira no computador e no celular, e então envie para a área. Detalhes: [HOW_TO_EXPORT_EML.md](HOW_TO_EXPORT_EML.md).
+**13. Baixe a página do mês.** Em `gerar-report.html`, **Baixar página do mês (.html)** → salve em `reports/` com o nome sugerido (`2026-10.html`). Ela abre em qualquer navegador, com imagens e vídeos dentro.
 
-**14. Faça o backup.** **Baixar página do mês (.html)** → salve em `reports/` com o nome sugerido (`2026-10.html`). Ela abre em qualquer navegador, com as imagens dentro.
+**14. Confira no Chrome.** Dois cliques no arquivo salvo. Role a página: as seções aparecem suaves, os números grandes contam até o valor e a barra do Creative X cresce. O vídeo do projeto principal toca no clique; as peças abrem maiores. Aperte **F12 → ícone do celular** (Ctrl+Shift+M) para ver como fica no celular.
 
-**15. Registre a atualização.** No ambiente do banco, com Git: *Commit* (Ctrl+K) com a mensagem `report: outubro 2026` → *Push* (Ctrl+Shift+K). Sem Git: copie a pasta do projeto para o local de backup combinado com a área ([BACKUP.md](BACKUP.md)).
+**15. Abra o conversor.** Dois cliques em `converter-html-eml.html` → **Escolher o arquivo .html** → escolha a página do passo 13. O **Status** mostra cada etapa em tempo real (✓ pronto, ! olhar, ✕ problema).
+
+**16. Suba a versão interativa.** **Baixar versão interativa (.html)** → suba numa pasta do SharePoint que o público do e-mail consiga abrir → **Copiar link** → cole no campo **Link do report completo** (ou guarde em `link_report_completo` e gere de novo).
+
+**17. Revise o e-mail-resumo.** Na **Prévia**, aba **E-mail-resumo**, botões **Computador** e **Celular**. Confira período, números, campanhas, aprendizados, Transformation Hub e próximos passos. Os blocos podem ser desmarcados em **Blocos do e-mail-resumo**. Como os destaques são escolhidos: [CONVERTER_HTML_EML.md](CONVERTER_HTML_EML.md#como-o-resumo-escolhe-os-destaques).
+
+**18. Baixe e teste.** **Baixar e-mail-resumo (.eml)** → dois cliques no arquivo (pasta Downloads): o Outlook abre uma **mensagem nova**. Envie primeiro **só para você**. No Outlook do computador e no celular, confira o layout e **clique em "Ver report completo"**: o report precisa abrir. Peça a alguém de outra equipe para testar o link (permissão do SharePoint).
+
+**19. Envie.** Abra o `.eml` de novo, coloque os destinatários autorizados e envie pelo Outlook corporativo. Precisa mandar o report inteiro por e-mail? **Baixar e-mail completo (.eml, opcional)**. Detalhes: [HOW_TO_EXPORT_EML.md](HOW_TO_EXPORT_EML.md).
+
+**20. Registre.** Anote a data do envio e a versão (o nome do arquivo em `reports/`). No ambiente do banco, com Git: *Commit* (Ctrl+K) com a mensagem `report: outubro 2026` → *Push* (Ctrl+Shift+K). Sem Git: copie a pasta do projeto para o local de backup combinado ([BACKUP.md](BACKUP.md)).
+
+> **Dados reais só em ambiente autorizado.** A página do mês, a versão interativa e os `.eml` têm resultados internos: ficam no computador do trabalho, no SharePoint e no Outlook corporativos. Não suba para repositório público nem para serviços externos.
 
 ---
 
@@ -120,7 +150,7 @@ Use o [checklist](TEST_CHECKLIST.md) e, se quiser uma segunda leitura, o [Prompt
 | `[LANCAMENTO 1]` a `[LANCAMENTO 6]` | **02** · "Também neste mês", com miniatura (linhas de 3) |
 | `[CREATIVE X]` | **03** · score anterior → atual, barra e frase |
 | `[FOI BEM 1]` a `[4]`, `[A MELHORAR 1]` a `[4]` | Resumo das campanhas, depois do Creative X e antes do Transformation Hub: o que foi bem (verde) e o que precisa melhorar (âmbar) |
-| `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Transformation Hub (até 3 prints por projeto: `prints:` e `descricao_prints:`) |
+| `[TRANSFORMATION]`, `[TRANSFORMATION 1]` a `[3]` | **04** · Transformation Hub: nome, texto, `status` (ex.: "Previsão de lançamento: nov/26"), `logo:` (PNG original do logo do projeto, 56 px), `links:` (ex.: documento e agente) e até 3 prints (`prints:`, `descricao_prints:`) |
 | `[APRENDIZADO 1]` a `[3]` | **05** · O que aprendemos |
 | `[FOCO]` | **06** · bloco vermelho do foco do próximo mês; `selo:` opcional (PNG original do selo da campanha, versão para fundo vermelho) |
 | `[AGENDA 1]` a `[AGENDA 6]` | **07** · Também vem aí (linhas de 3) |
@@ -135,11 +165,18 @@ A formiguinha aparece sozinha no rodapé. Não há campo para ela no arquivo do 
 
 ## Onde está cada texto no HTML?
 
-Os textos **não** são editados no HTML: eles ficam no arquivo do mês, e a página monta o HTML a cada geração. Assim o layout nunca quebra. Para saber qual campo preenche qual trecho do e-mail, abra `template/report.html` e procure (Ctrl+F) `EDITAR AQUI`: cada comentário diz o bloco e o campo. Exemplo:
+O caminho recomendado é sempre o arquivo do mês: o layout nunca quebra e o mês seguinte começa de uma cópia. Mas a página gerada (`reports/2026-10.html`) também leva **comentários `EDITAR AQUI`**, para quem precisar achar um texto direto nela (Ctrl+F no PyCharm ou no Chrome, em "Ver código-fonte"):
 
 ```html
-<!-- EDITAR AQUI: INDICADORES → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 4] valor, titulo, detalhe, variacao -->
+<!-- EDITAR AQUI: PERÍODO → dados/AAAA-MM.txt › [EDICAO] mes, ano (selo do mês) -->
+<!-- EDITAR AQUI: RESULTADO PRINCIPAL (INDICADORES) → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 3] … -->
+<!-- EDITAR AQUI: IMAGEM DO PROJETO PRINCIPAL → … -->
+<!-- EDITAR AQUI: APRENDIZADO → dados/AAAA-MM.txt › [APRENDIZADO 1..3] titulo, texto, levamos -->
 ```
+
+Cada comentário diz o bloco e o campo do arquivo de dados. Se editar a página direto (PyCharm ou Chrome), **passe a mesma mudança para o arquivo de dados**: senão ela some quando o report for gerado de novo.
+
+**Não apague** os atributos `data-campo="…"` dos textos: são eles que levam cada texto para o e-mail-resumo. O movimento (números contando, barra crescendo) também não depende de nada que você edita: ele reconhece a estrutura das seções, então trocar texto, número ou imagem não quebra a animação.
 
 ## Receitas rápidas
 
@@ -154,6 +191,10 @@ Os textos **não** são editados no HTML: eles ficam no arquivo do mês, e a pá
 | Data na agenda | `data: 12 OUT` aparece grande e vermelha; `data: A DEFINIR` aparece em cinza |
 | Ícones no Transformation Hub | `icones: icone-prancheta, icone-lupa` (arquivos de `assets/icones/`) |
 | Prints no Transformation Hub | `prints: print-1.png, print-2.png` (até 3, na pasta do mês) e `descricao_prints: Tela do agente \| Resultado` (separados por `\|`) |
+| Logo de um projeto do Transformation Hub | `logo: logo-agente.png` (PNG original, na pasta do mês) e `descricao_logo: Logo do agente`. O logo ocupa o lugar dos ícones |
+| Links de um projeto do Transformation Hub | `links: Documento One Brief \| https://… ; Briefing Agent \| https://…` (texto `\|` endereço; vários, separados por `;`) |
+| Previsão de lançamento | `status: Previsão de lançamento: nov/26` e `status_cor: ambar` |
+| Trocar imagem por vídeo | Na peça: `tipo: video`, `imagem:` com a capa (sem ▶) e `video: arquivo.mp4` (na pasta do mês). Desfazer: volte `tipo: peca` e apague a linha `video:` |
 | Quebrar a linha de um título | Escrevo `<br>` no ponto da quebra |
 
 ## Erros comuns
@@ -168,6 +209,9 @@ Os textos **não** são editados no HTML: eles ficam no arquivo do mês, e a pá
 | "é um caminho de rede" | Você colou `\\servidor\...` ou `C:\...`. Use o link do SharePoint |
 | "não está salvo em UTF-8" | Salve o arquivo em UTF-8 (o PyCharm já salva assim) |
 | A página não mudou | Salve e clique em **Selecionar a pasta** de novo |
+| Conversor: "Falta o link do report completo" | Suba a versão interativa no SharePoint e cole o link (passo 16) |
+| Conversor: "Esta página não tem os campos do resumo" | A página é de antes da versão 4.2: gere de novo pelo `gerar-report.html` |
+| O resumo deixou um item de fora | É a regra de seleção (os primeiros de cada lista). Mude a ordem dos blocos no arquivo de dados: o 1º é o que entra |
 
 Mais dúvidas: [FAQ.md](FAQ.md).
 
