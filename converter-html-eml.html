@@ -151,7 +151,7 @@
       <span><b>Imagem ou vídeo:</b> passe o mouse e use "Trocar imagem" (ou "Trocar vídeo").</span>
       <span><b>Link:</b> passe o mouse em um link vermelho e use "Trocar link".</span>
       <span><b>Mais links ou imagens:</b> passe o mouse no item (projeto, lançamento, destaque…) e use "+ Link" ou "+ Imagem" (até 3 por item).</span>
-      <span><b>Item que não vale este mês:</b> passe o mouse e use "Ocultar item".</span>
+      <span><b>Item que não vale este mês:</b> passe o mouse e use "Tirar item" (o último de um grupo fica: para tirar tudo, oculte a seção).</span>
       <span><b>Assunto novo (ex.: Testes):</b> <b>+ Novo tópico</b>: escreva o nome e escolha o layout (lista, colunas, cartões ou números). Até 4.</span>
     </div>
     <div class="ferramentas">
@@ -452,7 +452,8 @@
         if (item.tagName !== "P" && !numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
         if (item.hasAttribute("data-item")) {
           if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
-          bi.push(["Ocultar item", function () { ocultarItem(item); }, "cinza"]);
+          /* o último item de um grupo fica (a seção não fica vazia): para tirar o grupo todo, oculte a seção */
+          if (!gi || itensDo(gi).length > 1) bi.push(["Tirar item", function () { ocultarItem(item); }, "cinza"]);
         }
         mostrarBarra(item, bi, item.getBoundingClientRect().width < 320 ? "acima" : "direita");
       }
@@ -975,7 +976,7 @@
     pilha(volta);
     ED.doc.getElementById("ed-barra").hidden = true;
     novo.scrollIntoView({ block: "center" });
-    marcarSujo("Item adicionado (" + GRUPOS[g].nome + "): troque os textos [entre colchetes]" + (novo.querySelector("img[data-img]") ? " e a imagem" : "") + ". Para tirar: Desfazer ou Ocultar item.");
+    marcarSujo("Item adicionado (" + GRUPOS[g].nome + "): troque os textos [entre colchetes]" + (novo.querySelector("img[data-img]") ? " e a imagem" : "") + ". Para tirar: Desfazer ou Tirar item.");
   }
   function ocultarItem(item) {
     var g = grupoDe(item), G = g && ED.grupos[g];
@@ -983,7 +984,7 @@
     else if (item.tagName === "TD") { var antes = item.innerHTML; item.innerHTML = "&nbsp;"; item.removeAttribute("data-item"); pilha(function () { item.innerHTML = antes; item.setAttribute("data-item", ""); }); }
     else { var pai = item.parentNode, prox = item.nextSibling; item.remove(); pilha(function () { pai.insertBefore(item, prox); }); }
     ED.doc.getElementById("ed-barra").hidden = true;
-    marcarSujo("Item ocultado: a grade se ajustou. Para voltar: Desfazer.");
+    marcarSujo("Item tirado: a grade se ajustou. Para voltar: Desfazer.");
   }
   var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
   function marcaSecao(doc, id) { var w = doc.createTreeWalker(doc.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:" + id) return n; return null; }

@@ -138,7 +138,7 @@ function salvarComo() {
         cores: it.map(function (x) { var v = x.querySelector('[data-campo$=".valor"]'); return v ? (/color:#EC0000/i.test(v.getAttribute("style")) ? "vermelho" : "preto") : ""; }).join(",") };
     }, g);
   }
-  await ferramenta(p, f, '[data-item="agenda-6"]', "Ocultar item");
+  await ferramenta(p, f, '[data-item="agenda-6"]', "Tirar item");
   var ga = await grade("agenda");
   confere(ga.n === 5 && ga.linhas === "3+0 2+1", "agenda: item ocultado e a grade refeita (3 + 2 e um espaço vazio) · " + ga.linhas);
   confere(ga.mais === "+ Adicionar item na agenda", "agenda: botão visível \"+ Adicionar item na agenda\"");
@@ -146,8 +146,8 @@ function salvarComo() {
   ga = await grade("agenda");
   confere(ga.n === 6 && ga.linhas === "3+0 3+0" && ga.chaves === "agenda-1,agenda-2,agenda-3,agenda-4,agenda-5,agenda-6" && /^bloqueado: Máximo de 6/.test(ga.mais), "agenda: item adicionado depois do 1º, chaves em sequência, máximo de 6 · " + ga.mais);
   confere(await noQuadro(p, function (d) { return d.querySelector('[data-campo="agenda-2.titulo"]').textContent.trim(); }) === "[Item da agenda 2]", "item novo vem do modelo, com o número da posição");
-  await ferramenta(p, f, '[data-item="agenda-6"]', "Ocultar item");
-  for (var lk of ["lancamento-6", "lancamento-5", "lancamento-4"]) await ferramenta(p, f, '[data-item="' + lk + '"]', "Ocultar item");
+  await ferramenta(p, f, '[data-item="agenda-6"]', "Tirar item");
+  for (var lk of ["lancamento-6", "lancamento-5", "lancamento-4"]) await ferramenta(p, f, '[data-item="' + lk + '"]', "Tirar item");
   var gl = await grade("lancamento");
   confere(gl.n === 3 && gl.linhas === "3+0" && gl.larguras === "184,184,184" && gl.classes === "col gap|col gap|col" && gl.cab === "5", "lançamentos: 3 numa linha, como o motor monta · " + gl.larguras + " · " + gl.classes);
   await noQuadro(p, function (d) { d.querySelector('.ed-mais button[data-grupo="lancamento"]').scrollIntoView({ block: "center" }); });
@@ -165,7 +165,7 @@ function salvarComo() {
   var cel = await noQuadro(p, function (d) { var w = d.defaultView; return { vaza: d.documentElement.scrollWidth - d.documentElement.clientWidth, agenda: w.getComputedStyle(d.querySelector('[data-item="agenda-1"]')).display, num: w.getComputedStyle(d.querySelector('[data-item="numero-4"]')).display }; });
   confere(cel.vaza <= 0 && cel.agenda === "block" && cel.num === "inline-block", "celular: sem vazar para o lado; agenda empilhada; indicadores 2 a 2 · " + JSON.stringify(cel));
   await p.click('[data-ew="100%"]'); await p.waitForTimeout(300);
-  await ferramenta(p, f, '[data-item="numero-4"]', "Ocultar item");
+  await ferramenta(p, f, '[data-item="numero-4"]', "Tirar item");
   gn = await grade("numero");
   confere(gn.n === 3 && gn.larguras === "184,184,184" && gn.classes === "third|third|third", "capa: de volta a 3 indicadores na grade de 184 px");
   /* Imagens opcionais do modelo (selo, logo e print do Transformation Hub): saem com o espaço delas. */

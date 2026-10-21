@@ -200,8 +200,8 @@ function salvarComo() {
   await f.locator('.ed-mais button[data-grupo="topicob"]').click();
   var c4 = await noQuadro(p, function (d) { var x = d.querySelector('[data-item="topicob-4"]'); return x && x.parentNode !== d.querySelector('[data-item="topicob-1"]').parentNode && /padding-top:28px/.test(x.getAttribute("style")) && x.querySelector('img[data-img="topicob-4-print-1"]') ? "ok" : ""; });
   confere(c4 === "ok", "+ Adicionar cartão: o 4º vai para a linha de baixo, com a imagem do modelo");
-  await ferramenta(p, f, '[data-item="topicob-4"] [data-campo="topicob-4.nome"]', "Ocultar item");
-  await ferramenta(p, f, '[data-item="topicob-3"] [data-campo="topicob-3.nome"]', "Ocultar item");
+  await ferramenta(p, f, '[data-item="topicob-4"] [data-campo="topicob-4.nome"]', "Tirar item");
+  await ferramenta(p, f, '[data-item="topicob-3"] [data-campo="topicob-3.nome"]', "Tirar item");
   confere(await larguras(p, "topicob") === "288,288" && await noQuadro(p, function (d) { return d.querySelector('img[data-img="topicob-2-print-1"]').getAttribute("width"); }) === "288", "ocultar cartões: 2 de 288 px, com a imagem na largura nova");
   var id3 = await novoTopico(p, "Mídia", "numeros");
   confere(id3 === "topicoc" && await larguras(p, "topicoc") === "184,184,184", "tópico MÍDIA (números): 3 números de 184 px");
@@ -213,7 +213,7 @@ function salvarComo() {
   await escrever(p, f, "topicoc-1.nome", "Alcance fictício");
   var id4 = await novoTopico(p, "Pesquisas", "colunas");
   confere(id4 === "topicod" && await larguras(p, "topicod") === "184,184,184" && await noQuadro(p, function (d) { return d.querySelector('[data-item="topicod-3"] p.ft').textContent; }) === "3", "tópico PESQUISAS (colunas): 3 colunas numeradas");
-  await ferramenta(p, f, '[data-item="topicod-1"] [data-campo="topicod-1.nome"]', "Ocultar item");
+  await ferramenta(p, f, '[data-item="topicod-1"] [data-campo="topicod-1.nome"]', "Tirar item");
   confere(await larguras(p, "topicod") === "288,288" && await noQuadro(p, function (d) { return Array.prototype.map.call(d.querySelectorAll('[data-item^="topicod-"] > p.ft:first-child'), function (x) { return x.textContent; }).join(","); }) === "1,2", "ocultar coluna: 2 de 288 px, renumeradas");
   confere(await p.$eval("#bNovoTopico", function (b) { return b.disabled; }), "4 tópicos novos: o botão + Novo tópico fica desligado");
   var ordemT = await noQuadro(p, function (d) { var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n, r = []; while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue.trim()); if (m) r.push(m[1]); } return r.join(","); });

@@ -61,7 +61,7 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 | Mudar um indicador | Clico no valor, no título e na base de comparação e escrevo. Na variação: `▲ +25%` ou `▼ −20%`. Ao clicar na etiqueta aparecem **Cor: verde** (positivo; custo que caiu também é positivo) e **Cor: âmbar** (atenção) |
 | Mudar o período | Clico no período (ex.: `NOVEMBRO 2026`): ele muda em todos os lugares |
 | Pôr mais um item | Embaixo do grupo (indicadores, resultados, lançamentos, foi bem/a melhorar, projetos, aprendizados, agenda), clico em **+ Adicionar …**; ou passo o mouse num item › **+ Adicionar depois**. O item novo vem com textos [entre colchetes] (e imagem neutra) para trocar. A grade se ajusta sozinha, no computador e no celular |
-| Tirar um item sem dado | Passo o mouse no item › **Ocultar item** (canto de cima, à direita). A grade se ajusta. Nunca deixo o número do mês anterior nem escrevo 0 |
+| Tirar um item sem dado | Passo o mouse no item › **Tirar item** (canto de cima, à direita). A grade se ajusta. Nunca deixo o número do mês anterior nem escrevo 0 |
 | Tirar uma seção inteira | **Seções do report** › desmarco a seção. A numeração se ajusta |
 | Voltar atrás | **Desfazer** (imagem, link, cor, item); **Ctrl+Z** (texto) |
 
@@ -91,7 +91,7 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 
 ### Campanhas (O que lançamos)
 
-Destaque do mês (categoria, título, texto, imagem e até 3 resultados) e até 6 lançamentos (status, nome, texto, imagem). Status em verde (no ar) ou âmbar (em teste, previsto). Mais lançamentos: **+ Adicionar lançamento** (o 4º abre uma linha nova). Menos: **Ocultar item** nos que sobrarem.
+Destaque do mês (categoria, título, texto, imagem e até 3 resultados) e até 6 lançamentos (status, nome, texto, imagem). Status em verde (no ar) ou âmbar (em teste, previsto). Mais lançamentos: **+ Adicionar lançamento** (o 4º abre uma linha nova). Menos: **Tirar item** nos que sobrarem.
 
 ### Importar conteúdo do Copilot
 
