@@ -21,6 +21,8 @@ function salvarComo() {
     return { name: o.suggestedName, createWritable: async function () { var partes = []; return { write: async function (b) { partes.push(await b.text()); }, close: async function () { window.__salvos.push({ nome: o.suggestedName, html: partes.join("") }); } }; } };
   };
 }
+/* tipo e tamanho reais de uma mídia da edição (blob: ou data:), lida como o navegador lê */
+function midiaDe(pg, sel, at) { return pg.evaluate(async function (o) { var v = document.querySelector("#edFrame").contentDocument.querySelector(o.sel).getAttribute(o.at) || ""; if (!v) return { tipo: "", tam: 0 }; var b = await (await fetch(v)).blob(); return { tipo: b.type, tam: b.size }; }, { sel: sel, at: at }); }
 function kb(n) { return Math.round(n / 1024) + " KB"; }
 
 (async function () {
@@ -53,9 +55,17 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
     await p.mouse.click(c.x, c.y);
   }
 
-  /* 1. Ícone da aba da ferramenta: chama + PF */
-  var icone = await p.$eval('link[rel="icon"]', function (l) { return decodeURIComponent(l.getAttribute("href")); });
-  confere(/EC0000/.test(icone) && />PF</.test(icone), "ferramenta: ícone da aba com a chama e o selo PF");
+  /* 1. Aba do emulador: nome e ícone Santander + PF (PNG 16 e 32, SVG e celular), todos carregando; símbolo no cabeçalho */
+  var ab = await p.evaluate(async function () {
+    var r = { titulo: document.title, icones: [] };
+    for (var l of document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]')) { var im = new Image(); im.src = l.href; try { await im.decode(); r.icones.push((l.getAttribute("sizes") || "") + ":" + im.naturalWidth); } catch (e) { r.icones.push((l.getAttribute("sizes") || "") + ":ERRO"); } }
+    var svg = document.querySelector('link[type="image/svg+xml"]'); r.svgPF = !!svg && /PF<\/text>/.test(decodeURIComponent(svg.getAttribute("href")));
+    var c = document.querySelector("header .marca-pf img"); r.cab = c ? c.naturalWidth + "x" + c.getBoundingClientRect().width : "";
+    return r;
+  });
+  confere(ab.titulo === "Emulador Report PF", "aba do emulador: " + ab.titulo);
+  confere(ab.icones.join(",") === "32x32:32,16x16:16,any:150,180x180:180" && ab.svgPF, "ícone Santander + PF carregando em todos os tamanhos · " + ab.icones.join(","));
+  confere(/^150x/.test(ab.cab), "símbolo Santander + PF no cabeçalho do emulador · " + ab.cab);
 
   /* 2. Abrir o exemplo: edição sem rolagem dentro do quadro, no computador e no celular */
   await p.setInputFiles("#arquivo", path.join(RAIZ, "kit/report-exemplo.html"));
@@ -65,7 +75,7 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   async function semRolagem(sel) { return p.$eval(sel, function (fr) { var d = fr.contentDocument; return { quadro: Math.round(fr.getBoundingClientRect().height), conteudo: d.documentElement.scrollHeight, rola: d.documentElement.scrollHeight - d.documentElement.clientHeight }; }); }
   var a1 = await semRolagem("#edFrame");
   confere(a1.rola <= 1, "edição (computador): o quadro mostra o report inteiro, sem rolagem dentro · " + JSON.stringify(a1));
-  await p.click('.ferramentas button[data-ew="400px"]'); await p.waitForTimeout(700);
+  await p.click('.ferramentas button[data-ew="390px"]'); await p.waitForTimeout(700);
   var a2 = await semRolagem("#edFrame");
   confere(a2.rola <= 1 && a2.conteudo > a1.conteudo, "edição (celular): o report inteiro aparece, rolando só a página · " + JSON.stringify(a2));
   await p.screenshot({ path: path.join(SAIDA, "leveza-celular.png") });
@@ -76,7 +86,8 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   var fc = await Promise.all([p.waitForEvent("filechooser"), ferramenta(f, '[data-item="lancamento-1"] [data-campo="lancamento-1.nome"]', "+ Imagem")]);
   await fc[0].setFiles(FOTO);
   await p.waitForFunction(function () { return !!document.querySelector("#edFrame").contentDocument.querySelector('img[data-img="lancamento-1-print-1"]'); }, null, { timeout: 15000 });
-  var im = await noQuadro(function (d) { var i = d.querySelector('img[data-img="lancamento-1-print-1"]'); return { src: i.getAttribute("src").slice(0, 16), n: i.getAttribute("src").length * 0.75, z: (i.getAttribute("data-ampliar") || "").length * 0.75, zt: (i.getAttribute("data-ampliar") || "").slice(0, 16) }; });
+  var im = await midiaDe(p, 'img[data-img="lancamento-1-print-1"]', "src"), zz = await midiaDe(p, 'img[data-img="lancamento-1-print-1"]', "data-ampliar");
+  im = { src: im.tipo, n: im.tam, zt: zz.tipo, z: zz.tam };
   confere(/image\/jpeg/.test(im.src) && im.n < 120 * 1024 && /image\/jpeg/.test(im.zt) && im.z < 400 * 1024, "imagem de " + kb(tamFoto) + " (PNG) vira JPEG: " + kb(im.n) + " na página, " + kb(im.z) + " ampliada");
 
   /* 4. Vídeo pesado: otimizado no navegador */
@@ -88,7 +99,7 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   await p.waitForSelector("#progVideo", { timeout: 10000 });
   confere(true, "otimizando, com a barra de andamento");
   await p.waitForFunction(function () { return /otimizado/.test(document.querySelector("#estado").textContent); }, null, { timeout: 60000 });
-  var vid = await noQuadro(function (d) { var v = d.querySelector('img[data-img="principal"]').getAttribute("data-video") || ""; return { tipo: v.slice(0, 16), n: v.length * 0.75 }; });
+  var vid = await midiaDe(p, 'img[data-img="principal"]', "data-video"); vid = { tipo: vid.tipo, n: vid.tam };
   confere(/video\/webm/.test(vid.tipo) && vid.n < tamVid * 0.6, "vídeo otimizado: " + kb(tamVid) + " → " + kb(vid.n) + " · " + await p.$eval("#estado", function (e) { return e.textContent.slice(0, 90); }));
 
   /* 5. Indicadores do resumo: o nome do projeto, e aviso de repetição com a frase */
@@ -116,8 +127,10 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   await p.waitForFunction(function () { return window.__salvos.length === 1; }, null, { timeout: 30000 });
   var salvo = await p.evaluate(function () { return window.__salvos[0]; });
   fs.writeFileSync(path.join(SAIDA, "leveza-" + salvo.nome), salvo.html);
-  var ic = (/<link rel="icon"[^>]*href="([^"]*)"/.exec(salvo.html) || [])[1] || "";
-  confere(/EC0000/.test(decodeURIComponent(ic)) && !/>PF</.test(decodeURIComponent(ic)), "report salvo: ícone da aba é a chama (sem o PF)");
+  var cabS = salvo.html.slice(0, salvo.html.indexOf("</head>")), corpoS = salvo.html.slice(salvo.html.indexOf("</head>"));
+  var svgS = (/<link rel="icon" type="image\/svg\+xml"[^>]*href="([^"]*)"/.exec(cabS) || [])[1] || "";
+  confere(/PF<\/text>/.test(decodeURIComponent(svgS)) && /sizes="32x32"/.test(cabS) && (cabS.match(/rel="icon"/g) || []).length === 3, "report salvo: ícone da aba Santander + PF (sem ícones repetidos)");
+  confere(!/santander-pf|PF%3C\/text|marca-pf/.test(corpoS), "report salvo: o símbolo fica só na aba, fora do conteúdo");
   confere(Buffer.byteLength(salvo.html) < 2.5 * 1048576, "report salvo com foto e vídeo pesados: " + kb(Buffer.byteLength(salvo.html)) + " (os originais somam " + kb(tamVid + tamFoto) + ")");
 
   /* 8. Reabrir um report pesado (imagem PNG enorme embutida): fica mais leve ao abrir */
@@ -128,11 +141,11 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   await p2.goto(URL_EMULADOR); await p2.setInputFiles("#arquivo", arqP);
   await p2.waitForFunction(function () { return /Otimizei/.test(document.querySelector("#estado").textContent); }, null, { timeout: 30000 }).catch(function () {});
   var est = await p2.$eval("#estado", function (e) { return e.textContent; });
-  var lanc = await p2.evaluate(function () { var i = document.querySelector("#edFrame").contentDocument.querySelector('img[data-img="lancamento-1"]'); return i.getAttribute("src").length * 0.75; });
+  var lanc = (await midiaDe(p2, 'img[data-img="lancamento-1"]', "src")).tam;
   confere(n === 1 && /Otimizei/.test(est) && lanc < 200 * 1024, "report com imagem de " + kb(tamFoto) + ": ao abrir, ela cai para " + kb(lanc) + " · " + est.slice(0, 80));
   await p2.close({ runBeforeUnload: false });
 
-  /* 9. Status: cada pendência tem "Ir até lá"; aviso informativo tem "Ok, ciente" e a etapa fica verde; "Creative X" não é pendência */
+  /* 9. Status: cada pendência tem "Ir até lá"; URL válida não dá aviso e vai gravada no report; "Creative X" não é pendência */
   var p3 = await ctx.newPage(); p3.on("pageerror", function (e) { erros.push(e.message); });
   async function etapaRes(pg) { return pg.$eval("#et-resumir", function (li) { return { estado: li.dataset.estado, itens: Array.prototype.map.call(li.querySelectorAll("ul li"), function (x) { return x.textContent; }) }; }); }
   async function espera(pg) { await pg.waitForTimeout(1300); await pg.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 60000 }); }
@@ -150,12 +163,22 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   var p4 = await ctx.newPage(); p4.on("pageerror", function (e) { erros.push(e.message); });
   await p4.goto(URL_EMULADOR); await p4.setInputFiles("#arquivo", path.join(RAIZ, "kit/report-exemplo.html")); await espera(p4);
   await p4.fill("#link", "report-2099-01.html"); await espera(p4);
-  var e3 = await etapaRes(p4), b3 = await p4.$eval("#banner", function (b) { return b.className; });
-  confere(e3.estado === "aviso" && /banner warn/.test(b3) && e3.itens.some(function (x) { return /endereço relativo/.test(x) && /Ok, ciente/.test(x); }), "link relativo: aviso amarelo com \"Ok, ciente\"");
-  await p4.click('#et-resumir ul li button:text("Ok, ciente")'); await espera(p4);
-  var e4 = await etapaRes(p4), b4 = await p4.$eval("#banner", function (b) { return b.className + " · " + b.textContent; });
-  if (process.env.DEPURAR) console.log(JSON.stringify(e4));
-  confere(e4.estado === "ok" && /banner ok/.test(b4) && e4.itens.some(function (x) { return /ciente/.test(x); }), "\"Ok, ciente\": a etapa fica verde e o status, pronto · " + b4.slice(0, 60));
+  var e3 = await etapaRes(p4), b3 = await p4.$eval("#banner", function (b) { return b.className + " · " + b.textContent; }), i3 = await p4.$eval("#linkInfo", function (e) { return e.textContent; });
+  confere(e3.estado === "ok" && /banner ok/.test(b3) && !e3.itens.some(function (x) { return /Ok, ciente/.test(x); }) && /relativo/.test(i3), "link relativo (URL válida): sem aviso, status verde; só uma nota no campo · " + i3.slice(0, 70));
+  for (var lv of ["empresa.sharepoint.com/sites/cs/report.html", "http://intranet/report.html", "Link do report: https://empresa.sharepoint.com/:u:/r/sites/cs/r.html?csf=1&web=1", "mailto:time@example.com"]) {
+    await p4.fill("#link", lv); await espera(p4);
+    var ev = await etapaRes(p4), bv = await p4.$eval("#banner", function (b) { return b.className; }), hv = ((await p4.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1];
+    confere(ev.estado === "ok" && /banner ok/.test(bv) && !!hv, "\"" + lv.slice(0, 40) + "\": aceito sem aviso e aplicado ao botão · " + hv);
+  }
+  /* o link vai gravado no report: salvar, reabrir e o campo vem preenchido */
+  await p4.fill("#link", "https://empresa.sharepoint.com/sites/cs/report-ficticio.html"); await espera(p4);
+  await p4.evaluate(function () { window.__salvos = []; window.showSaveFilePicker = async function (o) { return { name: o.suggestedName, createWritable: async function () { var pt = []; return { write: async function (b) { pt.push(await b.text()); }, close: async function () { window.__salvos.push(pt.join("")); } }; } }; }; });
+  await p4.click("#bSalvar"); await p4.waitForFunction(function () { return window.__salvos.length === 1; }, null, { timeout: 30000 });
+  var hs = await p4.evaluate(function () { return window.__salvos[0]; }), arqL = path.join(SAIDA, "leveza-link.html"); fs.writeFileSync(arqL, hs);
+  confere(/<meta name="report-completo" content="https:\/\/empresa\.sharepoint\.com\/sites\/cs\/report-ficticio\.html">/.test(hs), "link gravado no report salvo");
+  var p5 = await ctx.newPage(); await p5.goto(URL_EMULADOR); await p5.setInputFiles("#arquivo", arqL); await espera(p5);
+  confere(await p5.$eval("#link", function (e) { return e.value; }) === "https://empresa.sharepoint.com/sites/cs/report-ficticio.html", "reaberto: o campo do link já vem preenchido");
+  await p5.close({ runBeforeUnload: false });
   var f4 = await (await p4.$("#edFrame")).contentFrame();
   await f4.locator('[data-campo="numero-1.detalhe"][data-ed-campo]').first().click({ position: { x: 4, y: 6 } }); await p4.waitForTimeout(150);
   await p4.keyboard.press("Control+A"); await p4.keyboard.type("Creative X 79%"); await p4.keyboard.press("Enter"); await espera(p4);

@@ -100,13 +100,13 @@ function medir(d, celular) {
   await p.waitForTimeout(400);
   var f = await (await p.$("#edFrame")).contentFrame();
   async function noQuadro(fn, arg) { return p.evaluate(function (o) { var d = document.querySelector("#edFrame").contentDocument; return new Function("d", "arg", "return (" + o.fn + ")(d, arg);")(d, o.arg); }, { fn: fn.toString(), arg: arg === undefined ? null : arg }); }
-  async function modo(cel) { await p.click('button[data-ew="' + (cel ? "400px" : "100%") + '"], button[data-ew]:not([data-ew="400px"])' ); }
+  async function modo(cel) { await p.click('button[data-ew="' + (cel ? "390px" : "100%") + '"], button[data-ew]:not([data-ew="390px"])' ); }
   async function auditar(rotulo) {
     passos++;
     var pd = await noQuadro(medir, false);
-    await p.click('.ferramentas button[data-ew="400px"]'); await p.waitForTimeout(350);
+    await p.click('.ferramentas button[data-ew="390px"]'); await p.waitForTimeout(350);
     var pc = await noQuadro(medir, true);
-    await p.click('.ferramentas button[data-ew]:not([data-ew="400px"])'); await p.waitForTimeout(350);
+    await p.click('.ferramentas button[data-ew]:not([data-ew="390px"])'); await p.waitForTimeout(350);
     confere(!pd.length, rotulo + " · computador" + (pd.length ? ": " + pd.slice(0, 4).join(" | ") : ""));
     confere(!pc.length, rotulo + " · celular" + (pc.length ? ": " + pc.slice(0, 4).join(" | ") : ""));
   }

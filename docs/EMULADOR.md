@@ -23,7 +23,7 @@ O report abre num quadro, já como página final. As ferramentas de edição exi
 | Texto ou número (contorno tracejado) | Clique e escreva. O texto de exemplo [entre colchetes] fica selecionado ao clicar. Enter confirma; Shift+Enter quebra a linha; colar entra sem formatação; negrito e itálico não mudam (layout fixo). O período muda em todos os lugares |
 | Etiqueta de variação ou status | Ao clicar: "Cor: verde" e "Cor: âmbar" |
 | Imagem | Passe o mouse: **Trocar imagem** (recorta e reduz para o espaço, em dobro para telas de alta resolução; avisa se for pequena), **Descrição** (texto alternativo). Projeto principal, destaque e lançamentos: **Colocar vídeo** / **Trocar vídeo** / **Tirar o vídeo**. Selo, logo, prints do Transformation Hub e imagens adicionadas: **Tirar imagem** (as outras sobem e se reorganizam) |
-| Link | **Colocar link** / **Trocar link** (qualquer link: `https://`, endereço sem `https://` (ganha o `https://`), caminho do arquivo (vira `file:///…`, com aviso), `mailto:`, `msteams:`, endereço relativo (com aviso); espaço vira `%20`; só `javascript:`/`data:`/`vbscript:` são recusados; links iguais mudam juntos), **Anexar PDF** (vai dentro do report e abre em nova aba no clique; no e-mail vira texto), **Tirar link** (a quebra de linha sai junto; a linha vazia também); nos links de lista (Transformation Hub, novo tópico, links adicionados), **Texto do link** |
+| Link | **Colocar link** / **Trocar link** (qualquer link, sem aviso: `https://`, endereço sem `https://` (ganha o `https://`), caminho do arquivo (vira `file:///…`), `mailto:`, `msteams:`, endereço relativo (com aviso); espaço vira `%20`; só `javascript:`/`data:`/`vbscript:` são recusados; links iguais mudam juntos), **Anexar PDF** (vai dentro do report e abre em nova aba no clique; no e-mail vira texto), **Tirar link** (a quebra de linha sai junto; a linha vazia também); nos links de lista (Transformation Hub, novo tópico, links adicionados), **Texto do link** |
 | Mais links e mais imagens (4.6) | Passe o mouse no item ou bloco: **+ Link** (texto do link e endereço; sem endereço, o link fica cinza, pendente, e se completa com **Colocar link** ou **Anexar PDF**) e **+ Imagem** (escolha o arquivo e escreva a descrição). Vale para todos os itens e para o destaque, o projeto principal (capa) e o foco. Os links entram no fim do texto, **um embaixo do outro** (no projeto do Transformation Hub, junto dos que já existem; em "foi bem"/"a melhorar", na linha de baixo da frase). Reports de antes, com links separados por " · ", passam a um por linha ao abrir no emulador. As imagens: **até 3 por item**, lado a lado na largura da coluna (coluna de 184 px: uma embaixo da outra; novo tópico: 1 × 600, 2 × 288 ou 3 × 184 px), juntas dos prints que o item já tem; no celular, empilhadas; no report, abrem maiores no clique. Fundo vermelho (capa, foco): link em branco |
 | Item (número, resultado, lançamento, projeto, aprendizado, agenda, "foi bem"/"a melhorar") | **+ Adicionar …** (embaixo de cada grupo, sempre visível) e **+ Adicionar depois** / **Tirar item** (passando o mouse; o último item de um grupo não sai, para a seção não ficar vazia: para tirar tudo, oculte a seção). Regra dos nomes: "+ Adicionar …" põe, "Tirar …" tira (item, link, imagem, vídeo), "Ocultar" é só para seção, que volta quando quiser. O item novo vem do modelo em branco, com textos [entre colchetes]; a grade é refeita com as regras do motor (linhas de 3, larguras, espaços e classes do celular) e as chaves seguem em sequência. Máximo: 4 indicadores, 3 resultados, 6 lançamentos, 4 "foi bem", 4 "a melhorar", 3 projetos, 3 aprendizados, 6 itens na agenda; nos tópicos novos, o do layout (lista 6, colunas 3, cartões 6, números 4) |
 | Seção | "Seções do report": desmarcar tira a seção do report e do e-mail; a numeração (01, 02…) se ajusta na hora |
@@ -48,14 +48,16 @@ O report abre num quadro, já como página final. As ferramentas de edição exi
 
 Cole a resposta do Copilot no formato de blocos do report (`[NUMERO 1]`, `valor: 12,5%`…) e **Aplicar na página**. Os campos que existem na página são preenchidos (variação ganha a seta; `variacao_cor`/`status_cor` dão a cor); o resto é listado como "ficou de fora". Não traz imagens, links nem PDF e não cria item nem seção nova (para o novo tópico, ligue a seção antes de importar `[TOPICO]`). Formato e prompts: [PROMPTS_COPILOT.md](PROMPTS_COPILOT.md).
 
-## Status: o que é amarelo e como resolver (4.8.1)
+## Status: o que é amarelo e como resolver (4.9)
+
+Amarelo só aparece quando há algo a resolver no report. Link válido, imagem da internet ou report feito fora da ferramenta não deixam o status amarelo (são detalhes da etapa, quando ajudam).
 
 | No status | O que fazer |
 |---|---|
-| "Ainda é texto do modelo: …" | **Ir até lá**: o emulador rola até o texto e põe o cursor nele. Troque e aperte Enter: o item sai em menos de um segundo |
+| "Ainda é texto do modelo: …" | **Ir até lá**: o emulador rola até o texto e põe o cursor nele. Troque e aperte Enter: o item sai em menos de um segundo. Item que não vale: **Tirar item** |
+| "Falta o link do report completo" | Cole o link no passo 3 |
 | "Repete a frase do mês" | **Ir até lá** leva aos indicadores: troque o indicador ou a frase. Ou **Ok, ciente** se quiser assim |
-| "Link: …" (link de arquivo, relativo, sem https) | **Ir até lá** leva ao passo 3. Se o link é esse mesmo, **Ok, ciente**: a etapa fica verde |
-| Notas do Outlook, imagem da internet, report não reconhecido | Leia e, se estiver tudo certo, **Ok, ciente** |
+| Nota do Outlook no e-mail-resumo | Leia e, se estiver tudo certo, **Ok, ciente** |
 | Vermelho (✕) | Erro: o e-mail não é montado até resolver (ex.: imagem em arquivo que falta) |
 
 O "ciente" vale enquanto o aviso for o mesmo e até abrir outro report. O "X" só conta como texto do modelo no lugar de um número (X%, +X p.p., R$ X); "Creative X 79%" é texto real.
@@ -71,9 +73,11 @@ O emulador otimiza sozinho o que entra, para o report, os e-mails e o próprio e
 | Report pesado aberto | Imagens acima de 160 KB são refeitas no tamanho de uso; o status diz quanto ficou mais leve. Salve para gravar |
 | PDF anexado | Vai como está (o navegador não reduz PDF): prefira o PDF exportado "para web" ou com tamanho mínimo |
 
-A edição e a prévia do e-mail crescem até o tamanho do conteúdo: rolando a página, o report (ou o e-mail) aparece inteiro, também no modo **Celular**, sem rolagem dentro do quadro.
+A edição e a prévia do e-mail crescem até o tamanho do conteúdo: rolando a página, o report (ou o e-mail) aparece inteiro, sem rolagem dentro do quadro. **Celular** (4.9) é uma visualização só, de 390 px, para a edição e a prévia juntas, nunca mais larga que a tela: aberto num celular, o emulador já começa nela, sem rolagem para o lado.
 
-**Ícones da aba:** o report (`.html`) leva a chama do Santander; o emulador e o `gerar-report.html`, a chama com o selo PF. Os e-mails não levam ícone.
+**Desempenho (4.9):** fotos, vídeos e PDFs ficam como arquivos na memória do navegador enquanto você edita; o report em edição guarda só uma referência curta a cada um. Por isso editar, conferir e montar o resumo não passam mais pela mídia a cada mudança, e a página não trava, mesmo com reports de dezenas de MB e em notebooks modestos. A mídia volta para dentro do arquivo ao salvar, e o `.eml` é montado ao baixar. O rascunho guarda cada mídia uma vez só.
+
+**Identidade:** a aba do emulador se chama **Emulador Report PF**, e o símbolo **Santander + PF** fica no cabeçalho, numa placa branca (a chama vermelha não vai sobre o vermelho). O mesmo símbolo é o ícone da aba do emulador, do `gerar-report.html` e do report (`.html`): no report, só na aba, sem mudar o conteúdo. Os e-mails não levam ícone. Arquivos: `assets/marca/svg/santander-pf.svg` e `assets/marca/santander-pf-16.png`, `-32.png`, `-180.png`.
 
 ## E-mail-resumo
 
@@ -91,7 +95,7 @@ Sem vídeo, carrossel, botões secundários nem script. **Cantos retos de propó
 
 **Indicadores:** cada um aparece com o nome do projeto, ex.: "28 · Contas abertas (Milheiros)" (4.8). O número que a frase do mês já diz não vem marcado e mostra "já está na frase do mês"; marcado mesmo assim, o status avisa "Repete a frase do mês". Os candidatos são os números da página (projeto principal, resultados do destaque, Creative X e os números dos tópicos novos no layout Números); vêm marcados os do projeto principal. A pessoa escolhe até 3 (o 4º fica bloqueado). Nenhum número é criado: sem indicador na página, o e-mail sai só com a frase e a chamada.
 
-**Link:** vem do report, se já estiver gravado nele; senão, cole no passo 3. **Vale qualquer link** (4.7): `https://…` (ambiente autorizado), endereço sem `https://` (ex.: `empresa.sharepoint.com/…`, ganha o `https://`, com aviso), o caminho do arquivo, que vira `file:///…` (abre só onde o arquivo está; o status avisa), `mailto:`, `msteams:` ou um endereço relativo (ex.: `report-2026-10.html`, com aviso). Espaço vira `%20`. Só endereço que executa código (`javascript:`, `data:`, `vbscript:`) é recusado. Sem link válido, a prévia mostra "FALTA O LINK DO REPORT COMPLETO" no lugar do botão e o `.eml` do resumo não é liberado.
+**Link:** vem do report, se já estiver gravado nele; senão, cole no passo 3. **Vale qualquer link, sem aviso** (4.9): `https://…` (ambiente autorizado), `http://`, endereço sem `https://` (ex.: `empresa.sharepoint.com/…`, ganha o `https://`), texto com o link dentro (ex.: "Link do report: https://…": vale o link), o caminho do arquivo, que vira `file:///…`, `mailto:`, `msteams:` ou um endereço relativo (ex.: `report-2026-10.html`). Espaço vira `%20`. Para caminho de arquivo e endereço relativo, uma nota cinza no campo diz onde ele abre (não é aviso). Só endereço que executa código (`javascript:`, `data:`, `vbscript:`) é recusado. O link é aplicado ao botão do e-mail-resumo na hora e **gravado no report ao salvar**: ao reabrir o arquivo, o campo já vem preenchido. Sem link válido, a prévia mostra "FALTA O LINK DO REPORT COMPLETO" no lugar do botão e o `.eml` do resumo não é liberado.
 
 ## Status (tempo real)
 

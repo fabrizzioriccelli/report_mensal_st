@@ -114,6 +114,7 @@ Testes (Node.js; os `e2e` também precisam do Playwright):
 - `node tests/motor.test.js`: motor (71 testes).
 - `node tests/emulador.e2e.js`: o fluxo completo do emulador como uma pessoa faria (abrir, editar, imagem, link, ocultar, importar, salvar, reabrir, recuperar, resumo, `.eml`). Com `EMULADOR=kit/emulador-report.html`, testa a versão avulsa.
 - `node tests/emulador-extras.e2e.js`: + Link e + Imagem em vários tipos de item (até 3 imagens), tirar e desfazer, e os tópicos novos (+ Novo tópico com os 4 layouts, numa página nova e numa antiga, adicionar e ocultar itens, numeração, salvar, e-mail-resumo, reabrir, celular).
+- `node tests/desempenho.e2e.js`: abrir, editar e salvar um report sintético pesado (~27 MB) com a CPU 4× mais lenta; falha se a página voltar a travar (precisa do ffmpeg).
 - `node tests/leveza.e2e.js`: imagem e vídeo pesados otimizados, report pesado mais leve ao abrir, edição e prévia sem rolagem dentro do quadro, nomes dos projetos e aviso de repetição no resumo, ícones da aba (precisa do ffmpeg para gerar os arquivos de teste).
 - `node tests/grade.e2e.js`: o grid depois de cada adicionar e tirar (itens de todos os grupos, os 4 layouts de tópico, imagens, links, seções), medido no computador e no celular (100 passos).
 - `node tests/ferramenta.e2e.js`: geração pelo arquivo de dados, em 7 larguras de tela.

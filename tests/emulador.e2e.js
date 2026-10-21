@@ -107,7 +107,8 @@ function salvarComo() {
   /* 3. Trocar imagem (seletor de arquivo) e link. */
   var fc = await Promise.all([p.waitForEvent("filechooser"), ferramenta(p, f, 'img[data-img="principal"]', "Trocar imagem")]);
   await fc[0].setFiles(path.join(RAIZ, "assets/exemplo/peca-exemplo-principal.png"));
-  await p.waitForFunction(function () { return /^data:image\/jpeg/.test(document.querySelector("#edFrame").contentDocument.querySelector('img[data-img="principal"]').getAttribute("src")); }, null, { timeout: 10000 });
+  /* a mídia fica fora do texto (blob:) na edição: confere o tipo real do arquivo */
+  await p.waitForFunction(async function () { var s = document.querySelector("#edFrame").contentDocument.querySelector('img[data-img="principal"]').getAttribute("src"); if (!/^(blob:|data:)/.test(s)) return false; var b = await (await fetch(s)).blob(); return b.type === "image/jpeg"; }, null, { timeout: 10000 });
   confere(true, "imagem do projeto principal trocada (recortada e reduzida no navegador)");
   p.__resposta = "https://www.example.com/peca-ficticia";
   await ferramenta(p, f, '[data-item="lancamento-1"] span[title="Link ainda não definido"]', "Colocar link");
@@ -115,7 +116,7 @@ function salvarComo() {
   p.__resposta = "\"C:\\Users\\fulano\\peça 2.png\"";
   await ferramenta(p, f, '[data-item="lancamento-2"] span[title="Link ainda não definido"]', "Colocar link");
   var hrefArq = await noQuadro(p, function (d) { var a2 = d.querySelector('[data-item="lancamento-2"] a.cta'); return a2 ? a2.getAttribute("href") : "(sem link)"; }), estArq = await p.$eval("#estado", function (e) { return e.textContent; });
-  confere(hrefArq === "file:///C:/Users/fulano/pe%C3%A7a%202.png" && /Atenção/.test(estArq), "caminho do computador (com aspas, espaço e acento) aceito como link de arquivo, com aviso · " + hrefArq);
+  confere(hrefArq === "file:///C:/Users/fulano/pe%C3%A7a%202.png" && !/Atenção/.test(estArq) && /Caminho de arquivo/.test(estArq), "caminho do computador (com aspas, espaço e acento) aceito como link de arquivo, sem aviso (só uma nota) · " + hrefArq);
   p.__resposta = "javascript:alert(1)";
   await ferramenta(p, f, '[data-item="lancamento-3"] span[title="Link ainda não definido"]', "Colocar link");
   await p.waitForSelector("#modal:not([hidden])");
@@ -161,7 +162,7 @@ function salvarComo() {
   var gn = await grade("numero");
   confere(gn.n === 4 && gn.larguras === "132,132,132,132" && gn.classes === "half|half|half|half" && gn.cores === "vermelho,preto,preto,preto", "capa: 4 indicadores em 4 colunas iguais (1º em vermelho) · " + gn.larguras);
   /* no celular: nada sai para o lado e os itens empilham */
-  await p.click('[data-ew="400px"]'); await p.waitForTimeout(400);
+  await p.click('[data-ew="390px"]'); await p.waitForTimeout(400);
   var cel = await noQuadro(p, function (d) { var w = d.defaultView; return { vaza: d.documentElement.scrollWidth - d.documentElement.clientWidth, agenda: w.getComputedStyle(d.querySelector('[data-item="agenda-1"]')).display, num: w.getComputedStyle(d.querySelector('[data-item="numero-4"]')).display }; });
   confere(cel.vaza <= 0 && cel.agenda === "block" && cel.num === "inline-block", "celular: sem vazar para o lado; agenda empilhada; indicadores 2 a 2 · " + JSON.stringify(cel));
   await p.click('[data-ew="100%"]'); await p.waitForTimeout(300);
@@ -205,7 +206,7 @@ function salvarComo() {
   await p.setInputFiles("#arquivo", path.join(SAIDA, salvo.nome));
   f = await quadro(p);
   confere(await texto(p, "frase") === "Teste fictício" && await texto(p, "numero-1.valor") === "12,5%" && await texto(p, "numero-2.valor") === "R$ 1,20", "reaberto: textos e números continuam");
-  confere(/^data:image\/jpeg/.test(await noQuadro(p, function (d) { return d.querySelector('img[data-img="principal"]').getAttribute("src"); })), "reaberto: imagem trocada continua");
+  confere(await p.evaluate(async function () { var s = document.querySelector("#edFrame").contentDocument.querySelector('img[data-img="principal"]').getAttribute("src"); return (await (await fetch(s)).blob()).type; }) === "image/jpeg", "reaberto: imagem trocada continua");
   confere(await noQuadro(p, function (d) { var e = d.querySelector('[data-campo="numero-2.variacao"]'), c = e.matches("[data-tom]") ? e : e.querySelector("[data-tom]"); return c.getAttribute("data-tom"); }) === "verde", "reaberto: cor da etiqueta importada (variação negativa = verde, padrão)");
 
   /* 8. Mês novo a partir do salvo: números sem mexer pedem confirmação. */
@@ -244,7 +245,7 @@ function salvarComo() {
   await p.fill("#link", "\"C:\\Users\\Fulano\\Downloads\\report-2099-01.html\"");
   await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
   var hrefRes = ((await p.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1], infoRes = await p.$eval("#linkInfo", function (e) { return e.textContent; });
-  confere(hrefRes === "file:///C:/Users/Fulano/Downloads/report-2099-01.html" && /Atenção/.test(infoRes), "link de arquivo (C:\\…) aceito: vira file:///… no botão, com aviso · " + hrefRes + " · " + infoRes.slice(0, 60));
+  confere(hrefRes === "file:///C:/Users/Fulano/Downloads/report-2099-01.html" && !/Atenção/.test(infoRes) && /Caminho de arquivo/.test(infoRes), "link de arquivo (C:\\…) aceito: vira file:///… no botão, sem aviso (só uma nota) · " + hrefRes + " · " + infoRes.slice(0, 60));
   var LINK = "https://www.example.com/report-ficticio";
   await p.fill("#link", LINK);
   await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });

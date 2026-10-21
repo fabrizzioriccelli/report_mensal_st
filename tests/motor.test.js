@@ -577,12 +577,12 @@ teste("Transformation Hub: logo no lugar dos ícones, links extras com seta e li
   assert.ok(!/icone-prancheta|@@IMG\d+@@" width="32"/.test(semIcone.split('data-bloco="transformation-1"')[1] || ""), "com logo, sem ícones");
 });
 
-teste("link_report_completo vira a meta da página e sai do e-mail; caminho local vale, com aviso", function () {
+teste("link_report_completo vira a meta da página e sai do e-mail; caminho local vale, sem aviso", function () {
   var r = montar(COMPLETO);
   assert.ok(/<meta name="report-completo" content="https:\/\/empresa\.sharepoint\.com\/sites\/cs\/report-atual\.html">/.test(r.html));
   assert.ok(!/report-completo/.test(M.paraEmail(r.html)));
   var local = montar(COMPLETO.replace("link_report_completo: https://empresa.sharepoint.com/sites/cs/report-atual.html", "link_report_completo: C:\\Users\\eu\\report.html"));
-  assert.ok(/<meta name="report-completo" content="file:\/\/\/C:\/Users\/eu\/report\.html">/.test(local.html) && niveis(local, "aviso").some(function (p) { return /link_report_completo/.test(p.msg); }));
+  assert.ok(/<meta name="report-completo" content="file:\/\/\/C:\/Users\/eu\/report\.html">/.test(local.html) && !niveis(local, "aviso").some(function (p) { return /link_report_completo/.test(p.msg); }));
   var js = montar(COMPLETO.replace("link_report_completo: https://empresa.sharepoint.com/sites/cs/report-atual.html", "link_report_completo: javascript:alert(1)"));
   assert.ok(!/report-completo/.test(js.html) && niveis(js, "erro").some(function (p) { return /link_report_completo/.test(p.msg); }));
 });
@@ -672,27 +672,30 @@ teste("importarDados: todos os blocos da biblioteca de prompts (docs/PROMPTS_COP
   assert.deepStrictEqual(faltam, [], "campos sem lugar no modelo em branco");
 });
 
-teste("normalizarLink: aceita qualquer link (https, http, arquivo, mailto/tel/msteams, sem https://, relativo); só recusa o que executa código", function () {
+teste("normalizarLink: aceita qualquer link válido sem aviso (https, http, arquivo, mailto/tel/msteams, sem https://, relativo, link dentro de um texto); só recusa o que executa código", function () {
   var n = M.normalizarLink;
   assert.deepStrictEqual([n("https://empresa.sharepoint.com/x").url, n("https://empresa.sharepoint.com/x").avisos.length], ["https://empresa.sharepoint.com/x", 0]);
-  assert.ok(n("http://intranet/x").url && n("http://intranet/x").avisos.length === 1);
+  assert.deepStrictEqual([n("http://intranet/x").url, n("http://intranet/x").avisos.length], ["http://intranet/x", 0]);
+  assert.strictEqual(n("Link do report: https://empresa.sharepoint.com/:u:/r/sites/cs/r.html?csf=1&web=1.").url, "https://empresa.sharepoint.com/:u:/r/sites/cs/r.html?csf=1&web=1", "link dentro de um texto");
+  assert.strictEqual(n("<https://empresa.sharepoint.com/x>").url, "https://empresa.sharepoint.com/x");
+  assert.strictEqual(n("//empresa.sharepoint.com/x").url, "https://empresa.sharepoint.com/x");
   assert.strictEqual(n('"C:\\Users\\Fulano Silva\\Downloads\\report-2026-10.html"').url, "file:///C:/Users/Fulano%20Silva/Downloads/report-2026-10.html");
   assert.strictEqual(n("C:\\Pasta\\Relatório #1.html").url, "file:///C:/Pasta/Relat%C3%B3rio%20%231.html");
   assert.strictEqual(n("\\\\servidor\\area\\report.html").url, "file://servidor/area/report.html");
   assert.strictEqual(n("file:///C:/Users/x/report%202026.html").url, "file:///C:/Users/x/report%202026.html");
-  assert.ok(n("C:\\x.html").tipo === "arquivo" && /só onde esse caminho existe/.test(n("C:\\x.html").avisos[0]));
+  assert.ok(n("C:\\x.html").tipo === "arquivo" && !n("C:\\x.html").avisos.length && /onde esse caminho existe/.test(n("C:\\x.html").info), "arquivo: nota informativa, não aviso");
   ["javascript:alert(1)", " JavaScript:x", "data:text/html,x", "vbscript:x"].forEach(function (x) { assert.ok(n(x).erro && !n(x).url, x); });
   assert.strictEqual(n("https://tem espaço.com/a b").url, "https://tem%20espaço.com/a%20b");
   [["mailto:time@empresa.com", "outro"], ["tel:+551100000000", "outro"], ["msteams://teams.microsoft.com/l/x", "outro"]].forEach(function (c) { assert.deepStrictEqual([n(c[0]).url, n(c[0]).tipo, n(c[0]).avisos.length], [c[0], c[1], 0], c[0]); });
-  assert.deepStrictEqual([n("www.example.com/report").url, n("www.example.com/report").avisos.length], ["https://www.example.com/report", 1]);
+  assert.deepStrictEqual([n("www.example.com/report").url, n("www.example.com/report").avisos.length], ["https://www.example.com/report", 0]);
   assert.strictEqual(n("empresa.sharepoint.com/sites/cs/r.html").url, "https://empresa.sharepoint.com/sites/cs/r.html");
-  [["report-2026-10.html", "report-2026-10.html"], ["pasta/plano.pdf#p2", "pasta/plano.pdf#p2"], ["abc", "abc"], ["/sites/area/r.html", "/sites/area/r.html"]].forEach(function (c) { assert.deepStrictEqual([n(c[0]).url, n(c[0]).tipo, n(c[0]).avisos.length], [c[1], "relativo", 1], c[0]); });
-  assert.deepStrictEqual(n(""), { url: "", tipo: "", avisos: [], erro: "" });
+  [["report-2026-10.html", "report-2026-10.html"], ["pasta/plano.pdf#p2", "pasta/plano.pdf#p2"], ["abc", "abc"], ["/sites/area/r.html", "/sites/area/r.html"]].forEach(function (c) { assert.deepStrictEqual([n(c[0]).url, n(c[0]).tipo, n(c[0]).avisos.length, !!n(c[0]).info], [c[1], "relativo", 0, true], c[0]); });
+  assert.deepStrictEqual(n(""), { url: "", tipo: "", avisos: [], info: "", erro: "" });
   /* o botão do e-mail-resumo aceita o link de arquivo; a conferência avisa, sem bloquear */
   var r = M.emailResumo(montar(COMPLETO).html, { link: "C:\\Users\\Fulano\\report.html" });
   assert.ok(r.temLink && (r.html.match(/href="file:\/\/\/C:\/Users\/Fulano\/report\.html"/g) || []).length === 1 && !/FALTA O LINK/.test(r.html));
   var conf = M.conferirHtml(r.html).filter(function (x) { return /arquivo local/.test(x.msg); });
-  assert.ok(conf.length === 1 && conf[0].nivel === "aviso");
+  assert.ok(conf.length === 1 && conf[0].nivel === "info", "link de arquivo: informação, não aviso");
 });
 
 teste("e-mail-resumo sem repetição: nome do projeto (não \"Projeto principal\"), detalhe que só repete o número sai, número que a frase já diz não vem marcado", function () {
@@ -710,10 +713,12 @@ teste("e-mail-resumo sem repetição: nome do projeto (não \"Projeto principal\
   assert.deepStrictEqual(r3.indicadores, ["numero-1"], "se a pessoa escolhe, vale a escolha (o emulador avisa)");
 });
 
-teste("ícone da aba: a página do report leva a chama; os e-mails não", function () {
-  var r = montar(COMPLETO), h = r.html;
-  assert.ok(/<link rel="icon" type="image\/svg\+xml" href="data:image\/svg\+xml,[^"]*EC0000[^"]*">/.test(h), "chama na página");
-  assert.ok(!/rel="icon"/.test(M.paraEmail(h)) && !/rel="icon"/.test(M.limparHtmlEditado(h).html) && !/rel="icon"/.test(M.emailResumido(h, { link: "https://example.com/r" }).html), "nenhum e-mail leva o ícone");
+teste("ícone da aba: a página do report leva o Santander + PF (PNG 16/32, SVG, celular), só na aba; os e-mails não", function () {
+  var r = montar(COMPLETO), h = r.html, head = h.slice(0, h.indexOf("</head>"));
+  assert.ok(/<link rel="icon" type="image\/png" sizes="32x32" href="data:image\/png;base64,/.test(head) && /sizes="16x16"/.test(head) && /<link rel="apple-touch-icon" sizes="180x180"/.test(head), "PNG 32, 16 e 180 no cabeçalho");
+  assert.ok(/<link rel="icon" type="image\/svg\+xml" sizes="any" href="data:image\/svg\+xml,[^"]*EC0000[^"]*PF%3C\/text/.test(head), "SVG com a chama e o PF");
+  assert.strictEqual((h.match(/santander-pf|PF%3C\/text/g) || []).length, 1, "o símbolo não entra no conteúdo do report");
+  assert.ok(!/rel="(icon|apple-touch-icon)"/.test(M.paraEmail(h)) && !/rel="(icon|apple-touch-icon)"/.test(M.limparHtmlEditado(h).html) && !/rel="(icon|apple-touch-icon)"/.test(M.emailResumido(h, { link: "https://example.com/r" }).html), "nenhum e-mail leva o ícone");
   assert.ok(!/rel="icon"/.test(M.emailResumo(h, { link: "https://example.com/r" }).html));
 });
 
