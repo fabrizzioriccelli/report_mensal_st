@@ -695,6 +695,28 @@ teste("normalizarLink: aceita qualquer link (https, http, arquivo, mailto/tel/ms
   assert.ok(conf.length === 1 && conf[0].nivel === "aviso");
 });
 
+teste("e-mail-resumo sem repetição: nome do projeto (não \"Projeto principal\"), detalhe que só repete o número sai, número que a frase já diz não vem marcado", function () {
+  var base = MINIMO.replace("nome: Projeto", "nome: Milheiros").replace("valor: 10%\ntitulo: CTR\ndetalhe: era 5%", "valor: 28\ntitulo: Contas abertas\ndetalhe: 28 contas abertas no Milheiros") +
+    "\n[NUMERO 2]\nvalor: R$ 1,20\ntitulo: Custo por conta\ndetalhe: Referência: R$ 1,50";
+  var r = montar(base), res = M.emailResumo(r.html, { link: "https://example.com/r" }), txt = res.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  assert.ok(/PRINCIPAIS RESULTADOS Milheiros 28 Contas abertas/.test(txt) && !/Projeto principal/.test(txt), "o nome do projeto, sem \"Projeto principal:\" · " + txt.slice(txt.indexOf("PRINCIPAIS"), txt.indexOf("PRINCIPAIS") + 90));
+  assert.ok(!/28 contas abertas no Milheiros/.test(txt) && /Referência: R\$ 1,50/.test(txt), "o detalhe que repete o número sai; o que acrescenta fica");
+  var r2 = montar(base.replace("frase: Um mês", "frase: Milheiros: 28 contas abertas")), res2 = M.emailResumo(r2.html, { link: "https://example.com/r" }), t2 = res2.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  assert.deepStrictEqual(res2.indicadores, ["numero-2"], "o número da frase não vem marcado");
+  assert.ok(res2.candidatos.filter(function (x) { return x.chave === "numero-1"; })[0].na_frase, "o candidato fica marcado como \"já está na frase\"");
+  var corpo2 = t2.slice(t2.indexOf("REPORT MENSAL"));
+  assert.ok(!/PRINCIPAIS RESULTADOS Milheiros/.test(corpo2) && (corpo2.match(/28 contas abertas/gi) || []).length === 1 && !/ 28 Contas abertas/.test(corpo2), "nem o número nem o nome do projeto se repetem · " + corpo2.slice(0, 220));
+  var r3 = M.emailResumo(r2.html, { link: "https://example.com/r", indicadores: ["numero-1"] });
+  assert.deepStrictEqual(r3.indicadores, ["numero-1"], "se a pessoa escolhe, vale a escolha (o emulador avisa)");
+});
+
+teste("ícone da aba: a página do report leva a chama; os e-mails não", function () {
+  var r = montar(COMPLETO), h = r.html;
+  assert.ok(/<link rel="icon" type="image\/svg\+xml" href="data:image\/svg\+xml,[^"]*EC0000[^"]*">/.test(h), "chama na página");
+  assert.ok(!/rel="icon"/.test(M.paraEmail(h)) && !/rel="icon"/.test(M.limparHtmlEditado(h).html) && !/rel="icon"/.test(M.emailResumido(h, { link: "https://example.com/r" }).html), "nenhum e-mail leva o ícone");
+  assert.ok(!/rel="icon"/.test(M.emailResumo(h, { link: "https://example.com/r" }).html));
+});
+
 teste("vários tópicos novos ([TOPICO], [TOPICO B], [TOPICO C], [TOPICO D]), cada um no seu layout, entram na página, no texto e no e-mail-resumo", function () {
   var dados = MINIMO + "\n" + [
     "[TOPICO]", "rotulo: Testes", "titulo: O que testamos", "layout: lista",
