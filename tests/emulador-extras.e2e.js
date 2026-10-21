@@ -103,8 +103,8 @@ function salvarComo() {
   fase = "2";
   p.__respostas = ["Guia do agente", "https://www.example.com/guia-agente"];
   await ferramenta(p, f, '[data-item="transformation-1"] [data-campo="transformation-1.nome"]', "+ Link");
-  var linhaT = await noQuadro(p, function (d) { var a = Array.prototype.find.call(d.querySelectorAll('[data-item="transformation-1"] a.cta'), function (x) { return /Guia do agente/.test(x.textContent); }); return a ? { href: a.getAttribute("href"), irmaos: a.parentNode.querySelectorAll('a.cta, span[title="Link ainda não definido"]').length, sep: /·/.test(a.parentNode.textContent) } : null; });
-  confere(linhaT && linhaT.href === "https://www.example.com/guia-agente" && linhaT.irmaos === 2 && linhaT.sep, "Transformation Hub: segundo link na mesma linha, separado por \" · \"");
+  var linhaT = await noQuadro(p, function (d) { var a = Array.prototype.find.call(d.querySelectorAll('[data-item="transformation-1"] a.cta'), function (x) { return /Guia do agente/.test(x.textContent); }); return a ? { href: a.getAttribute("href"), irmaos: a.parentNode.querySelectorAll('a.cta, span[title="Link ainda não definido"]').length, sep: !!a.previousElementSibling && a.previousElementSibling.tagName === "BR" && !/·/.test(a.parentNode.textContent) } : null; });
+  confere(linhaT && linhaT.href === "https://www.example.com/guia-agente" && linhaT.irmaos === 2 && linhaT.sep, "Transformation Hub: segundo link embaixo do primeiro (um por linha)");
   p.__respostas = ["Plano do teste", "https://www.example.com/plano"];
   await ferramenta(p, f, '[data-item="topico-1"] [data-campo="topico-1.nome"]', "+ Link");
   p.__respostas = ["Resultado do teste", null];
@@ -219,6 +219,8 @@ function salvarComo() {
   await p.setInputFiles("#arquivo", path.join(RAIZ, "kit/report-exemplo.html"));
   f = await quadro(p);
   confere(!(await noQuadro(p, function (d) { return !!d.querySelector('[data-item^="topico-"]'); })) && !(await p.isChecked('#secoesRep input[value="topico"]')), "página sem o novo tópico: a opção aparece desmarcada");
+  var antigos = await noQuadro(p, function (d) { var a = d.querySelector('[data-item^="transformation-"] a.cta + br + a.cta, [data-item^="transformation-"] a.cta + br + span[title]'); return { br: !!a, ponto: Array.prototype.some.call(d.querySelectorAll('[data-item^="transformation-"] p'), function (x) { return x.querySelector("a.cta") && /·/.test(x.textContent); }) }; });
+  confere(antigos.br && !antigos.ponto, "report antigo: links separados por \" · \" viram um embaixo do outro ao abrir");
   antes = await pilulas(p);
   await p.$eval("#secoesRep", function (e) { e.closest("details").open = true; });
   await p.check('#secoesRep input[value="topico"]');

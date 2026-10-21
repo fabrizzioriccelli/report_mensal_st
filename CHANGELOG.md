@@ -2,6 +2,12 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.6.1 · 2026-10-21 · Links um embaixo do outro
+
+- Links de um item (Transformation Hub, novo tópico e os adicionados com **+ Link**) agora ficam **um por linha**, em vez de lado a lado com " · ": a lista não quebra no meio de um link e fica mais fácil de tocar no celular. Vale no report gerado pelo arquivo de dados e no emulador.
+- Report já salvo com " · ": ao abrir no emulador, os links passam a um por linha (salve para gravar).
+- Testes: o motor confere a quebra entre os links; o teste do emulador confere o link novo embaixo do anterior e a conversão de um report antigo.
+
 ## 4.6 · 2026-10-21 · Mais links e imagens em qualquer item e o "Novo tópico" (ex.: Testes)
 
 - **+ Link em todos os itens** do emulador (projetos do Transformation Hub, lançamentos, resultados, aprendizados, agenda, "foi bem"/"a melhorar", indicadores) e nos blocos destaque, projeto principal (capa) e foco: escreve o texto e cola o endereço. Os links ficam numa linha no fim do texto, separados por " · " (no Transformation Hub, junto dos que já existem). Sem endereço, o link fica cinza (pendente) e se completa com **Colocar link** ou **Anexar PDF**. **Tirar link** leva o separador e a linha vazia junto; **Texto do link** vale para todos os links de lista. Na capa e no foco (fundo vermelho), o link novo é branco.

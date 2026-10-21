@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.6 (2026-10-21)";
+  var VERSAO = "4.6.1 (2026-10-21)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -631,7 +631,7 @@
       };
     }
 
-    /* Links extras de um item (Transformation Hub, novo tópico): "Texto | https://…", vários separados por ";".
+    /* Links extras de um item (Transformation Hub, novo tópico): "Texto | https://…", vários separados por ";" (na página, um embaixo do outro).
        PDF na pasta do mês vai DENTRO da página e abre em nova aba; no e-mail vira texto. */
     function linksDoItem(v, nb, onde) {
       return (v.links || "").split(";").map(function (x) { return x.trim(); }).filter(Boolean).map(function (par) {
@@ -650,7 +650,8 @@
           : '<span title="Link ainda não definido" style="color:' + cor.texto_apoio.s + ';font-weight:bold;">' + esc(rot) + "&nbsp;&#8594;</span>";
       }).filter(Boolean);
     }
-    function juntaLinks(lista) { return seguro(lista.join('<span style="color:' + cor.texto_apoio.s + ';">&nbsp;&nbsp;·&nbsp;&nbsp;</span>')); }
+    /* Um link por linha: lista longa não quebra no meio de um link e fica fácil de tocar no celular. */
+    function juntaLinks(lista) { return seguro(lista.join("<br>")); }
     /* Imagens de um item (até 3), lado a lado nas larguras dadas (1, 2 ou 3); no celular, empilhadas.
        Na página do navegador, abrem inteiras e maiores no clique. */
     function printsDoItem(v, nb, campo, campoDesc, larguras) {

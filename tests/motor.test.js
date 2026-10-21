@@ -720,6 +720,7 @@ teste("novo tópico (ex.: Testes): seção reservada só aparece com [TOPICO 1],
   assert.ok(/data-item="topico-1"/.test(h) && /data-item="topico-2"/.test(h) && /data-campo="topico-1.status"/.test(h));
   assert.ok(/href="https:\/\/empresa.sharepoint.com\/:w:\/s\/site\/plano"[^>]*class="cta"[^>]*>Plano do teste&nbsp;&#8594;<\/a>/.test(h), "link de verdade");
   assert.ok(/title="Link ainda não definido"[^>]*>Resultado&nbsp;&#8594;/.test(h), "link pendente não vira clique");
+  assert.ok(/Plano do teste&nbsp;&#8594;<\/a><br><span title="Link ainda não definido"/.test(h), "um link embaixo do outro");
   var ims = h.match(/<img\b[^>]*data-img="topico-1-print-\d"[^>]*>/g) || [];
   assert.strictEqual(ims.length, 2);
   ims.forEach(function (x) { assert.ok(/ width="288"/.test(x) && /data-ampliar="@@IMG\d+@@"/.test(x), x); });
