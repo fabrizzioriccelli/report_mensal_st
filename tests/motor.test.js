@@ -577,12 +577,14 @@ teste("Transformation Hub: logo no lugar dos ícones, links extras com seta e li
   assert.ok(!/icone-prancheta|@@IMG\d+@@" width="32"/.test(semIcone.split('data-bloco="transformation-1"')[1] || ""), "com logo, sem ícones");
 });
 
-teste("link_report_completo vira a meta da página e sai do e-mail; caminho local não vale", function () {
+teste("link_report_completo vira a meta da página e sai do e-mail; caminho local vale, com aviso", function () {
   var r = montar(COMPLETO);
   assert.ok(/<meta name="report-completo" content="https:\/\/empresa\.sharepoint\.com\/sites\/cs\/report-atual\.html">/.test(r.html));
   assert.ok(!/report-completo/.test(M.paraEmail(r.html)));
   var local = montar(COMPLETO.replace("link_report_completo: https://empresa.sharepoint.com/sites/cs/report-atual.html", "link_report_completo: C:\\Users\\eu\\report.html"));
-  assert.ok(!/report-completo/.test(local.html) && niveis(local, "aviso").some(function (p) { return /link_report_completo/.test(p.msg); }));
+  assert.ok(/<meta name="report-completo" content="file:\/\/\/C:\/Users\/eu\/report\.html">/.test(local.html) && niveis(local, "aviso").some(function (p) { return /link_report_completo/.test(p.msg); }));
+  var js = montar(COMPLETO.replace("link_report_completo: https://empresa.sharepoint.com/sites/cs/report-atual.html", "link_report_completo: javascript:alert(1)"));
+  assert.ok(!/report-completo/.test(js.html) && niveis(js, "erro").some(function (p) { return /link_report_completo/.test(p.msg); }));
 });
 
 teste("dadosDoResumo: lê da página cada campo e lista os indicadores candidatos (sem criar nenhum)", function () {
@@ -670,7 +672,7 @@ teste("importarDados: todos os blocos da biblioteca de prompts (docs/PROMPTS_COP
   assert.deepStrictEqual(faltam, [], "campos sem lugar no modelo em branco");
 });
 
-teste("normalizarLink: https, http (aviso) e caminho do arquivo (C:\\, \\\\servidor, file:///) viram link; o resto é recusado", function () {
+teste("normalizarLink: aceita qualquer link (https, http, arquivo, mailto/tel/msteams, sem https://, relativo); só recusa o que executa código", function () {
   var n = M.normalizarLink;
   assert.deepStrictEqual([n("https://empresa.sharepoint.com/x").url, n("https://empresa.sharepoint.com/x").avisos.length], ["https://empresa.sharepoint.com/x", 0]);
   assert.ok(n("http://intranet/x").url && n("http://intranet/x").avisos.length === 1);
@@ -679,13 +681,61 @@ teste("normalizarLink: https, http (aviso) e caminho do arquivo (C:\\, \\\\servi
   assert.strictEqual(n("\\\\servidor\\area\\report.html").url, "file://servidor/area/report.html");
   assert.strictEqual(n("file:///C:/Users/x/report%202026.html").url, "file:///C:/Users/x/report%202026.html");
   assert.ok(n("C:\\x.html").tipo === "arquivo" && /só onde esse caminho existe/.test(n("C:\\x.html").avisos[0]));
-  ["abc", "javascript:alert(1)", "https://tem espaço.com"].forEach(function (x) { assert.ok(n(x).erro && !n(x).url, x); });
+  ["javascript:alert(1)", " JavaScript:x", "data:text/html,x", "vbscript:x"].forEach(function (x) { assert.ok(n(x).erro && !n(x).url, x); });
+  assert.strictEqual(n("https://tem espaço.com/a b").url, "https://tem%20espaço.com/a%20b");
+  [["mailto:time@empresa.com", "outro"], ["tel:+551100000000", "outro"], ["msteams://teams.microsoft.com/l/x", "outro"]].forEach(function (c) { assert.deepStrictEqual([n(c[0]).url, n(c[0]).tipo, n(c[0]).avisos.length], [c[0], c[1], 0], c[0]); });
+  assert.deepStrictEqual([n("www.example.com/report").url, n("www.example.com/report").avisos.length], ["https://www.example.com/report", 1]);
+  assert.strictEqual(n("empresa.sharepoint.com/sites/cs/r.html").url, "https://empresa.sharepoint.com/sites/cs/r.html");
+  [["report-2026-10.html", "report-2026-10.html"], ["pasta/plano.pdf#p2", "pasta/plano.pdf#p2"], ["abc", "abc"], ["/sites/area/r.html", "/sites/area/r.html"]].forEach(function (c) { assert.deepStrictEqual([n(c[0]).url, n(c[0]).tipo, n(c[0]).avisos.length], [c[1], "relativo", 1], c[0]); });
   assert.deepStrictEqual(n(""), { url: "", tipo: "", avisos: [], erro: "" });
   /* o botão do e-mail-resumo aceita o link de arquivo; a conferência avisa, sem bloquear */
   var r = M.emailResumo(montar(COMPLETO).html, { link: "C:\\Users\\Fulano\\report.html" });
   assert.ok(r.temLink && (r.html.match(/href="file:\/\/\/C:\/Users\/Fulano\/report\.html"/g) || []).length === 1 && !/FALTA O LINK/.test(r.html));
   var conf = M.conferirHtml(r.html).filter(function (x) { return /arquivo local/.test(x.msg); });
   assert.ok(conf.length === 1 && conf[0].nivel === "aviso");
+});
+
+teste("vários tópicos novos ([TOPICO], [TOPICO B], [TOPICO C], [TOPICO D]), cada um no seu layout, entram na página, no texto e no e-mail-resumo", function () {
+  var dados = MINIMO + "\n" + [
+    "[TOPICO]", "rotulo: Testes", "titulo: O que testamos", "layout: lista",
+    "[TOPICO 1]", "nome: Teste de chamada", "status: Em teste", "links: Plano | https://empresa.sharepoint.com/x",
+    "[TOPICO B]", "rotulo: Pesquisas", "titulo: O que ouvimos", "layout: colunas",
+    "[TOPICO B 1]", "nome: Pesquisa A", "texto: Achado A.", "[TOPICO B 2]", "nome: Pesquisa B", "imagens: icone-lupa.png", "[TOPICO B 3]", "nome: Pesquisa C", "[TOPICO B 4]", "nome: Pesquisa D",
+    "[TOPICO C]", "rotulo: Eventos", "layout: cartões",
+    "[TOPICO C 1]", "nome: Evento 1", "imagens: icone-prancheta.png", "[TOPICO C 2]", "nome: Evento 2", "[TOPICO C 3]", "nome: Evento 3", "[TOPICO C 4]", "nome: Evento 4", "links: Fotos | fotos/evento-4.html",
+    "[TOPICO D]", "rotulo: Mídia", "titulo: Números de mídia", "layout: numeros",
+    "[TOPICO D 1]", "valor: 1,2 mi", "nome: Alcance", "texto: Fictício.", "[TOPICO D 2]", "valor: 3%", "nome: CTR"
+  ].join("\n");
+  var r = montar(dados), h = r.html;
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  var pos = ["topico", "topicob", "topicoc", "topicod"].map(function (id) { return h.indexOf("<!--secao:" + id + "-->"); });
+  assert.ok(pos[0] > 0 && pos[1] > pos[0] && pos[2] > pos[1] && pos[3] > pos[2] && h.indexOf("<!--secao:foco-->") < 0 || pos[3] < h.indexOf("<!--secao:rodape-->"), "na ordem, antes do encerramento");
+  ["lista", "colunas", "cartoes", "numeros"].forEach(function (l) { assert.strictEqual((h.match(new RegExp('data-layout="' + l + '"', "g")) || []).length, 1, l); });
+  assert.ok(niveis(r, "aviso").some(function (p) { return /TOPICO B\] o layout colunas leva até 3/.test(p.msg); }), "colunas: até 3");
+  assert.ok(!/data-item="topicob-4"/.test(h) && /data-item="topicob-3"[^>]*width="184"/.test(h), "3 colunas de 184");
+  assert.ok(/data-img="topicob-2-print-1"[^>]*>/.test(h) && / width="184"[^>]*data-img="topicob-2-print-1"|data-img="topicob-2-print-1"/.test(h));
+  assert.ok(/data-item="topicoc-4"[^>]*width="184"[^>]*style="width:184px;padding-top:28px;"/.test(h), "4º cartão na 2ª linha");
+  assert.ok(/href="fotos\/evento-4.html"/.test(h), "endereço relativo vale como link");
+  assert.ok(/data-campo="topicod-1.valor"[^>]*>1,2 mi</.test(h) && /data-item="topicod-2"[^>]*width="288"/.test(h), "números: 2 × 288");
+  assert.ok(/data-campo="topicoc.rotulo">EVENTOS</.test(h) && /data-campo="topicod.rotulo">MÍDIA</.test(h));
+  assert.ok(/PESQUISAS: O que ouvimos/.test(r.texto) && /1,2 mi · Alcance/.test(r.texto), "versão em texto");
+  assert.deepStrictEqual(M.secoesDoHtml(h).filter(function (x) { return /^topico/.test(x.id); }).map(function (x) { return x.nome; }), ["Tópico: TESTES", "Tópico: PESQUISAS", "Tópico: EVENTOS", "Tópico: MÍDIA"]);
+  /* e-mail-resumo: cada tópico com rótulo, título e itens; os números viram indicadores que dá para escolher */
+  var res = M.emailResumo(h, { link: "https://empresa.sharepoint.com/r" });
+  ["TESTES", "PESQUISAS", "EVENTOS", "MÍDIA"].forEach(function (x) { assert.ok(res.html.indexOf(">" + x + "</p>") > 0, x); });
+  assert.ok(/<b>Teste de chamada<\/b><span[^>]*>&nbsp;·&nbsp;Em teste</.test(res.html) && /E mais 0|E mais/.test(res.html) === false, "itens, sem \"E mais\" quando cabe");
+  assert.ok(/>1,2 mi<\/b>&nbsp;·&nbsp;<b>Alcance</.test(res.html));
+  assert.ok(/Testes, pesquisas, eventos e mídia, com as peças/.test(res.html), "a chamada cita os tópicos");
+  var c = res.candidatos.filter(function (x) { return x.grupo === "Mídia"; });
+  assert.deepStrictEqual(c.map(function (x) { return x.chave + "|" + x.valor; }), ["topicod-1|1,2 mi", "topicod-2|3%"]);
+  var res2 = M.emailResumo(h, { link: "https://empresa.sharepoint.com/r", indicadores: ["topicod-1"] });
+  assert.ok(/>1,2 mi<\/p>/.test(res2.html) && /Números de mídia/.test(res2.html), "número do tópico escolhido como indicador");
+  /* importar do Copilot: [TOPICO C 2] e o rótulo em maiúsculas */
+  var im = M.importarDados("[TOPICO C]\nrotulo: Eventos\n[TOPICO D 1]\nvalor: -5%");
+  assert.strictEqual(im.campos["topicoc.rotulo"].texto, "EVENTOS"); assert.strictEqual(im.campos["topicod-1.valor"].texto, "−5%");
+  /* layout desconhecido: lista, com aviso */
+  var rr = montar(MINIMO + "\n[TOPICO]\nlayout: mosaico\n[TOPICO 1]\nnome: X");
+  assert.ok(/data-layout="lista"/.test(rr.html) && niveis(rr, "aviso").some(function (p) { return /layout deve ser/.test(p.msg); }));
 });
 
 teste("PDF anexo no Transformation Hub: vai dentro da página, abre em nova aba; no e-mail vira texto", function () {
@@ -726,7 +776,7 @@ teste("novo tópico (ex.: Testes): seção reservada só aparece com [TOPICO 1],
   ims.forEach(function (x) { assert.ok(/ width="288"/.test(x) && /data-ampliar="@@IMG\d+@@"/.test(x), x); });
   assert.ok(/alt="Versão A"/.test(h) && /alt="Versão B"/.test(h));
   assert.ok(/TESTES: O que testamos/.test(r.texto) && /Plano do teste: https:/.test(r.texto), "versão em texto do e-mail");
-  assert.ok(r.links.some(function (l) { return /Novo tópico 1 · Plano do teste/.test(l.onde); }), "link na lista de testar antes de enviar");
+  assert.ok(r.links.some(function (l) { return /Testes 1 · Plano do teste/.test(l.onde); }), "link na lista de testar antes de enviar");
   var im = M.importarDados("[TOPICO]\ntitulo: Testes do mês\n[TOPICO 2]\nnome: Teste B\nstatus: Concluído\nstatus_cor: verde");
   assert.deepStrictEqual(im.problemas, []);
   assert.strictEqual(im.campos["topico.titulo"].texto, "Testes do mês");

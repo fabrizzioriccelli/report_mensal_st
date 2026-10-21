@@ -253,13 +253,16 @@ titulo: [Aprendizado 3]
 texto: [O que os dados mostraram.]
 levamos: [o que levamos para os próximos meses.]
 
-# Novo tópico (ex.: Testes): no emulador, esta seção começa desligada
-# (Seções do report › Novo tópico) até alguém ligar e preencher.
-# Sem imagem no modelo: cada item ganha imagens pelo "+ Imagem".
+# Novos tópicos (ex.: Testes): um de cada layout (lista, colunas,
+# cartoes, numeros). No emulador, eles não aparecem ao abrir: são a
+# fonte do botão "+ Novo tópico" (Seções do report), que pergunta o nome
+# e o layout e põe o tópico antes do Foco do próximo mês.
+# Lista sem imagem no modelo: cada item ganha imagens pelo "+ Imagem".
 [TOPICO]
 rotulo: [Nome do tópico]
 titulo: [Título do novo tópico.]
 texto: [Uma frase de abertura do tópico.]
+layout: lista
 
 [TOPICO 1]
 status: [Status do item]
@@ -287,6 +290,81 @@ texto: [O que é, o que foi feito e o resultado.]
 links: [Texto do link] | [INSERIR LINK]
 imagens:
 descricao_imagens:
+
+[TOPICO B]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+layout: colunas
+
+[TOPICO B 1]
+nome: [Nome do item 1]
+texto: [O que é e o que aprendemos.]
+links: [Texto do link] | [INSERIR LINK]
+
+[TOPICO B 2]
+nome: [Nome do item 2]
+texto: [O que é e o que aprendemos.]
+links: [Texto do link] | [INSERIR LINK]
+
+[TOPICO B 3]
+nome: [Nome do item 3]
+texto: [O que é e o que aprendemos.]
+links: [Texto do link] | [INSERIR LINK]
+
+[TOPICO C]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+layout: cartoes
+
+[TOPICO C 1]
+status: [Status]
+status_cor: ambar
+nome: [Nome do item 1]
+texto: [Texto curto do item.]
+links: [Texto do link] | [INSERIR LINK]
+imagens: coringa-lancamento.png
+descricao_imagens: [Descrição da imagem]
+
+[TOPICO C 2]
+status: [Status]
+status_cor: ambar
+nome: [Nome do item 2]
+texto: [Texto curto do item.]
+links: [Texto do link] | [INSERIR LINK]
+imagens: coringa-lancamento.png
+descricao_imagens: [Descrição da imagem]
+
+[TOPICO C 3]
+status: [Status]
+status_cor: ambar
+nome: [Nome do item 3]
+texto: [Texto curto do item.]
+links: [Texto do link] | [INSERIR LINK]
+imagens: coringa-lancamento.png
+descricao_imagens: [Descrição da imagem]
+
+[TOPICO D]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+layout: numeros
+
+[TOPICO D 1]
+valor: [X]
+nome: [O que o número mede]
+texto: [Período ou comparação]
+
+[TOPICO D 2]
+valor: [X]
+nome: [O que o número mede]
+texto: [Período ou comparação]
+
+[TOPICO D 3]
+valor: [X]
+nome: [O que o número mede]
+texto: [Período ou comparação]
 
 [FOCO]
 prioridade: [Prioridade do próximo mês.]

@@ -116,11 +116,14 @@ function salvarComo() {
   await ferramenta(p, f, '[data-item="lancamento-2"] span[title="Link ainda não definido"]', "Colocar link");
   var hrefArq = await noQuadro(p, function (d) { var a2 = d.querySelector('[data-item="lancamento-2"] a.cta'); return a2 ? a2.getAttribute("href") : "(sem link)"; }), estArq = await p.$eval("#estado", function (e) { return e.textContent; });
   confere(hrefArq === "file:///C:/Users/fulano/pe%C3%A7a%202.png" && /Atenção/.test(estArq), "caminho do computador (com aspas, espaço e acento) aceito como link de arquivo, com aviso · " + hrefArq);
-  p.__resposta = "abc";
+  p.__resposta = "javascript:alert(1)";
   await ferramenta(p, f, '[data-item="lancamento-3"] span[title="Link ainda não definido"]', "Colocar link");
   await p.waitForSelector("#modal:not([hidden])");
-  confere(/Link não aceito/.test(await p.$eval("#modalTit", function (e) { return e.textContent; })), "texto que não é endereço nem caminho é recusado");
+  confere(/Link não aceito/.test(await p.$eval("#modalTit", function (e) { return e.textContent; })), "endereço que executa código (javascript:) é recusado");
   await p.click("#modalOk");
+  p.__resposta = "mailto:time@example.com";
+  await ferramenta(p, f, '[data-item="lancamento-3"] span[title="Link ainda não definido"]', "Colocar link");
+  confere(await noQuadro(p, function (d) { var a3 = d.querySelector('[data-item="lancamento-3"] a.cta'); return a3 ? a3.getAttribute("href") : ""; }) === "mailto:time@example.com", "qualquer outro tipo de link (mailto:) é aceito");
 
   /* 4. Ocultar e adicionar itens (a grade se refaz como o motor monta) e ocultar uma seção. */
   async function grade(g) {

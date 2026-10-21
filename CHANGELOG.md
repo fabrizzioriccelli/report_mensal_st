@@ -2,6 +2,17 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.7 · 2026-10-21 · Qualquer link e tópicos novos com o layout escolhido
+
+- **Link aceita qualquer endereço** (link do report no passo 3, **Colocar link** / **+ Link** no emulador, `links` e `link_report_completo` no arquivo de dados): `https://`, `http://` (com aviso), endereço sem `https://` (ex.: `empresa.sharepoint.com/…`, ganha o `https://`, com aviso), caminho do arquivo (`C:\…`, `\\servidor\…`, `file:///…`, com aviso), `mailto:`, `tel:`, `msteams:` e outros esquemas, e endereço relativo (ex.: `report-2026-10.html`, com aviso). Espaço vira `%20` em vez de recusar. Só `javascript:`, `data:` e `vbscript:` (podem executar código) são recusados.
+- **Tópicos novos com layout à escolha:** **+ Novo tópico** (barra de ferramentas do emulador ou "Seções do report") pede o nome e mostra os 4 layouts em miniatura para escolher: **Lista** (um item embaixo do outro, com links e imagens; até 6), **Colunas** (numeradas, lado a lado, como "O que aprendemos"; até 3), **Cartões** (imagem em cima, 3 por linha, como "Também neste mês"; até 6) e **Números** (números grandes com o que medem, como os da capa; até 4). Até **4 tópicos novos** por report, criados no modelo em branco ou em qualquer report aberto (inclusive de antes da 4.6), antes do "Foco do próximo mês" e com a numeração das seções refeita. Itens: **+ Adicionar …**, **Ocultar item** (a grade se refaz, com as imagens na largura nova), **+ Link** e **+ Imagem** (menos em Números). Cada tópico aparece em "Seções do report" com o nome dele.
+- **Tópicos no e-mail inteiro:** além da página e do e-mail completo, o **e-mail-resumo** mostra cada tópico (rótulo, título e até 4 itens) e a chamada cita os tópicos; os números de um tópico em Números podem ser escolhidos como indicadores.
+- **Arquivo de dados:** blocos `[TOPICO]`, `[TOPICO B]`, `[TOPICO C]` e `[TOPICO D]` (itens `[TOPICO B 1]`…), com o campo novo `layout` (`lista`, `colunas`, `cartoes`, `numeros`) e, nos itens, `valor` (Números). Sem `layout`, lista (igual à 4.6). Exemplo comentado em `dados/MODELO.txt`; a importação do Copilot aceita os mesmos blocos.
+- **Modelo em branco:** traz um tópico de cada layout, que o emulador usa como fonte do **+ Novo tópico** (ao abrir, eles não aparecem). Modelo e emulador avulso refeitos.
+- Mês sem tópico novo: a página e o e-mail saem idênticos aos da 4.6.1 (conferido com `dados/EXEMPLO-treinamento.txt` e `dados/MODELO.txt`).
+- Testes: 69 no motor (qualquer link; os 4 layouts juntos na página, no texto e no e-mail-resumo; indicadores do tópico; importação) e o teste do emulador refeito para o fluxo novo (janela com as miniaturas, 4 tópicos, cartões, números e colunas com adicionar e ocultar, salvar, e-mail-resumo, reabrir), nas duas versões.
+- **Ainda não feito:** o guia operacional e a apresentação executiva (kit) ainda não mostram os botões novos.
+
 ## 4.6.1 · 2026-10-21 · Links um embaixo do outro
 
 - Links de um item (Transformation Hub, novo tópico e os adicionados com **+ Link**) agora ficam **um por linha**, em vez de lado a lado com " · ": a lista não quebra no meio de um link e fica mais fácil de tocar no celular. Vale no report gerado pelo arquivo de dados e no emulador.

@@ -83,11 +83,11 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 
 **Imagens opcionais:** selo, logo e prints do Transformation Hub têm **Tirar imagem** (o espaço sai junto). **Vídeo:** no projeto principal, no destaque e nos lançamentos, **Colocar vídeo** (`.mp4`); depois, **Trocar vídeo** ou **Tirar o vídeo**. No report completo o vídeo toca; no e-mail vai só a capa.
 
-**Links:** passe o mouse no link › **Colocar link** / **Trocar link** (endereço `https://` ou o caminho do arquivo, `C:\…`, `\\servidor\…` ou `file:///…`, que abre só onde o arquivo está), **Anexar PDF** (o documento vai dentro do report e abre em nova aba) ou **Tirar link**. No Transformation Hub, **Texto do link** muda o nome do link.
+**Links:** passe o mouse no link › **Colocar link** / **Trocar link** (vale qualquer link: `https://`, o caminho do arquivo, `C:\…`, `\\servidor\…` ou `file:///…`, que abre só onde o arquivo está, `mailto:`, `msteams:`, endereço relativo…), **Anexar PDF** (o documento vai dentro do report e abre em nova aba) ou **Tirar link**. No Transformation Hub, **Texto do link** muda o nome do link.
 
 **Mais um link ou mais imagens num item:** passe o mouse no item (projeto, lançamento, destaque, aprendizado…) › **+ Link** (escreva o texto e cole o endereço) ou **+ Imagem** (escolha o arquivo e escreva a descrição). Até 3 imagens por item. Para tirar: passe o mouse no link ou na imagem › **Tirar link** / **Tirar imagem**.
 
-**Assunto novo (ex.: Testes):** em "Seções do report", marque **Novo tópico (ex.: Testes)**. A seção aparece antes do "Foco do próximo mês": troque o rótulo (ex.: TESTES), o título e os itens; use **+ Adicionar item no novo tópico**, **+ Link** e **+ Imagem**. Mês sem esse assunto: deixe desmarcado (não vai no report).
+**Assunto novo (ex.: Testes):** clique em **+ Novo tópico** (barra de ferramentas), escreva o nome e escolha o layout olhando as miniaturas: **Lista** (um item embaixo do outro, com links e imagens), **Colunas** (até 3, numeradas), **Cartões** (imagem em cima, 3 por linha) ou **Números** (até 4 números grandes). O tópico aparece antes do "Foco do próximo mês": troque o título e os itens [entre colchetes]; use **+ Adicionar …**, **+ Link** e **+ Imagem**. Cabem até 4 tópicos novos, no modelo em branco ou em qualquer report. Eles vão no report, no e-mail completo e no e-mail-resumo. Para tirar: **Desfazer** ou desmarque o tópico em "Seções do report".
 
 ### Campanhas (O que lançamos)
 
@@ -144,7 +144,7 @@ Imagens, links e PDF não vêm pelo Copilot: troque na página.
 | Não consigo escrever no texto | Clique dentro do contorno tracejado. Rótulos fixos (ex.: "O QUE LANÇAMOS") não mudam |
 | "A imagem não abriu" | Use `.png` ou `.jpg` |
 | "pode ficar borrada" | A imagem é menor que o espaço: peça a versão em alta |
-| "Link não aceito" | Cole um endereço `https://` ou o caminho do arquivo (`C:\…`, `\\servidor\…`, `file:///…`) |
+| "Link não aceito" | O endereço começa com `javascript:`, `data:` ou `vbscript:` (pode executar código). Qualquer outro link vale: `https://`, caminho do arquivo, `mailto:`… |
 | "é um arquivo: abre só onde esse caminho existe" | Normal para testar no seu computador. Para enviar à área, use o link do ambiente autorizado |
 | Fechei sem salvar | Abra o emulador: **Recuperar a edição** |
 | Não acho o arquivo salvo | Downloads ou a pasta escolhida; pesquise `report-` no Explorador |

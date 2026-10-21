@@ -9,4 +9,4 @@ Ele é carregado pela página **`gerar-report.html`**, na pasta principal, que �
 | `montar-avulso.js` | Monta `kit/emulador-report.html` (o emulador avulso, com o motor e o modelo em branco embutidos) |
 | `atualizar-coringa.js` | Depois de mudar o template ou `dados/CORINGA.txt`: gera o modelo em branco pelo `gerar-report.html` e grava `kit/report-coringa.html` e `tools/coringa.js` (precisa do Playwright) |
 
-Testes: `node tests/motor.test.js` (68 testes), `node tests/ferramenta.e2e.js` (página de ponta a ponta, 7 larguras de tela), `node tests/emulador.e2e.js` e `node tests/emulador-extras.e2e.js` (emulador: edição, salvar, e-mail-resumo; links e imagens extras e o novo tópico). Decisões técnicas: [docs/ARQUITETURA.md](../docs/ARQUITETURA.md).
+Testes: `node tests/motor.test.js` (69 testes), `node tests/ferramenta.e2e.js` (página de ponta a ponta, 7 larguras de tela), `node tests/emulador.e2e.js` e `node tests/emulador-extras.e2e.js` (emulador: edição, salvar, e-mail-resumo; links e imagens extras e os tópicos novos). Decisões técnicas: [docs/ARQUITETURA.md](../docs/ARQUITETURA.md).

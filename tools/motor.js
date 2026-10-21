@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.6.1 (2026-10-21)";
+  var VERSAO = "4.7 (2026-10-21)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -93,12 +93,30 @@
     { bloco: "TRANSFORMATION", campos: { titulo: 0 } },
     { bloco: "TRANSFORMATION", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, citacao: 0, resultado: 0, icones: 0, logo: 0, descricao_logo: 0, links: 0, prints: 0, descricao_prints: 0 }, PECA) },
     { bloco: "APRENDIZADO", max: 3, campos: { titulo: 1, texto: 0, levamos: 0 } },
-    /* Novo tópico (ex.: Testes): espaço reservado para um assunto que ainda não tem seção própria. */
-    { bloco: "TOPICO", campos: { rotulo: 0, titulo: 0, texto: 0 } },
-    { bloco: "TOPICO", max: 6, campos: { status: 0, status_cor: 0, nome: 1, texto: 0, links: 0, imagens: 0, descricao_imagens: 0 } },
+    /* Novos tópicos (ex.: Testes): até 4 assuntos que ainda não têm seção própria ([TOPICO], [TOPICO B], [TOPICO C],
+       [TOPICO D]), cada um no layout escolhido (lista, colunas, cartoes ou numeros). Entram aqui por TOPICOS (abaixo). */
     { bloco: "FOCO", campos: { prioridade: 1, texto: 0, selo: 0, descricao_selo: 0 } },
     { bloco: "AGENDA", max: 6, campos: { data: 0, titulo: 1, detalhe: 0 } }
   ];
+
+  /* Novos tópicos: bloco nos dados → id da seção na página (só letras: a marca <!--secao:id--> e as chaves data-campo/data-item usam o id). */
+  var TOPICOS = [["TOPICO", "topico"], ["TOPICO B", "topicob"], ["TOPICO C", "topicoc"], ["TOPICO D", "topicod"]];
+  /* Layouts de um tópico novo, com o máximo de itens de cada um (a grade de 600 px: 3 colunas, 3 cartões por linha, 4 números). */
+  var LAYOUTS_TOPICO = {
+    lista: { max: 6, nome: "Lista", como: "um item embaixo do outro, na largura inteira, com status, links e imagens (como o Transformation Hub)" },
+    colunas: { max: 3, nome: "Colunas", como: "colunas numeradas, lado a lado (como O que aprendemos)" },
+    cartoes: { max: 6, nome: "Cartões", como: "cartões com imagem em cima, 3 por linha (como Também neste mês)" },
+    numeros: { max: 4, nome: "Números", como: "números grandes com o que medem (como os da capa); viram indicadores do e-mail-resumo" }
+  };
+  TOPICOS.forEach(function (t) {
+    ESQUEMA_DADOS.splice(ESQUEMA_DADOS.length - 2, 0,
+      { bloco: t[0], campos: { rotulo: 0, titulo: 0, texto: 0, layout: 0 } },
+      { bloco: t[0], max: 6, campos: { status: 0, status_cor: 0, nome: 1, texto: 0, valor: 0, links: 0, imagens: 0, descricao_imagens: 0 } });
+  });
+  function layoutTopico(s) {
+    var k = chaveCampo(s || "lista");
+    return { lista: "lista", linhas: "lista", colunas: "colunas", cartoes: "cartoes", cartao: "cartoes", cards: "cartoes", numeros: "numeros", numero: "numeros", indicadores: "numeros" }[k] || "";
+  }
 
   var CORES = ["marca", "titulo", "texto", "texto_corpo", "texto_apoio", "positivo", "positivo_fundo", "atencao", "atencao_fundo", "fundo_pagina", "fundo_email"];
   var CORES_APOIO = ["grupo_resultados", "grupo_resultados_fundo", "grupo_evolucao", "grupo_evolucao_fundo", "grupo_aprendizado", "grupo_aprendizado_fundo",
@@ -200,26 +218,30 @@
   }
 
   /*
-   * normalizarLink(texto) → { url, tipo: "web" | "arquivo", avisos: [msg], erro }
-   *   O link que a pessoa cola no emulador (botão do e-mail-resumo, links da página).
-   *   Aceita https:// (http://, com aviso) e o caminho de um arquivo: file:///…, C:\… ou \\servidor\pasta\…
-   *   (com ou sem aspas, como o Windows copia em "Copiar como caminho"); o caminho vira file:///….
-   *   Link de arquivo só abre onde o caminho existe: o aviso diz isso, mas não bloqueia.
+   * normalizarLink(texto) → { url, tipo: "web" | "arquivo" | "outro" | "relativo", avisos: [msg], erro }
+   *   O link que a pessoa cola no emulador (botão do e-mail-resumo, links da página). Aceita qualquer link:
+   *   https:// e http://; qualquer outro esquema (mailto:, tel:, msteams:, ms-word:, sip:, ftp:…); endereço
+   *   sem "https://" (www.…, empresa.sharepoint.com/…: ganha https://); caminho de arquivo (file:///…, C:\…,
+   *   \\servidor\…, com ou sem aspas, como o Windows copia: vira file:///…) e endereço relativo
+   *   (report-2026-10.html, ./pasta/x.pdf). Espaços viram %20. Só recusa vazio e javascript:/data:/vbscript:.
+   *   Avisos (sem bloquear): http, link de arquivo, endereço relativo.
    */
   function normalizarLink(entrada) {
-    var s = String(entrada || "").trim().replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, "").trim(), url = "", tipo = "", avisos = [];
+    var s = String(entrada || "").trim().replace(/^["'\u201c\u201d<]+|["'\u201c\u201d>]+$/g, "").trim(), url = "", tipo = "", avisos = [];
     if (!s) return { url: "", tipo: "", avisos: [], erro: "" };
-    if (/^(javascript|data|vbscript):/i.test(s)) return { url: "", tipo: "", avisos: [], erro: "esse tipo de endereço não é permitido." };
+    if (/^\s*(javascript|data|vbscript):/i.test(s)) return { url: "", tipo: "", avisos: [], erro: "esse tipo de endereço não é permitido (pode executar código)." };
     function semEspeciais(x) { return encodeURI(x).replace(/#/g, "%23").replace(/\?/g, "%3F"); }
+    function espacos(x) { return x.replace(/\s/g, "%20"); }
     if (/^https?:\/\//i.test(s)) {
-      if (/\s/.test(s)) return { url: "", tipo: "", avisos: [], erro: "o link tem espaço. Copie de novo o link de compartilhamento." };
-      url = s; tipo = "web";
-      if (/^http:/i.test(s)) avisos.push("começa com http:// (sem segurança). Prefira o endereço https://.");
-    } else if (/^file:\/\//i.test(s)) { url = s.replace(/\\/g, "/").replace(/ /g, "%20"); tipo = "arquivo"; }
+      url = espacos(s); tipo = "web";
+      if (/^http:/i.test(s)) avisos.push("começa com http:// (sem segurança). Se houver, prefira o endereço https://.");
+    } else if (/^file:/i.test(s)) { url = espacos(s.replace(/\\/g, "/")); tipo = "arquivo"; }
     else if (/^[a-z]:[\\/]/i.test(s)) { url = "file:///" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
-    else if (/^\\\\[^\\/]+[\\/]/.test(s)) { url = "file:" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
-    else return { url: "", tipo: "", avisos: [], erro: "não é um endereço. Cole o link do ambiente autorizado (https://…) ou o caminho do arquivo (C:\\…, \\\\servidor\\… ou file:///…)." };
-    try { new URL(url); } catch (e) { return { url: "", tipo: "", avisos: [], erro: "não é um endereço válido." }; }
+    else if (/^\\\\[^\\/]+/.test(s)) { url = "file:" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
+    else if (/^[a-z][a-z0-9+.-]*:/i.test(s) && !/^[^:]+:\d+(\/|$)/.test(s)) { url = espacos(s); tipo = "outro"; }
+    else if (/^www\./i.test(s) || /^[\w-]+:\d+/.test(s) || (/^[\w-]+(\.[\w-]+)*\.[a-z]{2,24}(:\d+)?([\/?#]|$)/i.test(s) && !/^[^\/?#]*\.(html?|pdf|eml|msg|txt|csv|png|jpe?g|gif|svg|webp|mp4|zip|docx?|xlsx?|pptx?)([?#]|$)/i.test(s))) { url = "https://" + espacos(s); tipo = "web"; avisos.push("acrescentei https:// no começo (" + url.slice(0, 60) + "). Confira se abre.");
+    } else { url = espacos(s.replace(/\\/g, "/")); tipo = "relativo"; avisos.push("é um endereço relativo: abre só se o arquivo estiver no lugar indicado, a partir da pasta onde o report está publicado."); }
+    if (tipo === "web") { try { new URL(url); } catch (e) { avisos.push("o endereço parece incompleto. Confira se abre."); } }
     if (tipo === "arquivo") avisos.push("é um arquivo: abre só onde esse caminho existe (neste computador, ou na pasta de rede para quem tem acesso a ela), e o Outlook na Web e o celular não abrem link de arquivo. Para enviar à área, use o link do ambiente autorizado (https://…).");
     return { url: url, tipo: tipo, avisos: avisos, erro: "" };
   }
@@ -380,6 +402,16 @@
     var qualidade = I.qualidade_jpg ? parseInt(I.qualidade_jpg, 10) : 82;
     if (!(qualidade >= 60 && qualidade <= 95)) { problema(prob, "aviso", arqM, I._linhas.qualidade_jpg, "qualidade_jpg deve ficar entre 60 e 95. Usei 82."); qualidade = 82; }
     var dominios = ((M.simples.LINKS || {}).dominios_permitidos || "").split(",").map(function (d) { return d.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, ""); }).filter(Boolean);
+    /* Link escrito nos dados (links dos itens, link do report completo): qualquer link vale (normalizarLink);
+       o endereço web passa ainda pela conferência de domínio, embed e download, só como aviso. */
+    function qualquerLink(url) {
+      if (ehPendencia(url)) return { url: "", problemas: [{ nivel: "pendencia", msg: "ainda não preenchido: " + url }] };
+      var nl = normalizarLink(url);
+      if (nl.erro) return { url: "", problemas: [{ nivel: "erro", msg: nl.erro }] };
+      var pr = nl.avisos.map(function (m) { return { nivel: "aviso", msg: m }; });
+      if (nl.tipo === "web") conferirLink(nl.url, "projeto", dominios).forEach(function (x) { if (x.nivel !== "erro" && !/http:\/\//.test(x.msg)) pr.push(x); });
+      return { url: nl.url, problemas: pr };
+    }
 
     /* ---- Pendências: qualquer [texto entre colchetes] nos dados ---- */
     lidoD.ordem.forEach(function (k) {
@@ -643,8 +675,9 @@
           return '<a href="#" data-anexo="@@ANX' + anexos.length + '@@" target="_blank" class="cta" title="Abre o documento (PDF) em nova aba" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>";
         }
         if (!rot) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: escreva \"Texto do link | endereço\" (ex.: Briefing Agent | https://…). Vários, separados por ;"); return ""; }
-        conferirLink(url, "projeto", dominios).forEach(function (x) { problema(prob, x.nivel, arqD, v._linhas.links, "[" + nb + "] links (" + rot + "): " + x.msg); });
-        var ok = url && !ehPendencia(url) && /^https?:\/\//i.test(url) && !/\s/.test(url);
+        var lk = qualquerLink(url), ok = !!lk.url;
+        lk.problemas.forEach(function (x) { problema(prob, x.nivel, arqD, v._linhas.links, "[" + nb + "] links (" + rot + "): " + x.msg); });
+        url = lk.url;
         if (ok) linksReport.push({ onde: onde + " · " + rot, tipo: "projeto", rotulo: rot, url: url });
         return ok ? '<a href="' + esc(url) + '" target="_blank" class="cta" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>"
           : '<span title="Link ainda não definido" style="color:' + cor.texto_apoio.s + ';font-weight:bold;">' + esc(rot) + "&nbsp;&#8594;</span>";
@@ -728,21 +761,47 @@
       };
     }
 
-    /* Novo tópico (ex.: Testes): só aparece com [TOPICO 1] preenchido. Itens em linhas, na largura inteira. */
-    var tp = L.TOPICO || [], TP = D.simples.TOPICO || {}, topico = null;
-    if (tp.length) {
-      topico = {
-        n: proxSecao(), rotulo: texto(maiusculas(TP.rotulo || "Novo tópico")), titulo: texto(TP.titulo || ""), texto: texto(TP.texto || ""),
-        itens: tp.map(function (v, i) {
-          var nb = "TOPICO " + (i + 1), prints = printsDoItem(v, nb, "imagens", "descricao_imagens", [0, 600, 288, 184]);
-          curto(v, "texto", 240, nb);
-          return {
-            numero: i + 1, status: status(v, nb), nome: texto(v.nome), texto: texto(v.texto), links: juntaLinks(linksDoItem(v, nb, "Novo tópico " + (i + 1))),
-            prints: prints, tem_prints: prints.length > 0, filete: i === 0 ? cor.texto : cor.linha
-          };
-        })
+    /* Novos tópicos (ex.: Testes): cada um só aparece com [TOPICO 1] (ou [TOPICO B 1]…) preenchido, no layout escolhido. */
+    var topicos = TOPICOS.map(function (t) {
+      var tp = L[t[0]] || [], TP = D.simples[t[0]] || {};
+      if (!tp.length) return null;
+      var lay = layoutTopico(TP.layout);
+      if (!lay) { problema(prob, "aviso", arqD, (TP._linhas || {}).layout, "[" + t[0] + "] layout deve ser lista, colunas, cartoes ou numeros. Usei lista."); lay = "lista"; }
+      var max = LAYOUTS_TOPICO[lay].max;
+      if (tp.length > max) { problema(prob, "aviso", arqD, tp[max]._linhas.nome, "[" + t[0] + "] o layout " + lay + " leva até " + max + " itens. Usei os " + max + " primeiros."); tp = tp.slice(0, max); }
+      var n = tp.length, larg = lay === "cartoes" ? (n <= 3 ? colunas(LARGURA, n) : [COL, COL, COL]) : colunas(LARGURA, n);
+      var itens = tp.map(function (v, i) {
+        var nb = t[0] + " " + (i + 1), w = lay === "lista" ? LARGURA : larg[i % larg.length];
+        if (lay === "numeros") {
+          if (!v.valor) problema(prob, "aviso", arqD, v._linhas.nome, "[" + nb + "] no layout numeros, preencha valor (o número grande).");
+          if (v.imagens) problema(prob, "aviso", arqD, v._linhas.imagens, "[" + nb + "] o layout numeros não mostra imagens. Use lista ou cartoes.");
+        }
+        var prints = lay === "numeros" ? [] : printsDoItem(v, nb, "imagens", "descricao_imagens", lay === "lista" ? [0, 600, 288, 184] : [0, w, w, w]);
+        curto(v, "texto", lay === "lista" ? 240 : 140, nb);
+        var ult = i === n - 1;
+        return {
+          numero: i + 1, status: status(v, nb), nome: texto(v.nome), texto: texto(v.texto), valor: numero(v.valor || ""),
+          links: lay === "numeros" ? seguro("") : juntaLinks(linksDoItem(v, nb, (TP.rotulo || "Novo tópico") + " " + (i + 1))),
+          prints: prints, tem_prints: prints.length > 0, largura: w, primeiro: lay === "cartoes" ? i % 3 === 0 : i === 0,
+          classe: (ult ? "col" : "col gap") + (lay === "cartoes" && i >= 3 ? " pt0" : ""), topo: lay === "cartoes" && i >= 3 ? "padding-top:28px;" : "",
+          filete: i === 0 ? (lay === "numeros" ? cor.grupo_resultados : cor.texto) : (lay === "numeros" ? cor.texto : cor.linha)
+        };
+      });
+      var tpc = {
+        sid: t[1], n: proxSecao(), rotulo: texto(maiusculas(TP.rotulo || "Novo tópico")), titulo: texto(TP.titulo || ""), texto: texto(TP.texto || ""),
+        lista: null, colunas: null, cartoes: null, numeros: null
       };
-    }
+      if (lay === "cartoes") {
+        var linhas = [];
+        for (var k = 0; k < n; k += 3) {
+          var lin = itens.slice(k, k + 3).map(function (x) { x.vazio = false; return x; });
+          while (n > 3 && lin.length < 3) lin.push({ vazio: true, primeiro: false, largura: COL });
+          linhas.push({ itens: lin });
+        }
+        tpc.cartoes = { linhas: linhas };
+      } else tpc[lay] = { itens: itens };
+      return tpc;
+    }).filter(Boolean);
 
     /* 06 · Foco */
     var FO = D.simples.FOCO, foco = null;
@@ -778,16 +837,16 @@
        e o converter-html-eml.html já abre com ele no campo do botão do e-mail-resumo. */
     var linkRC = (E.link_report_completo || "").trim();
     if (linkRC) {
-      var pl = conferirLink(linkRC, "projeto", dominios);
-      pl.forEach(function (x) { problema(prob, x.nivel === "erro" ? "aviso" : x.nivel, arqD, E._linhas.link_report_completo, "[EDICAO] link_report_completo: " + x.msg); });
-      if (ehPendencia(linkRC) || !/^https:\/\/\S+$/i.test(linkRC)) linkRC = "";
+      var lrc = qualquerLink(linkRC);
+      lrc.problemas.forEach(function (x) { problema(prob, x.nivel, arqD, E._linhas.link_report_completo, "[EDICAO] link_report_completo: " + x.msg); });
+      linkRC = lrc.url;
     }
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
       assunto: assunto, link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
-      abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topico: topico, foco: foco, agenda: agenda
+      abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topicos: topicos, foco: foco, agenda: agenda
     };
 
     if (prob.some(function (p) { return p.nivel === "erro"; })) return { ok: false, problemas: prob };
@@ -855,14 +914,15 @@
       });
     }
     if ((L.APRENDIZADO || []).length) { o.push("", "O QUE APRENDEMOS"); L.APRENDIZADO.forEach(function (v, i) { o.push((i + 1) + ". " + t(v.titulo) + ": " + t(v.texto) + (v.levamos ? " Levamos: " + t(v.levamos) : "")); }); }
-    if ((L.TOPICO || []).length) {
-      var T = S.TOPICO || {};
+    TOPICOS.forEach(function (tb) {
+      if (!(L[tb[0]] || []).length) return;
+      var T = S[tb[0]] || {};
       o.push("", maiusculas(T.rotulo || "Novo tópico") + (T.titulo ? ": " + t(T.titulo) : ""), t(T.texto || ""));
-      L.TOPICO.forEach(function (v) {
-        o.push("", t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto));
+      L[tb[0]].forEach(function (v) {
+        o.push("", (v.valor ? t(v.valor) + " · " : "") + t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto));
         (v.links || "").split(";").forEach(function (par) { var k = par.lastIndexOf("|"), u = k > 0 ? par.slice(k + 1).trim() : ""; if (u && !ehPendencia(u) && !/\.pdf$/i.test(u)) o.push("  " + par.slice(0, k).trim() + ": " + u); });
       });
-    }
+    });
     if (S.FOCO) o.push("", "FOCO DE " + maiusculas(E.proximo_mes) + ": " + t(S.FOCO.prioridade), t(S.FOCO.texto));
     if ((L.AGENDA || []).length) { o.push("", "TAMBÉM VEM AÍ"); L.AGENDA.forEach(function (v) { o.push("- " + t(v.data) + " · " + t(v.titulo) + (v.detalhe ? " (" + t(v.detalhe) + ")" : "")); }); }
     o.push("", "Até " + E.proximo_mes.toLowerCase() + ".", E.contato ? "Dúvidas, sugestões ou pedidos: " + t(E.contato) : "");
@@ -1219,17 +1279,23 @@
   /* Nome de cada seção (marcas <!--secao:nome--> do template) e as que o e-mail resumido leva. */
   var SECOES = {
     capa: "Capa e números do projeto principal", lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas",
-    transformation: "Transformation Hub", aprendizados: "O que aprendemos", topico: "Novo tópico (ex.: Testes)", foco: "Foco do próximo mês",
+    transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês",
     agenda: "Também vem aí", rodape: "Encerramento e assinatura"
   };
+  TOPICOS.forEach(function (t, i) { SECOES[t[1]] = "Novo tópico " + (i + 1); });
   var SECOES_RESUMO = ["capa", "resumo", "foco", "rodape"];
   var MARCA_SECAO = /<!--secao:([a-z]+)-->/g;
 
+  /* Nome da seção; o de um tópico novo é o rótulo que ele tem na página (ex.: "Tópico: TESTES"). */
+  function nomeDaSecao(html, id) {
+    var m = /^topico[a-z]?$/.test(id) && new RegExp('data-campo="' + id + '\\.rotulo"[^>]*>([^<]*)<').exec(html);
+    return m && m[1].trim() ? "Tópico: " + desfazEntidades(m[1].trim()) : SECOES[id] || id;
+  }
   /* Seções que a página tem, na ordem: [{ id, nome }]. Vazio = arquivo de antes da versão 3.9 (sem marcas). */
   function secoesDoHtml(html) {
     var r = [], m;
     MARCA_SECAO.lastIndex = 0;
-    while ((m = MARCA_SECAO.exec(html))) if (m[1] !== "fim" && m[1] !== "interativo") r.push({ id: m[1], nome: SECOES[m[1]] || m[1] });
+    while ((m = MARCA_SECAO.exec(html))) if (m[1] !== "fim" && m[1] !== "interativo") r.push({ id: m[1], nome: nomeDaSecao(html, m[1]) });
     return r;
   }
 
@@ -1243,7 +1309,7 @@
   /* Bloco "Ver o report completo": rótulo, título, o que ficou de fora e o botão (tabela com fundo: funciona no Outlook). */
   function blocoInterativo(html, op) {
     var ft = fonteDaClasse(html, "ft", "Arial, Helvetica, sans-serif"), fx = fonteDaClasse(html, "fx", "Arial, Helvetica, sans-serif");
-    var fora = (op.fora || []).map(function (id) { return SECOES[id] || id; });
+    var fora = (op.fora || []).map(function (id) { return nomeDaSecao(html, id); });
     var lista = fora.length ? fora.slice(0, -1).join(", ") + (fora.length > 1 ? " e " : "") + fora[fora.length - 1] : "";
     var texto = op.chamada || ((lista ? "Na versão completa estão também: " + lista + ". " : "") +
       (op.temVideo ? "Lá, os vídeos das campanhas tocam e as peças abrem maiores no clique." : "Lá, as peças abrem maiores no clique."));
@@ -1355,7 +1421,7 @@
    * No emulador, dá para trocar por outros indicadores da página (resultados do destaque, Creative X).
    * Indicador vazio não aparece; nada é inventado nem completado com zero.
    */
-  var RESUMO_REGRAS = { indicadores: 3 };
+  var RESUMO_REGRAS = { indicadores: 3, itens_topico: 4 };
   /* Paleta do Brand Guide (a mesma de config/marca.txt). */
   var CR = {
     marca: "#EC0000", branco: "#FFFFFF", lisboa: "#FBF1EA", rio: "#F5DECF", mexico: "#F0B998", texto: "#000000", apoio: "#767676", linha: "#E2E2E2",
@@ -1420,12 +1486,22 @@
       numeros: lista("numero", ["valor", "titulo", "detalhe", "variacao"]).filter(function (n) { return n.valor; }),
       destaque: c["destaque.titulo"] ? { titulo: c["destaque.titulo"], resultados: lista("resultado", ["valor", "titulo", "detalhe", "variacao"]).filter(function (n) { return n.valor; }) } : null,
       cx: c["cx.atual"] ? { anterior: c["cx.anterior"] || "", atual: c["cx.atual"], variacao: c["cx.variacao"] || "", tom: tom["cx.variacao"] || "", periodo: c["cx.periodo"] || "", subtitulo: c["cx.subtitulo"] || "" } : null,
-      tem: { campanhas: !!(c["destaque.titulo"] || c["lancamento-1.nome"]), aprendizados: !!c["aprendizado-1.titulo"], transformation: !!c["transformation-1.nome"], proximos: !!(c["foco.prioridade"] || c["agenda-1.titulo"]) }
+      tem: { campanhas: !!(c["destaque.titulo"] || c["lancamento-1.nome"]), aprendizados: !!c["aprendizado-1.titulo"], transformation: !!c["transformation-1.nome"], proximos: !!(c["foco.prioridade"] || c["agenda-1.titulo"]) },
+      /* Novos tópicos, na ordem da página: rótulo, título e itens (o layout numeros dá indicadores) */
+      topicos: TOPICOS.map(function (t) {
+        var sid = t[1], its = lista(sid, ["status", "nome", "texto", "valor"]);
+        if (!its.length && !c[sid + ".rotulo"]) return null;
+        return { id: sid, rotulo: c[sid + ".rotulo"] || "Novo tópico", titulo: c[sid + ".titulo"] || "", itens: its, pos: html.indexOf("<!--secao:" + sid + "-->") };
+      }).filter(Boolean).sort(function (a, b) { return a.pos - b.pos; })
     };
     /* Indicadores candidatos (o e-mail usa até 3): números do projeto principal, resultados do destaque e Creative X. */
     var ind = [];
     d.numeros.forEach(function (n) { ind.push({ chave: n.chave, valor: n.valor, titulo: n.titulo, detalhe: n.detalhe, variacao: n.variacao, tom: n.tom_variacao, origem: d.principal ? d.principal.nome : "Projeto principal", grupo: "Projeto principal" }); });
     if (d.destaque) d.destaque.resultados.forEach(function (n) { ind.push({ chave: n.chave, valor: n.valor, titulo: n.titulo, detalhe: n.detalhe, variacao: n.variacao, tom: n.tom_variacao, origem: d.destaque.titulo, grupo: "Destaque do mês" }); });
+    d.topicos.forEach(function (tp) {
+      var gr = tp.rotulo.charAt(0) + tp.rotulo.slice(1).toLocaleLowerCase("pt-BR");
+      tp.itens.forEach(function (n) { if (n.valor) ind.push({ chave: n.chave, valor: n.valor, titulo: n.nome, detalhe: n.texto, variacao: "", tom: "", origem: tp.titulo || gr, grupo: gr }); });
+    });
     if (d.cx) ind.push({ chave: "cx", valor: d.cx.atual, titulo: "Creative X" + (d.cx.subtitulo ? " · " + d.cx.subtitulo.split(" · ")[0] : ""), detalhe: (d.cx.anterior ? "Antes: " + d.cx.anterior : "") + (d.cx.periodo ? (d.cx.anterior ? " · " : "") + d.cx.periodo : ""), variacao: d.cx.variacao, tom: d.cx.tom, origem: "Creative X", grupo: "Creative X" });
     d.indicadores = ind;
     return { ok: true, d: d, pendencias: pend };
@@ -1517,6 +1593,21 @@
     '  </td></tr>',
     '  {{/tem_indicadores}}',
     '',
+    '  {{#tem_topicos}}',
+    '  <!-- NOVOS TÓPICOS (ex.: Testes): rótulo, título e os itens de cada um, sem link (o link do e-mail é o botão) -->',
+    '  <tr><td class="px" style="padding:26px 40px 0 40px;">',
+    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">',
+    '      {{#topicos}}{{^primeiro}}<tr><td height="18" style="height:18px;font-size:0;line-height:0;">&nbsp;</td></tr>{{/primeiro}}',
+    '      <tr><td style="border-top:1px solid {{cor.texto}};padding-top:12px;">',
+    '        <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">{{rotulo}}</p>',
+    '        {{#titulo}}<p class="ft" style="margin:4px 0 0 0;font-family:{{ft}};font-size:17px;line-height:22px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>{{/titulo}}',
+    '        {{#itens}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;mso-line-height-rule:exactly;color:{{cor.texto}};"><span style="color:{{cor.marca}};font-weight:bold;">&#9679;</span>&nbsp; {{#valor}}<b style="color:{{cor.marca}};">{{valor}}</b>&nbsp;·&nbsp;{{/valor}}<b>{{nome}}</b>{{#status}}<span style="color:{{cor.apoio}};">&nbsp;·&nbsp;{{status}}</span>{{/status}}</p>{{/itens}}',
+    '        {{#mais}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.apoio}};">E mais {{mais}} no report completo.</p>{{/mais}}',
+    '      </td></tr>{{/topicos}}',
+    '    </table>',
+    '  </td></tr>',
+    '  {{/tem_topicos}}',
+    '',
     '  <!-- CHAMADA PRINCIPAL: o único link do e-mail -->',
     '  <tr><td class="px" style="padding:26px 40px 28px 40px;">',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" style="background:{{cor.lisboa}};"><tr>',
@@ -1579,7 +1670,8 @@
     var grupos = sel.map(function (x) { return x.grupo + "|" + x.origem; }).filter(function (g, i, a) { return a.indexOf(g) === i; });
     var unica = grupos.length === 1 ? sel[0] : null;
     var periodo = d.periodo, mesTxt = periodo ? periodo.charAt(0) + periodo.slice(1).toLocaleLowerCase("pt-BR") : "";
-    var partes = [d.tem.campanhas ? "as campanhas" : "", d.tem.aprendizados ? "os aprendizados" : "", d.tem.transformation ? "o Transformation Hub" : "", d.tem.proximos ? "os próximos passos" : ""].filter(Boolean);
+    var nomesTop = d.topicos.map(function (t) { return t.rotulo.toLocaleLowerCase("pt-BR"); });
+    var partes = [d.tem.campanhas ? "as campanhas" : "", d.tem.aprendizados ? "os aprendizados" : "", d.tem.transformation ? "o Transformation Hub" : ""].concat(nomesTop, [d.tem.proximos ? "os próximos passos" : ""]).filter(Boolean);
     var lista = partes.length > 1 ? partes.slice(0, -1).join(", ") + " e " + partes[partes.length - 1] : partes[0] || "";
     var temVideo = /data-video="/.test(html) || /alt="Vídeo: /.test(html);
     var nl = normalizarLink(op.link), link = !nl.erro && nl.url ? nl.url : "", txtBotao = op.botao || "Acessar report completo";
@@ -1595,6 +1687,14 @@
       origem_unica: unica ? unica.origem : "", grupo_unico: unica ? unica.grupo : "",
       indicadores: sel.map(function (x, i) {
         return { valor: x.valor, titulo: x.titulo, detalhe: x.detalhe, origem: unica ? "" : x.origem, variacao: etiquetaResumo(x.variacao, x.tom, fx), primeiro: i === 0, largura: larg[i], cor_valor: i === 0 ? CR.marca : CR.texto };
+      }),
+      tem_topicos: d.topicos.length > 0,
+      topicos: d.topicos.map(function (t, i) {
+        var mostra = t.itens.slice(0, RESUMO_REGRAS.itens_topico), resto = t.itens.length - mostra.length;
+        return {
+          primeiro: i === 0, rotulo: maiusculas(t.rotulo), titulo: t.titulo, mais: resto > 0 ? resto + (resto > 1 ? " itens" : " item") : "",
+          itens: mostra.map(function (x) { return { valor: x.valor, nome: x.nome || x.texto, status: (x.status || "").replace(/^[\u25cf\u25cb]\s*/, "") }; })
+        };
       }),
       cta_titulo: op.titulo || "Acesse o report completo.",
       cta_texto: op.chamada || ((lista ? lista.charAt(0).toUpperCase() + lista.slice(1) : "Todas as seções") + ", com as peças" + (temVideo ? " e os vídeos" : "") + "."),
@@ -1621,15 +1721,17 @@
     "DESTAQUE": { categoria: "destaque.categoria", titulo: "destaque.titulo", texto: "destaque.texto", nota: "destaque.nota" },
     "CREATIVE X": { subtitulo: "cx.subtitulo", anterior: "cx.anterior", atual: "cx.atual", variacao: "cx.variacao", periodo: "cx.periodo", referencia: "cx.referencia", significado: "cx.significado" },
     "TRANSFORMATION": { titulo: "transformation.titulo" },
-    "TOPICO": { rotulo: "topico.rotulo", titulo: "topico.titulo", texto: "topico.texto" },
     "FOCO": { prioridade: "foco.prioridade", texto: "foco.texto" }
   };
   var IMPORTA_LISTA = {
     "NUMERO": ["numero", ["valor", "titulo", "detalhe", "variacao"]], "RESULTADO": ["resultado", ["valor", "titulo", "detalhe", "variacao"]],
     "LANCAMENTO": ["lancamento", ["status", "nome", "texto"]], "FOI BEM": ["bem", ["texto"]], "A MELHORAR": ["melhorar", ["texto"]],
-    "TRANSFORMATION": ["transformation", ["status", "nome", "texto", "resultado"]], "APRENDIZADO": ["aprendizado", ["titulo", "texto", "levamos"]], "AGENDA": ["agenda", ["data", "titulo", "detalhe"]],
-    "TOPICO": ["topico", ["status", "nome", "texto"]]
+    "TRANSFORMATION": ["transformation", ["status", "nome", "texto", "resultado"]], "APRENDIZADO": ["aprendizado", ["titulo", "texto", "levamos"]], "AGENDA": ["agenda", ["data", "titulo", "detalhe"]]
   };
+  TOPICOS.forEach(function (t) {
+    IMPORTA[t[0]] = { rotulo: t[1] + ".rotulo", titulo: t[1] + ".titulo", texto: t[1] + ".texto" };
+    IMPORTA_LISTA[t[0]] = [t[1], ["status", "nome", "texto", "valor"]];
+  });
   function importarDados(texto) {
     var lido = ler(texto, "conteúdo colado"), campos = {}, problemas = lido.problemas.slice(), n = 0;
     function poe(chave, valor, tipo, tom) { campos[chave] = { texto: valor, tipo: tipo || "texto", tom: tom || "" }; n++; }
@@ -1656,6 +1758,7 @@
           var verde = chaveCampo(v.status_cor || "ambar") === "verde";
           poe(chave, (verde ? "● " : "○ ") + val, "etiqueta", verde ? "verde" : "ambar");
         } else if (c === "categoria") poe(chave, maiusculas(val).replace(/\s+·\s+/g, " · "));
+        else if (c === "rotulo") poe(chave, maiusculas(val));
         else if (c === "valor" || c === "anterior" || c === "atual") poe(chave, val.replace(/^-\s*/, "−"));
         else if (c === "data" && base === "AGENDA") poe(chave, maiusculas(val));
         else poe(chave, val);
@@ -1676,7 +1779,7 @@
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
-    RESUMO_REGRAS: RESUMO_REGRAS, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
+    RESUMO_REGRAS: RESUMO_REGRAS, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });
