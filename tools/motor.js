@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.8.1 (2026-10-21)";
+  var VERSAO = "4.9 (2026-10-21)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -99,10 +99,10 @@
     { bloco: "AGENDA", max: 6, campos: { data: 0, titulo: 1, detalhe: 0 } }
   ];
 
-  /* Ícone da aba do report no navegador: a chama do Santander (assets/marca/svg/chama-santander.svg, traçado oficial,
-     em Vermelho Santander), embutida. Só na página: o e-mail não leva (paraEmail e limparHtmlEditado tiram). */
-  var ICONE_REPORT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 43.9 41.5' width='43.9' height='41.5'%3E %3Cpath transform='translate(0,-0.4)' fill='%23EC0000' d='M 31.5,19.5 C 31.4,18 31,16.5 30.2,15.2 L 23.4,3.3 C 22.9,2.4 22.5,1.4 22.3,0.4 L 22,0.9 c -1.7,2.9 -1.7,6.6 0,9.5 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 l -5,-8.7 -3.2,-5.6 C 17.4,11.8 17,10.8 16.8,9.8 l -0.3,0.5 c -1.7,2.9 -1.7,6.5 0,9.5 v 0 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 L 13.7,24.5 C 12.8,22.9 12.4,21.1 12.4,19.3 5.1,21.2 0,25.3 0,30 0,36.6 9.8,41.9 21.9,41.9 34,41.9 43.8,36.6 43.8,30 43.9,25.5 38.9,21.4 31.5,19.5 Z'/%3E %3C/svg%3E";
-  var ICONE_TAG = '<link rel="icon" type="image/svg+xml" href="' + ICONE_REPORT + '">';
+  /* Ícone da aba do report no navegador: Santander + PF (assets/marca/svg/santander-pf.svg e os PNG de 16, 32 e 180 px),
+     o mesmo do emulador. Só na aba (cabeçalho da página): o conteúdo do report não muda, e o e-mail não leva o ícone
+     (paraEmail, limparHtmlEditado e emailResumido tiram). */
+  var ICONE_TAG = "<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADO0lEQVR4nMRXXUgUURT+xt1ZDVtHXYNAKMqULO1Rw0BIHyzTMAIVgp6Cgv40Kcyi8CEKohDxwR57CZceIpAkXxUy8clNJKlAfCrbdjcpdN1t+u7sVcxtZ2faIT+4nDt3zj33u+ece+aOG1uMLDvKQeAcHIZiVfELsJ1swyqwXwM+wCFY9kA2sJPCtQo8hoOwTCBmOMFAM0PRAIeQlsB3oEgH3D6ji+di7BfQzzEVDiAtgRXg0jfgtOi7gW6KKBOn7CtwFQ4gLQEuVsPdPmLLyQc+cahPjt9ZAnYgQ1jJAXFSihn3K+KBoeglmUV2vcvATWQIKwQmpLwl8oFsfrJdl2PNyBBJdYCxraI4w3a0CDjERX1R4COfefwxwLHLUu8dxUG2GbaX9MpTxmMONrHuARrIpZsH2X2LhLsrQ8DuPBZAsrwr1S7Q92Wy/0xKQaKHOjMk1aPbrK5ZcnGVi49Snt/4Mi6fC7lzivdsbi70UIxRft5ki4cE92inH3YJcFIvRc1f3ncJL3CxuCKTkDjJsVrK4hQ2L/LYHocdAtx5a4r3nrg8dr6Eh4ZFn1XxBvttqYxyzlnYIUB4TXRa1kovle8LSW+coDhgMkeDHQI0+NpMiaV3QOQJc2EKFqBIT1kmwC9dl56ocqkM7qMXrrHrQhrQziuG6wkswiBA/y9ykVox2cTwbSZXrdrUBG18HIWhEHy6ntSKdL0Ruh7TUyPENs7WJDf3J7jIESZRN18cQ+JorcPT2hr0+v0+xGKIjowgHghAj0ZhFYrHA1dlJTwNTCn2iVOKyY5zSaaG8d9LpV183lMQCDS6Sku1cFUV4tPT+Fe4KiqQP8V0ys6esHwlM0jpejjq92tL7e3IFN6hIXja2iK2yiahxWZn4QSkHc0ugSQUzM+vJ2BhMAjmCLBtmyE3J6haX5803w0HsNzXhx+dnVDr6pA3OoqcicQXPDY5iUh1telcRwisIb6wwDvcChTV+nUx4xAI5HR0GC4umJvD6tgYlgcHjXE3T8vGEGSVlCTNdTQEm2ElBHY9EHGXl8MJSDsRu3XgDWN8eCsLUQvFi/9Sik1IiI+I+EERd8F82EcYiYvsA0VRhn8DAAD///RxfWoAAAAGSURBVAMAdkE0NBPwdJsAAAAASUVORK5CYII=\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABtElEQVR4nJxSTUsCURQ9b2b6wMySEloIGcFYUGAE9QeKIMofELVoI7RsUZs+IGpVQbRoI7SMgqho1V9oFwiJYlCQbcwy0yDxYzqOIqYjWg/uvPPu3HPm3PtGgsF6A+xocElGyRzgeQVG8R8BDTAx+SyAIzSwqgRof48OzijUHwUW/ixAYi+3GcYGY62egMg/YoAjUygOysB9FjgmdjJCLHjivtsNXBoKfNAqyXfE7fz6IwsH2cY1iT6eR5ifKDpbsQH7VS2QPJUnF+30vQOr3Lc4hyWmxspq54wcSFS+YkTLZrDOiFHEzKOlVFjjVkozYN87hLN5krBYAmavd0AZHkY2EqkmyTKU8fEgmps39VuwclDsfb4L6OTRbjk9PcnF44gNDUFWVUg2GzK3tzoWJhNS5+eIqaoTicS2UmGH7vGiTU8rSZeLJw1Zvx+fbjc6bm4KeHKyVJ+6uFANf2W9Z6u1sNvtMB8e4tvr1XHbwQGaiiKSwwEFdVYuHEbS49Fxy+IivpaXf3+oBi/AIemg3HI55gChuFwhYcTWNM2MdPo46/O5c4lEa+V7IQRkp/NB9PSs/QAAAP//Vu1NDgAAAAZJREFUAwDKA33QsZYOOgAAAABJRU5ErkJggg==\">\n<link rel=\"icon\" type=\"image/svg+xml\" sizes=\"any\" href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(2,2) scale(0.95)'%3E%3Cpath transform='translate(0,-0.4)' fill='%23EC0000' d='M 31.5,19.5 C 31.4,18 31,16.5 30.2,15.2 L 23.4,3.3 C 22.9,2.4 22.5,1.4 22.3,0.4 L 22,0.9 c -1.7,2.9 -1.7,6.6 0,9.5 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 l -5,-8.7 -3.2,-5.6 C 17.4,11.8 17,10.8 16.8,9.8 l -0.3,0.5 c -1.7,2.9 -1.7,6.5 0,9.5 v 0 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 L 13.7,24.5 C 12.8,22.9 12.4,21.1 12.4,19.3 5.1,21.2 0,25.3 0,30 0,36.6 9.8,41.9 21.9,41.9 34,41.9 43.8,36.6 43.8,30 43.9,25.5 38.9,21.4 31.5,19.5 Z'/%3E%3C/g%3E%3Crect x='22' y='36' width='42' height='28' rx='8' fill='%23FFFFFF'/%3E%3Crect x='25' y='39' width='36' height='22' rx='6' fill='%23EC0000'/%3E%3Ctext x='43' y='57' text-anchor='middle' font-family='Arial,Helvetica,sans-serif' font-weight='900' font-size='19' fill='%23FFFFFF'%3EPF%3C/text%3E%3C/svg%3E\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"data:image/png;base64,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\">";
   /* Novos tópicos: bloco nos dados → id da seção na página (só letras: a marca <!--secao:id--> e as chaves data-campo/data-item usam o id). */
   var TOPICOS = [["TOPICO", "topico"], ["TOPICO B", "topicob"], ["TOPICO C", "topicoc"], ["TOPICO D", "topicod"]];
   /* Layouts de um tópico novo, com o máximo de itens de cada um (a grade de 600 px: 3 colunas, 3 cartões por linha, 4 números). */
@@ -234,32 +234,34 @@
   }
 
   /*
-   * normalizarLink(texto) → { url, tipo: "web" | "arquivo" | "outro" | "relativo", avisos: [msg], erro }
-   *   O link que a pessoa cola no emulador (botão do e-mail-resumo, links da página). Aceita qualquer link:
-   *   https:// e http://; qualquer outro esquema (mailto:, tel:, msteams:, ms-word:, sip:, ftp:…); endereço
-   *   sem "https://" (www.…, empresa.sharepoint.com/…: ganha https://); caminho de arquivo (file:///…, C:\…,
-   *   \\servidor\…, com ou sem aspas, como o Windows copia: vira file:///…) e endereço relativo
-   *   (report-2026-10.html, ./pasta/x.pdf). Espaços viram %20. Só recusa vazio e javascript:/data:/vbscript:.
-   *   Avisos (sem bloquear): http, link de arquivo, endereço relativo.
+   * normalizarLink(texto) → { url, tipo: "web" | "arquivo" | "outro" | "relativo", avisos: [], info, erro }
+   *   O link que a pessoa cola no emulador (botão do e-mail-resumo, links da página) ou escreve nos dados.
+   *   Aceita qualquer link, sem aviso: https:// e http://; qualquer outro esquema (mailto:, tel:, msteams:,
+   *   ms-word:, sip:, ftp:…); endereço sem "https://" (www.…, empresa.sharepoint.com/…: ganha o https://);
+   *   texto com um link dentro ("Link: https://…": vale o link); caminho de arquivo (file:///…, C:\…,
+   *   \\servidor\…, com ou sem aspas: vira file:///…) e endereço relativo (report-2026-10.html).
+   *   Espaços viram %20. Só recusa vazio e javascript:/data:/vbscript: (executam código).
+   *   info: nota informativa, não é aviso (link de arquivo ou relativo: onde ele abre).
    */
   function normalizarLink(entrada) {
-    var s = String(entrada || "").trim().replace(/^["'\u201c\u201d<]+|["'\u201c\u201d>]+$/g, "").trim(), url = "", tipo = "", avisos = [];
-    if (!s) return { url: "", tipo: "", avisos: [], erro: "" };
-    if (/^\s*(javascript|data|vbscript):/i.test(s)) return { url: "", tipo: "", avisos: [], erro: "esse tipo de endereço não é permitido (pode executar código)." };
+    var s = String(entrada || "").replace(/[\u200b\u00a0]/g, " ").trim().replace(/^["'\u201c\u201d<(\[]+|["'\u201c\u201d>)\].,;]+$/g, "").trim(), url = "", tipo = "", info = "";
+    if (!s) return { url: "", tipo: "", avisos: [], info: "", erro: "" };
+    if (/^\s*(javascript|data|vbscript):/i.test(s)) return { url: "", tipo: "", avisos: [], info: "", erro: "esse tipo de endereço não é permitido (pode executar código)." };
+    /* texto com um link no meio (ex.: "Link do report: https://…"): vale o link */
+    var dentro = /\s/.test(s) && !/^(https?:|file:|[a-z]:[\\/]|\\\\)/i.test(s) && /(https?:\/\/[^\s"'<>]+)/i.exec(s);
+    if (dentro) s = dentro[1].replace(/[.,;)\]]+$/, "");
     function semEspeciais(x) { return encodeURI(x).replace(/#/g, "%23").replace(/\?/g, "%3F"); }
     function espacos(x) { return x.replace(/\s/g, "%20"); }
-    if (/^https?:\/\//i.test(s)) {
-      url = espacos(s); tipo = "web";
-      if (/^http:/i.test(s)) avisos.push("começa com http:// (sem segurança). Se houver, prefira o endereço https://.");
-    } else if (/^file:/i.test(s)) { url = espacos(s.replace(/\\/g, "/")); tipo = "arquivo"; }
+    if (/^https?:\/\//i.test(s)) { url = espacos(s); tipo = "web"; }
+    else if (/^file:/i.test(s)) { url = espacos(s.replace(/\\/g, "/")); tipo = "arquivo"; }
     else if (/^[a-z]:[\\/]/i.test(s)) { url = "file:///" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
     else if (/^\\\\[^\\/]+/.test(s)) { url = "file:" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
+    else if (/^\/\/[\w-]+(\.[\w-]+)+/.test(s)) { url = "https:" + espacos(s); tipo = "web"; }
     else if (/^[a-z][a-z0-9+.-]*:/i.test(s) && !/^[^:]+:\d+(\/|$)/.test(s)) { url = espacos(s); tipo = "outro"; }
-    else if (/^www\./i.test(s) || /^[\w-]+:\d+/.test(s) || (/^[\w-]+(\.[\w-]+)*\.[a-z]{2,24}(:\d+)?([\/?#]|$)/i.test(s) && !/^[^\/?#]*\.(html?|pdf|eml|msg|txt|csv|png|jpe?g|gif|svg|webp|mp4|zip|docx?|xlsx?|pptx?)([?#]|$)/i.test(s))) { url = "https://" + espacos(s); tipo = "web"; avisos.push("acrescentei https:// no começo (" + url.slice(0, 60) + "). Confira se abre.");
-    } else { url = espacos(s.replace(/\\/g, "/")); tipo = "relativo"; avisos.push("é um endereço relativo: abre só se o arquivo estiver no lugar indicado, a partir da pasta onde o report está publicado."); }
-    if (tipo === "web") { try { new URL(url); } catch (e) { avisos.push("o endereço parece incompleto. Confira se abre."); } }
-    if (tipo === "arquivo") avisos.push("é um arquivo: abre só onde esse caminho existe (neste computador, ou na pasta de rede para quem tem acesso a ela), e o Outlook na Web e o celular não abrem link de arquivo. Para enviar à área, use o link do ambiente autorizado (https://…).");
-    return { url: url, tipo: tipo, avisos: avisos, erro: "" };
+    else if (/^www\./i.test(s) || /^[\w-]+:\d+/.test(s) || (/^[\w-]+(\.[\w-]+)*\.[a-z]{2,24}(:\d+)?([\/?#]|$)/i.test(s) && !/^[^\/?#]*\.(html?|pdf|eml|msg|txt|csv|png|jpe?g|gif|svg|webp|mp4|zip|docx?|xlsx?|pptx?)([?#]|$)/i.test(s))) { url = "https://" + espacos(s); tipo = "web"; }
+    else { url = espacos(s.replace(/\\/g, "/")); tipo = "relativo"; info = "Endereço relativo: abre a partir da pasta onde o report estiver publicado."; }
+    if (tipo === "arquivo") info = "Caminho de arquivo: abre onde esse caminho existe (neste computador ou na pasta de rede da área).";
+    return { url: url, tipo: tipo, avisos: [], info: info, erro: "" };
   }
 
   /* =================================================================== */
@@ -424,7 +426,7 @@
       if (ehPendencia(url)) return { url: "", problemas: [{ nivel: "pendencia", msg: "ainda não preenchido: " + url }] };
       var nl = normalizarLink(url);
       if (nl.erro) return { url: "", problemas: [{ nivel: "erro", msg: nl.erro }] };
-      var pr = nl.avisos.map(function (m) { return { nivel: "aviso", msg: m }; });
+      var pr = [];
       if (nl.tipo === "web") conferirLink(nl.url, "projeto", dominios).forEach(function (x) { if (x.nivel !== "erro" && !/http:\/\//.test(x.msg)) pr.push(x); });
       return { url: nl.url, problemas: pr };
     }
@@ -958,7 +960,7 @@
     [/src="data:/i, "erro", "Imagem em base64 dentro do HTML: o Outlook bloqueia."],
     [/@import|<link\b|@font-face/i, "erro", "Fonte ou CSS externo: o Outlook não carrega. Use fontes instaladas (config/marca.txt)."],
     [/src="(file:|\\\\|[a-z]:\\)/i, "erro", "Imagem apontando para arquivo local ou caminho de rede: o destinatário não vê e o Outlook bloqueia."],
-    [/href="(file:|\\\\|[a-z]:\\)/i, "aviso", "Link para arquivo local ou de rede: só abre onde esse caminho existe (para enviar à área, use o link do ambiente autorizado)."],
+    [/href="(file:|\\\\|[a-z]:\\)/i, "info", "Link para arquivo local ou de rede: abre onde esse caminho existe."],
     [/<img(?![^>]*\bwidth=")[^>]*>/i, "erro", "Imagem sem o atributo width: o Outlook pode mostrar no tamanho original."],
     [/<img(?![^>]*\balt=")[^>]*>/i, "erro", "Imagem sem alt: quem bloqueia imagens não vê nada no lugar."],
     [/href="#/i, "pendencia", "Link ainda sem endereço (#…)."]
@@ -1044,7 +1046,7 @@
     (o.imagens || []).forEach(function (im) {
       /* Cabeçalhos dobrados (linha seguinte começa com espaço) para nenhuma linha passar de 78 caracteres. */
       L.push("--" + b2, "Content-Type: " + tipoMime(im.nome) + ";", ' name="' + im.nome + '"', "Content-Transfer-Encoding: base64",
-        "Content-ID: <" + im.cid + ">", "Content-Disposition: inline;", ' filename="' + im.nome + '"', "", quebra76(base64(im.bytes)));
+        "Content-ID: <" + im.cid + ">", "Content-Disposition: inline;", ' filename="' + im.nome + '"', "", quebra76(im.b64 || base64(im.bytes)));
     });
     L.push("--" + b2 + "--", "", "--" + b1 + "--", "");
     return L.join("\r\n");
@@ -1055,7 +1057,7 @@
 
   /* E-mail: sem ampliação (nenhum cliente de e-mail roda script). A peça só clica quando tem link. */
   function paraEmail(html) {
-    return anexosSemLink(html).replace(/<link rel="icon"[^>]*>\n?/g, "").replace(/ data-(ampliar|legenda|video|thumb|campo|tom|img|item)="[^"]*"/g, "").replace(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "").replace(/<meta name="report-completo"[^>]*>\n?/, "");
+    return anexosSemLink(html).replace(/<link rel="(?:icon|apple-touch-icon)"[^>]*>\n?/g, "").replace(/ data-(ampliar|legenda|video|thumb|campo|tom|img|item)="[^"]*"/g, "").replace(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "").replace(/<meta name="report-completo"[^>]*>\n?/, "");
   }
   /* Troca os marcadores @@VIDn@@ pelo endereço do vídeo (só na página do navegador). */
   function trocarVideos(html, fn) { return html.replace(/@@VID(\d+)@@/g, function (m, id) { return fn(+id); }); }
@@ -1202,7 +1204,7 @@
     tira(/ data-(?:campo|tom|img|item)="[^"]*"/g, "marca dos campos do resumo e do editor");
     tira(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "comentário \"EDITAR AQUI\"");
     tira(/<meta name="report-completo"[^>]*>\n?/g, "endereço do report completo (meta)");
-    html = html.replace(/<link rel="icon"[^>]*>\n?/g, "");
+    html = html.replace(/<link rel="(?:icon|apple-touch-icon)"[^>]*>\n?/g, "");
     tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
     tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
     return { html: html, saiu: saiu };
@@ -1387,7 +1389,7 @@
    *   Devolve { html, mantidas, fora, videos } ou { erro }.
    */
   function emailResumido(html, op) {
-    html = html.replace(/<link rel="icon"[^>]*>\n?/g, "");
+    html = html.replace(/<link rel="(?:icon|apple-touch-icon)"[^>]*>\n?/g, "");
     var partes = html.split(/(<!--secao:[a-z]+-->)/);
     if (partes.length < 3) return { erro: "Este arquivo não tem as marcas de seção (foi gerado antes da versão 3.9). Gere a página de novo pelo gerar-report.html." };
     var manter = op.manter || SECOES_RESUMO, mantidas = [], fora = [], out = partes[0], atual = null, bloco = false;
@@ -1575,6 +1577,8 @@
     '    .kpiv{font-size:26px !important;line-height:30px !important;}',
     '    .ctat{display:block !important;width:100% !important;box-sizing:border-box !important;padding:18px 20px 0 20px !important;}',
     '    .ctab{display:block !important;width:100% !important;box-sizing:border-box !important;padding:14px 20px 20px 20px !important;text-align:left !important;}',
+    '    .btn{width:100% !important;max-width:100% !important;}',
+    '    .btn a{white-space:normal !important;}',
     '    .h1{font-size:26px !important;line-height:30px !important;}',
     '    .selo{float:none !important;margin-top:12px !important;}',
     '    .al-l{text-align:left !important;}',

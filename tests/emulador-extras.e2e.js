@@ -169,7 +169,7 @@ function salvarComo() {
   await p.waitForFunction(function () { return document.querySelector("#edFrame").contentDocument.querySelectorAll('img[data-img^="lancamento-1-print-"]').length === 2; }, null, { timeout: 10000 });
   var imsL = await imagensDe(p, "lancamento-1");
   confere(imsL.join(",") === "lancamento-1-print-1:184,lancamento-1-print-2:184", "lançamento (coluna de 184 px): imagens uma embaixo da outra · " + imsL.join(","));
-  confere(await noQuadro(p, function (d) { var i = d.querySelector('img[data-img="lancamento-1-print-1"]'); return i.alt === "Peça B" && /^data:image\//.test(i.getAttribute("data-ampliar")) && i.classList.contains("fluid"); }), "imagem nova com descrição, versão ampliada (clique) e largura de celular");
+  confere(await noQuadro(p, function (d) { var i = d.querySelector('img[data-img="lancamento-1-print-1"]'); return i.alt === "Peça B" && /^(data:image\/|blob:)/.test(i.getAttribute("data-ampliar")) && i.classList.contains("fluid"); }), "imagem nova com descrição, versão ampliada (clique) e largura de celular");
   p.__respostas = ["Peça D"];
   await comArquivo(p, f, '[data-item="lancamento-1"] [data-campo="lancamento-1.nome"]', "+ Imagem", IMG2);
   await p.waitForFunction(function () { return document.querySelectorAll('img').length >= 0 && document.querySelector("#edFrame").contentDocument.querySelectorAll('img[data-img^="lancamento-1-print-"]').length === 3; }, null, { timeout: 10000 });
