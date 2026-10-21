@@ -48,6 +48,21 @@ O report abre num quadro, já como página final. As ferramentas de edição exi
 
 Cole a resposta do Copilot no formato de blocos do report (`[NUMERO 1]`, `valor: 12,5%`…) e **Aplicar na página**. Os campos que existem na página são preenchidos (variação ganha a seta; `variacao_cor`/`status_cor` dão a cor); o resto é listado como "ficou de fora". Não traz imagens, links nem PDF e não cria item nem seção nova (para o novo tópico, ligue a seção antes de importar `[TOPICO]`). Formato e prompts: [PROMPTS_COPILOT.md](PROMPTS_COPILOT.md).
 
+## Arquivos leves (4.8)
+
+O emulador otimiza sozinho o que entra, para o report, os e-mails e o próprio emulador não ficarem pesados:
+
+| Arquivo | O que acontece |
+|---|---|
+| Imagem (Trocar imagem, + Imagem) | Entra no tamanho de uso (o dobro da coluna), em JPEG quando não tem transparência; PNG só com transparência (logo, selo) e quando fica menor. A versão ampliada (clique) vai até 1200 px e não é guardada quando não é maior que a imagem da página |
+| Vídeo acima de 4 MB | Pergunta se otimiza: o vídeo é refeito no navegador (até 960 px, com som), com barra de andamento; leva o tempo do vídeo. "Usar o original" para e mantém o arquivo como veio |
+| Report pesado aberto | Imagens acima de 160 KB são refeitas no tamanho de uso; o status diz quanto ficou mais leve. Salve para gravar |
+| PDF anexado | Vai como está (o navegador não reduz PDF): prefira o PDF exportado "para web" ou com tamanho mínimo |
+
+A edição e a prévia do e-mail crescem até o tamanho do conteúdo: rolando a página, o report (ou o e-mail) aparece inteiro, também no modo **Celular**, sem rolagem dentro do quadro.
+
+**Ícones da aba:** o report (`.html`) leva a chama do Santander; o emulador e o `gerar-report.html`, a chama com o selo PF. Os e-mails não levam ícone.
+
 ## E-mail-resumo
 
 Curto de propósito, na identidade do report (vermelho Santander, Lisboa, chama):
@@ -55,14 +70,14 @@ Curto de propósito, na identidade do report (vermelho Santander, Lisboa, chama)
 | Bloco | O que mostra |
 |---|---|
 | Abertura (vermelha) | Chama, "Creative Strategy PF", REPORT MENSAL · período, a frase do mês e uma linha de contexto |
-| Principais resultados | **Até 3 indicadores**, cada um com valor, título, base e variação. Quando todos vêm do mesmo projeto, uma linha diz qual |
+| Principais resultados | **Até 3 indicadores**, cada um com valor, título, base e variação. Quando todos vêm do mesmo projeto, uma linha diz o nome dele (ex.: Milheiros). Sem repetição (4.8): o detalhe que só repete o número sai, e o nome do projeto não aparece de novo se a frase ou o título já o dizem |
 | Tópicos novos (4.7) | Cada tópico novo do report (ex.: TESTES): rótulo, título e até 4 itens (nome e status; em Números, o número antes). Mais itens: "E mais N no report completo". Sem link: o link do e-mail continua sendo só o botão. A chamada cita os tópicos ("Campanhas, …, testes e os próximos passos") |
 | Chamada | "Acesse o report completo." e o botão **Acessar report completo**, o **único link** do e-mail: célula vermelha com link de texto, que continua clicável depois que o Outlook envia |
 | Assinatura | CUSTOMER INTERACTIONS · RESUMO DO REPORT MENSAL |
 
 Sem vídeo, carrossel, botões secundários nem script. **Cantos retos de propósito** (4.5): ao enviar, o Outlook para Windows tira os cantos arredondados para todos que recebem, então a prévia já mostra o e-mail como ele chega.
 
-**Indicadores:** os candidatos são os números da página (projeto principal, resultados do destaque, Creative X e os números dos tópicos novos no layout Números); vêm marcados os do projeto principal. A pessoa escolhe até 3 (o 4º fica bloqueado). Nenhum número é criado: sem indicador na página, o e-mail sai só com a frase e a chamada.
+**Indicadores:** cada um aparece com o nome do projeto, ex.: "28 · Contas abertas (Milheiros)" (4.8). O número que a frase do mês já diz não vem marcado e mostra "já está na frase do mês"; marcado mesmo assim, o status avisa "Repete a frase do mês". Os candidatos são os números da página (projeto principal, resultados do destaque, Creative X e os números dos tópicos novos no layout Números); vêm marcados os do projeto principal. A pessoa escolhe até 3 (o 4º fica bloqueado). Nenhum número é criado: sem indicador na página, o e-mail sai só com a frase e a chamada.
 
 **Link:** vem do report, se já estiver gravado nele; senão, cole no passo 3. **Vale qualquer link** (4.7): `https://…` (ambiente autorizado), endereço sem `https://` (ex.: `empresa.sharepoint.com/…`, ganha o `https://`, com aviso), o caminho do arquivo, que vira `file:///…` (abre só onde o arquivo está; o status avisa), `mailto:`, `msteams:` ou um endereço relativo (ex.: `report-2026-10.html`, com aviso). Espaço vira `%20`. Só endereço que executa código (`javascript:`, `data:`, `vbscript:`) é recusado. Sem link válido, a prévia mostra "FALTA O LINK DO REPORT COMPLETO" no lugar do botão e o `.eml` do resumo não é liberado.
 

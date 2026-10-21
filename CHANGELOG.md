@@ -2,6 +2,22 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.8 · 2026-10-21 · Resumo sem repetição, arquivos leves, celular inteiro e ícones
+
+- **E-mail-resumo com o nome do projeto:** no passo 4 e no e-mail, o indicador diz de qual projeto é (ex.: "28 · Contas abertas (Milheiros)"), não "Projeto principal" ou "Destaque do mês". Quando todos vêm do mesmo projeto, a linha embaixo de PRINCIPAIS RESULTADOS traz só o nome.
+- **Sem repetição no resumo:**
+  - o detalhe que só repete o número (ex.: "28 contas abertas no Milheiros" embaixo de 28 · Contas abertas) sai;
+  - o nome do projeto não aparece de novo quando a frase do mês ou o título já o dizem;
+  - o número que a frase do mês já diz (ex.: "Milheiros: 28 contas abertas") não vem marcado como indicador; na lista, ele mostra "já está na frase do mês" e, se for marcado mesmo assim, o status avisa "Repete a frase do mês".
+- **Arquivos leves, sem pensar nisso:**
+  - imagem: entra no tamanho de uso, em JPEG quando não tem transparência (um print PNG de 3000 px vira poucos KB); a versão ampliada (clique) vai até 1200 px e não é guardada quando não é maior que a imagem da página;
+  - vídeo acima de 4 MB: o emulador oferece **otimizar** (refaz no navegador, até 960 px, com som, com barra de andamento; "Usar o original" para). No teste, 4,5 MB → 0,7 MB. O player do report acerta a duração do vídeo otimizado;
+  - ao abrir um report pesado (feito antes ou com imagens grandes), as imagens acima de 160 KB são refeitas no tamanho de uso, e o status diz quanto ficou mais leve.
+- **Celular inteiro:** a edição e a prévia do e-mail crescem até o tamanho do conteúdo. Não há mais rolagem dentro do quadro: rolando a página, o report (ou o e-mail) aparece inteiro, no computador e no Celular.
+- **Ícones da aba:** o report gerado (`.html`) mostra a chama do Santander na aba, no lugar do globo do navegador (os e-mails não levam ícone); report salvo de antes ganha a chama ao salvar no emulador. O emulador e o `gerar-report.html` mostram a chama com um selo **PF**, para distinguir a ferramenta do report.
+- Celular: imagem com borda não vaza mais 2 px (da 4.7.1, agora também no modelo em branco).
+- Testes: 71 no motor (resumo sem repetição e com o nome do projeto; ícone só na página) e o teste novo `tests/leveza.e2e.js` (imagem e vídeo pesados, otimização ao abrir, quadros sem rolagem, nomes e aviso no passo 4, ícones), nas duas versões do emulador.
+
 ## 4.7.2 · 2026-10-21 · Chama do Santander na aba do navegador
 
 - O emulador (`converter-html-eml.html` e a versão avulsa `kit/emulador-report.html`) e o `gerar-report.html` mostram a **chama do Santander** como ícone da aba do Chrome/Edge. É o traçado oficial (`assets/marca/svg/chama-santander.svg`), em Vermelho Santander, sem redesenho, embutido na página: funciona em qualquer pasta, sem arquivo extra.

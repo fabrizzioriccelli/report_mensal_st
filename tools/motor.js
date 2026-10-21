@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.7.2 (2026-10-21)";
+  var VERSAO = "4.8 (2026-10-21)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -99,6 +99,10 @@
     { bloco: "AGENDA", max: 6, campos: { data: 0, titulo: 1, detalhe: 0 } }
   ];
 
+  /* Ícone da aba do report no navegador: a chama do Santander (assets/marca/svg/chama-santander.svg, traçado oficial,
+     em Vermelho Santander), embutida. Só na página: o e-mail não leva (paraEmail e limparHtmlEditado tiram). */
+  var ICONE_REPORT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 43.9 41.5' width='43.9' height='41.5'%3E %3Cpath transform='translate(0,-0.4)' fill='%23EC0000' d='M 31.5,19.5 C 31.4,18 31,16.5 30.2,15.2 L 23.4,3.3 C 22.9,2.4 22.5,1.4 22.3,0.4 L 22,0.9 c -1.7,2.9 -1.7,6.6 0,9.5 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 l -5,-8.7 -3.2,-5.6 C 17.4,11.8 17,10.8 16.8,9.8 l -0.3,0.5 c -1.7,2.9 -1.7,6.5 0,9.5 v 0 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 L 13.7,24.5 C 12.8,22.9 12.4,21.1 12.4,19.3 5.1,21.2 0,25.3 0,30 0,36.6 9.8,41.9 21.9,41.9 34,41.9 43.8,36.6 43.8,30 43.9,25.5 38.9,21.4 31.5,19.5 Z'/%3E %3C/svg%3E";
+  var ICONE_TAG = '<link rel="icon" type="image/svg+xml" href="' + ICONE_REPORT + '">';
   /* Novos tópicos: bloco nos dados → id da seção na página (só letras: a marca <!--secao:id--> e as chaves data-campo/data-item usam o id). */
   var TOPICOS = [["TOPICO", "topico"], ["TOPICO B", "topicob"], ["TOPICO C", "topicoc"], ["TOPICO D", "topicod"]];
   /* Layouts de um tópico novo, com o máximo de itens de cada um (a grade de 600 px: 3 colunas, 3 cartões por linha, 4 números). */
@@ -843,7 +847,7 @@
     }
     var assunto = "Creative Strategy PF | Report de " + mes + " " + ano;
     var modelo = {
-      assunto: assunto, link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
+      assunto: assunto, icone: seguro(ICONE_TAG), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topicos: topicos, foco: foco, agenda: agenda
@@ -1039,7 +1043,7 @@
 
   /* E-mail: sem ampliação (nenhum cliente de e-mail roda script). A peça só clica quando tem link. */
   function paraEmail(html) {
-    return anexosSemLink(html).replace(/ data-(ampliar|legenda|video|thumb|campo|tom|img|item)="[^"]*"/g, "").replace(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "").replace(/<meta name="report-completo"[^>]*>\n?/, "");
+    return anexosSemLink(html).replace(/<link rel="icon"[^>]*>\n?/g, "").replace(/ data-(ampliar|legenda|video|thumb|campo|tom|img|item)="[^"]*"/g, "").replace(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "").replace(/<meta name="report-completo"[^>]*>\n?/, "");
   }
   /* Troca os marcadores @@VIDn@@ pelo endereço do vídeo (só na página do navegador). */
   function trocarVideos(html, fn) { return html.replace(/@@VID(\d+)@@/g, function (m, id) { return fn(+id); }); }
@@ -1069,6 +1073,8 @@
   var AMPLIAR_JS = "(function(){var d=document,box=d.createElement('div'),im=d.createElement('img'),tx=d.createElement('p'),bt=d.createElement('button'),volta=null;" +
     "box.id='amp';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label','Peça ampliada');bt.type='button';bt.setAttribute('aria-label','Fechar');bt.textContent='\u00D7';" +
     "var vd=d.createElement('video');vd.controls=true;vd.setAttribute('playsinline','');" +
+    /* vídeo otimizado no emulador (WebM gravado no navegador) não traz a duração: o player a descobre indo ao fim e voltando */
+    "vd.addEventListener('loadedmetadata',function(){if(vd.duration===Infinity){vd.currentTime=1e101;vd.addEventListener('timeupdate',function f(){vd.removeEventListener('timeupdate',f);vd.currentTime=0;});}});" +
     "box.appendChild(bt);box.appendChild(im);box.appendChild(vd);box.appendChild(tx);d.body.appendChild(box);" +
     "function fecha(){box.removeAttribute('open');im.removeAttribute('src');vd.pause();vd.removeAttribute('src');vd.load();if(volta)volta.focus();}" +
     "function abre(el){volta=el;var v=el.getAttribute('data-video');im.style.display=v?'none':'';vd.style.display=v?'':'none';" +
@@ -1184,6 +1190,7 @@
     tira(/ data-(?:campo|tom|img|item)="[^"]*"/g, "marca dos campos do resumo e do editor");
     tira(/[ \t]*<!-- EDITAR AQUI[\s\S]*?-->\n?/g, "comentário \"EDITAR AQUI\"");
     tira(/<meta name="report-completo"[^>]*>\n?/g, "endereço do report completo (meta)");
+    html = html.replace(/<link rel="icon"[^>]*>\n?/g, "");
     tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
     tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
     return { html: html, saiu: saiu };
@@ -1368,6 +1375,7 @@
    *   Devolve { html, mantidas, fora, videos } ou { erro }.
    */
   function emailResumido(html, op) {
+    html = html.replace(/<link rel="icon"[^>]*>\n?/g, "");
     var partes = html.split(/(<!--secao:[a-z]+-->)/);
     if (partes.length < 3) return { erro: "Este arquivo não tem as marcas de seção (foi gerado antes da versão 3.9). Gere a página de novo pelo gerar-report.html." };
     var manter = op.manter || SECOES_RESUMO, mantidas = [], fora = [], out = partes[0], atual = null, bloco = false;
@@ -1516,6 +1524,16 @@
       ';font-size:10px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;white-space:nowrap;">' + esc(texto) + "</td></tr></table>");
   }
 
+  /* Repetição no e-mail-resumo: textos comparados sem acento, maiúsculas e pontuação. */
+  function textoComparavel(s) { return semAcento(String(s || "")).toLowerCase().replace(/[^a-z0-9%$,]+/g, " ").replace(/(\d),(?!\d)/g, "$1 ").replace(/\s+/g, " ").trim(); }
+  function contemTexto(a, b) { var x = textoComparavel(b); return !!x && (" " + textoComparavel(a) + " ").indexOf(" " + x + " ") >= 0; }
+  /* O texto já diz o indicador: tem o valor e a maior parte das palavras do que ele mede. */
+  function repete(texto, x) {
+    if (!x.valor || !contemTexto(texto, x.valor)) return false;
+    var t = " " + textoComparavel(texto) + " ", ps = textoComparavel(x.titulo).split(" ").filter(function (w) { return w.length >= 4 && !/^\d/.test(w); });
+    return !ps.length || ps.filter(function (w) { return t.indexOf(" " + w + " ") >= 0 || t.indexOf(" " + w.replace(/s$/, "") + " ") >= 0; }).length * 2 >= ps.length;
+  }
+
   /* Cantos retos de propósito: ao enviar, o Outlook para Windows reescreve o e-mail e tira os cantos arredondados para
      todos que recebem. Assim a prévia do emulador mostra o que chega na caixa de entrada. */
   var RESUMO_TPL = [
@@ -1579,7 +1597,7 @@
     '  <!-- PRINCIPAIS RESULTADOS: dois ou três indicadores -->',
     '  <tr><td class="px" style="padding:26px 40px 0 40px;">',
     '    <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">PRINCIPAIS RESULTADOS</p>',
-    '    {{#origem_unica}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fx}};font-size:13px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};">{{grupo_unico}}: <b>{{origem_unica}}</b></p>{{/origem_unica}}',
+    '    {{#origem_unica}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fx}};font-size:13px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};"><b>{{origem_unica}}</b></p>{{/origem_unica}}',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>',
     '      {{#indicadores}}{{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}',
     '      <td class="kpi" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor_valor}};padding-top:12px;">',
@@ -1663,9 +1681,13 @@
     var mso = (/<!--\[if mso\]>\s*<noscript>[\s\S]*?<!\[endif\]-->/.exec(html) || [""])[0];
     var cand = d.indicadores, porChave = {};
     cand.forEach(function (x) { porChave[x.chave] = x; });
-    var escolha = (op.indicadores && op.indicadores.length ? op.indicadores : cand.filter(function (x) { return x.grupo === "Projeto principal"; }).map(function (x) { return x.chave; }))
+    /* Sem repetição: um indicador que a frase do mês já diz (valor e o que ele mede) não vem marcado sozinho. */
+    var fraseMes = [d.frase, d.frase_final].join(" ");
+    cand.forEach(function (x) { x.na_frase = repete(fraseMes, x); });
+    var livres = cand.filter(function (x) { return !x.na_frase; });
+    var escolha = (op.indicadores && op.indicadores.length ? op.indicadores : livres.filter(function (x) { return x.grupo === "Projeto principal"; }).map(function (x) { return x.chave; }))
       .filter(function (k) { return porChave[k]; }).slice(0, RESUMO_REGRAS.indicadores);
-    if (!escolha.length) escolha = cand.slice(0, RESUMO_REGRAS.indicadores).map(function (x) { return x.chave; });
+    if (!escolha.length) escolha = (livres.length ? livres : cand).slice(0, RESUMO_REGRAS.indicadores).map(function (x) { return x.chave; });
     var sel = escolha.map(function (k) { return porChave[k]; }), n = sel.length, larg = n ? colunas(LARGURA, n) : [];
     var grupos = sel.map(function (x) { return x.grupo + "|" + x.origem; }).filter(function (g, i, a) { return a.indexOf(g) === i; });
     var unica = grupos.length === 1 ? sel[0] : null;
@@ -1684,9 +1706,14 @@
       intro: "Os destaques" + (mesTxt ? " de " + mesTxt : " do mês") + " em poucos segundos. O report completo traz todos os detalhes.",
       logo: d.logo && d.logo.src ? { src: d.logo.src, w: Math.min(d.logo.w || 32, 40) } : null,
       tem_indicadores: n > 0,
-      origem_unica: unica ? unica.origem : "", grupo_unico: unica ? unica.grupo : "",
+      /* o nome do projeto (não "Projeto principal"), e só uma vez: se a frase do mês já diz o nome, a linha sai */
+      origem_unica: unica && !contemTexto(fraseMes, unica.origem) ? unica.origem : "",
       indicadores: sel.map(function (x, i) {
-        return { valor: x.valor, titulo: x.titulo, detalhe: x.detalhe, origem: unica ? "" : x.origem, variacao: etiquetaResumo(x.variacao, x.tom, fx), primeiro: i === 0, largura: larg[i], cor_valor: i === 0 ? CR.marca : CR.texto };
+        /* o detalhe que só repete o valor e o título (ex.: "28 contas abertas" embaixo de 28 · Contas abertas) sai;
+           o nome do projeto embaixo do indicador também, se o título ou a frase já o dizem */
+        var detalhe = x.detalhe && !repete(x.detalhe, x) && !contemTexto(x.titulo, x.detalhe) ? x.detalhe : "";
+        var origem = unica || contemTexto(x.titulo + " " + detalhe + " " + fraseMes, x.origem) ? "" : x.origem;
+        return { valor: x.valor, titulo: x.titulo, detalhe: detalhe, origem: origem, variacao: etiquetaResumo(x.variacao, x.tom, fx), primeiro: i === 0, largura: larg[i], cor_valor: i === 0 ? CR.marca : CR.texto };
       }),
       tem_topicos: d.topicos.length > 0,
       topicos: d.topicos.map(function (t, i) {
@@ -1779,7 +1806,7 @@
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
-    RESUMO_REGRAS: RESUMO_REGRAS, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
+    RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

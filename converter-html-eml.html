@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<!-- Ícone da aba: a chama do Santander (assets/marca/svg/chama-santander.svg, o traçado oficial, em Vermelho Santander), embutida para funcionar em qualquer pasta. -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 43.9 41.5' width='43.9' height='41.5'%3E %3Cpath transform='translate(0,-0.4)' fill='%23EC0000' d='M 31.5,19.5 C 31.4,18 31,16.5 30.2,15.2 L 23.4,3.3 C 22.9,2.4 22.5,1.4 22.3,0.4 L 22,0.9 c -1.7,2.9 -1.7,6.6 0,9.5 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 l -5,-8.7 -3.2,-5.6 C 17.4,11.8 17,10.8 16.8,9.8 l -0.3,0.5 c -1.7,2.9 -1.7,6.5 0,9.5 v 0 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 L 13.7,24.5 C 12.8,22.9 12.4,21.1 12.4,19.3 5.1,21.2 0,25.3 0,30 0,36.6 9.8,41.9 21.9,41.9 34,41.9 43.8,36.6 43.8,30 43.9,25.5 38.9,21.4 31.5,19.5 Z'/%3E %3C/svg%3E">
+<!-- Ícone da aba: a chama do Santander (traçado oficial, assets/marca/svg/chama-santander.svg) com o selo "PF", para distinguir a ferramenta da aba do report (que leva só a chama). Embutido: funciona em qualquer pasta. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(2,2) scale(0.95)'%3E%3Cpath transform='translate(0,-0.4)' fill='#EC0000' d='M 31.5,19.5 C 31.4,18 31,16.5 30.2,15.2 L 23.4,3.3 C 22.9,2.4 22.5,1.4 22.3,0.4 L 22,0.9 c -1.7,2.9 -1.7,6.6 0,9.5 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 l -5,-8.7 -3.2,-5.6 C 17.4,11.8 17,10.8 16.8,9.8 l -0.3,0.5 c -1.7,2.9 -1.7,6.5 0,9.5 v 0 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 L 13.7,24.5 C 12.8,22.9 12.4,21.1 12.4,19.3 5.1,21.2 0,25.3 0,30 0,36.6 9.8,41.9 21.9,41.9 34,41.9 43.8,36.6 43.8,30 43.9,25.5 38.9,21.4 31.5,19.5 Z'/%3E%3C/g%3E%3Crect x='22' y='36' width='42' height='28' rx='8' fill='#FFFFFF'/%3E%3Crect x='25' y='39' width='36' height='22' rx='6' fill='#EC0000'/%3E%3Ctext x='43' y='57' text-anchor='middle' font-family='Arial,Helvetica,sans-serif' font-weight='900' font-size='19' fill='#FFFFFF'%3EPF%3C/text%3E%3C/svg%3E">
 <title>Emulador do report mensal · Creative Strategy PF</title>
 <!--
   EMULADOR DO REPORT MENSAL (antigo "converter HTML em .eml")
@@ -77,6 +77,8 @@
   .check input{accent-color:var(--red);width:16px;height:16px}
   iframe{width:100%;border:1px solid var(--rule);border-radius:8px;background:#EAE4DE;transition:width .2s}
   #prev{height:760px}
+  /* edição e prévia crescem até o tamanho do conteúdo (ajustarAltura): só a página rola, sem rolagem dentro do quadro */
+  #edFrame.cresce,#prev.cresce{overflow:hidden}
   #edFrame{height:calc(100vh - 84px);min-height:480px;display:block;margin:0 auto}
   .tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
   .frame{display:flex;justify-content:center}
@@ -201,7 +203,7 @@
     <div class="campo">
       <label>Indicadores do e-mail (até 3)</label>
       <div class="lista" id="indicadores"><span class="muted">Abra um report para ver os indicadores.</span></div>
-      <p class="muted" style="margin-top:6px">Vêm marcados os números do projeto principal. Pode trocar por outros indicadores da página. Nenhum número é criado aqui: só aparecem os que estão no report.</p>
+      <p class="muted" style="margin-top:6px">Vêm marcados os números do projeto da capa (cada um com o nome do projeto). O número que a frase do mês já diz não vem marcado, para não repetir. Pode trocar por outros indicadores da página. Nenhum número é criado aqui: só aparecem os que estão no report.</p>
     </div>
     <div class="campo">
       <label for="botao">Texto do botão</label>
@@ -372,6 +374,7 @@
       $("#secEditar").hidden = false; $("#secLink").hidden = false; $("#secResumo").hidden = false; $("#secStatus").hidden = false;
       $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
       montarSecoes(); reconverter(true);
+      otimizarAoAbrir().then(function (o) { if (o.n) marcarSujo("Otimizei " + o.n + " imagem(ns) pesada(s) deste report (−" + kb(o.economia) + "): ele fica mais leve para abrir e enviar. Salve para gravar"); });
       document.querySelector(".ferramentas").scrollIntoView({ behavior: "smooth", block: "start" });
     };
     fr.srcdoc = paraEditar(html);
@@ -516,7 +519,9 @@
   function mesmasImagens(chave) { return Array.prototype.slice.call(ED.doc.querySelectorAll('img[data-img="' + chave + '"]')); }
   function lerComo(file, modo) { return new Promise(function (ok, falha) { var r = new FileReader(); r.onload = function () { ok(r.result); }; r.onerror = falha; r[modo](file); }); }
   function carregar(src) { return new Promise(function (ok, falha) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { falha(new Error("A imagem não abriu. Use .jpg ou .png.")); }; im.src = src; }); }
-  /* Recorta (se a imagem tem altura fixa) e reduz para o dobro do tamanho na tela (nitidez em telas de alta resolução). */
+  /* Recorta (se a imagem tem altura fixa) e reduz para o dobro do tamanho na tela (nitidez em telas de alta resolução).
+     Otimizada para o report e os e-mails não pesarem: JPEG sempre que a imagem não tem transparência (um print em PNG
+     vira JPEG); PNG só quando há transparência (logo, selo) e fica menor. */
   function desenhar(im, w, h, png, play) {
     var W = w * 2, H = h ? h * 2 : Math.round(W * im.naturalHeight / im.naturalWidth);
     if (!h && im.naturalWidth < W) { W = im.naturalWidth; H = im.naturalHeight; }
@@ -525,7 +530,24 @@
     var esc_ = Math.max(W / im.naturalWidth, H / im.naturalHeight), sw = W / esc_, sh = H / esc_;
     g.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, 0, 0, W, H);
     if (play) desenharPlay(g, W, H, "#EC0000");
-    return png ? c.toDataURL("image/png") : c.toDataURL("image/jpeg", 0.86);
+    return codificar(c, png);
+  }
+  var QUALIDADE = 0.82;
+  function transparente(c) {
+    var d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+    for (var i = 3; i < d.length; i += 4) if (d[i] < 250) return true;
+    return false;
+  }
+  function codificar(c, podePng) {
+    if (podePng && transparente(c)) return c.toDataURL("image/png");
+    if (podePng) {
+      /* sem transparência: fundo branco (o JPEG não tem transparência) e o menor dos dois */
+      var b = document.createElement("canvas"); b.width = c.width; b.height = c.height; var g = b.getContext("2d");
+      g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, b.width, b.height); g.drawImage(c, 0, 0);
+      var jpg = b.toDataURL("image/jpeg", QUALIDADE), png = c.toDataURL("image/png");
+      return png.length < jpg.length ? png : jpg;
+    }
+    return c.toDataURL("image/jpeg", QUALIDADE);
   }
   function desenharPlay(g, W, H, cor) {
     var m = Math.min(W, H), r = Math.round(m * 0.24), x = W / 2, y = H / 2;
@@ -534,13 +556,18 @@
     g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = "rgba(255,255,255,0.94)"; g.fill(); g.restore();
     g.beginPath(); var t = r * 0.42; g.moveTo(x - t * 0.62, y - t); g.lineTo(x - t * 0.62, y + t); g.lineTo(x + t, y); g.closePath(); g.fillStyle = cor; g.fill();
   }
-  function ampliada(im) {
-    var W = Math.min(1400, im.naturalWidth), H = Math.round(W * im.naturalHeight / im.naturalWidth), c = document.createElement("canvas");
-    c.width = W; c.height = H; var g = c.getContext("2d"); g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, W, H); g.drawImage(im, 0, 0, W, H); return c.toDataURL("image/jpeg", 0.88);
+  /* Versão ampliada (abre no clique, só na página): até 1200 px. Se não for maior que a imagem da página (larguraNaPagina,
+     em px reais), fica vazia e o clique abre a própria imagem: não guarda uma cópia. */
+  var AMPLIADA = 1200;
+  function ampliada(im, larguraNaPagina) {
+    var W = Math.min(AMPLIADA, im.naturalWidth);
+    if (larguraNaPagina && W <= larguraNaPagina * 1.25) return "";
+    var H = Math.round(W * im.naturalHeight / im.naturalWidth), c = document.createElement("canvas");
+    c.width = W; c.height = H; var g = c.getContext("2d"); g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, W, H); g.drawImage(im, 0, 0, W, H); return c.toDataURL("image/jpeg", 0.8);
   }
   async function trocarImagem(chave, file) {
     if (!/^image\//.test(file.type)) { await perguntar("Arquivo não é uma imagem", "<p>Escolha um arquivo <b>.jpg</b> ou <b>.png</b>.</p>", "Entendi"); return; }
-    var im = await carregar(await lerComo(file, "readAsDataURL")), png = file.type === "image/png" && /logo|selo/.test(chave);
+    var im = await carregar(await lerComo(file, "readAsDataURL")), png = /png|webp|gif/.test(file.type);
     var pequenas = [];
     mesmasImagens(chave).forEach(function (i) {
       var w = +i.getAttribute("width") || i.width, h = +i.getAttribute("height") || 0;
@@ -549,7 +576,7 @@
       var video = i.hasAttribute("data-video");
       i.setAttribute("src", desenhar(im, w, h, png, video));
       if (video) i.setAttribute("data-thumb", desenhar(im, w, h, png, false));
-      if (i.hasAttribute("data-ampliar")) i.setAttribute("data-ampliar", ampliada(im));
+      if (i.hasAttribute("data-ampliar")) i.setAttribute("data-ampliar", ampliada(im, w * 2));
       if (!h) i.removeAttribute("height");
       pilha(function () { i.setAttribute("src", antes.src); if (antes.thumb !== null) i.setAttribute("data-thumb", antes.thumb); if (antes.zoom !== null) i.setAttribute("data-ampliar", antes.zoom); });
     });
@@ -557,8 +584,14 @@
   }
   async function trocarVideo(chave, file, novo) {
     if (!/\.(mp4|webm)$/i.test(file.name)) { await perguntar("Formato de vídeo", "<p>Use um vídeo <b>.mp4</b> (ou .webm).</p>", "Entendi"); return; }
-    if (file.size > 25 * 1048576 && !(await perguntar("Vídeo grande", "<p>O vídeo tem " + kb(file.size) + ". O report fica pesado para abrir. Continuar mesmo assim?</p>", "Continuar", "Escolher outro"))) return;
-    var dados = await lerComo(file, "readAsDataURL");
+    var dados = null, otimizado = null;
+    if (file.size > VIDEO_LEVE) {
+      var quer = await perguntar("Vídeo pesado (" + kb(file.size) + ")", "<p>Vídeo grande deixa o report e o emulador lentos. Posso <b>otimizar</b> agora: ele é refeito aqui no navegador, até 960 px de largura, com som. Leva o tempo do vídeo (um vídeo de 30 s leva uns 30 s).</p>", "Otimizar (recomendado)", "Usar o original");
+      if (quer) otimizado = await otimizarVideo(file);
+      if (otimizado && otimizado.size < file.size) dados = await lerComo(otimizado, "readAsDataURL");
+      else if (quer) await perguntar("Vídeo mantido", "<p>Não deu para deixar o vídeo menor neste navegador. Vai o original (" + kb(file.size) + ").</p>", "Entendi");
+    }
+    if (!dados) dados = await lerComo(file, "readAsDataURL");
     if (/^data:application\/octet-stream/.test(dados)) dados = dados.replace(/^data:application\/octet-stream/, /\.webm$/i.test(file.name) ? "data:video/webm" : "data:video/mp4");
     for (var k = 0, l = mesmasImagens(chave); k < l.length; k++) {
       var i = l[k], antes = { video: i.getAttribute("data-video"), src: i.getAttribute("src"), thumb: i.getAttribute("data-thumb"), zoom: i.getAttribute("data-ampliar"), alt: i.alt };
@@ -570,7 +603,63 @@
       i.setAttribute("data-video", dados); i.setAttribute("data-legenda", i.alt.replace(/^Vídeo: /, ""));
       (function (i, antes) { pilha(function () { ["video", "thumb"].forEach(function (k2) { var v = antes[k2], at = "data-" + k2; if (v === null) i.removeAttribute(at); else i.setAttribute(at, v); }); i.setAttribute("src", antes.src); i.alt = antes.alt; if (antes.zoom !== null) i.setAttribute("data-ampliar", antes.zoom); }); })(i, antes);
     }
-    marcarSujo("Vídeo colocado: " + file.name + " (" + kb(file.size) + "). Ele toca no report completo; no e-mail vai só a imagem.");
+    marcarSujo("Vídeo colocado: " + file.name + " (" + (otimizado && otimizado.size < file.size ? "otimizado: " + kb(file.size) + " → " + kb(otimizado.size) : kb(file.size)) + "). Ele toca no report completo; no e-mail vai só a imagem.");
+  }
+  /* Vídeo acima de VIDEO_LEVE: refeito no navegador (canvas + MediaRecorder), até 960 px de largura, ~1,2 Mb/s, com som.
+     Toca no tempo real do vídeo; a janela mostra o andamento e "Usar o original" para. Sem suporte: devolve null. */
+  var VIDEO_LEVE = 4 * 1048576;
+  function otimizarVideo(file) {
+    return new Promise(function (fim) {
+      if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { fim(null); return; }
+      var tipo = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"].filter(function (t) { return MediaRecorder.isTypeSupported(t); })[0];
+      if (!tipo) { fim(null); return; }
+      var url = URL.createObjectURL(file), v = document.createElement("video"), parar = false, acabou = false, ac = null;
+      v.src = url; v.playsInline = true; v.preload = "auto";
+      $("#modalTit").textContent = "Otimizando o vídeo"; $("#modalCorpo").innerHTML = '<p>' + esc(file.name) + ' · ' + kb(file.size) + '</p><progress id="progVideo" max="100" value="0" style="width:100%"></progress><p class="muted" id="progTexto">Começando…</p>';
+      $("#modalOk").hidden = true; $("#modalCancela").hidden = false; $("#modalCancela").textContent = "Usar o original"; $("#modal").hidden = false;
+      function sai(r) { if (acabou) return; acabou = true; $("#modal").hidden = true; $("#modalOk").hidden = false; $("#modalCancela").onclick = null; try { v.pause(); } catch (e) {} URL.revokeObjectURL(url); if (ac) ac.close(); fim(r); }
+      $("#modalCancela").onclick = function () { parar = true; sai(null); };
+      v.onerror = function () { sai(null); };
+      v.onloadedmetadata = function () {
+        var W = Math.min(960, v.videoWidth || 960); W -= W % 2; var H = Math.round(W * (v.videoHeight || 540) / (v.videoWidth || 960)); H -= H % 2;
+        var c = document.createElement("canvas"); c.width = W; c.height = H; var g = c.getContext("2d"), st = c.captureStream(30);
+        try { ac = new AudioContext(); var dst = ac.createMediaStreamDestination(); ac.createMediaElementSource(v).connect(dst); dst.stream.getAudioTracks().forEach(function (t) { st.addTrack(t); }); } catch (e) { v.muted = true; }
+        var rec = new MediaRecorder(st, { mimeType: tipo, videoBitsPerSecond: 1200000, audioBitsPerSecond: 96000 }), partes = [];
+        rec.ondataavailable = function (e) { if (e.data && e.data.size) partes.push(e.data); };
+        rec.onstop = function () { sai(parar || !partes.length ? null : new Blob(partes, { type: "video/webm" })); };
+        function quadro() {
+          if (acabou) return;
+          g.drawImage(v, 0, 0, W, H);
+          var pc = v.duration ? Math.min(100, Math.round(100 * v.currentTime / v.duration)) : 0;
+          var pg = document.getElementById("progVideo"); if (pg) { pg.value = pc; $("#progTexto").textContent = pc + "% · " + Math.round(v.currentTime) + " de " + Math.round(v.duration || 0) + " s"; }
+          if (v.ended) { if (rec.state !== "inactive") rec.stop(); return; }
+          if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(quadro); else setTimeout(quadro, 33);
+        }
+        v.onended = function () { g.drawImage(v, 0, 0, W, H); setTimeout(function () { if (rec.state !== "inactive") rec.stop(); }, 120); };
+        rec.start(1000);
+        if (ac && ac.state === "suspended") ac.resume();
+        v.play().then(quadro, function () { v.muted = true; v.play().then(quadro, function () { sai(null); }); });
+      };
+    });
+  }
+  /* Ao abrir: imagens pesadas (feitas antes da otimização, ou vindas de fora) são refeitas no tamanho de uso.
+     Só troca quando fica pelo menos 20% menor. */
+  var IMAGEM_LEVE = 160 * 1024;
+  async function otimizarAoAbrir() {
+    var ims = Array.prototype.slice.call(ED.doc.querySelectorAll("img")), antes = 0, depois = 0, n = 0, cache = {};
+    for (var k = 0; k < ims.length; k++) {
+      var i = ims[k], w = +i.getAttribute("width") || 0, h = +i.getAttribute("height") || 0;
+      for (var at of ["src", "data-thumb", "data-ampliar"]) {
+        var val = i.getAttribute(at); if (!val || !/^data:image\//.test(val) || val.length * 0.75 < IMAGEM_LEVE) continue;
+        var chave = at + "|" + w + "|" + h + "|" + val.length + val.slice(-40), novo = cache[chave];
+        if (novo === undefined) {
+          try { var el = await carregar(val); novo = at === "data-ampliar" ? ampliada(el, w * 2) : w ? desenhar(el, w, h, /^data:image\/(png|webp|gif)/.test(val), false) : null; } catch (e) { novo = null; }
+          cache[chave] = novo;
+        }
+        if (novo !== null && novo.length < val.length * 0.8) { i.setAttribute(at, novo); antes += val.length; depois += novo.length; n++; }
+      }
+    }
+    return { n: n, economia: Math.round((antes - depois) * 0.75) };
   }
   /* Imagem opcional (selo, logo e prints do Transformation Hub): sai com o espaço dela. */
   function tirarImagem(chave) {
@@ -779,8 +868,8 @@
       cx.setAttribute("style", "margin-top:14px;"); cx.appendChild(d.createElement("tbody")); area.appendChild(cx); W = larguraUtil(area);
     } else W = larguraDaCaixa(cx);
     var img = d.createElement("img"), escuro = fundoEscuro(area);
-    img.setAttribute("src", desenhar(im, W, 0, file.type === "image/png", false)); img.setAttribute("alt", desc); img.setAttribute("data-legenda", desc);
-    img.setAttribute("data-ampliar", ampliada(im)); img.className = "fluid"; img.setAttribute("data-img", chave + "-print-0");
+    img.setAttribute("src", desenhar(im, W, 0, /png|webp|gif/.test(file.type), false)); img.setAttribute("alt", desc); img.setAttribute("data-legenda", desc);
+    img.setAttribute("data-ampliar", ampliada(im, W * 2)); img.className = "fluid"; img.setAttribute("data-img", chave + "-print-0");
     img.setAttribute("style", "display:block;border:1px solid " + (escuro ? "#F5DECF" : COR.linha) + ";width:" + W + "px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#767676;");
     (cx.tBodies[0] || cx).appendChild(d.createElement("tr")).appendChild(d.createElement("td")).appendChild(img);
     arrumarImagens(cx, W, chave);
@@ -1125,6 +1214,8 @@
     var doc = ED.doc.cloneNode(true);
     Array.prototype.forEach.call(doc.querySelectorAll("[data-editor], #ed-css"), function (n) { n.remove(); });
     Array.prototype.forEach.call(doc.querySelectorAll("[data-ed-oculta]"), function (n) { n.remove(); });
+    /* report de antes da 4.8, sem ícone na aba: ganha a chama (o globo do navegador some) */
+    if (!doc.querySelector('link[rel="icon"]') && doc.head) { var t = doc.createElement("template"); t.innerHTML = Motor.ICONE_TAG; doc.head.appendChild(t.content.firstChild); }
     Array.prototype.forEach.call(doc.querySelectorAll("[contenteditable], [data-ed-campo], [data-ed-alterado], [spellcheck], [data-ed-bloco]"), function (n) {
       n.removeAttribute("contenteditable"); n.removeAttribute("data-ed-campo"); n.removeAttribute("data-ed-alterado"); n.removeAttribute("spellcheck"); n.removeAttribute("data-ed-bloco");
     });
@@ -1207,6 +1298,7 @@
     b.addEventListener("click", function () {
       Array.prototype.forEach.call(document.querySelectorAll("[data-ew]"), function (x) { x.setAttribute("aria-pressed", x === b); });
       $("#edFrame").style.width = b.dataset.ew;
+      setTimeout(function () { if (typeof alturaEdicao === "function") alturaEdicao(); }, 60);
     });
   });
 
@@ -1251,7 +1343,7 @@
 
   /* Indicadores candidatos: caixas (até 3). */
   function atualizarIndicadores(cand, escolha) {
-    var box = $("#indicadores"), chave = cand.map(function (x) { return x.chave + x.valor; }).join("|");
+    var box = $("#indicadores"), chave = cand.map(function (x) { return x.chave + x.valor + x.titulo + x.origem + x.na_frase; }).join("|");
     if (box.dataset.chave === chave) return;
     var antes = {}; Array.prototype.forEach.call(box.querySelectorAll("input"), function (c) { antes[c.value] = c.checked; });
     box.dataset.chave = chave; box.textContent = "";
@@ -1259,7 +1351,11 @@
     cand.forEach(function (x) {
       var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.value = x.chave;
       c.checked = x.chave in antes ? antes[x.chave] : escolha.indexOf(x.chave) >= 0;
-      l.appendChild(c); l.appendChild(document.createTextNode(" " + x.valor + " · " + x.titulo + " (" + x.grupo + ")")); box.appendChild(l);
+      /* o nome do projeto (ex.: Milheiros), não "Projeto principal"; sem repetir o nome que o título já tem */
+      var de = x.origem && x.origem !== x.titulo && x.titulo.indexOf(x.origem) < 0 ? " (" + x.origem + ")" : "";
+      l.appendChild(c); l.appendChild(document.createTextNode(" " + x.valor + " · " + x.titulo + de));
+      if (x.na_frase) { var av = document.createElement("span"); av.className = "muted"; av.textContent = " · já está na frase do mês"; l.appendChild(av); l.title = "A frase do mês já diz este número: no e-mail ele apareceria duas vezes."; }
+      box.appendChild(l);
     });
     limitar();
   }
@@ -1316,12 +1412,14 @@
       atualizarIndicadores(res.candidatos, res.indicadores);
       res.indicadores.forEach(function (k) { var x = res.candidatos.filter(function (c) { return c.chave === k; })[0]; itens.push(x.valor + " · " + x.titulo + " (" + x.grupo + ")"); });
       if (!res.indicadores.length) itens.push("Nenhum indicador na página: o e-mail sai só com a frase do mês e a chamada.");
+      var repetidos = res.candidatos.filter(function (x) { return x.na_frase && res.indicadores.indexOf(x.chave) >= 0; });
+      if (repetidos.length) { itens.push("Repete a frase do mês: " + repetidos.map(function (x) { return x.valor + " · " + x.titulo; }).join(" | ") + ". Troque o indicador ou a frase."); avisos.push("repeticao"); }
       if (res.pendencias.length) { itens.push("Ainda é texto do modelo: " + res.pendencias.slice(0, 3).join(" | ") + (res.pendencias.length > 3 ? " (+" + (res.pendencias.length - 3) + ")" : "")); avisos.push("pendencias"); }
       if (lk.erro) resErro = "O link do report completo " + lk.erro;
       else if (!link) resErro = "Falta o link do report completo (passo 3).";
       if (linkOk && lk.avisos.length) { itens.push("Link: " + lk.avisos.join(" ")); avisos.push("link"); }
       if (!resErro && !res.temLink) resErro = "O botão ficou sem o link: confira o endereço no passo 3.";
-      etapa("resumir", resErro || res.pendencias.length || lk.avisos.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURIComponent(link.split("/").pop().replace(/%(?![0-9a-f]{2})/gi, "%25")) : hostDe(link)) + " (o único link do e-mail).", itens);
+      etapa("resumir", resErro || res.pendencias.length || lk.avisos.length || repetidos.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURIComponent(link.split("/").pop().replace(/%(?![0-9a-f]{2})/gi, "%25")) : hostDe(link)) + " (o único link do e-mail).", itens);
     }
     var completo = { html: limpo.html };
     progresso(32); await respira(); if (parou()) return;
@@ -1391,6 +1489,22 @@
     baixar(r.nome, eml, "message/rfc822");
     $(info).textContent = "Baixado: " + r.nome + ". Abra na pasta Downloads."; log("Baixado: " + r.nome + ".");
   }
+  /* O quadro (edição ou prévia) acompanha a altura do conteúdo: no Celular, o report inteiro aparece rolando só a página. */
+  function ajustarAltura(fr) {
+    function mede() {
+      var d = fr.contentDocument; if (!d || !d.documentElement) return;
+      var h = Math.ceil(Math.max(d.documentElement.getBoundingClientRect().height, d.body ? d.body.scrollHeight : 0));
+      if (h > 50) fr.style.height = h + (fr.offsetHeight - fr.clientHeight) + "px";
+    }
+    fr.classList.add("cresce");
+    fr.addEventListener("load", function () {
+      mede();
+      if (window.ResizeObserver && fr.contentDocument) { if (fr.__ro) fr.__ro.disconnect(); fr.__ro = new ResizeObserver(mede); fr.__ro.observe(fr.contentDocument.documentElement); }
+      Array.prototype.forEach.call(fr.contentDocument.images, function (im) { if (!im.complete) im.addEventListener("load", mede); });
+    });
+    return mede;
+  }
+  var alturaEdicao = ajustarAltura($("#edFrame")), alturaPrevia = ajustarAltura($("#prev"));
   $("#bEml").addEventListener("click", function () { baixarEml(resultado, "#emlInfo"); });
   $("#bEmlRes").addEventListener("click", function () { baixarEml(resumido, "#emlResInfo"); });
   function mostrarPrevia() { $("#prev").srcdoc = previas[qualPrev] || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">A prévia aparece quando o report estiver aberto.</p>'; }
@@ -1398,7 +1512,7 @@
     b.addEventListener("click", function () { Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (x) { x.setAttribute("aria-pressed", x === b); }); qualPrev = b.dataset.qual; mostrarPrevia(); });
   });
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (b) {
-    b.addEventListener("click", function () { Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (x) { x.setAttribute("aria-pressed", x === b); }); $("#prev").style.width = b.dataset.w; });
+    b.addEventListener("click", function () { Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-w]"), function (x) { x.setAttribute("aria-pressed", x === b); }); $("#prev").style.width = b.dataset.w; setTimeout(alturaPrevia, 60); });
   });
   $("#pasta").addEventListener("change", function () {
     pastaArquivos = {}; Array.prototype.forEach.call(this.files, function (f) { pastaArquivos[f.name] = f; });
