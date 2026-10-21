@@ -1,8 +1,9 @@
 /*
  * Teste de ponta a ponta dos recursos 4.6 do emulador (uso técnico, opcional), só com conteúdo fictício:
  *   + Link e + Imagem em qualquer item (projeto, lançamento, destaque, "foi bem"…), até 3 imagens por item,
- *   tirar link/imagem, Desfazer, e a seção reservada "Novo tópico" (ex.: Testes): desligada no modelo em
- *   branco, ligada em "Seções do report", acrescentada numa página que não tem, com a numeração refeita.
+ *   tirar link/imagem, Desfazer, e os tópicos novos (ex.: Testes): "+ Novo tópico" pergunta o nome e o layout
+ *   (lista, colunas, cartões, números, com miniaturas), até 4 por página, numa página nova ou antiga, com a
+ *   numeração refeita; os tópicos vão no arquivo salvo e no e-mail-resumo.
  *   Requer Node.js + Playwright:  node tests/emulador-extras.e2e.js [pasta-de-saida]
  *   Versão avulsa:  EMULADOR=kit/emulador-report.html node tests/emulador-extras.e2e.js
  */
@@ -81,23 +82,38 @@ function salvarComo() {
     if (process.env.DEPURAR) console.log("  [" + chave + "] " + await noQuadro(p, function (d) { return (d.activeElement.getAttribute("data-campo") || d.activeElement.tagName) + " = " + d.activeElement.textContent; }));
     await p.keyboard.press("Enter");
   }
+  /* "+ Novo tópico": nome e layout na janela; devolve o id da seção criada */
+  async function novoTopico(p, nome, layout) {
+    var antes = await noQuadro(p, function (d) { var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n, r = []; while ((n = w.nextNode())) if (/^secao:topico/.test(n.nodeValue.trim())) r.push(n.nodeValue.trim().slice(6)); return r; });
+    await p.click("#bNovoTopico");
+    await p.waitForSelector("#modal:not([hidden]) #nomeTopico");
+    await p.fill("#nomeTopico", nome);
+    await p.click('label.layout:has(input[value="' + layout + '"])');
+    await p.click("#modalOk");
+    return noQuadro(p, function (d, a) { var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) { var id = n.nodeValue.trim().slice(6); if (/^secao:topico/.test(n.nodeValue.trim()) && a.indexOf(id) < 0) return id; } return ""; }, antes);
+  }
+  function larguras(p, g) { return noQuadro(p, function (d, k) { return Array.prototype.filter.call(d.querySelectorAll('[data-item^="' + k + '-"]'), function (x) { return new RegExp("^" + k + "-\\d+$").test(x.getAttribute("data-item")); }).map(function (x) { return x.getAttribute("width"); }).join(","); }, g); }
   function emOrdem(lista) { return lista.split(",").every(function (x, i) { return +x === i + 1; }); }
   async function imagensDe(p, chave) {
     return noQuadro(p, function (d, k) { return Array.prototype.map.call(d.querySelectorAll('img[data-img^="' + k + '-print-"]'), function (i) { return i.getAttribute("data-img") + ":" + i.getAttribute("width"); }); }, chave);
   }
 
-  /* 1. Modelo em branco: o novo tópico vem desligado. */
+  /* 1. Modelo em branco: nenhum tópico novo ao abrir; "+ Novo tópico" pergunta o nome e o layout. */
   fase = "1";
   var p = await abrirEmulador();
   await p.click("#bModelo");
   var f = await quadro(p);
-  confere(await noQuadro(p, function (d) { var t = d.querySelector('[data-item="topico-1"]'); return !!t && !!t.closest("[data-ed-oculta]"); }), "modelo em branco: o novo tópico existe e começa desligado");
-  confere(!(await p.isChecked('#secoesRep input[value="topico"]')), "\"Novo tópico (ex.: Testes)\" aparece desmarcado em Seções do report");
+  confere(!(await noQuadro(p, function (d) { return !!d.querySelector('[data-item^="topico"]') || /secao:topico/.test(d.body.innerHTML); })), "modelo em branco: abre sem tópico novo (os do modelo são a fonte do + Novo tópico)");
   var antes = await pilulas(p);
-  await p.$eval("#secoesRep", function (e) { e.closest("details").open = true; });
-  await p.check('#secoesRep input[value="topico"]');
+  await p.click("#bNovoTopico");
+  await p.waitForSelector("#modal:not([hidden]) #nomeTopico");
+  var opc = await p.$$eval("#modal label.layout", function (l) { return l.map(function (x) { return x.querySelector("input").value + ":" + !!x.querySelector("svg rect, svg text"); }); });
+  confere(opc.join(",") === "lista:true,colunas:true,cartoes:true,numeros:true", "janela do novo tópico: nome e os 4 layouts, cada um com a miniatura · " + opc.join(","));
+  await p.click("#modalCancela");
+  var id1 = await novoTopico(p, "Testes", "lista");
   var depois = await pilulas(p);
-  confere(emOrdem(antes) && emOrdem(depois) && depois.split(",").length === antes.split(",").length + 1, "ligado: a seção aparece e a numeração das seções se refaz (" + antes + " → " + depois + ")");
+  confere(id1 === "topico" && emOrdem(antes) && emOrdem(depois) && depois.split(",").length === antes.split(",").length + 1, "tópico TESTES (lista) criado e a numeração das seções se refaz (" + antes + " → " + depois + ")");
+  confere(await noQuadro(p, function (d) { return d.querySelector('[data-campo="topico.rotulo"]').textContent; }) === "TESTES" && await p.isChecked('#secoesRep input[value="topico"]'), "rótulo em maiúsculas; o tópico aparece marcado em Seções do report");
 
   /* 2. + Link: no projeto do Transformation Hub (que já tem link), no novo tópico e num lançamento. */
   fase = "2";
@@ -174,12 +190,34 @@ function salvarComo() {
   await p.waitForFunction(function () { return document.querySelector("#edFrame").contentDocument.querySelectorAll('img[data-img^="destaque-print-"]').length === 1; }, null, { timeout: 10000 });
   confere(true, "destaque: + Imagem também");
 
-  /* 4. Itens do novo tópico e textos. */
+  /* 4. Itens do novo tópico e textos; mais tópicos, nos outros layouts (até 4). */
   fase = "4";
   await f.locator('.ed-mais button[data-grupo="topico"]').click();
   confere(await noQuadro(p, function (d) { return d.querySelectorAll('[data-item^="topico-"]').length; }) === 4, "+ Adicionar item no novo tópico");
-  await escrever(p, f, "topico.rotulo", "TESTES");
   await escrever(p, f, "topico-1.nome", "Teste A/B fictício");
+  var id2 = await novoTopico(p, "Eventos", "cartoes");
+  confere(id2 === "topicob" && await larguras(p, "topicob") === "184,184,184", "tópico EVENTOS (cartões): 3 cartões de 184 px");
+  await f.locator('.ed-mais button[data-grupo="topicob"]').click();
+  var c4 = await noQuadro(p, function (d) { var x = d.querySelector('[data-item="topicob-4"]'); return x && x.parentNode !== d.querySelector('[data-item="topicob-1"]').parentNode && /padding-top:28px/.test(x.getAttribute("style")) && x.querySelector('img[data-img="topicob-4-print-1"]') ? "ok" : ""; });
+  confere(c4 === "ok", "+ Adicionar cartão: o 4º vai para a linha de baixo, com a imagem do modelo");
+  await ferramenta(p, f, '[data-item="topicob-4"] [data-campo="topicob-4.nome"]', "Ocultar item");
+  await ferramenta(p, f, '[data-item="topicob-3"] [data-campo="topicob-3.nome"]', "Ocultar item");
+  confere(await larguras(p, "topicob") === "288,288" && await noQuadro(p, function (d) { return d.querySelector('img[data-img="topicob-2-print-1"]').getAttribute("width"); }) === "288", "ocultar cartões: 2 de 288 px, com a imagem na largura nova");
+  var id3 = await novoTopico(p, "Mídia", "numeros");
+  confere(id3 === "topicoc" && await larguras(p, "topicoc") === "184,184,184", "tópico MÍDIA (números): 3 números de 184 px");
+  var bNum = await botoes(p, f, '[data-item="topicoc-1"]');
+  confere(bNum.indexOf("+ Link") < 0 && bNum.indexOf("+ Imagem") < 0 && bNum.indexOf("+ Adicionar depois") >= 0, "números: sem + Link e + Imagem · " + bNum.join(", "));
+  await f.locator('.ed-mais button[data-grupo="topicoc"]').click();
+  confere(await larguras(p, "topicoc") === "132,132,132,132", "+ Adicionar número: 4 de 132 px");
+  await escrever(p, f, "topicoc-1.valor", "1,2 mi");
+  await escrever(p, f, "topicoc-1.nome", "Alcance fictício");
+  var id4 = await novoTopico(p, "Pesquisas", "colunas");
+  confere(id4 === "topicod" && await larguras(p, "topicod") === "184,184,184" && await noQuadro(p, function (d) { return d.querySelector('[data-item="topicod-3"] p.ft').textContent; }) === "3", "tópico PESQUISAS (colunas): 3 colunas numeradas");
+  await ferramenta(p, f, '[data-item="topicod-1"] [data-campo="topicod-1.nome"]', "Ocultar item");
+  confere(await larguras(p, "topicod") === "288,288" && await noQuadro(p, function (d) { return Array.prototype.map.call(d.querySelectorAll('[data-item^="topicod-"] > p.ft:first-child'), function (x) { return x.textContent; }).join(","); }) === "1,2", "ocultar coluna: 2 de 288 px, renumeradas");
+  confere(await p.$eval("#bNovoTopico", function (b) { return b.disabled; }), "4 tópicos novos: o botão + Novo tópico fica desligado");
+  var ordemT = await noQuadro(p, function (d) { var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n, r = []; while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue.trim()); if (m) r.push(m[1]); } return r.join(","); });
+  confere(/aprendizados,topico,topicob,topicoc,topicod,foco/.test(ordemT) && emOrdem(await pilulas(p)), "tópicos na ordem em que foram criados, antes do Foco; seções renumeradas · " + ordemT);
 
   /* 5. Salvar e conferir o arquivo. */
   fase = "5";
@@ -189,6 +227,7 @@ function salvarComo() {
   fs.writeFileSync(path.join(SAIDA, "extras-" + salvo.nome), salvo.html);
   var h = salvo.html, nums = (h.match(/border-radius:999px;padding:0 7px;letter-spacing:1px;">(\d{2})</g) || []).map(function (x) { return x.slice(-3, -1); });
   confere(/<!--secao:topico-->/.test(h) && />TESTES</.test(h) && /Teste A\/B fictício/.test(h), "arquivo: novo tópico com rótulo e textos");
+  confere(["lista", "cartoes", "numeros", "colunas"].every(function (l) { return h.indexOf('data-layout="' + l + '"') > 0; }) && />EVENTOS</.test(h) && />MÍDIA</.test(h) && />PESQUISAS</.test(h), "arquivo: os 4 tópicos, cada um no seu layout");
   confere(emOrdem(nums.join(",")), "arquivo: seções numeradas em ordem (" + nums.join(",") + ")");
   confere(["guia-agente", "plano", "peca", "dados", "estudo", "apresentacao"].every(function (x) { return h.indexOf('href="https://www.example.com/' + x + '"') > 0; }), "arquivo: todos os links novos");
   confere(/data-img="lancamento-1-print-2"[^>]*|[^>]*data-img="lancamento-1-print-2"/.test(h) && /data-img="destaque-print-1"/.test(h) && (h.match(/data-ampliar="data:image/g) || []).length >= 5, "arquivo: imagens novas, ampliáveis no clique");
@@ -197,6 +236,10 @@ function salvarComo() {
   await p.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 60000 });
   var ban = await p.$eval("#banner", function (e) { return e.className + " · " + e.textContent; });
   confere(!/banner err/.test(ban), "conversão do arquivo salvo sem erro · " + ban.replace(/^banner \w+ · /, "").slice(0, 90));
+  /* e-mail-resumo: os tópicos aparecem (rótulo e itens) e os números do tópico viram indicadores para escolher */
+  var prev = await p.$eval("#prev", function (e) { return e.srcdoc; });
+  confere([">TESTES</p>", ">EVENTOS</p>", ">MÍDIA</p>", ">PESQUISAS</p>"].every(function (x) { return prev.indexOf(x) > 0; }) && /<b>Teste A\/B fictício<\/b>/.test(prev) && />1,2 mi<\/b>&nbsp;·&nbsp;<b>Alcance fictício</.test(prev), "e-mail-resumo: os 4 tópicos, com os itens");
+  confere(!!(await p.$('#indicadores input[value="topicoc-1"]')), "e-mail-resumo: o número do tópico MÍDIA pode ser escolhido como indicador");
   await p.close();
 
   /* 6. Reabrir o salvo: o novo tópico preenchido continua ligado. */
@@ -205,6 +248,7 @@ function salvarComo() {
   await p.setInputFiles("#arquivo", path.join(SAIDA, "extras-" + salvo.nome));
   f = await quadro(p);
   confere(await p.isChecked('#secoesRep input[value="topico"]') && await noQuadro(p, function (d) { return !d.querySelector('[data-item="topico-1"]').closest("[data-ed-oculta]"); }), "reaberto: novo tópico preenchido continua ligado");
+  confere(await larguras(p, "topicoc") === "132,132,132,132" && !!(await f.locator('.ed-mais button[data-grupo="topicod"]').count()), "reaberto: tópicos reconhecidos pelo layout (itens podem ser adicionados)");
   confere((await imagensDe(p, "lancamento-1")).length === 2 && await noQuadro(p, function (d) { return d.querySelectorAll("[data-links] a.cta").length >= 3; }), "reaberto: links e imagens novos continuam editáveis");
   /* celular: nada vaza para o lado */
   var pc = await ctx.newPage(); await pc.setViewportSize({ width: 390, height: 844 });
@@ -213,23 +257,22 @@ function salvarComo() {
   confere(vaza <= 0, "celular (390 px): nada vaza para o lado · " + vaza);
   await pc.close(); await p.close();
 
-  /* 7. Página que não tem o novo tópico (report de antes da 4.6): ligar acrescenta a seção antes do Foco. */
+  /* 7. Página que não tem tópico novo (report de antes da 4.6): + Novo tópico acrescenta a seção antes do Foco. */
   fase = "7";
   p = await abrirEmulador();
   await p.setInputFiles("#arquivo", path.join(RAIZ, "kit/report-exemplo.html"));
   f = await quadro(p);
-  confere(!(await noQuadro(p, function (d) { return !!d.querySelector('[data-item^="topico-"]'); })) && !(await p.isChecked('#secoesRep input[value="topico"]')), "página sem o novo tópico: a opção aparece desmarcada");
+  confere(!(await noQuadro(p, function (d) { return !!d.querySelector('[data-item^="topico"]'); })) && !(await p.$('#secoesRep input[value="topico"]')), "página sem tópico novo: nenhum na lista de seções");
   var antigos = await noQuadro(p, function (d) { var a = d.querySelector('[data-item^="transformation-"] a.cta + br + a.cta, [data-item^="transformation-"] a.cta + br + span[title]'); return { br: !!a, ponto: Array.prototype.some.call(d.querySelectorAll('[data-item^="transformation-"] p'), function (x) { return x.querySelector("a.cta") && /·/.test(x.textContent); }) }; });
   confere(antigos.br && !antigos.ponto, "report antigo: links separados por \" · \" viram um embaixo do outro ao abrir");
   antes = await pilulas(p);
-  await p.$eval("#secoesRep", function (e) { e.closest("details").open = true; });
-  await p.check('#secoesRep input[value="topico"]');
+  await novoTopico(p, "Testes", "lista");
   depois = await pilulas(p);
   var ordem = await noQuadro(p, function (d) { var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n, r = []; while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue.trim()); if (m) r.push(m[1]); } return r.join(","); });
   confere(/aprendizados,topico,foco/.test(ordem) && depois.split(",").length === antes.split(",").length + 1 && emOrdem(depois), "acrescentado entre O que aprendemos e o Foco, com a numeração refeita · " + ordem);
   confere(!!(await f.locator('.ed-mais button[data-grupo="topico"]').count()), "itens do novo tópico já podem ser adicionados");
   await p.click("#bDesfazer");
-  confere(!(await noQuadro(p, function (d) { return !!d.querySelector('[data-item^="topico-"]'); })) && await pilulas(p) === antes && !(await p.isChecked('#secoesRep input[value="topico"]')), "Desfazer: a seção sai e a numeração volta");
+  confere(!(await noQuadro(p, function (d) { return !!d.querySelector('[data-item^="topico-"]'); })) && await pilulas(p) === antes && !(await p.$('#secoesRep input[value="topico"]')), "Desfazer: a seção sai e a numeração volta");
   await p.close({ runBeforeUnload: false });
 
   await browser.close();

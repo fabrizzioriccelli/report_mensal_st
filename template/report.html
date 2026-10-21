@@ -481,32 +481,35 @@
   </tr>
   {{/aprendizados}}
 
-  {{#topico}}
-  <!--secao:topico-->
-  <!-- NOVO TÓPICO (ex.: TESTES) · espaço reservado para um assunto novo. Só aparece quando o mês tem
-       [TOPICO 1] preenchido ou quando a seção é ligada no emulador (Seções do report › Novo tópico).
-       Itens em linhas (largura inteira), com status, nome, texto, links e até 3 imagens. -->
-  <!-- EDITAR AQUI: NOVO TÓPICO → dados/AAAA-MM.txt › [TOPICO] rotulo, titulo, texto · [TOPICO 1..6] status, status_cor, nome, texto, links, imagens, descricao_imagens -->
+  {{#topicos}}
+  <!--secao:{{sid}}-->
+  <!-- NOVO TÓPICO (ex.: TESTES) · até 4 assuntos novos, cada um no layout escolhido. Só aparece quando o mês tem
+       [TOPICO 1] (ou [TOPICO B 1], [TOPICO C 1], [TOPICO D 1]) preenchido, ou quando o tópico é acrescentado no emulador
+       (Seções do report › + Novo tópico). Layouts: lista (linhas na largura inteira), colunas (até 3, numeradas),
+       cartoes (imagem em cima, 3 por linha) e numeros (até 4 números grandes). -->
+  <!-- EDITAR AQUI: NOVO TÓPICO → dados/AAAA-MM.txt › [TOPICO] rotulo, titulo, texto, layout · [TOPICO 1..6] status, status_cor, nome, texto, valor, links, imagens, descricao_imagens ([TOPICO B], [TOPICO C] e [TOPICO D]: iguais) -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
-      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;<span data-campo="topico.rotulo">{{rotulo}}</span></p>
-      {{#titulo}}<p class="ft h2" data-campo="topico.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
-      {{#texto}}<p class="fx tm" data-campo="topico.texto" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;<span data-campo="{{sid}}.rotulo">{{rotulo}}</span></p>
+      {{#titulo}}<p class="ft h2" data-campo="{{sid}}.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
+      {{#texto}}<p class="fx tm" data-campo="{{sid}}.texto" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
       <div style="font-size:14px;line-height:14px;mso-line-height-rule:exactly;">&nbsp;</div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      {{#lista}}
+      <!-- Layout LISTA: um item embaixo do outro, na largura inteira. -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-layout="lista">
         {{#itens}}
-        <tr data-item="topico-{{numero}}">
-          <td data-bloco="topico-{{numero}}" style="padding:14px 0 16px 0;border-top:1px solid {{filete}};">
-            {{#status}}<p class="fx" data-campo="topico-{{numero}}.status" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
-            <p class="ft" data-campo="topico-{{numero}}.nome" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:17px;line-height:22px;color:{{cor.titulo}};">{{nome}}</p>
-            {{#texto}}<p class="fx tm" data-campo="topico-{{numero}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+        <tr data-item="{{sid}}-{{numero}}">
+          <td data-bloco="{{sid}}-{{numero}}" style="padding:14px 0 16px 0;border-top:1px solid {{filete}};">
+            {{#status}}<p class="fx" data-campo="{{sid}}-{{numero}}.status" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
+            <p class="ft" data-campo="{{sid}}-{{numero}}.nome" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:17px;line-height:22px;color:{{cor.titulo}};">{{nome}}</p>
+            {{#texto}}<p class="fx tm" data-campo="{{sid}}-{{numero}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
             {{#links}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:22px;">{{links}}</p>{{/links}}
             {{#tem_prints}}
             <!-- IMAGENS do item (dados › imagens, descricao_imagens): 1 × 600, 2 × 288 ou 3 × 184 px; no celular, empilhadas. -->
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>
               {{#prints}}
               {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
-              <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} data-img="topico-{{numero}}-print-{{pidx}}" class="fluid" style="display:block;border:1px solid {{cor.linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td>
+              <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} data-img="{{sid}}-{{numero}}-print-{{pidx}}" class="fluid" style="display:block;border:1px solid {{cor.linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td>
               {{/prints}}
             </tr></table>
             {{/tem_prints}}
@@ -514,9 +517,70 @@
         </tr>
         {{/itens}}
       </table>
+      {{/lista}}
+      {{#colunas}}
+      <!-- Layout COLUNAS: até 3, numeradas, com separador fino (como O que aprendemos); no celular, uma embaixo da outra. -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-layout="colunas">
+        <tr>
+          {{#itens}}
+          {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
+          <td class="{{classe}}" data-item="{{sid}}-{{numero}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
+            <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:36px;line-height:38px;color:{{cor.grupo_resultados}};">{{numero}}</p>
+            {{#status}}<p class="fx" data-campo="{{sid}}-{{numero}}.status" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
+            <p class="ft" data-campo="{{sid}}-{{numero}}.nome" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
+            {{#texto}}<p class="fx tm" data-campo="{{sid}}-{{numero}}.texto" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+            {{#links}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:22px;">{{links}}</p>{{/links}}
+            {{#tem_prints}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-imagens="{{largura}}" style="margin-top:12px;">
+              {{#prints}}<tr><td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;{{^primeiro}}padding-top:24px;{{/primeiro}}">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} data-img="{{sid}}-{{numero}}-print-{{pidx}}" class="fluid" style="display:block;border:1px solid {{cor.linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td></tr>{{/prints}}
+            </table>{{/tem_prints}}
+          </td>
+          {{/itens}}
+        </tr>
+      </table>
+      {{/colunas}}
+      {{#cartoes}}
+      <!-- Layout CARTÕES: imagem em cima, 3 por linha (como Também neste mês); no celular, um embaixo do outro. -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-layout="cartoes">
+        {{#linhas}}
+        <tr>
+          {{#itens}}
+          {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
+          {{#vazio}}<td class="hide-m" width="{{largura}}" style="width:{{largura}}px;">&nbsp;</td>{{/vazio}}
+          {{^vazio}}
+          <td class="{{classe}}" data-item="{{sid}}-{{numero}}" width="{{largura}}" valign="top" style="width:{{largura}}px;{{topo}}">
+            {{#tem_prints}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-imagens="{{largura}}" style="margin-bottom:10px;">
+              {{#prints}}<tr><td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;{{^primeiro}}padding-top:24px;{{/primeiro}}">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} data-img="{{sid}}-{{numero}}-print-{{pidx}}" class="fluid" style="display:block;border:1px solid {{cor.linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td></tr>{{/prints}}
+            </table>{{/tem_prints}}
+            {{#status}}<p class="fx" data-campo="{{sid}}-{{numero}}.status" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
+            <p class="ft" data-campo="{{sid}}-{{numero}}.nome" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
+            {{#texto}}<p class="fx tm" data-campo="{{sid}}-{{numero}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+            {{#links}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:22px;">{{links}}</p>{{/links}}
+          </td>
+          {{/vazio}}
+          {{/itens}}
+        </tr>
+        {{/linhas}}
+      </table>
+      {{/cartoes}}
+      {{#numeros}}
+      <!-- Layout NÚMEROS: até 4 números grandes, com filete em cima (como os números da capa). -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-layout="numeros">
+        <tr>
+          {{#itens}}
+          {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
+          <td class="{{classe}}" data-item="{{sid}}-{{numero}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{filete}};padding-top:12px;">
+            <p class="ft num" data-campo="{{sid}}-{{numero}}.valor" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:30px;line-height:34px;color:{{filete}};">{{valor}}</p>
+            <p class="ft" data-campo="{{sid}}-{{numero}}.nome" style="margin:4px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:14px;line-height:18px;color:{{cor.titulo}};">{{nome}}</p>
+            {{#texto}}<p class="fx ts" data-campo="{{sid}}-{{numero}}.texto" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+            {{#status}}<p class="fx" data-campo="{{sid}}-{{numero}}.status" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
+          </td>
+          {{/itens}}
+        </tr>
+      </table>
+      {{/numeros}}
     </td>
   </tr>
-  {{/topico}}
+  {{/topicos}}
 
   {{#foco}}
   <!--secao:foco-->

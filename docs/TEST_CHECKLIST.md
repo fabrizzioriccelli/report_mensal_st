@@ -13,7 +13,7 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 - [ ] Campanhas: destaque, resultados e lançamentos; o que não vale no mês, oculto
 - [ ] Transformation Hub (status/previsão, logo, links ou PDF), conferido com a área
 - [ ] Links e imagens adicionados (+ Link / + Imagem): cada link abre o lugar certo; cada imagem tem descrição
-- [ ] Novo tópico (ex.: Testes): ligado só se o mês tiver o assunto; rótulo, título e itens sem [colchetes]
+- [ ] Tópicos novos (ex.: Testes): só os que o mês tem; rótulo, título e itens sem [colchetes]; layout certo; aparecem também no e-mail-resumo
 - [ ] Aprendizados, foco do próximo mês e agenda
 - [ ] Nenhum texto de exemplo [entre colchetes] nem `X` (o estado avisa depois de salvar)
 - [ ] Imagens trocadas, nítidas, com descrição; links com `https://`

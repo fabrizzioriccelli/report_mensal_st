@@ -96,6 +96,15 @@
   .modal>div{background:#fff;border-radius:14px;max-width:620px;width:calc(100% - 32px);padding:22px 24px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
   .modal h3{margin:0 0 8px;font-size:18px;color:var(--red)}
   .modal ul{font-size:14px;max-height:260px;overflow:auto}
+  .modal>div{max-height:calc(100vh - 32px);overflow:auto}
+  .layouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .layout{position:relative;border:2px solid #E2E2E2;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:4px;cursor:pointer;font-size:13px;background:#fff}
+  .layout:has(input:checked){border-color:var(--red);background:#FFF7F5}
+  .layout input{position:absolute;opacity:0;pointer-events:none}
+  .layout:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+  .layout svg{width:100%;height:auto;background:#fff;border:1px solid #F0ECE9;border-radius:6px}
+  .layout span{font-size:12px;color:var(--gray);line-height:1.35}
+  .novoTopico{font-size:13px}
   [hidden]{display:none !important}
 </style>
 </head>
@@ -143,11 +152,12 @@
       <span><b>Link:</b> passe o mouse em um link vermelho e use "Trocar link".</span>
       <span><b>Mais links ou imagens:</b> passe o mouse no item (projeto, lançamento, destaque…) e use "+ Link" ou "+ Imagem" (até 3 por item).</span>
       <span><b>Item que não vale este mês:</b> passe o mouse e use "Ocultar item".</span>
-      <span><b>Assunto novo (ex.: Testes):</b> em "Seções do report", marque "Novo tópico".</span>
+      <span><b>Assunto novo (ex.: Testes):</b> <b>+ Novo tópico</b>: escreva o nome e escolha o layout (lista, colunas, cartões ou números). Até 4.</span>
     </div>
     <div class="ferramentas">
       <button type="button" class="pri" id="bSalvar">Salvar report (.html)</button>
       <button type="button" id="bImportar">Importar conteúdo (Copilot)</button>
+      <button type="button" id="bNovoTopico">+ Novo tópico</button>
       <button type="button" id="bDesfazer" disabled>Desfazer</button>
       <span class="tabs" role="group" aria-label="Tamanho da edição">
         <button type="button" data-ew="100%" aria-pressed="true">Computador</button>
@@ -161,7 +171,7 @@
       <div class="row"><button type="button" class="pri" id="bAplicar">Aplicar na página</button><button type="button" id="bFecharImportar">Fechar</button><span class="muted" id="importarInfo"></span></div>
     </div>
     <details>
-      <summary>Seções do report (mostrar, ocultar ou ligar o novo tópico)</summary>
+      <summary>Seções do report (mostrar, ocultar ou criar um tópico novo)</summary>
       <div class="lista" id="secoesRep"></div>
     </details>
     <div class="frame" style="margin-top:4px"><iframe id="edFrame" title="Report em edição" sandbox="allow-same-origin"></iframe></div>
@@ -170,10 +180,10 @@
   <!-- 3 · LINK -->
   <section aria-labelledby="s3" id="secLink" hidden>
     <h2 id="s3"><b>3</b>Link do report completo</h2>
-    <p class="muted">O botão do e-mail-resumo leva quem lê para o report completo (o arquivo salvo no passo 2). Vale o <b>link do ambiente corporativo autorizado</b> (<code>https://…</code>), para quem recebe o e-mail, ou o <b>caminho do arquivo</b> (<code>C:\…</code>, <code>\\servidor\…</code> ou <code>file:///…</code>), que abre só onde esse caminho existe: bom para testar no seu computador ou para uma pasta de rede da área (no Outlook na Web e no celular, link de arquivo não abre).</p>
+    <p class="muted">O botão do e-mail-resumo leva quem lê para o report completo (o arquivo salvo no passo 2). Vale <b>qualquer link</b>: o do ambiente corporativo autorizado (<code>https://…</code>, ou só <code>empresa.sharepoint.com/…</code>, que ganha o <code>https://</code>), o <b>caminho do arquivo</b> (<code>C:\…</code>, <code>\\servidor\…</code> ou <code>file:///…</code>, que abre só onde esse caminho existe: bom para testar no seu computador ou para uma pasta de rede da área; no Outlook na Web e no celular, link de arquivo não abre), <code>mailto:</code>, <code>msteams:</code> ou um endereço relativo (<code>report-AAAA-MM.html</code>). Espaço vira <code>%20</code>. Só endereço que executa código (<code>javascript:</code>) é recusado.</p>
     <div class="campo">
       <label for="link">Link do report completo</label>
-      <input type="text" id="link" inputmode="url" placeholder="https://…  ou  C:\…\report-AAAA-MM.html" autocomplete="off">
+      <input type="text" id="link" inputmode="url" placeholder="qualquer link: https://…  ·  C:\…\report-AAAA-MM.html  ·  mailto:…" autocomplete="off">
       <p class="muted" id="linkInfo"></p>
     </div>
     <ol class="passos">
@@ -346,13 +356,19 @@
     var fr = $("#edFrame");
     fr.onload = function () {
       ED.doc = fr.contentDocument;
+      /* Tópico novo ainda do modelo em branco (rótulo [entre colchetes]) sai ao abrir: os do modelo são a fonte do
+         "+ Novo tópico", que pergunta o nome e o layout. */
+      var tirou = IDS_TOPICO.filter(function (id) {
+        var rot = ED.doc.querySelector('[data-campo="' + id + '.rotulo"]');
+        if (!rot || !/^\s*\[[^\]]*\]\s*$/.test(rot.textContent)) return false;
+        var m = marcaSecao(ED.doc, id); nosDaSecao(id).forEach(function (n) { n.remove(); }); if (m) m.remove();
+        return true;
+      });
       instrumentar();
+      if (tirou.length) renumerarPilulas();
       ED.periodoInicial = periodoInicial !== undefined ? periodoInicial : periodoAtual();
       $("#secEditar").hidden = false; $("#secLink").hidden = false; $("#secResumo").hidden = false; $("#secStatus").hidden = false;
       $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
-      /* Novo tópico ainda do modelo (rótulo [entre colchetes]): começa desligado; liga em "Seções do report". */
-      var rot = ED.doc.querySelector('[data-campo="topico.rotulo"]');
-      if (rot && /^\s*\[[^\]]*\]\s*$/.test(rot.textContent)) mostrarSecao("topico", false, true);
       montarSecoes(); reconverter(true);
       document.querySelector(".ferramentas").scrollIntoView({ behavior: "smooth", block: "start" });
     };
@@ -374,6 +390,7 @@
     editavel(d.body);
     marcarBlocos();
     linksUmPorLinha();
+    registrarTopicos();
     localizarGrupos();
     d.addEventListener("focusin", function (e) {
       var el = e.target.closest && e.target.closest("[data-ed-campo]"); if (!el) return;
@@ -431,8 +448,8 @@
       else if (a) mostrarBarra(a, ferramentasLink(a));
       else if (d.activeElement && d.activeElement.hasAttribute("data-ed-campo") && d.activeElement.contains(t)) return;
       else if (item) {
-        var gi = grupoDe(item), bi = [["+ Link", function () { adicionarLink(item); }]];
-        if (item.tagName !== "P") bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
+        var gi = grupoDe(item), numeros = gi && GRUPOS[gi].layout === "numeros", bi = numeros ? [] : [["+ Link", function () { adicionarLink(item); }]];
+        if (item.tagName !== "P" && !numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
         if (item.hasAttribute("data-item")) {
           if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
           bi.push(["Ocultar item", function () { ocultarItem(item); }, "cinza"]);
@@ -596,7 +613,7 @@
   }
   function ferramentasLink(a) {
     var pend = a.tagName !== "A", b = [[pend ? "Colocar link" : "Trocar link", function () { trocarLink(a); }], ["Anexar PDF", function () { escolher("#fPdf", function (f) { anexarPdf(a, f); }); }, "cinza"]];
-    if (a.closest('[data-item^="transformation-"], [data-item^="topico-"], [data-links]')) b.push(["Texto do link", function () {
+    if (a.closest('[data-item^="transformation-"], [data-item^="topico"], [data-links]')) b.push(["Texto do link", function () {
       var atual = a.textContent.replace(/\s*→\s*$/, "").trim(), n = prompt("Texto do link (ex.: Documento One Brief):", /^\[.*\]$/.test(atual) ? "" : atual);
       if (n === null || !n.trim()) return; var antes = a.innerHTML; a.innerHTML = esc(n.trim()) + "&nbsp;&#8594;"; pilha(function () { a.innerHTML = antes; }); marcarSujo();
     }, "cinza"]);
@@ -605,10 +622,10 @@
   }
   async function trocarLink(a) {
     var atual = a.tagName !== "A" || a.hasAttribute("data-anexo") ? "" : a.getAttribute("href");
-    var resp = prompt("Endereço (link) que este botão abre: https://… ou o caminho do arquivo (C:\\…, \\\\servidor\\… ou file:///…)", atual || "https://");
+    var resp = prompt("Endereço (link) que este botão abre. Vale qualquer link: https://…, caminho do arquivo (C:\\…, \\\\servidor\\…), mailto:, msteams:, endereço relativo…", atual || "https://");
     if (resp === null) return;
     var lk = Motor.normalizarLink(resp), u = lk.url;
-    if (lk.erro || !u) { await perguntar("Link não aceito", "<p>Este endereço " + esc(lk.erro || "está vazio.") + "</p><p>Use o link de compartilhamento do ambiente autorizado (https://…) ou o caminho do arquivo.</p>", "Entendi"); return; }
+    if (lk.erro || !u) { await perguntar("Link não aceito", "<p>Este endereço " + esc(lk.erro || "está vazio.") + "</p><p>Vale qualquer outro link: https://…, caminho do arquivo, mailto:, msteams:, endereço relativo…</p>", "Entendi"); return; }
     a = virarLink(a);
     var antigo = a.getAttribute("href"), anexo = a.getAttribute("data-anexo");
     var mesmos = Array.prototype.filter.call(ED.doc.querySelectorAll("a"), function (x) { return x === a || (!anexo && antigo && antigo !== "#" && x.getAttribute("href") === antigo); });
@@ -662,14 +679,14 @@
   function areaDoAlvo(alvo) {
     if (alvo.tagName === "P" || alvo.hasAttribute("data-ed-bloco")) return alvo;
     var b = alvo.querySelector("td[data-bloco]"), nome = alvo.querySelector('[data-campo$=".nome"]');
-    if (/^topico-/.test(chaveDoAlvo(alvo)) && b) return b;
+    if (/^topico[a-z]?-/.test(chaveDoAlvo(alvo)) && b) return b;
     if (alvo.tagName === "TR") return nome ? nome.closest("td") : alvo.querySelector("td");
     return alvo;
   }
   /* Largura útil da coluna (a mesma do motor), sem medir a tela: no modo celular do emulador a medida enganaria. */
   function larguraUtil(area) {
     var w = +area.getAttribute("width"); if (w) return Math.min(w, 600);
-    if (/^topico-/.test(area.getAttribute("data-bloco") || "")) return 600;
+    if (/^topico[a-z]?-/.test(area.getAttribute("data-bloco") || "")) return 600;
     if (area.closest('[data-item^="transformation-"]')) return area.parentElement.children.length > 1 ? 434 : 504;
     return 184;
   }
@@ -790,8 +807,28 @@
   var GRUPOS = {
     numero: { max: 4, nome: "indicador" }, resultado: { max: 3, nome: "resultado" }, lancamento: { max: 6, nome: "lançamento" },
     bem: { max: 4, nome: "\"foi bem\"" }, melhorar: { max: 4, nome: "\"a melhorar\"" }, transformation: { max: 3, nome: "projeto" },
-    aprendizado: { max: 3, nome: "aprendizado" }, agenda: { max: 6, nome: "item na agenda" }, topico: { max: 6, nome: "item no novo tópico" }
+    aprendizado: { max: 3, nome: "aprendizado" }, agenda: { max: 6, nome: "item na agenda" }
   };
+  /* Novos tópicos (até 4): o id da seção é o grupo dos itens (topico-1, topicob-1…), e o layout vem da página
+     (tabela data-layout; sem ela, página da 4.6: lista). O máximo de itens é o do layout (Motor.LAYOUTS_TOPICO). */
+  var IDS_TOPICO = Motor.TOPICOS.map(function (t) { return t[1]; }), LAYOUTS = Motor.LAYOUTS_TOPICO, COR_TOPICO = "#127277";
+  function layoutDaSecao(doc, id) {
+    var rot = doc.querySelector('[data-campo="' + id + '.rotulo"]'), td = rot && rot.closest("td.px"), t = td && td.querySelector("table[data-layout]");
+    return t ? t.getAttribute("data-layout") : "lista";
+  }
+  function registrarTopicos() {
+    IDS_TOPICO.forEach(function (id) {
+      delete GRUPOS[id];
+      if (!ED.doc.querySelector('[data-campo="' + id + '.rotulo"]')) return;
+      var lay = layoutDaSecao(ED.doc, id); if (!LAYOUTS[lay]) lay = "lista";
+      GRUPOS[id] = { max: LAYOUTS[lay].max, nome: lay === "numeros" ? "número" : lay === "cartoes" ? "cartão" : lay === "colunas" ? "coluna" : "item", layout: lay };
+    });
+  }
+  function nomeSec(id) {
+    if (NOMES_SEC[id]) return NOMES_SEC[id];
+    var rot = ED.doc && ED.doc.querySelector('[data-campo="' + id + '.rotulo"]');
+    return "Tópico: " + (rot ? rot.textContent.replace(/\s+/g, " ").trim() : id);
+  }
   function grupoDe(el) { var m = /^([a-z]+)-\d+$/.exec(el.getAttribute("data-item") || ""); return m && GRUPOS[m[1]] ? m[1] : ""; }
   function itensDo(g) { var re = new RegExp("^" + g + "-\\d+$"); return Array.prototype.filter.call(ED.doc.querySelectorAll('[data-item^="' + g + '-"]'), function (x) { return re.test(x.getAttribute("data-item")); }); }
   /* Onde cada grupo mora: a linha (tr), o corpo da tabela (tbody) ou a coluna (td). Guardado ao abrir. */
@@ -802,7 +839,7 @@
   }
   function prepararGrupo(g) {
     var it = itensDo(g); if (!it.length || ED.grupos[g]) return;
-    var f = it[0], cont = /^(numero|aprendizado|bem|melhorar|transformation|topico)$/.test(g) ? f.parentNode : f.parentNode.parentNode;
+    var lay = GRUPOS[g].layout, f = it[0], cont = /^(numero|aprendizado|bem|melhorar|transformation)$/.test(g) || /^(lista|colunas|numeros)$/.test(lay) ? f.parentNode : f.parentNode.parentNode;
     var total = 600;
     if (g === "resultado") total = it.reduce(function (s2, x) { return s2 + (+x.getAttribute("width") || 0); }, 0) + 24 * (it.length - 1);
     ED.grupos[g] = { cont: cont, total: total };
@@ -831,13 +868,27 @@
       [it].concat(Array.prototype.slice.call(it.querySelectorAll("[data-campo],[data-img],[data-bloco]"))).forEach(function (x) {
         ["data-campo", "data-img", "data-bloco"].forEach(function (at) { var v = x.getAttribute(at); if (v && re.test(v)) x.setAttribute(at, v.replace(re, nova)); });
       });
-      if (g === "aprendizado") { var num = it.querySelector("p.ft"); if (num && /^\d+$/.test(num.textContent.trim())) num.textContent = String(i + 1); }
+      if (g === "aprendizado" || GRUPOS[g].layout === "colunas") { var num = it.querySelector("p.ft"); if (num && /^\d+$/.test(num.textContent.trim())) num.textContent = String(i + 1); }
     });
   }
   /* A grade de cada grupo, com as mesmas regras do motor (tools/motor.js): larguras, espaços, classes do celular. */
   function refazer(g) {
     var G = ED.grupos[g]; if (!G) return;
-    var cont = G.cont, it = itensDo(g), n = it.length;
+    var cont = G.cont, it = itensDo(g), n = it.length, lay = GRUPOS[g].layout;
+    if (lay === "colunas" || lay === "numeros") {
+      /* colunas (separador fino) e números (filete em cima, 1º na cor do grupo): uma linha, larguras iguais */
+      Array.prototype.slice.call(cont.children).forEach(function (c) { if (it.indexOf(c) < 0) c.remove(); });
+      var lg = divide(600, Math.max(n, 1));
+      it.forEach(function (x, i) {
+        if (i) cont.insertBefore(lay === "colunas" ? separador() : espaco(24), x);
+        var cor = i === 0 ? COR_TOPICO : COR.texto;
+        x.setAttribute("class", i === n - 1 ? "col" : "col gap"); x.setAttribute("width", String(lg[i]));
+        x.setAttribute("style", "width:" + lg[i] + "px;" + (lay === "numeros" ? "border-top:2px solid " + cor + ";padding-top:12px;" : ""));
+        var val = lay === "numeros" && x.querySelector('[data-campo$=".valor"]'); if (val) val.setAttribute("style", trocaCor(val.getAttribute("style"), cor));
+        var cx = x.querySelector("table[data-imagens]"); if (cx && cx.querySelector("img[data-img]")) arrumarImagens(cx, lg[i], x.getAttribute("data-item"));
+      });
+      return;
+    }
     if (g === "numero" || g === "aprendizado" || g === "resultado") {
       var row = g === "resultado" ? cont.lastElementChild : cont;
       Array.prototype.slice.call(row.children).forEach(function (c) { if (it.indexOf(c) < 0) c.remove(); });
@@ -855,11 +906,11 @@
       });
       if (g === "numero" && n && n < 3) row.appendChild(espaco(600 - n * 184 - (n - 1) * 24));
       if (g === "resultado") { var cab = cont.firstElementChild.querySelector("td[colspan]"); if (cab) cab.setAttribute("colspan", String(Math.max(1, n * 3 - 2))); }
-    } else if (g === "lancamento" || g === "agenda") {
+    } else if (g === "lancamento" || g === "agenda" || lay === "cartoes") {
       var cabeca = g === "lancamento" ? cont.firstElementChild : null;
       it.forEach(function (x) { x.remove(); });
       Array.prototype.slice.call(cont.children).forEach(function (tr) { if (tr !== cabeca) tr.remove(); });
-      var porLinha = g === "agenda" || n > 3 ? 3 : Math.max(n, 1), larguras = g === "lancamento" && n <= 3 ? divide(600, Math.max(n, 1)) : null;
+      var porLinha = g === "agenda" || n > 3 ? 3 : Math.max(n, 1), larguras = g !== "agenda" && n <= 3 ? divide(600, Math.max(n, 1)) : null;
       for (var k = 0; k < Math.max(n, 1); k += porLinha) {
         var tr = ED.doc.createElement("tr"), filete = k === 0 ? COR.texto : COR.linha;
         for (var j = 0; j < porLinha; j++) {
@@ -871,14 +922,17 @@
             else tr.appendChild(celula({ "class": "hide-m", width: "184", valign: "top", style: est }));
           } else {
             var w = larguras ? larguras[j] : 184;
-            if (x) { x.setAttribute("class", (idx === n - 1 ? "col" : "col gap") + (idx >= 3 ? " pt0" : "")); x.setAttribute("width", String(w)); x.setAttribute("style", "width:" + w + "px;" + (idx >= 3 ? "padding-top:28px;" : "")); tr.appendChild(x); }
+            if (x) {
+              x.setAttribute("class", (idx === n - 1 ? "col" : "col gap") + (idx >= 3 ? " pt0" : "")); x.setAttribute("width", String(w)); x.setAttribute("style", "width:" + w + "px;" + (idx >= 3 ? "padding-top:28px;" : "")); tr.appendChild(x);
+              var cxc = lay === "cartoes" && x.querySelector("table[data-imagens]"); if (cxc && cxc.querySelector("img[data-img]")) arrumarImagens(cxc, w, x.getAttribute("data-item"));
+            }
             else if (n > 3) tr.appendChild(celula({ "class": "hide-m", width: "184", style: "width:184px;" }));
           }
         }
         cont.appendChild(tr);
       }
       if (cabeca) { var cc = cabeca.querySelector("td[colspan]"); if (cc) cc.setAttribute("colspan", String(Math.min(Math.max(n, 1), 3) * 2 - 1)); }
-    } else if (g === "topico") {
+    } else if (lay === "lista") {
       it.forEach(function (x, i) {
         var b = x.querySelector("td[data-bloco]"); if (!b) return;
         b.setAttribute("style", (b.getAttribute("style") || "").replace(/border-top:1px solid #[0-9a-f]{3,6};?/i, "") + "border-top:1px solid " + (i ? COR.linha : COR.texto) + ";");
@@ -894,6 +948,12 @@
   function modeloDoItem(g) {
     if (!window.CORINGA_HTML) return null;
     if (!ED.coringa) ED.coringa = new DOMParser().parseFromString(window.CORINGA_HTML, "text/html");
+    var lay = GRUPOS[g] && GRUPOS[g].layout;
+    if (lay) {
+      var t = ED.coringa.querySelector('table[data-layout="' + lay + '"]'), x = t && t.querySelector("[data-item]");
+      if (!x) return null;
+      var novo = ED.doc.importNode(x, true); trocarChaves(novo, x.getAttribute("data-item").replace(/-\d+$/, ""), g); return novo;
+    }
     var el = ED.coringa.querySelector('[data-item="' + g + '-1"]');
     return el ? ED.doc.importNode(el, true) : null;
   }
@@ -906,7 +966,7 @@
     var volta = desfazGrupo(G), ref = depois || it[it.length - 1];
     if (ref) ref.parentNode.insertBefore(novo, ref.nextSibling);
     else if (/^(bem|melhorar)$/.test(g)) G.cont.insertBefore(novo, G.cont.querySelector(".ed-mais"));
-    else if (/^(numero|aprendizado|transformation|topico)$/.test(g)) G.cont.appendChild(novo);
+    else if (/^(numero|aprendizado|transformation)$/.test(g) || /^(lista|colunas|numeros)$/.test(GRUPOS[g].layout)) G.cont.appendChild(novo);
     else (g === "resultado" ? G.cont.lastElementChild : G.cont.appendChild(ED.doc.createElement("tr"))).appendChild(novo);
     editavel(novo); renumerar(g); refazer(g); atualizarMais();
     /* "[Item da agenda 1]" do modelo vira "[Item da agenda 3]": o número da posição nova */
@@ -925,27 +985,31 @@
     ED.doc.getElementById("ed-barra").hidden = true;
     marcarSujo("Item ocultado: a grade se ajustou. Para voltar: Desfazer.");
   }
-  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", topico: "Novo tópico (ex.: Testes)", foco: "Foco do próximo mês", agenda: "Também vem aí" };
-  /* Seções que o emulador acrescenta mesmo quando a página não tem (vêm do modelo em branco). */
-  var SECOES_NOVAS = ["topico"];
+  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
   function marcaSecao(doc, id) { var w = doc.createTreeWalker(doc.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:" + id) return n; return null; }
   function nosDaSecao(id) {
     var w = ED.doc.createTreeWalker(ED.doc.body, NodeFilter.SHOW_COMMENT), n, ini = null, prox = null;
-    while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue); if (!m) continue; if (ini && !prox) { prox = n; break; } if (m[1] === id) ini = n; }
+    while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue.trim()); if (!m) continue; if (ini && !prox) { prox = n; break; } if (m[1] === id) ini = n; }
     var r = []; if (!ini) return r;
     for (var el = ini.nextSibling; el && el !== prox; el = el.nextSibling) r.push(el);
     return r;
   }
+  /* Seções da página, na ordem (os tópicos novos onde estão), cada uma com mostrar/ocultar; e o "+ Novo tópico". */
   function montarSecoes() {
     var box = $("#secoesRep"); box.textContent = "";
-    Object.keys(NOMES_SEC).forEach(function (id) {
-      var nos = ED.ocultas[id] || nosDaSecao(id), nova = !nos.length && !ED.ocultas[id];
-      if (nova && SECOES_NOVAS.indexOf(id) < 0) return;
-      var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.checked = !nova && !ED.ocultas[id]; c.value = id;
-      c.addEventListener("change", function () { if (nova) { c.checked = ligarSecaoNova(id); montarSecoes(); } else mostrarSecao(id, c.checked); });
-      l.appendChild(c); l.appendChild(document.createTextNode(" " + NOMES_SEC[id])); box.appendChild(l);
+    var ids = [], w = ED.doc.createTreeWalker(ED.doc.body, NodeFilter.SHOW_COMMENT), n;
+    while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue.trim()); if (m && (NOMES_SEC[m[1]] || IDS_TOPICO.indexOf(m[1]) >= 0) && ids.indexOf(m[1]) < 0) ids.push(m[1]); }
+    ids.forEach(function (id) {
+      var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.checked = !ED.ocultas[id]; c.value = id;
+      c.addEventListener("change", function () { mostrarSecao(id, c.checked); });
+      l.appendChild(c); l.appendChild(document.createTextNode(" " + nomeSec(id))); box.appendChild(l);
     });
+    var b = document.createElement("button"), livres = idsLivres().length; b.type = "button"; b.className = "novoTopico";
+    b.textContent = livres ? "+ Novo tópico" : "Máximo de " + IDS_TOPICO.length + " tópicos novos"; b.disabled = !livres;
+    b.addEventListener("click", novoTopico); box.appendChild(b);
+    $("#bNovoTopico").disabled = !livres;
   }
+  function idsLivres() { return IDS_TOPICO.filter(function (id) { return !marcaSecao(ED.doc, id); }); }
   /* Número de cada seção (01, 02…) na ordem do que está à mostra, como fica no arquivo salvo. */
   function renumerarPilulas() {
     var n = 0;
@@ -961,31 +1025,66 @@
       ED.ocultas[id] = nos;
     } else { (ED.ocultas[id] || []).forEach(function (n) { n.removeAttribute("data-ed-oculta"); n.style.display = ""; }); delete ED.ocultas[id]; }
     renumerarPilulas();
-    if (!quieto) marcarSujo(mostrar ? "Seção à mostra: " + NOMES_SEC[id] + "." : "Seção oculta: " + NOMES_SEC[id] + " (não vai no arquivo salvo).");
+    if (!quieto) marcarSujo(mostrar ? "Seção à mostra: " + nomeSec(id) + "." : "Seção oculta: " + nomeSec(id) + " (não vai no arquivo salvo).");
   }
-  /* Seção que a página ainda não tem (ex.: Novo tópico): vem do modelo em branco, antes do Foco do próximo mês. */
-  function ligarSecaoNova(id) {
-    if (!window.CORINGA_HTML) { perguntar("Modelo não encontrado", "<p>O modelo em branco não está junto deste emulador. Use a versão avulsa (kit/emulador-report.html).</p>", "Entendi"); return false; }
+  /* Troca o id de um tópico nas chaves (topicoc-2.nome → topicob-2.nome) e na marca da seção. */
+  function trocarChaves(raiz, de, para) {
+    var re = new RegExp("^" + de + "(?=[.-])");
+    [raiz].concat(raiz.querySelectorAll ? Array.prototype.slice.call(raiz.querySelectorAll("[data-campo],[data-item],[data-img],[data-bloco]")) : []).forEach(function (x) {
+      if (x.nodeType === 8) { if (x.nodeValue.trim() === "secao:" + de) x.nodeValue = "secao:" + para; return; }
+      if (x.nodeType !== 1) return;
+      ["data-campo", "data-item", "data-img", "data-bloco"].forEach(function (at) { var v = x.getAttribute(at); if (v && re.test(v)) x.setAttribute(at, v.replace(re, para)); });
+    });
+  }
+  /* Miniaturas dos layouts (o desenho de cada um, para escolher olhando). */
+  var MINI = {
+    lista: '<rect x="4" y="6" width="112" height="1.5" fill="#000"/><rect x="4" y="12" width="26" height="5" rx="2.5" fill="#FFE1B3"/><rect x="4" y="20" width="58" height="5" fill="#EC0000"/><rect x="4" y="28" width="96" height="3" fill="#bbb"/><rect x="4" y="34" width="34" height="3" fill="#EC0000"/>' +
+      '<rect x="4" y="44" width="112" height="1" fill="#ddd"/><rect x="4" y="50" width="26" height="5" rx="2.5" fill="#FFE1B3"/><rect x="4" y="58" width="50" height="5" fill="#EC0000"/><rect x="4" y="66" width="90" height="3" fill="#bbb"/>',
+    colunas: [0, 1, 2].map(function (i) { var x = 4 + i * 39; return '<text x="' + x + '" y="20" font-size="15" font-weight="700" fill="#127277" font-family="Arial">' + (i + 1) + '</text><rect x="' + x + '" y="27" width="30" height="5" fill="#EC0000"/><rect x="' + x + '" y="36" width="32" height="3" fill="#bbb"/><rect x="' + x + '" y="42" width="26" height="3" fill="#bbb"/><rect x="' + x + '" y="50" width="20" height="3" fill="#EC0000"/>' + (i ? '<rect x="' + (x - 4) + '" y="6" width="1" height="60" fill="#ddd"/>' : ""); }).join(""),
+    cartoes: [0, 1, 2].map(function (i) { var x = 4 + i * 39; return '<rect x="' + x + '" y="6" width="34" height="30" rx="5" fill="#F5DECF"/><rect x="' + x + '" y="41" width="18" height="4" rx="2" fill="#FFE1B3"/><rect x="' + x + '" y="49" width="30" height="5" fill="#EC0000"/><rect x="' + x + '" y="58" width="32" height="3" fill="#bbb"/><rect x="' + x + '" y="64" width="20" height="3" fill="#EC0000"/>'; }).join(""),
+    numeros: [0, 1, 2].map(function (i) { var x = 4 + i * 39, c = i ? "#000" : "#127277"; return '<rect x="' + x + '" y="10" width="34" height="2" fill="' + c + '"/><text x="' + x + '" y="34" font-size="16" font-weight="700" fill="' + c + '" font-family="Arial">' + ["12%", "3x", "R$1"][i] + '</text><rect x="' + x + '" y="42" width="28" height="4" fill="#EC0000"/><rect x="' + x + '" y="50" width="32" height="3" fill="#bbb"/>'; }).join("")
+  };
+  /* "+ Novo tópico": pergunta o nome e o layout (com a miniatura de cada um) e põe o tópico antes do Foco do próximo mês,
+     vindo do modelo em branco (o tópico do mesmo layout, com as chaves trocadas para o id livre). */
+  async function novoTopico() {
+    var livres = idsLivres();
+    if (!livres.length) { await perguntar("Máximo de tópicos novos", "<p>Cabem até " + IDS_TOPICO.length + " tópicos novos. Desfaça um deles para criar outro.</p>", "Entendi"); return; }
+    if (!window.CORINGA_HTML) { await perguntar("Modelo não encontrado", "<p>O modelo em branco não está junto deste emulador. Use a versão avulsa (kit/emulador-report.html).</p>", "Entendi"); return; }
+    var opcoes = Object.keys(LAYOUTS).map(function (k, i) {
+      return '<label class="layout"><input type="radio" name="layoutTopico" value="' + k + '"' + (i ? "" : " checked") + '><svg viewBox="0 0 120 72" width="120" height="72" aria-hidden="true">' + MINI[k] + '</svg><b>' + LAYOUTS[k].nome + '</b><span>' + esc(LAYOUTS[k].como) + ' · até ' + LAYOUTS[k].max + ' itens</span></label>';
+    }).join("");
+    var ok = await perguntar("Novo tópico", '<div class="campo" style="margin-top:0"><label for="nomeTopico">Nome do tópico (vai em MAIÚSCULAS no topo da seção)</label><input type="text" id="nomeTopico" placeholder="ex.: Testes" autocomplete="off"></div>' +
+      '<p style="margin:12px 0 6px;font-size:14px;font-weight:600">Qual layout seguir?</p><div class="layouts">' + opcoes + '</div>' +
+      '<p class="muted" style="margin:10px 0 0">Entra antes do Foco do próximo mês, com textos [entre colchetes] para trocar. Vai na página, no e-mail completo e no e-mail-resumo.</p>', "Criar tópico", "Cancelar");
+    if (!ok) return;
+    var nome = ($("#nomeTopico").value || "").replace(/\s+/g, " ").trim() || "Novo tópico", lay = (document.querySelector('input[name="layoutTopico"]:checked') || {}).value || "lista";
+    criarTopico(livres[0], lay, nome);
+  }
+  function criarTopico(id, lay, nome) {
     if (!ED.coringa) ED.coringa = new DOMParser().parseFromString(window.CORINGA_HTML, "text/html");
-    var ini = marcaSecao(ED.coringa, id); if (!ini) return false;
+    var t = ED.coringa.querySelector('table[data-layout="' + lay + '"]'), it = t && t.querySelector("[data-item]");
+    if (!it) return false;
+    var de = it.getAttribute("data-item").replace(/-\d+$/, ""), ini = marcaSecao(ED.coringa, de); if (!ini) return false;
     var nos = [ini];
     for (var el = ini.nextSibling; el && !(el.nodeType === 8 && /^secao:/.test(el.nodeValue.trim())); el = el.nextSibling) nos.push(el);
     var ref = null; ["foco", "agenda", "rodape", "fim"].some(function (x) { ref = marcaSecao(ED.doc, x); return !!ref; });
     if (!ref) return false;
-    var novos = nos.map(function (n) { var x = ED.doc.importNode(n, true); ref.parentNode.insertBefore(x, ref); return x; });
+    var novos = nos.map(function (n) { var x = ED.doc.importNode(n, true); trocarChaves(x, de, id); ref.parentNode.insertBefore(x, ref); return x; });
+    var rot = ED.doc.querySelector('[data-campo="' + id + '.rotulo"]'); if (rot) rot.textContent = nome.toLocaleUpperCase("pt-BR");
     novos.forEach(function (n) { if (n.nodeType === 1) editavel(n); });
-    prepararGrupo(id); atualizarMais(); renumerarPilulas();
+    registrarTopicos(); prepararGrupo(id); atualizarMais(); renumerarPilulas(); montarSecoes();
     pilha(function () {
       novos.forEach(function (n) { if (n.parentNode) n.remove(); });
       var b = ED.doc.querySelector('.ed-mais button[data-grupo="' + id + '"]'); if (b) b.parentNode.remove();
-      delete ED.grupos[id]; renumerarPilulas(); montarSecoes();
+      delete ED.grupos[id]; delete ED.ocultas[id]; registrarTopicos(); renumerarPilulas(); montarSecoes();
     });
     var alvo = novos.filter(function (n) { return n.nodeType === 1; })[0]; if (alvo) alvo.scrollIntoView({ block: "start" });
-    marcarSujo(NOMES_SEC[id] + " ligado: troque os textos [entre colchetes]; use + Adicionar, + Link e + Imagem nos itens. Para tirar: Desfazer ou desmarque a seção.");
+    marcarSujo("Tópico " + nome.toLocaleUpperCase("pt-BR") + " criado (layout " + LAYOUTS[lay].nome.toLowerCase() + "): troque os textos [entre colchetes]; use + Adicionar" + (lay === "numeros" ? "" : ", + Link e + Imagem") + " nos itens. Para tirar: Desfazer ou desmarque o tópico em Seções do report.");
     return true;
   }
 
   /* ---------- importar conteúdo (Copilot) ---------- */
+  $("#bNovoTopico").addEventListener("click", function () { if (ED.doc) novoTopico(); });
   $("#bImportar").addEventListener("click", function () { $("#painelImportar").hidden = false; $("#txtImportar").focus(); });
   $("#bFecharImportar").addEventListener("click", function () { $("#painelImportar").hidden = true; });
   $("#bAplicar").addEventListener("click", function () {
@@ -1145,7 +1244,7 @@
     });
   }
   function nomeDoSrc(src) { try { src = decodeURIComponent(src); } catch (e) {} return src.split(/[?#]/)[0].split(/[\\/]/).pop(); }
-  function hostDe(u) { try { return new URL(u).host; } catch (e) { return u; } }
+  function hostDe(u) { try { return new URL(u).host || u.slice(0, 60); } catch (e) { return u.slice(0, 60); } }
 
   /* Indicadores candidatos: caixas (até 3). */
   function atualizarIndicadores(cand, escolha) {
@@ -1219,7 +1318,7 @@
       else if (!link) resErro = "Falta o link do report completo (passo 3).";
       if (linkOk && lk.avisos.length) { itens.push("Link: " + lk.avisos.join(" ")); avisos.push("link"); }
       if (!resErro && !res.temLink) resErro = "O botão ficou sem o link: confira o endereço no passo 3.";
-      etapa("resumir", resErro || res.pendencias.length || lk.avisos.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURI(link.split("/").pop()) : hostDe(link)) + " (o único link do e-mail).", itens);
+      etapa("resumir", resErro || res.pendencias.length || lk.avisos.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURIComponent(link.split("/").pop().replace(/%(?![0-9a-f]{2})/gi, "%25")) : hostDe(link)) + " (o único link do e-mail).", itens);
     }
     var completo = { html: limpo.html };
     progresso(32); await respira(); if (parou()) return;

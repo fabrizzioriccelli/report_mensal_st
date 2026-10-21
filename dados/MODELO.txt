@@ -314,16 +314,23 @@ levamos: lorem ipsum dolor.
 
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: NOVO TÓPICO (opcional · ex.: TESTES)
+#  EDITAR AQUI: NOVOS TÓPICOS (opcional · ex.: TESTES)
 # ----------------------------------------------------------------------
-#  Espaço reservado para um assunto novo que ainda não tem seção própria
-#  (ex.: os testes do mês). A seção só aparece no report quando
-#  [TOPICO 1] existe. Para usar: tire o "#" do começo das linhas abaixo.
+#  Até 4 assuntos novos que ainda não têm seção própria (ex.: os testes
+#  do mês): [TOPICO], [TOPICO B], [TOPICO C] e [TOPICO D], nessa ordem,
+#  antes do Foco do próximo mês. Cada um só aparece no report quando
+#  [TOPICO 1] (ou [TOPICO B 1]…) existe. Para usar: tire o "#" do
+#  começo das linhas abaixo.
 #  rotulo: o nome curto no topo da seção (vira MAIÚSCULAS: TESTES).
-#  Até 6 itens ([TOPICO 1] a [TOPICO 6]). Em cada item:
-#    status + status_cor (verde ou ambar), nome (obrigatório), texto,
-#    links: "Texto | endereço", vários separados por ; (PDF da pasta do
-#           mês também vale: "Plano do teste | plano.pdf")
+#  layout: qual desenho seguir
+#    lista    um item embaixo do outro, na largura inteira (até 6)
+#    colunas  colunas numeradas, lado a lado (até 3)
+#    cartoes  cartões com imagem em cima, 3 por linha (até 6)
+#    numeros  números grandes com o que medem (até 4; use valor)
+#  Em cada item: status + status_cor (verde ou ambar), nome
+#  (obrigatório), texto, valor (só no layout numeros),
+#    links: "Texto | endereço", vários separados por ; (vale qualquer
+#           link; PDF da pasta do mês também: "Plano | plano.pdf")
 #    imagens: até 3, separadas por vírgula (descrições em
 #             descricao_imagens, separadas por |)
 #
@@ -331,6 +338,7 @@ levamos: lorem ipsum dolor.
 # rotulo: Testes
 # titulo: Lorem ipsum dolor sit amet.
 # texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+# layout: lista
 #
 # [TOPICO 1]
 # status: Lorem ipsum
@@ -340,6 +348,16 @@ levamos: lorem ipsum dolor.
 # links: Lorem ipsum | [INSERIR LINK]
 # imagens:
 # descricao_imagens:
+#
+# [TOPICO B]
+# rotulo: Mídia
+# titulo: Lorem ipsum dolor sit amet.
+# layout: numeros
+#
+# [TOPICO B 1]
+# valor: X%
+# nome: Lorem ipsum
+# texto: Lorem ipsum dolor sit amet.
 
 
 # ----------------------------------------------------------------------
