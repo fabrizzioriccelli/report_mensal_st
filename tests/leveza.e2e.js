@@ -132,6 +132,37 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   confere(n === 1 && /Otimizei/.test(est) && lanc < 200 * 1024, "report com imagem de " + kb(tamFoto) + ": ao abrir, ela cai para " + kb(lanc) + " · " + est.slice(0, 80));
   await p2.close({ runBeforeUnload: false });
 
+  /* 9. Status: cada pendência tem "Ir até lá"; aviso informativo tem "Ok, ciente" e a etapa fica verde; "Creative X" não é pendência */
+  var p3 = await ctx.newPage(); p3.on("pageerror", function (e) { erros.push(e.message); });
+  async function etapaRes(pg) { return pg.$eval("#et-resumir", function (li) { return { estado: li.dataset.estado, itens: Array.prototype.map.call(li.querySelectorAll("ul li"), function (x) { return x.textContent; }) }; }); }
+  async function espera(pg) { await pg.waitForTimeout(1300); await pg.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 60000 }); }
+  await p3.goto(URL_EMULADOR); await p3.click("#bModelo"); await p3.fill("#link", "https://www.example.com/r"); await espera(p3);
+  var e1 = await etapaRes(p3), irs = await p3.$$("#et-resumir ul li button");
+  confere(e1.estado === "aviso" && e1.itens.some(function (x) { return /texto do modelo/.test(x) && /Ir até lá/.test(x); }), "modelo em branco: cada texto do modelo no status tem \"Ir até lá\" · " + e1.itens.length + " item(ns)");
+  var primeiro = await p3.$eval("#et-resumir ul li:has(button)", function (li) { return li.firstChild.textContent.replace(/^Ainda é texto do modelo: /, ""); });
+  await p3.click("#et-resumir ul li:has(button) button"); await p3.waitForTimeout(300);
+  var foco = await p3.evaluate(function () { var d = document.querySelector("#edFrame").contentDocument, a = d.activeElement; return a ? (a.getAttribute("data-campo") || "") + " = " + a.textContent.trim().slice(0, 40) : ""; });
+  confere(/=/.test(foco) && primeiro.indexOf(foco.split(" = ")[1].slice(0, 15)) >= 0, "\"Ir até lá\" leva ao campo, com o cursor dentro · " + foco);
+  await p3.keyboard.press("Control+A"); await p3.keyboard.type("Texto real fictício"); await p3.keyboard.press("Enter"); await espera(p3);
+  var e2 = await etapaRes(p3);
+  confere(!e2.itens.some(function (x) { return x.indexOf(primeiro) >= 0; }), "editado o campo, o item sai do status · " + primeiro);
+  await p3.close({ runBeforeUnload: false });
+  var p4 = await ctx.newPage(); p4.on("pageerror", function (e) { erros.push(e.message); });
+  await p4.goto(URL_EMULADOR); await p4.setInputFiles("#arquivo", path.join(RAIZ, "kit/report-exemplo.html")); await espera(p4);
+  await p4.fill("#link", "report-2099-01.html"); await espera(p4);
+  var e3 = await etapaRes(p4), b3 = await p4.$eval("#banner", function (b) { return b.className; });
+  confere(e3.estado === "aviso" && /banner warn/.test(b3) && e3.itens.some(function (x) { return /endereço relativo/.test(x) && /Ok, ciente/.test(x); }), "link relativo: aviso amarelo com \"Ok, ciente\"");
+  await p4.click('#et-resumir ul li button:text("Ok, ciente")'); await espera(p4);
+  var e4 = await etapaRes(p4), b4 = await p4.$eval("#banner", function (b) { return b.className + " · " + b.textContent; });
+  if (process.env.DEPURAR) console.log(JSON.stringify(e4));
+  confere(e4.estado === "ok" && /banner ok/.test(b4) && e4.itens.some(function (x) { return /ciente/.test(x); }), "\"Ok, ciente\": a etapa fica verde e o status, pronto · " + b4.slice(0, 60));
+  var f4 = await (await p4.$("#edFrame")).contentFrame();
+  await f4.locator('[data-campo="numero-1.detalhe"][data-ed-campo]').first().click({ position: { x: 4, y: 6 } }); await p4.waitForTimeout(150);
+  await p4.keyboard.press("Control+A"); await p4.keyboard.type("Creative X 79%"); await p4.keyboard.press("Enter"); await espera(p4);
+  var e5 = await etapaRes(p4);
+  confere(e5.estado === "ok" && !e5.itens.some(function (x) { return /texto do modelo/.test(x); }), "\"Creative X 79%\" não é texto do modelo (o X só conta no lugar de um número)");
+  await p4.close({ runBeforeUnload: false });
+
   await browser.close();
   if (erros.length) { console.log("ERROS NA PÁGINA:", erros.slice(0, 5)); falhas++; }
   console.log(falhas ? falhas + " falha(s)." : "Tudo certo.");

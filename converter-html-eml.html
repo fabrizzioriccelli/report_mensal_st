@@ -69,6 +69,8 @@
   @media (prefers-reduced-motion:reduce){li[data-estado=rodando] .ic{animation:none;border-top-color:#F3D1D1;background:var(--red)}}
   .et b{display:block;font-size:14px}.et span{display:block;font-size:13px;color:var(--gray)}
   .et ul{margin:4px 0 0;padding-left:18px;font-size:13px}
+  .et ul button{font-size:12px;padding:2px 9px;margin:2px 0 2px 8px;border-radius:999px;vertical-align:baseline}
+  .et ul li.ciente{color:var(--gray)}.et ul li.ciente b{color:var(--ok)}
   .tempo{font-size:12px;color:var(--gray);white-space:nowrap;font-variant-numeric:tabular-nums}
   pre.log{margin:8px 0 0;max-height:220px;overflow:auto;background:#FAF8F6;border:1px solid #F0ECE9;border-radius:8px;padding:10px;font:12px/1.6 Consolas,Menlo,monospace;white-space:pre-wrap}
   details summary{cursor:pointer;font-weight:600;font-size:14px;margin-top:12px}
@@ -345,7 +347,9 @@
   function marcarSujo(msg) {
     ED.sujo = true;
     $("#estado").className = "estado sujo"; $("#estado").textContent = (msg ? msg + " · " : "") + "Alterações não salvas (a edição fica guardada neste navegador até salvar).";
-    clearTimeout(ED.timer); ED.timer = setTimeout(function () { guardarRascunho({ nome: ED.nome, origem: ED.origem, periodoInicial: ED.periodoInicial, html: htmlEdicao(), quando: Date.now() }); reconverter(); }, 1200);
+    /* o status e as prévias acompanham logo (reconverter espera 0,6 s sem mudança); o rascunho é guardado a cada 1,2 s */
+    reconverter();
+    clearTimeout(ED.timer); ED.timer = setTimeout(function () { guardarRascunho({ nome: ED.nome, origem: ED.origem, periodoInicial: ED.periodoInicial, html: htmlEdicao(), quando: Date.now() }); }, 1200);
   }
   function camposDe(chave) { return Array.prototype.slice.call(ED.doc.querySelectorAll('[data-campo="' + chave + '"]')); }
 
@@ -355,7 +359,7 @@
     return limpo.replace("</head>", '<style id="ed-css">' + EDITOR_CSS + "</style>\n</head>");
   }
   function abrirNoEditor(html, nome, origem, periodoInicial) {
-    ED.nome = nome; ED.origem = origem; ED.desfazer = []; ED.ocultas = {}; ED.alterados = {}; ED.sujo = false;
+    ED.nome = nome; ED.origem = origem; ED.desfazer = []; ED.ocultas = {}; ED.alterados = {}; ED.sujo = false; CIENTES = {};
     $("#bDesfazer").disabled = true;
     var fr = $("#edFrame");
     fr.onload = function () {
@@ -1326,9 +1330,33 @@
   function etapa(id, estado, detalhe, itens) {
     var li = $("#et-" + id); li.dataset.estado = estado; li.querySelector(".ic").textContent = ICONE[estado]; li.querySelector(".et span").textContent = detalhe || "";
     var ul = li.querySelector("ul"); if (ul) ul.remove();
-    if (itens && itens.length) { ul = document.createElement("ul"); itens.forEach(function (t) { var x = document.createElement("li"); x.textContent = t; ul.appendChild(x); }); li.querySelector(".et").appendChild(ul); }
+    /* item: texto, ou { t: texto, ir: função (leva até onde se resolve), ciente: chave (aviso que a pessoa pode dar por visto) } */
+    if (itens && itens.length) {
+      ul = document.createElement("ul");
+      itens.forEach(function (it) {
+        if (typeof it === "string") it = { t: it };
+        var x = document.createElement("li"), visto = it.ciente && CIENTES[it.ciente]; x.textContent = it.t;
+        if (visto) { x.className = "ciente"; var ok = document.createElement("b"); ok.textContent = " · ciente ✓"; x.appendChild(ok); }
+        if (it.ir && !visto) { var b1 = document.createElement("button"); b1.type = "button"; b1.textContent = "Ir até lá"; b1.onclick = it.ir; x.appendChild(b1); }
+        if (it.ciente && !visto) { var b2 = document.createElement("button"); b2.type = "button"; b2.textContent = "Ok, ciente"; b2.onclick = function () { CIENTES[it.ciente] = true; reconverter(true); }; x.appendChild(b2); }
+        ul.appendChild(x);
+      });
+      li.querySelector(".et").appendChild(ul);
+    }
     if (estado === "rodando") li.dataset.t0 = performance.now(); else if (li.dataset.t0) li.querySelector(".tempo").textContent = seg(performance.now() - li.dataset.t0);
   }
+  /* Avisos que a pessoa já viu e deu por resolvidos ("Ok, ciente"), por report aberto: enquanto o aviso for o mesmo, a etapa fica verde. */
+  var CIENTES = {};
+  function abertos(itens) { return itens.filter(function (it) { return typeof it === "object" && it.aviso && !(it.ciente && CIENTES[it.ciente]); }); }
+  /* "Ir até lá": o campo do report (rolando até ele, com o cursor dentro), o link (passo 3) ou os indicadores (passo 4). */
+  function irParaCampo(chave) {
+    return function () {
+      var el = ED.doc && Array.prototype.filter.call(ED.doc.querySelectorAll('[data-campo="' + chave + '"][data-ed-campo]'), function (x) { return x.getClientRects().length && !x.closest("[data-ed-oculta]"); })[0];
+      if (!el) { log("Campo " + chave + " não está à mostra no report (seção oculta?)."); return; }
+      el.scrollIntoView({ block: "center" }); el.focus();
+    };
+  }
+  function irPara(sel) { return function () { var e = $(sel); e.scrollIntoView({ block: "center" }); if (e.focus) e.focus(); }; }
   function relogio(ligar) { clearInterval(relogioTimer); if (ligar) { inicio = performance.now(); relogioTimer = setInterval(function () { $("#relogio").textContent = "Tempo: " + seg(performance.now() - inicio); }, 100); } }
   function lerBytes(blob) { return blob.arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
   function paraPng(url) {
@@ -1391,7 +1419,7 @@
     var org = Motor.origemDoHtml(html), titulo = Motor.assuntoDoHtml(html);
     var dr = Motor.dadosDoResumo(html), per = dr.ok ? dr.d.periodo : "";
     if (org || dr.ok) etapa("origem", "ok", "Report " + (per ? "de " + per : "") + (org ? " · gerado pela versão " + org.versao : "") + ".");
-    else { etapa("origem", "aviso", "Não reconheci o report. Confira a prévia antes de enviar."); avisos.push("origem"); }
+    else { var itO = [{ t: "Confira a prévia antes de enviar.", aviso: true, ciente: "origem", ir: irPara("#prev") }]; etapa("origem", abertos(itO).length ? "aviso" : "ok", "Não reconheci a marca da ferramenta neste report.", itO); if (abertos(itO).length) avisos.push("origem"); }
     var meta = /<meta name="report-completo" content="([^"]*)"/.exec(html);
     if (meta && (!$("#link").value.trim() || $("#link").dataset.auto === "1")) { var t = document.createElement("textarea"); t.innerHTML = meta[1]; $("#link").value = t.value; $("#link").dataset.auto = "1"; $("#linkInfo").textContent = "Veio do report."; }
     progresso(18); await respira();
@@ -1410,16 +1438,19 @@
     if (res.erro) { resErro = res.erro; etapa("resumir", "erro", res.erro); erros.push("resumo"); }
     else {
       atualizarIndicadores(res.candidatos, res.indicadores);
-      res.indicadores.forEach(function (k) { var x = res.candidatos.filter(function (c) { return c.chave === k; })[0]; itens.push(x.valor + " · " + x.titulo + " (" + x.grupo + ")"); });
+      res.indicadores.forEach(function (k) { var x = res.candidatos.filter(function (c) { return c.chave === k; })[0]; itens.push(x.valor + " · " + x.titulo + (x.origem && x.titulo.indexOf(x.origem) < 0 ? " (" + x.origem + ")" : "")); });
       if (!res.indicadores.length) itens.push("Nenhum indicador na página: o e-mail sai só com a frase do mês e a chamada.");
       var repetidos = res.candidatos.filter(function (x) { return x.na_frase && res.indicadores.indexOf(x.chave) >= 0; });
-      if (repetidos.length) { itens.push("Repete a frase do mês: " + repetidos.map(function (x) { return x.valor + " · " + x.titulo; }).join(" | ") + ". Troque o indicador ou a frase."); avisos.push("repeticao"); }
-      if (res.pendencias.length) { itens.push("Ainda é texto do modelo: " + res.pendencias.slice(0, 3).join(" | ") + (res.pendencias.length > 3 ? " (+" + (res.pendencias.length - 3) + ")" : "")); avisos.push("pendencias"); }
+      if (repetidos.length) itens.push({ t: "Repete a frase do mês: " + repetidos.map(function (x) { return x.valor + " · " + x.titulo; }).join(" | ") + ". Troque o indicador ou a frase.", aviso: true, ir: irPara("#indicadores"), ciente: "rep|" + repetidos.map(function (x) { return x.chave + x.valor; }).join() });
+      /* cada texto do modelo que falta trocar, com "Ir até lá" (leva ao campo, com o cursor dentro) */
+      res.pendencias.slice(0, 6).forEach(function (pd) { var k = pd.indexOf(": "); itens.push({ t: "Ainda é texto do modelo: " + pd.slice(k + 2), aviso: true, ir: irParaCampo(pd.slice(0, k)) }); });
+      if (res.pendencias.length > 6) itens.push({ t: "E mais " + (res.pendencias.length - 6) + " texto(s) do modelo no report.", aviso: true });
       if (lk.erro) resErro = "O link do report completo " + lk.erro;
       else if (!link) resErro = "Falta o link do report completo (passo 3).";
-      if (linkOk && lk.avisos.length) { itens.push("Link: " + lk.avisos.join(" ")); avisos.push("link"); }
+      if (linkOk && lk.avisos.length) itens.push({ t: "Link: " + lk.avisos.join(" "), aviso: true, ir: irPara("#link"), ciente: "link|" + link });
       if (!resErro && !res.temLink) resErro = "O botão ficou sem o link: confira o endereço no passo 3.";
-      etapa("resumir", resErro || res.pendencias.length || lk.avisos.length || repetidos.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURIComponent(link.split("/").pop().replace(/%(?![0-9a-f]{2})/gi, "%25")) : hostDe(link)) + " (o único link do e-mail).", itens);
+      var abR = abertos(itens); if (abR.length) avisos.push("resumo");
+      etapa("resumir", resErro || abR.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURIComponent(link.split("/").pop().replace(/%(?![0-9a-f]{2})/gi, "%25")) : hostDe(link)) + " (o único link do e-mail).", itens);
     }
     var completo = { html: limpo.html };
     progresso(32); await respira(); if (parou()) return;
@@ -1435,7 +1466,7 @@
         if (tipo === "embutida") { var dd = Motor.imagemDeDataUri(src); bytes = dd.bytes; ext = dd.ext; mapaPrev[src] = src; }
         else if (tipo === "embutida-incompativel") { bytes = await paraPng(src); ext = "png"; }
         else if (tipo === "arquivo") { var nome = nomeDoSrc(src), f = pastaArquivos[nome]; if (!f) { faltam.push(nome); mapaPrev[src] = FALTA; continue; } bytes = await lerBytes(f); ext = nome.split(".").pop().toLowerCase().replace("jpeg", "jpg"); }
-        else if (tipo === "internet") { probs.push(rot + " vem da internet: fica como link."); continue; }
+        else if (tipo === "internet") { probs.push({ t: rot + " vem da internet: no e-mail, ela é carregada do endereço dela.", aviso: true, ciente: "net|" + src.slice(0, 200) }); continue; }
         else { erros.push("img"); probs.push(rot + ": endereço que não abre fora deste computador (" + tipo + ")."); continue; }
       } catch (e) { erros.push("img"); probs.push(rot + ": " + e.message + "."); continue; }
       var cid = "img" + String(n).padStart(2, "0") + "@report", arq = String(n).padStart(2, "0") + "-imagem." + ext;
@@ -1445,7 +1476,8 @@
       progresso(32 + 38 * (i + 1) / lista.length); if (i % 4 === 3) await respira();
     }
     if (faltam.length) { erros.push("faltam"); probs.unshift("Faltam " + faltam.length + " imagem(ns) em arquivo ao lado do .html: " + faltam.slice(0, 4).join(", ") + ". Use \"Avançado: imagens em arquivo\" (passo 1)."); }
-    etapa("imagens", erros.length ? "erro" : probs.length ? "aviso" : "ok", Object.keys(porSrc).length + " imagem(ns) · " + kb(total), probs);
+    var abI = abertos(probs); if (abI.length) avisos.push("imagens");
+    etapa("imagens", erros.length ? "erro" : abI.length ? "aviso" : "ok", Object.keys(porSrc).length + " imagem(ns) · " + kb(total), probs);
     progresso(72); await respira(); if (parou()) return;
     if (!$("#assunto").dataset.editado) $("#assunto").value = titulo || "Report mensal";
     var base = file.name.replace(/\.(html?|htm)$/i, "");
@@ -1470,7 +1502,11 @@
       if (nl > 1) rr.notas.push("O e-mail-resumo tem " + nl + " links; o esperado é um.");
       if (erros.length) etapa("resumido", "erro", "Não montei: há imagens com problema.");
       else if (resErro) etapa("resumido", "aviso", resErro + " (prévia pronta: " + kb(rr.tam) + ").");
-      else { resumido = rr; etapa("resumido", rr.notas.length ? "aviso" : "ok", kb(rr.tam) + " · " + rr.imagens.length + " imagem(ns) · um único botão", rr.notas); }
+      else {
+        resumido = rr;
+        var itN = rr.notas.map(function (t) { return { t: t, aviso: true, ciente: "nota|" + t }; }), abN = abertos(itN); if (abN.length) avisos.push("notas");
+        etapa("resumido", abN.length ? "aviso" : "ok", kb(rr.tam) + " · " + rr.imagens.length + " imagem(ns) · um único botão", itN);
+      }
     }
     $("#secPrev").hidden = false; $("#secBaixar").hidden = false; mostrarPrevia();
     relogio(false); $("#relogio").textContent = "Tempo: " + seg(performance.now() - t0);
