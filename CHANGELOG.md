@@ -2,6 +2,10 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.7.2 · 2026-10-21 · Chama do Santander na aba do navegador
+
+- O emulador (`converter-html-eml.html` e a versão avulsa `kit/emulador-report.html`) e o `gerar-report.html` mostram a **chama do Santander** como ícone da aba do Chrome/Edge. É o traçado oficial (`assets/marca/svg/chama-santander.svg`), em Vermelho Santander, sem redesenho, embutido na página: funciona em qualquer pasta, sem arquivo extra.
+
 ## 4.7.1 · 2026-10-21 · Adicionar e tirar sem confusão, grid conferido
 
 - **Nomes das ferramentas padronizados:** "+ Adicionar …" para pôr e "Tirar …" para tirar (item, link, imagem, vídeo). "Ocultar item" virou **Tirar item** (o item sai do report; Desfazer volta). "Ocultar" fica só para as seções, que podem voltar a qualquer momento em "Seções do report".
