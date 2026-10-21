@@ -2,6 +2,13 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.7.1 · 2026-10-21 · Adicionar e tirar sem confusão, grid conferido
+
+- **Nomes das ferramentas padronizados:** "+ Adicionar …" para pôr e "Tirar …" para tirar (item, link, imagem, vídeo). "Ocultar item" virou **Tirar item** (o item sai do report; Desfazer volta). "Ocultar" fica só para as seções, que podem voltar a qualquer momento em "Seções do report".
+- **O último item de um grupo fica:** "Tirar item" não aparece nele, para a seção não ficar vazia. Para tirar o grupo todo, oculte a seção.
+- **Celular:** imagens com borda (prints, cartões, imagens adicionadas) ficavam 2 px mais largas que a coluna e vazavam para o lado. Agora a borda entra na largura (`box-sizing:border-box` em `.fluid`).
+- **Teste novo, `tests/grade.e2e.js`:** em cada grupo e em cada layout de tópico novo, adiciona até o máximo e tira até sobrar um; põe e tira imagens e links; oculta e mostra cada seção. Depois de cada passo (100 no total), mede no computador e no celular: nada sai da coluna nem se sobrepõe; itens da mesma linha alinhados, com o mesmo espaço; a linha fecha na largura do grupo (capa e agenda: colunas de 184 px); rótulos das seções no mesmo alinhamento; no celular, itens empilhados na largura da tela, com respiro, sem vazar para o lado.
+
 ## 4.7 · 2026-10-21 · Qualquer link e tópicos novos com o layout escolhido
 
 - **Link aceita qualquer endereço** (link do report no passo 3, **Colocar link** / **+ Link** no emulador, `links` e `link_report_completo` no arquivo de dados): `https://`, `http://` (com aviso), endereço sem `https://` (ex.: `empresa.sharepoint.com/…`, ganha o `https://`, com aviso), caminho do arquivo (`C:\…`, `\\servidor\…`, `file:///…`, com aviso), `mailto:`, `tel:`, `msteams:` e outros esquemas, e endereço relativo (ex.: `report-2026-10.html`, com aviso). Espaço vira `%20` em vez de recusar. Só `javascript:`, `data:` e `vbscript:` (podem executar código) são recusados.

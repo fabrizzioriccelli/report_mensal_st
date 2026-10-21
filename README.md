@@ -37,7 +37,7 @@ Tudo o que o time usa está em **[`kit/`](kit/)**:
 
 1. **Organizar:** imagens do mês numa pasta, com nomes no padrão (`black_friday_selo.png`, `one_brief_icone.png`).
 2. **Abrir** o `emulador-report.html` no Chrome ou no Edge.
-3. **Editar** na própria página: clique no texto e escreva; passe o mouse na imagem e "Trocar imagem"; **+ Adicionar** (embaixo de cada grupo) para mais um item e "Ocultar item" no que não vale no mês (a grade se ajusta no computador e no celular). Ou cole o conteúdo organizado pelo Copilot em **Importar conteúdo**.
+3. **Editar** na própria página: clique no texto e escreva; passe o mouse na imagem e "Trocar imagem"; **+ Adicionar** (embaixo de cada grupo) para mais um item e "Tirar item" no que não vale no mês (a grade se ajusta no computador e no celular). Ou cole o conteúdo organizado pelo Copilot em **Importar conteúdo**.
 4. **Salvar** o report do mês (`report-AAAA-MM.html`).
 5. **Conferir:** reabrir o arquivo salvo, no computador e no celular.
 6. **Publicar** no ambiente corporativo autorizado e colar o link no emulador (para testar no seu computador, vale também o caminho do arquivo: `C:\…` ou `file:///…`).
@@ -114,6 +114,7 @@ Testes (Node.js; os `e2e` também precisam do Playwright):
 - `node tests/motor.test.js`: motor (69 testes).
 - `node tests/emulador.e2e.js`: o fluxo completo do emulador como uma pessoa faria (abrir, editar, imagem, link, ocultar, importar, salvar, reabrir, recuperar, resumo, `.eml`). Com `EMULADOR=kit/emulador-report.html`, testa a versão avulsa.
 - `node tests/emulador-extras.e2e.js`: + Link e + Imagem em vários tipos de item (até 3 imagens), tirar e desfazer, e os tópicos novos (+ Novo tópico com os 4 layouts, numa página nova e numa antiga, adicionar e ocultar itens, numeração, salvar, e-mail-resumo, reabrir, celular).
+- `node tests/grade.e2e.js`: o grid depois de cada adicionar e tirar (itens de todos os grupos, os 4 layouts de tópico, imagens, links, seções), medido no computador e no celular (100 passos).
 - `node tests/ferramenta.e2e.js`: geração pelo arquivo de dados, em 7 larguras de tela.
 - `node tests/movimento.e2e.js`: o movimento da página (números contando, seções aparecendo, "reduzir movimento").
 

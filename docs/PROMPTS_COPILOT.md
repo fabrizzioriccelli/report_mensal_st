@@ -436,5 +436,5 @@ Verifique e responda item a item (OK ou o problema e a correção):
 
 - **Não cole dados no Copilot pessoal** nem em outras IAs públicas. Use só o ambiente aprovado pela empresa.
 - O Copilot pode errar contas e trocar % por p.p. Confira toda variação calculada.
-- Indicador sem dado no mês: oculte o item no emulador ("Ocultar item"). Não deixe o número do mês anterior nem ponha zero no lugar.
+- Indicador sem dado no mês: oculte o item no emulador ("Tirar item"). Não deixe o número do mês anterior nem ponha zero no lugar.
 - Guarde a versão final no report salvo (`.html`), não na conversa.
