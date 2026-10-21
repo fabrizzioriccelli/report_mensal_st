@@ -2,6 +2,15 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.8.1 · 2026-10-21 · Status que sai do amarelo
+
+- **"Ir até lá"** em cada pendência do status: leva ao texto do modelo que falta trocar (rolando até ele, com o cursor dentro), ao link (passo 3) ou aos indicadores (passo 4). Cada texto do modelo aparece separado (até 6), não mais numa linha só.
+- **"Ok, ciente"** nos avisos informativos (tipo de link, notas do Outlook, imagem da internet, report não reconhecido): a etapa fica verde, com "ciente ✓", e o banner volta a "Pronto", enquanto o aviso for o mesmo. Texto do modelo não tem "ciente": precisa ser trocado.
+- **"X" de exemplo:** o emulador marcava como texto do modelo qualquer "X" sozinho em números e detalhes, e o amarelo não saía em textos reais como "Creative X 79%" ou "3X mais". Agora o X só conta no lugar de um número (X%, +X p.p., R$ X, XX, X,X). Vale também na conferência do arquivo de dados.
+- **Status na hora:** depois de editar, o status e as prévias se refazem em 0,6 s (antes esperavam também o rascunho ser guardado, ~2 s, e mostravam o estado antigo nesse meio tempo).
+- Status dos indicadores com o nome do projeto (como no passo 4).
+- Teste `tests/leveza.e2e.js` ampliado: "Ir até lá" leva ao campo e o item sai depois de editado; "Ok, ciente" deixa a etapa verde; "Creative X 79%" não é pendência.
+
 ## 4.8 · 2026-10-21 · Resumo sem repetição, arquivos leves, celular inteiro e ícones
 
 - **E-mail-resumo com o nome do projeto:** no passo 4 e no e-mail, o indicador diz de qual projeto é (ex.: "28 · Contas abertas (Milheiros)"), não "Projeto principal" ou "Destaque do mês". Quando todos vêm do mesmo projeto, a linha embaixo de PRINCIPAIS RESULTADOS traz só o nome.

@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.8 (2026-10-21)";
+  var VERSAO = "4.8.1 (2026-10-21)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -189,10 +189,22 @@
   /* Conteúdo PROVISÓRIO do modelo: Lorem Ipsum nos textos e "X" nos números (X%, R$ X, +X p.p., XX/XX).
      Aparece com visual de template, mas conta como pendência: a versão final só sai com dados reais. */
   var CAMPOS_NUMERICOS = ["valor", "detalhe", "variacao", "anterior", "atual", "data", "status", "resultado", "periodo", "referencia"];
+  /* "X" no lugar de um número (X%, +X p.p., R$ X, XX, X,X): texto do modelo. Não conta quando faz parte de um nome
+     ("Creative X 79%") ou de um número ("3X mais"). */
+  function xDeExemplo(t) {
+    t = String(t || ""); var re = /X{1,2}(?:[,.]X{1,2})?/g, m;
+    while ((m = re.exec(t))) {
+      var a = t.slice(0, m.index), d = t.slice(m.index + m[0].length);
+      if (/[A-Za-zÀ-ÿ0-9]$/.test(a) || /^[A-Za-zÀ-ÿ0-9]/.test(d)) continue;
+      if (/[A-Za-zÀ-ÿ]\s$/.test(a) && !/^\s*(%|p\.?\s?p\b)/.test(d)) continue;
+      return true;
+    }
+    return false;
+  }
   function provisorio(s, campo) {
     s = String(s || "");
     if (/\blorem\b|\bipsum\b/i.test(s)) return "texto de exemplo (Lorem Ipsum)";
-    if (CAMPOS_NUMERICOS.indexOf(campo) >= 0 && /(^|[^A-Za-zÀ-ÿ])X{1,2}(?![A-Za-zÀ-ÿ])/.test(s)) return "valor de exemplo (X)";
+    if (CAMPOS_NUMERICOS.indexOf(campo) >= 0 && xDeExemplo(s)) return "valor de exemplo (X)";
     if (/AAAA|\bMM\b/.test(s) && campo === "pasta_imagens") return "pasta do mês (AAAA-MM)";
     return "";
   }
@@ -1476,7 +1488,7 @@
       c[e.campo] = t;
       var tm = /data-tom="(verde|ambar)"/.exec(e.atributos + e.interno);
       if (tm) tom[e.campo] = tm[1];
-      if (/\[[^\]]*\]|\blorem\b|\bipsum\b/i.test(t) || (/\.(valor|detalhe|variacao|atual|anterior|data)$|^periodo$/.test(e.campo) && /(^|[^A-Za-zÀ-ÿ])X{1,2}(?![A-Za-zÀ-ÿ])|AAAA/.test(t))) pend.push(e.campo + ": " + t);
+      if (/\[[^\]]*\]|\blorem\b|\bipsum\b/i.test(t) || (/\.(valor|detalhe|variacao|atual|anterior|data)$|^periodo$/.test(e.campo) && (xDeExemplo(t) || /AAAA/.test(t)))) pend.push(e.campo + ": " + t);
     });
     function lista(prefixo, campos) {
       var r = [];
@@ -1806,7 +1818,7 @@
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
-    RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
+    RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, xDeExemplo: xDeExemplo, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

@@ -48,6 +48,18 @@ O report abre num quadro, já como página final. As ferramentas de edição exi
 
 Cole a resposta do Copilot no formato de blocos do report (`[NUMERO 1]`, `valor: 12,5%`…) e **Aplicar na página**. Os campos que existem na página são preenchidos (variação ganha a seta; `variacao_cor`/`status_cor` dão a cor); o resto é listado como "ficou de fora". Não traz imagens, links nem PDF e não cria item nem seção nova (para o novo tópico, ligue a seção antes de importar `[TOPICO]`). Formato e prompts: [PROMPTS_COPILOT.md](PROMPTS_COPILOT.md).
 
+## Status: o que é amarelo e como resolver (4.8.1)
+
+| No status | O que fazer |
+|---|---|
+| "Ainda é texto do modelo: …" | **Ir até lá**: o emulador rola até o texto e põe o cursor nele. Troque e aperte Enter: o item sai em menos de um segundo |
+| "Repete a frase do mês" | **Ir até lá** leva aos indicadores: troque o indicador ou a frase. Ou **Ok, ciente** se quiser assim |
+| "Link: …" (link de arquivo, relativo, sem https) | **Ir até lá** leva ao passo 3. Se o link é esse mesmo, **Ok, ciente**: a etapa fica verde |
+| Notas do Outlook, imagem da internet, report não reconhecido | Leia e, se estiver tudo certo, **Ok, ciente** |
+| Vermelho (✕) | Erro: o e-mail não é montado até resolver (ex.: imagem em arquivo que falta) |
+
+O "ciente" vale enquanto o aviso for o mesmo e até abrir outro report. O "X" só conta como texto do modelo no lugar de um número (X%, +X p.p., R$ X); "Creative X 79%" é texto real.
+
 ## Arquivos leves (4.8)
 
 O emulador otimiza sozinho o que entra, para o report, os e-mails e o próprio emulador não ficarem pesados:
