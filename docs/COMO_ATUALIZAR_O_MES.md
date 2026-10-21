@@ -85,6 +85,10 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 
 **Links:** passe o mouse no link › **Colocar link** / **Trocar link** (endereço `https://` ou o caminho do arquivo, `C:\…`, `\\servidor\…` ou `file:///…`, que abre só onde o arquivo está), **Anexar PDF** (o documento vai dentro do report e abre em nova aba) ou **Tirar link**. No Transformation Hub, **Texto do link** muda o nome do link.
 
+**Mais um link ou mais imagens num item:** passe o mouse no item (projeto, lançamento, destaque, aprendizado…) › **+ Link** (escreva o texto e cole o endereço) ou **+ Imagem** (escolha o arquivo e escreva a descrição). Até 3 imagens por item. Para tirar: passe o mouse no link ou na imagem › **Tirar link** / **Tirar imagem**.
+
+**Assunto novo (ex.: Testes):** em "Seções do report", marque **Novo tópico (ex.: Testes)**. A seção aparece antes do "Foco do próximo mês": troque o rótulo (ex.: TESTES), o título e os itens; use **+ Adicionar item no novo tópico**, **+ Link** e **+ Imagem**. Mês sem esse assunto: deixe desmarcado (não vai no report).
+
 ### Campanhas (O que lançamos)
 
 Destaque do mês (categoria, título, texto, imagem e até 3 resultados) e até 6 lançamentos (status, nome, texto, imagem). Status em verde (no ar) ou âmbar (em teste, previsto). Mais lançamentos: **+ Adicionar lançamento** (o 4º abre uma linha nova). Menos: **Ocultar item** nos que sobrarem.

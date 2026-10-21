@@ -121,7 +121,15 @@ O e-mail-resumo **não corta** o report: ele tem template próprio (`RESUMO_TPL`
 
 ### Modelo em branco (coringa)
 
-`dados/CORINGA.txt` (máximo de cada seção; textos [entre colchetes]; números em X; imagens neutras de `assets/coringa/`) → página gerada pelo `gerar-report.html` → `tools/coringa.js` (`window.CORINGA_HTML`, com `<` escapado). Depois de mudar o template: gere a página do CORINGA, atualize `tools/coringa.js`, rode `node tools/montar-avulso.js` e os testes.
+`dados/CORINGA.txt` (máximo de cada seção; textos [entre colchetes]; números em X; imagens neutras de `assets/coringa/`) → página gerada pelo `gerar-report.html` → `tools/coringa.js` (`window.CORINGA_HTML`, com `<` escapado). Depois de mudar o template: `node tools/atualizar-coringa.js` (gera a página do CORINGA no navegador e grava `kit/report-coringa.html` e `tools/coringa.js`), depois `node tools/montar-avulso.js` e os testes.
+
+### Novo tópico (4.6)
+
+Seção reservada (`<!--secao:topico-->`, entre aprendizados e foco) para um assunto que ainda não tem seção (ex.: Testes). O motor só a monta com `[TOPICO 1]` (`[TOPICO]` rotulo, titulo, texto; `[TOPICO n]` status, status_cor, nome, texto, links, imagens, descricao_imagens). Itens em linhas (`data-item="topico-n"`, `td[data-bloco]`), largura inteira; imagens 1 × 600, 2 × 288 ou 3 × 184. Links e imagens usam as mesmas funções do Transformation Hub (`linksDoItem`, `printsDoItem`). No emulador: no modelo em branco a seção começa oculta (rótulo ainda [entre colchetes]); numa página sem a seção, "Seções do report › Novo tópico" copia os nós do coringa antes de `secao:foco` (ou da próxima marca) e renumera as pílulas (`renumerarPilulas`, a mesma regra de `Motor.renumerarSecoes`).
+
+### Links e imagens extras (4.6)
+
+No emulador, **+ Link** e **+ Imagem** em qualquer `[data-item]` e nos blocos destaque, projeto principal e foco (`data-ed-bloco`, só durante a edição). Links: linha `p[data-links]` (em "foi bem"/"a melhorar", `span[data-links]` dentro da frase; no Transformation Hub, a linha de links que já existe), separados por " · "; link sem endereço é o mesmo `span title="Link ainda não definido"` do motor. Imagens: até 3 por item numa tabela `table[data-imagens="largura"]` (ou na tabela de prints que o item já tem), com `data-img="<item>-print-n"` (renumeradas junto com o item), `class="fluid"`, `data-ampliar` e `data-legenda`; desenhadas em dobro da largura da coluna, que vem do template e não da tela (no modo Celular a medida enganaria). O e-mail-resumo não leva links nem imagens extras.
 
 ### Kit
 

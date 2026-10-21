@@ -47,6 +47,8 @@ O que a importação **não** faz: não traz imagens, links nem PDFs (esses são
 [TRANSFORMATION]    titulo
 [TRANSFORMATION 1] a [3] status · status_cor · nome · texto · resultado
 [APRENDIZADO 1] a [3] titulo · texto · levamos
+[TOPICO]            rotulo · titulo · texto
+[TOPICO 1] a [6]    status · status_cor · nome · texto
 [FOCO]              prioridade · texto
 [AGENDA 1] a [6]    data · titulo · detalhe
 ```
@@ -54,6 +56,7 @@ O que a importação **não** faz: não traz imagens, links nem PDFs (esses são
 - `variacao`: com sinal (`+25%`, `-20%`, `+3 p.p.`). O emulador põe a seta (▲ ou ▼).
 - `variacao_cor` e `status_cor`: `verde` (resultado positivo; custo que caiu também é positivo) ou `ambar` (atenção, previsto, aguardando).
 - Campo sem dado: **não escreva o campo**. Nunca complete com estimativa.
+- `[TOPICO]`: o **novo tópico** (ex.: Testes), seção opcional para um assunto que ainda não tem lugar no report. No emulador, ligue a seção ("Seções do report › Novo tópico") antes de importar.
 
 ---
 

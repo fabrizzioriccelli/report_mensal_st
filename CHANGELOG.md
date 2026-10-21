@@ -2,6 +2,16 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.6 · 2026-10-21 · Mais links e imagens em qualquer item e o "Novo tópico" (ex.: Testes)
+
+- **+ Link em todos os itens** do emulador (projetos do Transformation Hub, lançamentos, resultados, aprendizados, agenda, "foi bem"/"a melhorar", indicadores) e nos blocos destaque, projeto principal (capa) e foco: escreve o texto e cola o endereço. Os links ficam numa linha no fim do texto, separados por " · " (no Transformation Hub, junto dos que já existem). Sem endereço, o link fica cinza (pendente) e se completa com **Colocar link** ou **Anexar PDF**. **Tirar link** leva o separador e a linha vazia junto; **Texto do link** vale para todos os links de lista. Na capa e no foco (fundo vermelho), o link novo é branco.
+- **+ Imagem em todos os itens** (menos "foi bem"/"a melhorar", que são linhas de texto): **até 3 por item**, com descrição obrigatória, lado a lado na largura da coluna (coluna estreita: uma embaixo da outra), junto dos prints que o item já tem. No celular, empilhadas; no report, abrem maiores no clique. **Tirar imagem** reorganiza as outras.
+- **Novo tópico (ex.: Testes):** seção reservada para um assunto que ainda não tem lugar no report, entre "O que aprendemos" e o "Foco do próximo mês": rótulo (ex.: TESTES), título, frase de abertura e até 6 itens (status, nome, texto, links, imagens). No emulador: "Seções do report › Novo tópico (ex.: Testes)" liga a seção (no modelo em branco ela vem desligada; em reports de antes da 4.6, marcar acrescenta), com **+ Adicionar item no novo tópico**. No arquivo de dados: blocos `[TOPICO]` e `[TOPICO 1]` a `[TOPICO 6]` (exemplo comentado em `dados/MODELO.txt`); a importação do Copilot aceita os mesmos blocos.
+- **Numeração das seções** (01, 02…) refeita na hora no emulador ao ocultar, mostrar ou acrescentar seção (antes só no arquivo salvo).
+- Motor: links e imagens do Transformation Hub e do novo tópico usam as mesmas funções. Modelo em branco refeito (`node tools/atualizar-coringa.js`, ferramenta nova) e emulador avulso remontado.
+- Testes: 68 no motor (novo tópico: ordem, numeração, links, imagens, texto do e-mail, importação) e um teste novo do emulador, `tests/emulador-extras.e2e.js` (links e imagens em vários tipos de item, máximo de 3, tirar, Desfazer, novo tópico ligado, acrescentado numa página antiga, salvar, reabrir, celular sem vazar), nas duas versões (pasta do projeto e avulsa).
+- **Ainda não feito:** o guia operacional e a apresentação executiva (kit) ainda não mostram os botões novos; o e-mail-resumo não leva o novo tópico.
+
 ## 4.5 · 2026-10-16 · E-mail-resumo chega como a prévia: botão clicável e cantos retos
 
 Teste do time: no Outlook, o e-mail-resumo saiu "quadrado" e diferente da prévia do emulador, e quem recebeu não conseguiu clicar no botão (apareceu como imagem).
