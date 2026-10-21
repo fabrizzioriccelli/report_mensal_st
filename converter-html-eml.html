@@ -373,6 +373,7 @@
     /* textos e números */
     editavel(d.body);
     marcarBlocos();
+    linksUmPorLinha();
     localizarGrupos();
     d.addEventListener("focusin", function (e) {
       var el = e.target.closest && e.target.closest("[data-ed-campo]"); if (!el) return;
@@ -627,8 +628,8 @@
   function tirarLink(a) {
     var pai = a.parentNode, tirados = [];
     function tira(n) { if (n && n.parentNode) { tirados.push([n, n.parentNode, n.nextSibling]); n.remove(); } }
-    function ehSep(x) { return x && x.nodeType === 1 && !x.matches("a, [title]") && /·/.test(x.textContent); }
-    /* o separador " · " sai junto: o de antes; se for o primeiro link da linha, o de depois */
+    function ehSep(x) { return x && x.nodeType === 1 && (x.tagName === "BR" || !x.matches("a, [title]") && /·/.test(x.textContent)); }
+    /* a quebra de linha (ou o " · " antigo) sai junto: a de antes; se for o primeiro link da linha, a de depois */
     tira(ehSep(a.previousElementSibling) ? a.previousElementSibling : ehSep(a.nextElementSibling) && !pai.matches("span[data-links]") ? a.nextElementSibling : null);
     tira(a);
     /* linha de links que ficou vazia (sem link e sem texto) sai também */
@@ -644,6 +645,16 @@
     [["destaque.titulo", "destaque"], ["principal.nome", "principal"], ["foco.prioridade", "foco"]].forEach(function (x) {
       var el = ED.doc.querySelector('[data-campo="' + x[0] + '"]'), td = el && el.closest("td");
       if (td && !td.closest("[data-item]")) td.setAttribute("data-ed-bloco", x[1]);
+    });
+  }
+  /* Linhas de links de antes (separadas por " · "): ao abrir, viram um link por linha, como na 4.6. */
+  function linksUmPorLinha() {
+    Array.prototype.forEach.call(ED.doc.querySelectorAll("[data-links], p:not([data-campo])"), function (l) {
+      if (l.querySelector("[data-campo]") || !l.querySelector('a.cta, span[title="Link ainda não definido"]')) return;
+      Array.prototype.forEach.call(l.children, function (x) {
+        if (x.tagName === "SPAN" && !x.hasAttribute("title") && !x.hasAttribute("data-links") && /^[\s\u00a0]*·[\s\u00a0]*$/.test(x.textContent)) x.replaceWith(ED.doc.createElement("br"));
+      });
+      if (l.tagName === "P") l.style.lineHeight = "22px";
     });
   }
   function chaveDoAlvo(alvo) { return alvo.getAttribute("data-item") || alvo.getAttribute("data-ed-bloco"); }
@@ -683,7 +694,7 @@
     if (p || !criar) return p || null;
     if (area.tagName === "P") { p = ED.doc.createElement("span"); p.setAttribute("data-links", ""); area.appendChild(p); return p; }
     p = ED.doc.createElement("p"); p.className = "fx ts"; p.setAttribute("data-links", "");
-    p.setAttribute("style", "margin:8px 0 0 0;font-family:" + fonteTexto(area) + ";font-size:12px;line-height:18px;");
+    p.setAttribute("style", "margin:8px 0 0 0;font-family:" + fonteTexto(area) + ";font-size:12px;line-height:22px;");
     var cx = area.querySelector("table[data-imagens]");
     if (cx && cx.parentNode === area) area.insertBefore(p, cx); else area.appendChild(p);
     return p;
@@ -693,10 +704,8 @@
     if (rot === null || !rot.trim()) return;
     var d = ED.doc, area = areaDoAlvo(alvo), escuro = fundoEscuro(area), corApoio = escuro ? "#F5DECF" : "#767676";
     var desde = ED.desfazer.length, criada = !linhaDeLinks(area, false), linha = linhaDeLinks(area, true), sep = null;
-    /* separador " · " entre links (na linha de texto, antes do primeiro também) */
-    if (linha.tagName === "SPAN" || linha.querySelector('a, span[title="Link ainda não definido"]')) {
-      sep = d.createElement("span"); sep.setAttribute("style", "color:" + corApoio + ";"); sep.innerHTML = "&nbsp;&nbsp;·&nbsp;&nbsp;"; linha.appendChild(sep);
-    }
+    /* um link por linha (na frase de "foi bem"/"a melhorar", o primeiro também vai para a linha de baixo) */
+    if (linha.tagName === "SPAN" || linha.querySelector('a, span[title="Link ainda não definido"]')) { sep = d.createElement("br"); linha.appendChild(sep); }
     var sp = d.createElement("span"); sp.setAttribute("title", "Link ainda não definido");
     sp.setAttribute("style", "color:" + corApoio + ";font-weight:bold;white-space:nowrap;"); sp.innerHTML = esc(rot.trim()) + "&nbsp;&#8594;";
     linha.appendChild(sp);
