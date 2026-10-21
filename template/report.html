@@ -481,6 +481,43 @@
   </tr>
   {{/aprendizados}}
 
+  {{#topico}}
+  <!--secao:topico-->
+  <!-- NOVO TÓPICO (ex.: TESTES) · espaço reservado para um assunto novo. Só aparece quando o mês tem
+       [TOPICO 1] preenchido ou quando a seção é ligada no emulador (Seções do report › Novo tópico).
+       Itens em linhas (largura inteira), com status, nome, texto, links e até 3 imagens. -->
+  <!-- EDITAR AQUI: NOVO TÓPICO → dados/AAAA-MM.txt › [TOPICO] rotulo, titulo, texto · [TOPICO 1..6] status, status_cor, nome, texto, links, imagens, descricao_imagens -->
+  <tr>
+    <td class="px" style="padding:40px 40px 0 40px;">
+      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;<span data-campo="topico.rotulo">{{rotulo}}</span></p>
+      {{#titulo}}<p class="ft h2" data-campo="topico.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
+      {{#texto}}<p class="fx tm" data-campo="topico.texto" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+      <div style="font-size:14px;line-height:14px;mso-line-height-rule:exactly;">&nbsp;</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        {{#itens}}
+        <tr data-item="topico-{{numero}}">
+          <td data-bloco="topico-{{numero}}" style="padding:14px 0 16px 0;border-top:1px solid {{filete}};">
+            {{#status}}<p class="fx" data-campo="topico-{{numero}}.status" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
+            <p class="ft" data-campo="topico-{{numero}}.nome" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:17px;line-height:22px;color:{{cor.titulo}};">{{nome}}</p>
+            {{#texto}}<p class="fx tm" data-campo="topico-{{numero}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
+            {{#links}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;">{{links}}</p>{{/links}}
+            {{#tem_prints}}
+            <!-- IMAGENS do item (dados › imagens, descricao_imagens): 1 × 600, 2 × 288 ou 3 × 184 px; no celular, empilhadas. -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>
+              {{#prints}}
+              {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
+              <td class="{{classe}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">{{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}} data-img="topico-{{numero}}-print-{{pidx}}" class="fluid" style="display:block;border:1px solid {{cor.linha}};width:{{w}}px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.texto_apoio}};">{{/img}}{{placeholder}}</td>
+              {{/prints}}
+            </tr></table>
+            {{/tem_prints}}
+          </td>
+        </tr>
+        {{/itens}}
+      </table>
+    </td>
+  </tr>
+  {{/topico}}
+
   {{#foco}}
   <!--secao:foco-->
   <!-- 06 · FOCO DO PRÓXIMO MÊS · bloco vermelho -->

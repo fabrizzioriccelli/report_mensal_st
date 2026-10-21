@@ -253,6 +253,41 @@ titulo: [Aprendizado 3]
 texto: [O que os dados mostraram.]
 levamos: [o que levamos para os próximos meses.]
 
+# Novo tópico (ex.: Testes): no emulador, esta seção começa desligada
+# (Seções do report › Novo tópico) até alguém ligar e preencher.
+# Sem imagem no modelo: cada item ganha imagens pelo "+ Imagem".
+[TOPICO]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+
+[TOPICO 1]
+status: [Status do item]
+status_cor: ambar
+nome: [Nome do item 1]
+texto: [O que é, o que foi feito e o resultado.]
+links: [Texto do link] | [INSERIR LINK]
+imagens:
+descricao_imagens:
+
+[TOPICO 2]
+status: [Status do item]
+status_cor: ambar
+nome: [Nome do item 2]
+texto: [O que é, o que foi feito e o resultado.]
+links: [Texto do link] | [INSERIR LINK]
+imagens:
+descricao_imagens:
+
+[TOPICO 3]
+status: [Status do item]
+status_cor: ambar
+nome: [Nome do item 3]
+texto: [O que é, o que foi feito e o resultado.]
+links: [Texto do link] | [INSERIR LINK]
+imagens:
+descricao_imagens:
+
 [FOCO]
 prioridade: [Prioridade do próximo mês.]
 texto: [Texto do foco do próximo mês.]

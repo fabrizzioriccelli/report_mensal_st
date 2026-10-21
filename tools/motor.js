@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.5 (2026-10-16)";
+  var VERSAO = "4.6 (2026-10-21)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -93,6 +93,9 @@
     { bloco: "TRANSFORMATION", campos: { titulo: 0 } },
     { bloco: "TRANSFORMATION", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, citacao: 0, resultado: 0, icones: 0, logo: 0, descricao_logo: 0, links: 0, prints: 0, descricao_prints: 0 }, PECA) },
     { bloco: "APRENDIZADO", max: 3, campos: { titulo: 1, texto: 0, levamos: 0 } },
+    /* Novo tópico (ex.: Testes): espaço reservado para um assunto que ainda não tem seção própria. */
+    { bloco: "TOPICO", campos: { rotulo: 0, titulo: 0, texto: 0 } },
+    { bloco: "TOPICO", max: 6, campos: { status: 0, status_cor: 0, nome: 1, texto: 0, links: 0, imagens: 0, descricao_imagens: 0 } },
     { bloco: "FOCO", campos: { prioridade: 1, texto: 0, selo: 0, descricao_selo: 0 } },
     { bloco: "AGENDA", max: 6, campos: { data: 0, titulo: 1, detalhe: 0 } }
   ];
@@ -628,6 +631,49 @@
       };
     }
 
+    /* Links extras de um item (Transformation Hub, novo tópico): "Texto | https://…", vários separados por ";".
+       PDF na pasta do mês vai DENTRO da página e abre em nova aba; no e-mail vira texto. */
+    function linksDoItem(v, nb, onde) {
+      return (v.links || "").split(";").map(function (x) { return x.trim(); }).filter(Boolean).map(function (par) {
+        var k = par.lastIndexOf("|"), rot = k > 0 ? par.slice(0, k).trim() : "", url = k > 0 ? par.slice(k + 1).trim() : par;
+        if (rot && /\.pdf$/i.test(url) && !/^[a-z]+:/i.test(url) && !ehPendencia(url)) {
+          var camA = caminhoImagem(url);
+          if (!existe(camA)) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: documento não encontrado: " + camA + "."); return ""; }
+          anexos.push({ id: anexos.length + 1, caminho: camA });
+          return '<a href="#" data-anexo="@@ANX' + anexos.length + '@@" target="_blank" class="cta" title="Abre o documento (PDF) em nova aba" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>";
+        }
+        if (!rot) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: escreva \"Texto do link | endereço\" (ex.: Briefing Agent | https://…). Vários, separados por ;"); return ""; }
+        conferirLink(url, "projeto", dominios).forEach(function (x) { problema(prob, x.nivel, arqD, v._linhas.links, "[" + nb + "] links (" + rot + "): " + x.msg); });
+        var ok = url && !ehPendencia(url) && /^https?:\/\//i.test(url) && !/\s/.test(url);
+        if (ok) linksReport.push({ onde: onde + " · " + rot, tipo: "projeto", rotulo: rot, url: url });
+        return ok ? '<a href="' + esc(url) + '" target="_blank" class="cta" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>"
+          : '<span title="Link ainda não definido" style="color:' + cor.texto_apoio.s + ';font-weight:bold;">' + esc(rot) + "&nbsp;&#8594;</span>";
+      }).filter(Boolean);
+    }
+    function juntaLinks(lista) { return seguro(lista.join('<span style="color:' + cor.texto_apoio.s + ';">&nbsp;&nbsp;·&nbsp;&nbsp;</span>')); }
+    /* Imagens de um item (até 3), lado a lado nas larguras dadas (1, 2 ou 3); no celular, empilhadas.
+       Na página do navegador, abrem inteiras e maiores no clique. */
+    function printsDoItem(v, nb, campo, campoDesc, larguras) {
+      var nomesP = (v[campo] || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean);
+      var ehPrint = campo === "prints", nomeIm = ehPrint ? "print" : "imagem";
+      if (nomesP.length > 3) { problema(prob, "aviso", arqD, v._linhas[campo], "[" + nb + "] " + campo + ": até 3. Usei " + (ehPrint ? "os 3 primeiros." : "as 3 primeiras.")); nomesP = nomesP.slice(0, 3); }
+      var descP = (v[campoDesc] || "").split("|").map(function (x) { return x.trim(); });
+      var largP = larguras[nomesP.length];
+      return nomesP.map(function (nm, j) {
+        var it = { pidx: j + 1, img: null, placeholder: seguro(""), largura: largP, primeiro: j === 0, classe: j < nomesP.length - 1 ? "col gap" : "col" };
+        if (ehPendencia(nm)) {
+          it.placeholder = placeholder("100%", Math.round(largP * 0.4), nomeIm + " · " + (largP * 2) + " px", 12, false);
+          return it;
+        }
+        var cam = caminhoImagem(nm), d = descP[j] || (ehPrint ? "Print: " : "Imagem: ") + semBr(v.nome || "");
+        if (!existe(cam)) problema(prob, "erro", arqD, v._linhas[campo], "[" + nb + "] " + nomeIm + " não encontrad" + (ehPrint ? "o" : "a") + ": " + cam + ".");
+        it.img = imagem(cam, largP, 0, { alt: d, papel: nb + " (" + nomeIm + " " + (j + 1) + ")", fluida: true });
+        var z = imagem(cam, 0, 0, { ampliada: true, alt: d, papel: nb + " (" + nomeIm + " " + (j + 1) + (ehPrint ? ", ampliado)" : ", ampliada)") });
+        it.img.zoom = z.src; it.img.legenda = seguro(esc(d));
+        return it;
+      });
+    }
+
     /* 04 · Transformation Hub */
     var tr = L.TRANSFORMATION || [], transformation = null, linksReport = [];
     if (tr.length) {
@@ -644,24 +690,7 @@
             if (!existe(camL)) problema(prob, "erro", arqD, v._linhas.logo, "[" + nb + "] logo não encontrado: " + camL + ". Confira o nome do arquivo.");
             logo = imagem(camL, 56, 0, { alt: v.descricao_logo || "Logo: " + semBr(v.nome || ""), papel: nb + " (logo)" });
           }
-          /* Links extras (ex.: documento e agente): "Texto | https://…", vários separados por ";". */
-          var links = (v.links || "").split(";").map(function (x) { return x.trim(); }).filter(Boolean).map(function (par, j) {
-            var k = par.lastIndexOf("|"), rot = k > 0 ? par.slice(0, k).trim() : "", url = k > 0 ? par.slice(k + 1).trim() : par;
-            /* Documento em PDF na pasta do mês (ex.: One Brief): vai DENTRO da página do mês e abre em nova aba
-               no clique (nenhum endereço inventado). No e-mail, vira texto sem link. */
-            if (rot && /\.pdf$/i.test(url) && !/^[a-z]+:/i.test(url) && !ehPendencia(url)) {
-              var camA = caminhoImagem(url);
-              if (!existe(camA)) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: documento não encontrado: " + camA + "."); return ""; }
-              anexos.push({ id: anexos.length + 1, caminho: camA });
-              return '<a href="#" data-anexo="@@ANX' + anexos.length + '@@" target="_blank" class="cta" title="Abre o documento (PDF) em nova aba" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>";
-            }
-            if (!rot) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: escreva \"Texto do link | endereço\" (ex.: Briefing Agent | https://…). Vários, separados por ;"); return ""; }
-            conferirLink(url, "projeto", dominios).forEach(function (x) { problema(prob, x.nivel, arqD, v._linhas.links, "[" + nb + "] links (" + rot + "): " + x.msg); });
-            var ok = url && !ehPendencia(url) && /^https?:\/\//i.test(url) && !/\s/.test(url);
-            if (ok) linksReport.push({ onde: "Transformation " + (i + 1) + " · " + rot, tipo: "projeto", rotulo: rot, url: url });
-            return ok ? '<a href="' + esc(url) + '" target="_blank" class="cta" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>"
-              : '<span title="Link ainda não definido" style="color:' + cor.texto_apoio.s + ';font-weight:bold;">' + esc(rot) + "&nbsp;&#8594;</span>";
-          }).filter(Boolean);
+          var links = linksDoItem(v, nb, "Transformation " + (i + 1));
           var icones = logo || logoPend ? [] : (v.icones || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean).map(function (ic, j) {
             var cam = "assets/icones/" + ic.replace(/\.png$/i, "") + ".png";
             if (!existe(cam)) problema(prob, "erro", arqD, v._linhas.icones, "[" + nb + "] ícone não encontrado: " + cam);
@@ -671,27 +700,11 @@
           });
           /* Prints (até 3), na largura do cartão (504 px): 1 × 504, 2 × 240 ou 3 × 152, separados por 24 px.
              No celular, um embaixo do outro. Na página do navegador, abrem inteiros e maiores no clique. */
-          var nomesP = (v.prints || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean);
-          if (nomesP.length > 3) { problema(prob, "aviso", arqD, v._linhas.prints, "[" + nb + "] prints: até 3. Usei os 3 primeiros."); nomesP = nomesP.slice(0, 3); }
-          var descP = (v.descricao_prints || "").split("|").map(function (x) { return x.trim(); });
-          var largP = [0, 504, 240, 152][nomesP.length];
-          var prints = nomesP.map(function (nm, j) {
-            var it = { pidx: j + 1, img: null, placeholder: seguro(""), largura: largP, primeiro: j === 0, classe: j < nomesP.length - 1 ? "col gap" : "col" };
-            if (ehPendencia(nm)) {
-              it.placeholder = placeholder("100%", Math.round(largP * 0.4), "print · " + (largP * 2) + " px", 12, false);
-              return it;
-            }
-            var cam = caminhoImagem(nm), d = descP[j] || "Print: " + semBr(v.nome || "");
-            if (!existe(cam)) problema(prob, "erro", arqD, v._linhas.prints, "[" + nb + "] print não encontrado: " + cam + ".");
-            it.img = imagem(cam, largP, 0, { alt: d, papel: nb + " (print " + (j + 1) + ")", fluida: true });
-            var z = imagem(cam, 0, 0, { ampliada: true, alt: d, papel: nb + " (print " + (j + 1) + ", ampliado)" });
-            it.img.zoom = z.src; it.img.legenda = seguro(esc(d));
-            return it;
-          });
+          var prints = printsDoItem(v, nb, "prints", "descricao_prints", [0, 504, 240, 152]);
           return {
             numero: i + 1, prints: prints, tem_prints: prints.length > 0,
             status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), citacao: texto(v.citacao), resultado: texto(v.resultado),
-            icones: icones, logo: logo, logo_placeholder: logoPend, links: seguro(links.join('<span style="color:' + cor.texto_apoio.s + ';">&nbsp;&nbsp;·&nbsp;&nbsp;</span>')),
+            icones: icones, logo: logo, logo_placeholder: logoPend, links: juntaLinks(links),
             peca: p, tem_visual: icones.length > 0 || !!logo || logoPend || !!p.img || !!p.placeholder,
             borda: i < tr.length - 1 ? "border-bottom:1px solid " + cor.transformation_linha.s + ";" : ""
           };
@@ -709,6 +722,22 @@
           var ult = i === ap.length - 1;
           return {
             numero: i + 1, titulo: texto(v.titulo), texto: texto(v.texto), levamos: texto(v.levamos), largura: la[i], primeiro: i === 0, classe: ult ? "col" : "col gap"
+          };
+        })
+      };
+    }
+
+    /* Novo tópico (ex.: Testes): só aparece com [TOPICO 1] preenchido. Itens em linhas, na largura inteira. */
+    var tp = L.TOPICO || [], TP = D.simples.TOPICO || {}, topico = null;
+    if (tp.length) {
+      topico = {
+        n: proxSecao(), rotulo: texto(maiusculas(TP.rotulo || "Novo tópico")), titulo: texto(TP.titulo || ""), texto: texto(TP.texto || ""),
+        itens: tp.map(function (v, i) {
+          var nb = "TOPICO " + (i + 1), prints = printsDoItem(v, nb, "imagens", "descricao_imagens", [0, 600, 288, 184]);
+          curto(v, "texto", 240, nb);
+          return {
+            numero: i + 1, status: status(v, nb), nome: texto(v.nome), texto: texto(v.texto), links: juntaLinks(linksDoItem(v, nb, "Novo tópico " + (i + 1))),
+            prints: prints, tem_prints: prints.length > 0, filete: i === 0 ? cor.texto : cor.linha
           };
         })
       };
@@ -757,7 +786,7 @@
       assunto: assunto, link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
-      abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, foco: foco, agenda: agenda
+      abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topico: topico, foco: foco, agenda: agenda
     };
 
     if (prob.some(function (p) { return p.nivel === "erro"; })) return { ok: false, problemas: prob };
@@ -825,6 +854,14 @@
       });
     }
     if ((L.APRENDIZADO || []).length) { o.push("", "O QUE APRENDEMOS"); L.APRENDIZADO.forEach(function (v, i) { o.push((i + 1) + ". " + t(v.titulo) + ": " + t(v.texto) + (v.levamos ? " Levamos: " + t(v.levamos) : "")); }); }
+    if ((L.TOPICO || []).length) {
+      var T = S.TOPICO || {};
+      o.push("", maiusculas(T.rotulo || "Novo tópico") + (T.titulo ? ": " + t(T.titulo) : ""), t(T.texto || ""));
+      L.TOPICO.forEach(function (v) {
+        o.push("", t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto));
+        (v.links || "").split(";").forEach(function (par) { var k = par.lastIndexOf("|"), u = k > 0 ? par.slice(k + 1).trim() : ""; if (u && !ehPendencia(u) && !/\.pdf$/i.test(u)) o.push("  " + par.slice(0, k).trim() + ": " + u); });
+      });
+    }
     if (S.FOCO) o.push("", "FOCO DE " + maiusculas(E.proximo_mes) + ": " + t(S.FOCO.prioridade), t(S.FOCO.texto));
     if ((L.AGENDA || []).length) { o.push("", "TAMBÉM VEM AÍ"); L.AGENDA.forEach(function (v) { o.push("- " + t(v.data) + " · " + t(v.titulo) + (v.detalhe ? " (" + t(v.detalhe) + ")" : "")); }); }
     o.push("", "Até " + E.proximo_mes.toLowerCase() + ".", E.contato ? "Dúvidas, sugestões ou pedidos: " + t(E.contato) : "");
@@ -1181,7 +1218,7 @@
   /* Nome de cada seção (marcas <!--secao:nome--> do template) e as que o e-mail resumido leva. */
   var SECOES = {
     capa: "Capa e números do projeto principal", lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas",
-    transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês",
+    transformation: "Transformation Hub", aprendizados: "O que aprendemos", topico: "Novo tópico (ex.: Testes)", foco: "Foco do próximo mês",
     agenda: "Também vem aí", rodape: "Encerramento e assinatura"
   };
   var SECOES_RESUMO = ["capa", "resumo", "foco", "rodape"];
@@ -1583,12 +1620,14 @@
     "DESTAQUE": { categoria: "destaque.categoria", titulo: "destaque.titulo", texto: "destaque.texto", nota: "destaque.nota" },
     "CREATIVE X": { subtitulo: "cx.subtitulo", anterior: "cx.anterior", atual: "cx.atual", variacao: "cx.variacao", periodo: "cx.periodo", referencia: "cx.referencia", significado: "cx.significado" },
     "TRANSFORMATION": { titulo: "transformation.titulo" },
+    "TOPICO": { rotulo: "topico.rotulo", titulo: "topico.titulo", texto: "topico.texto" },
     "FOCO": { prioridade: "foco.prioridade", texto: "foco.texto" }
   };
   var IMPORTA_LISTA = {
     "NUMERO": ["numero", ["valor", "titulo", "detalhe", "variacao"]], "RESULTADO": ["resultado", ["valor", "titulo", "detalhe", "variacao"]],
     "LANCAMENTO": ["lancamento", ["status", "nome", "texto"]], "FOI BEM": ["bem", ["texto"]], "A MELHORAR": ["melhorar", ["texto"]],
-    "TRANSFORMATION": ["transformation", ["status", "nome", "texto", "resultado"]], "APRENDIZADO": ["aprendizado", ["titulo", "texto", "levamos"]], "AGENDA": ["agenda", ["data", "titulo", "detalhe"]]
+    "TRANSFORMATION": ["transformation", ["status", "nome", "texto", "resultado"]], "APRENDIZADO": ["aprendizado", ["titulo", "texto", "levamos"]], "AGENDA": ["agenda", ["data", "titulo", "detalhe"]],
+    "TOPICO": ["topico", ["status", "nome", "texto"]]
   };
   function importarDados(texto) {
     var lido = ler(texto, "conteúdo colado"), campos = {}, problemas = lido.problemas.slice(), n = 0;

@@ -701,6 +701,38 @@ teste("PDF anexo no Transformation Hub: vai dentro da página, abre em nova aba;
   assert.ok(niveis(faltando, "erro").some(function (p) { return /documento não encontrado/.test(p.msg); }));
 });
 
+teste("novo tópico (ex.: Testes): seção reservada só aparece com [TOPICO 1], na ordem certa, com links e imagens", function () {
+  assert.ok(montar(MINIMO).html.indexOf("<!--secao:topico-->") < 0, "sem [TOPICO 1], a seção não aparece");
+  var dados = MINIMO + "\n" + [
+    "[APRENDIZADO 1]", "titulo: Aprender", "texto: Algo.",
+    "[TOPICO]", "rotulo: Testes", "titulo: O que testamos", "texto: Testes A/B do mês.",
+    "[TOPICO 1]", "status: Em teste", "status_cor: ambar", "nome: Teste de chamada", "texto: Duas versões do título.",
+    "links: Plano do teste | https://empresa.sharepoint.com/:w:/s/site/plano ; Resultado | [link]",
+    "imagens: icone-prancheta.png, icone-lupa.png", "descricao_imagens: Versão A | Versão B",
+    "[TOPICO 2]", "nome: Teste de imagem",
+    "[FOCO]", "prioridade: Foco"
+  ].join("\n");
+  var r = montar(dados);
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  var h = r.html, a = h.indexOf("<!--secao:aprendizados-->"), t = h.indexOf("<!--secao:topico-->"), f = h.indexOf("<!--secao:foco-->");
+  assert.ok(a > 0 && t > a && f > t, "entre O que aprendemos e o Foco");
+  assert.ok(/>0\d<\/span>&nbsp;&nbsp;<span data-campo="topico.rotulo">TESTES<\/span>/.test(h), "rótulo em maiúsculas, com o número da seção");
+  assert.ok(/data-item="topico-1"/.test(h) && /data-item="topico-2"/.test(h) && /data-campo="topico-1.status"/.test(h));
+  assert.ok(/href="https:\/\/empresa.sharepoint.com\/:w:\/s\/site\/plano"[^>]*class="cta"[^>]*>Plano do teste&nbsp;&#8594;<\/a>/.test(h), "link de verdade");
+  assert.ok(/title="Link ainda não definido"[^>]*>Resultado&nbsp;&#8594;/.test(h), "link pendente não vira clique");
+  var ims = h.match(/<img\b[^>]*data-img="topico-1-print-\d"[^>]*>/g) || [];
+  assert.strictEqual(ims.length, 2);
+  ims.forEach(function (x) { assert.ok(/ width="288"/.test(x) && /data-ampliar="@@IMG\d+@@"/.test(x), x); });
+  assert.ok(/alt="Versão A"/.test(h) && /alt="Versão B"/.test(h));
+  assert.ok(/TESTES: O que testamos/.test(r.texto) && /Plano do teste: https:/.test(r.texto), "versão em texto do e-mail");
+  assert.ok(r.links.some(function (l) { return /Novo tópico 1 · Plano do teste/.test(l.onde); }), "link na lista de testar antes de enviar");
+  var im = M.importarDados("[TOPICO]\ntitulo: Testes do mês\n[TOPICO 2]\nnome: Teste B\nstatus: Concluído\nstatus_cor: verde");
+  assert.deepStrictEqual(im.problemas, []);
+  assert.strictEqual(im.campos["topico.titulo"].texto, "Testes do mês");
+  assert.strictEqual(im.campos["topico-2.nome"].texto, "Teste B");
+  assert.strictEqual(im.campos["topico-2.status"].tom, "verde");
+});
+
 teste("marcas de edição (data-img, data-item, data-campo) existem na página e saem do e-mail", function () {
   var html = montar(COMPLETO).html;
   assert.ok(/data-img="principal"/.test(html) && /data-img="destaque"/.test(html) && /data-img="transformation-1-logo"/.test(html));

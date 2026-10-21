@@ -111,8 +111,9 @@ Sempre na mesma ordem:
 
 Testes (Node.js; os `e2e` também precisam do Playwright):
 
-- `node tests/motor.test.js`: motor (66 testes).
+- `node tests/motor.test.js`: motor (68 testes).
 - `node tests/emulador.e2e.js`: o fluxo completo do emulador como uma pessoa faria (abrir, editar, imagem, link, ocultar, importar, salvar, reabrir, recuperar, resumo, `.eml`). Com `EMULADOR=kit/emulador-report.html`, testa a versão avulsa.
+- `node tests/emulador-extras.e2e.js`: + Link e + Imagem em vários tipos de item (até 3 imagens), tirar e desfazer, e o novo tópico (ligar, acrescentar numa página antiga, numeração, salvar e reabrir, celular).
 - `node tests/ferramenta.e2e.js`: geração pelo arquivo de dados, em 7 larguras de tela.
 - `node tests/movimento.e2e.js`: o movimento da página (números contando, seções aparecendo, "reduzir movimento").
 

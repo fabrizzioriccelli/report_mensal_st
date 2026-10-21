@@ -314,6 +314,35 @@ levamos: lorem ipsum dolor.
 
 
 # ----------------------------------------------------------------------
+#  EDITAR AQUI: NOVO TÓPICO (opcional · ex.: TESTES)
+# ----------------------------------------------------------------------
+#  Espaço reservado para um assunto novo que ainda não tem seção própria
+#  (ex.: os testes do mês). A seção só aparece no report quando
+#  [TOPICO 1] existe. Para usar: tire o "#" do começo das linhas abaixo.
+#  rotulo: o nome curto no topo da seção (vira MAIÚSCULAS: TESTES).
+#  Até 6 itens ([TOPICO 1] a [TOPICO 6]). Em cada item:
+#    status + status_cor (verde ou ambar), nome (obrigatório), texto,
+#    links: "Texto | endereço", vários separados por ; (PDF da pasta do
+#           mês também vale: "Plano do teste | plano.pdf")
+#    imagens: até 3, separadas por vírgula (descrições em
+#             descricao_imagens, separadas por |)
+#
+# [TOPICO]
+# rotulo: Testes
+# titulo: Lorem ipsum dolor sit amet.
+# texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+#
+# [TOPICO 1]
+# status: Lorem ipsum
+# status_cor: ambar
+# nome: Lorem ipsum dolor
+# texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+# links: Lorem ipsum | [INSERIR LINK]
+# imagens:
+# descricao_imagens:
+
+
+# ----------------------------------------------------------------------
 #  EDITAR AQUI: 06 · FOCO DO PRÓXIMO MÊS
 # ----------------------------------------------------------------------
 #  selo (opcional): o PNG original do selo da campanha, na versão feita

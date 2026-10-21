@@ -141,7 +141,9 @@
       <span><b>Texto ou número:</b> clique e escreva. Enter confirma; Shift+Enter quebra a linha.</span>
       <span><b>Imagem ou vídeo:</b> passe o mouse e use "Trocar imagem" (ou "Trocar vídeo").</span>
       <span><b>Link:</b> passe o mouse em um link vermelho e use "Trocar link".</span>
+      <span><b>Mais links ou imagens:</b> passe o mouse no item (projeto, lançamento, destaque…) e use "+ Link" ou "+ Imagem" (até 3 por item).</span>
       <span><b>Item que não vale este mês:</b> passe o mouse e use "Ocultar item".</span>
+      <span><b>Assunto novo (ex.: Testes):</b> em "Seções do report", marque "Novo tópico".</span>
     </div>
     <div class="ferramentas">
       <button type="button" class="pri" id="bSalvar">Salvar report (.html)</button>
@@ -159,7 +161,7 @@
       <div class="row"><button type="button" class="pri" id="bAplicar">Aplicar na página</button><button type="button" id="bFecharImportar">Fechar</button><span class="muted" id="importarInfo"></span></div>
     </div>
     <details>
-      <summary>Seções do report (mostrar ou ocultar neste mês)</summary>
+      <summary>Seções do report (mostrar, ocultar ou ligar o novo tópico)</summary>
       <div class="lista" id="secoesRep"></div>
     </details>
     <div class="frame" style="margin-top:4px"><iframe id="edFrame" title="Report em edição" sandbox="allow-same-origin"></iframe></div>
@@ -315,7 +317,7 @@
     "[data-ed-campo]:focus{outline:2px solid #EC0000;background-color:rgba(255,241,201,.6)}" +
     "[data-ed-alterado]{outline-color:#21634F !important}" +
     "img[data-img]{outline:2px dashed rgba(236,0,0,.55);outline-offset:3px;cursor:pointer}" +
-    "[data-item]:hover{box-shadow:0 0 0 2px rgba(236,0,0,.18) inset}" +
+    "[data-item]:hover,[data-ed-bloco]:hover{box-shadow:0 0 0 2px rgba(236,0,0,.18) inset}" +
     "#ed-barra{position:absolute;z-index:99;display:flex;flex-wrap:wrap;gap:6px;max-width:330px;font:700 12px/1 Arial,sans-serif}" +
     "#ed-barra[hidden]{display:none !important}" +
     "#ed-barra button{all:unset;background:#EC0000;color:#fff;border-radius:999px;padding:7px 11px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.28);font:700 12px/1 Arial,sans-serif}" +
@@ -348,6 +350,9 @@
       ED.periodoInicial = periodoInicial !== undefined ? periodoInicial : periodoAtual();
       $("#secEditar").hidden = false; $("#secLink").hidden = false; $("#secResumo").hidden = false; $("#secStatus").hidden = false;
       $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
+      /* Novo tópico ainda do modelo (rótulo [entre colchetes]): começa desligado; liga em "Seções do report". */
+      var rot = ED.doc.querySelector('[data-campo="topico.rotulo"]');
+      if (rot && /^\s*\[[^\]]*\]\s*$/.test(rot.textContent)) mostrarSecao("topico", false, true);
       montarSecoes(); reconverter(true);
       document.querySelector(".ferramentas").scrollIntoView({ behavior: "smooth", block: "start" });
     };
@@ -367,6 +372,7 @@
     });
     /* textos e números */
     editavel(d.body);
+    marcarBlocos();
     localizarGrupos();
     d.addEventListener("focusin", function (e) {
       var el = e.target.closest && e.target.closest("[data-ed-campo]"); if (!el) return;
@@ -412,20 +418,24 @@
     function agendarEsconder(ms) { clearTimeout(esconder); esconder = setTimeout(function () { barra.hidden = true; }, ms); }
     barra.addEventListener("mouseenter", function () { clearTimeout(esconder); });
     /* Saindo da barra para outro item, imagem ou link: quem decide é o mouseover dele (senão a barra do próximo item some). */
-    var ALVOS_BARRA = 'img[data-img], a.cta, a[data-anexo], span[title="Link ainda não definido"], [data-item]';
+    var ALVOS_BARRA = 'img[data-img], a.cta, a[data-anexo], span[title="Link ainda não definido"], [data-item], [data-ed-bloco]';
     barra.addEventListener("mouseleave", function (e) {
       if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(ALVOS_BARRA)) return;
       agendarEsconder(500);
     });
     d.addEventListener("mouseover", function (e) {
       var t = e.target; if (!t.closest || t.closest("#ed-barra")) return;
-      var img = t.closest("img[data-img]"), a = t.closest('a.cta, a[data-anexo], span[title="Link ainda não definido"]'), item = t.closest("[data-item]");
+      var img = t.closest("img[data-img]"), a = t.closest('a.cta, a[data-anexo], span[title="Link ainda não definido"]'), item = t.closest("[data-item], [data-ed-bloco]");
       if (img) mostrarBarra(img, ferramentasImagem(img), img.getBoundingClientRect().width < 200 ? "abaixo" : "");
       else if (a) mostrarBarra(a, ferramentasLink(a));
       else if (d.activeElement && d.activeElement.hasAttribute("data-ed-campo") && d.activeElement.contains(t)) return;
       else if (item) {
-        var gi = grupoDe(item), bi = [["Ocultar item", function () { ocultarItem(item); }, "cinza"]];
-        if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
+        var gi = grupoDe(item), bi = [["+ Link", function () { adicionarLink(item); }]];
+        if (item.tagName !== "P") bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
+        if (item.hasAttribute("data-item")) {
+          if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
+          bi.push(["Ocultar item", function () { ocultarItem(item); }, "cinza"]);
+        }
         mostrarBarra(item, bi, item.getBoundingClientRect().width < 320 ? "acima" : "direita");
       }
       else return;
@@ -477,7 +487,7 @@
     var chave = img.getAttribute("data-img"), video = img.hasAttribute("data-video");
     if (video) b.push(["Trocar vídeo", function () { escolher("#fVideo", function (f) { trocarVideo(chave, f, false); }); }], ["Tirar o vídeo", function () { tirarVideo(chave); }, "cinza"]);
     else if (/^(principal|destaque|lancamento-\d+)$/.test(chave)) b.push(["Colocar vídeo", function () { escolher("#fVideo", function (f) { trocarVideo(chave, f, true); }); }, "cinza"]);
-    if (/^(selo|transformation-\d+-(logo|print-\d+))$/.test(chave)) b.push(["Tirar imagem", function () { tirarImagem(chave); }, "cinza"]);
+    if (/^(selo|transformation-\d+-logo)$|-print-\d+$/.test(chave)) b.push(["Tirar imagem", function () { tirarImagem(chave); }, "cinza"]);
     b.push(["Descrição", function () { var n = prompt("Descrição da imagem (o que ela mostra):", img.alt.replace(/^Vídeo: /, "")); if (n !== null) mesmasImagens(chave).forEach(function (i) { var antes = i.alt; i.alt = (i.hasAttribute("data-video") ? "Vídeo: " : "") + n; i.setAttribute("data-legenda", n); pilha(function () { i.alt = antes; }); }); marcarSujo(); }, "cinza"]);
     return b;
   }
@@ -543,6 +553,7 @@
   }
   /* Imagem opcional (selo, logo e prints do Transformation Hub): sai com o espaço dela. */
   function tirarImagem(chave) {
+    if (/-print-\d+$/.test(chave)) { tirarImagemExtra(chave); return; }
     var tirados = [];
     function tira(n) { if (n && n.parentNode) { tirados.push([n, n.parentNode, n.nextSibling]); n.remove(); } }
     mesmasImagens(chave).forEach(function (i) {
@@ -584,7 +595,7 @@
   }
   function ferramentasLink(a) {
     var pend = a.tagName !== "A", b = [[pend ? "Colocar link" : "Trocar link", function () { trocarLink(a); }], ["Anexar PDF", function () { escolher("#fPdf", function (f) { anexarPdf(a, f); }); }, "cinza"]];
-    if (a.closest('[data-item^="transformation-"]')) b.push(["Texto do link", function () {
+    if (a.closest('[data-item^="transformation-"], [data-item^="topico-"], [data-links]')) b.push(["Texto do link", function () {
       var atual = a.textContent.replace(/\s*→\s*$/, "").trim(), n = prompt("Texto do link (ex.: Documento One Brief):", /^\[.*\]$/.test(atual) ? "" : atual);
       if (n === null || !n.trim()) return; var antes = a.innerHTML; a.innerHTML = esc(n.trim()) + "&nbsp;&#8594;"; pilha(function () { a.innerHTML = antes; }); marcarSujo();
     }, "cinza"]);
@@ -614,11 +625,154 @@
     marcarSujo("PDF anexado: " + file.name + ". No report completo, o link abre o PDF em nova aba; no e-mail, vira texto.");
   }
   function tirarLink(a) {
-    var pai = a.parentNode, prox = a.nextSibling, sep = a.previousElementSibling && /·/.test(a.previousElementSibling.textContent) && !a.previousElementSibling.matches("a") ? a.previousElementSibling : null;
-    var sepProx = sep ? sep.nextSibling : null;
-    if (sep) sep.remove(); a.remove();
-    pilha(function () { pai.insertBefore(a, prox); if (sep) pai.insertBefore(sep, a); });
-    marcarSujo();
+    var pai = a.parentNode, tirados = [];
+    function tira(n) { if (n && n.parentNode) { tirados.push([n, n.parentNode, n.nextSibling]); n.remove(); } }
+    function ehSep(x) { return x && x.nodeType === 1 && !x.matches("a, [title]") && /·/.test(x.textContent); }
+    /* o separador " · " sai junto: o de antes; se for o primeiro link da linha, o de depois */
+    tira(ehSep(a.previousElementSibling) ? a.previousElementSibling : ehSep(a.nextElementSibling) && !pai.matches("span[data-links]") ? a.nextElementSibling : null);
+    tira(a);
+    /* linha de links que ficou vazia (sem link e sem texto) sai também */
+    if (pai.matches && pai.matches("p:not([data-campo]), span[data-links]") && !pai.querySelector('a, span[title="Link ainda não definido"]') && !pai.textContent.replace(/[\s\u00a0·]/g, "")) tira(pai);
+    pilha(function () { tirados.reverse().forEach(function (t) { t[1].insertBefore(t[0], t[2]); }); });
+    ED.doc.getElementById("ed-barra").hidden = true;
+    marcarSujo("Link tirado. Para voltar: Desfazer.");
+  }
+
+  /* ---------- mais links e mais imagens em qualquer item ---------- */
+  /* Blocos que não são itens de grupo, mas também recebem links e imagens: destaque, projeto principal e foco. */
+  function marcarBlocos() {
+    [["destaque.titulo", "destaque"], ["principal.nome", "principal"], ["foco.prioridade", "foco"]].forEach(function (x) {
+      var el = ED.doc.querySelector('[data-campo="' + x[0] + '"]'), td = el && el.closest("td");
+      if (td && !td.closest("[data-item]")) td.setAttribute("data-ed-bloco", x[1]);
+    });
+  }
+  function chaveDoAlvo(alvo) { return alvo.getAttribute("data-item") || alvo.getAttribute("data-ed-bloco"); }
+  /* Onde entram os links e as imagens novas: a coluna de texto do item ("foi bem"/"a melhorar": a própria linha). */
+  function areaDoAlvo(alvo) {
+    if (alvo.tagName === "P" || alvo.hasAttribute("data-ed-bloco")) return alvo;
+    var b = alvo.querySelector("td[data-bloco]"), nome = alvo.querySelector('[data-campo$=".nome"]');
+    if (/^topico-/.test(chaveDoAlvo(alvo)) && b) return b;
+    if (alvo.tagName === "TR") return nome ? nome.closest("td") : alvo.querySelector("td");
+    return alvo;
+  }
+  /* Largura útil da coluna (a mesma do motor), sem medir a tela: no modo celular do emulador a medida enganaria. */
+  function larguraUtil(area) {
+    var w = +area.getAttribute("width"); if (w) return Math.min(w, 600);
+    if (/^topico-/.test(area.getAttribute("data-bloco") || "")) return 600;
+    if (area.closest('[data-item^="transformation-"]')) return area.parentElement.children.length > 1 ? 434 : 504;
+    return 184;
+  }
+  /* Fundo vermelho (capa, foco): link e separador claros. */
+  function fundoEscuro(el) {
+    var w = ED.doc.defaultView;
+    for (var x = el; x && x.nodeType === 1; x = x.parentElement) {
+      var bg = (x.getAttribute("bgcolor") || "").toUpperCase(), cs = w.getComputedStyle(x).backgroundColor;
+      if (bg === COR.marca || /rgb\(236,\s*0,\s*0\)/.test(cs)) return true;
+      if (bg || (cs && !/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(cs))) return false;
+    }
+    return false;
+  }
+  function fonteTexto(area) { var p = area.querySelector("p.fx") || ED.doc.querySelector("p.fx"), m = p && /font-family:([^;]+)/.exec(p.getAttribute("style") || ""); return m ? m[1].trim() : "Arial,sans-serif"; }
+  /* Várias ações viram um "Desfazer" só. */
+  function agrupar(desde) { var fns = ED.desfazer.splice(desde); if (fns.length) pilha(function () { for (var i = fns.length - 1; i >= 0; i--) fns[i](); }); }
+  /* A linha de links do item (a do Transformation Hub já existe); sem ela, cria uma no fim da coluna de texto. */
+  function linhaDeLinks(area, criar) {
+    var p = area.querySelector("[data-links]") || Array.prototype.filter.call(area.querySelectorAll("p:not([data-campo])"), function (x) {
+      return !x.querySelector("[data-campo]") && x.querySelector('a.cta, span[title="Link ainda não definido"]');
+    })[0];
+    if (p || !criar) return p || null;
+    if (area.tagName === "P") { p = ED.doc.createElement("span"); p.setAttribute("data-links", ""); area.appendChild(p); return p; }
+    p = ED.doc.createElement("p"); p.className = "fx ts"; p.setAttribute("data-links", "");
+    p.setAttribute("style", "margin:8px 0 0 0;font-family:" + fonteTexto(area) + ";font-size:12px;line-height:18px;");
+    var cx = area.querySelector("table[data-imagens]");
+    if (cx && cx.parentNode === area) area.insertBefore(p, cx); else area.appendChild(p);
+    return p;
+  }
+  async function adicionarLink(alvo) {
+    var rot = prompt("Texto do novo link (ex.: Plano do teste, Documento One Brief):", "");
+    if (rot === null || !rot.trim()) return;
+    var d = ED.doc, area = areaDoAlvo(alvo), escuro = fundoEscuro(area), corApoio = escuro ? "#F5DECF" : "#767676";
+    var desde = ED.desfazer.length, criada = !linhaDeLinks(area, false), linha = linhaDeLinks(area, true), sep = null;
+    /* separador " · " entre links (na linha de texto, antes do primeiro também) */
+    if (linha.tagName === "SPAN" || linha.querySelector('a, span[title="Link ainda não definido"]')) {
+      sep = d.createElement("span"); sep.setAttribute("style", "color:" + corApoio + ";"); sep.innerHTML = "&nbsp;&nbsp;·&nbsp;&nbsp;"; linha.appendChild(sep);
+    }
+    var sp = d.createElement("span"); sp.setAttribute("title", "Link ainda não definido");
+    sp.setAttribute("style", "color:" + corApoio + ";font-weight:bold;white-space:nowrap;"); sp.innerHTML = esc(rot.trim()) + "&nbsp;&#8594;";
+    linha.appendChild(sp);
+    pilha(function () { sp.remove(); if (sep) sep.remove(); if (criada) linha.remove(); });
+    d.getElementById("ed-barra").hidden = true;
+    await trocarLink(sp);
+    agrupar(desde);
+    if (sp.isConnected) marcarSujo("Link \"" + rot.trim() + "\" criado sem endereço: passe o mouse nele › Colocar link ou Anexar PDF.");
+  }
+  /* Imagens extras: até 3 por item, lado a lado (coluna estreita: 2 ou 1 por linha); no celular, empilhadas.
+     Ficam na mesma tabela das imagens que o item já tem (prints do Transformation Hub e do novo tópico). */
+  var MAX_IMAGENS = 3;
+  function caixaDeImagens(alvo) {
+    var x = alvo.querySelector("table[data-imagens]"); if (x) return x;
+    var im = alvo.querySelector('img[data-img*="-print-"]'); return im ? im.closest("table") : null;
+  }
+  function larguraDaCaixa(cx) {
+    var w = +cx.getAttribute("data-imagens"); if (w) return w;
+    var ims = cx.querySelectorAll("img[data-img]"), t = 0;
+    Array.prototype.forEach.call(ims, function (i) { t += +i.getAttribute("width") || 0; });
+    return t + 24 * Math.max(0, ims.length - 1) || 504;
+  }
+  function arrumarImagens(cx, W, chave) {
+    var d = ED.doc, ims = Array.prototype.slice.call(cx.querySelectorAll("img[data-img]")), n = ims.length, corpo = cx.tBodies[0] || cx;
+    var porLinha = W >= 400 ? 3 : W >= 280 ? 2 : 1;
+    while (corpo.firstChild) corpo.removeChild(corpo.firstChild);
+    for (var k = 0; k < n; k += porLinha) {
+      var nl = Math.min(porLinha, n - k), larg = Math.floor((W - 24 * (nl - 1)) / nl), tr = d.createElement("tr");
+      for (var j = 0; j < nl; j++) {
+        var im = ims[k + j], td = d.createElement("td");
+        if (j) tr.appendChild(espaco(24));
+        td.className = j === nl - 1 && k + j === n - 1 ? "col" : "col gap"; td.setAttribute("width", String(larg)); td.setAttribute("valign", "top");
+        td.setAttribute("style", "width:" + larg + "px;" + (k ? "padding-top:24px;" : ""));
+        im.setAttribute("width", String(larg)); im.removeAttribute("height"); im.style.width = larg + "px"; im.style.height = "auto";
+        im.setAttribute("data-img", chave + "-print-" + (k + j + 1));
+        td.appendChild(im); tr.appendChild(td);
+      }
+      corpo.appendChild(tr);
+    }
+    cx.setAttribute("data-imagens", String(W));
+  }
+  async function adicionarImagem(alvo, file) {
+    if (!/^image\//.test(file.type)) { await perguntar("Arquivo não é uma imagem", "<p>Escolha um arquivo <b>.jpg</b> ou <b>.png</b>.</p>", "Entendi"); return; }
+    var d = ED.doc, chave = chaveDoAlvo(alvo), area = areaDoAlvo(alvo), cx = caixaDeImagens(alvo);
+    if (cx && cx.querySelectorAll("img[data-img]").length >= MAX_IMAGENS) { await perguntar("Máximo de imagens", "<p>Cada item leva até " + MAX_IMAGENS + " imagens. Tire uma (passe o mouse nela › Tirar imagem) ou troque uma delas.</p>", "Entendi"); return; }
+    var desc = prompt("Descrição da imagem (o que ela mostra, para quem não vê a imagem):", file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "));
+    if (desc === null) return;
+    var im = await carregar(await lerComo(file, "readAsDataURL")), antes = alvo.innerHTML, W;
+    if (!cx) {
+      cx = d.createElement("table"); cx.setAttribute("role", "presentation"); cx.setAttribute("width", "100%"); cx.setAttribute("cellpadding", "0"); cx.setAttribute("cellspacing", "0"); cx.setAttribute("border", "0");
+      cx.setAttribute("style", "margin-top:14px;"); cx.appendChild(d.createElement("tbody")); area.appendChild(cx); W = larguraUtil(area);
+    } else W = larguraDaCaixa(cx);
+    var img = d.createElement("img"), escuro = fundoEscuro(area);
+    img.setAttribute("src", desenhar(im, W, 0, file.type === "image/png", false)); img.setAttribute("alt", desc); img.setAttribute("data-legenda", desc);
+    img.setAttribute("data-ampliar", ampliada(im)); img.className = "fluid"; img.setAttribute("data-img", chave + "-print-0");
+    img.setAttribute("style", "display:block;border:1px solid " + (escuro ? "#F5DECF" : COR.linha) + ";width:" + W + "px;height:auto;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#767676;");
+    (cx.tBodies[0] || cx).appendChild(d.createElement("tr")).appendChild(d.createElement("td")).appendChild(img);
+    arrumarImagens(cx, W, chave);
+    pilha(function () { alvo.innerHTML = antes; atualizarMais(); });
+    d.getElementById("ed-barra").hidden = true;
+    marcarSujo("Imagem adicionada: " + file.name + (im.naturalWidth < W * 2 ? ". Atenção: ela é menor que o ideal (" + W * 2 + " px de largura) e pode ficar borrada." : "") + " No report, ela abre maior no clique.");
+  }
+  function tirarImagemExtra(chave) {
+    var img = mesmasImagens(chave)[0]; if (!img) return;
+    var alvo = img.closest("[data-item], [data-ed-bloco]") || img.closest("td"), antes = alvo.innerHTML, cx = img.closest("table"), W = larguraDaCaixa(cx);
+    var base = chave.replace(/-print-\d+$/, "");
+    img.closest("td").remove();
+    if (cx.querySelector("img[data-img]")) arrumarImagens(cx, W, base);
+    else {
+      /* sem imagens: a tabela sai (no Transformation Hub, a linha que a envolvia também) */
+      var envolve = cx.parentElement && cx.parentElement.matches("td[colspan]") && cx.parentElement.children.length === 1 ? cx.parentElement.parentElement : null;
+      (envolve || cx).remove();
+    }
+    pilha(function () { alvo.innerHTML = antes; });
+    ED.doc.getElementById("ed-barra").hidden = true;
+    marcarSujo("Imagem tirada. Para voltar: Desfazer.");
   }
 
   /* ---------- itens: adicionar e ocultar, com a grade refeita como o motor faz ---------- */
@@ -627,24 +781,25 @@
   var GRUPOS = {
     numero: { max: 4, nome: "indicador" }, resultado: { max: 3, nome: "resultado" }, lancamento: { max: 6, nome: "lançamento" },
     bem: { max: 4, nome: "\"foi bem\"" }, melhorar: { max: 4, nome: "\"a melhorar\"" }, transformation: { max: 3, nome: "projeto" },
-    aprendizado: { max: 3, nome: "aprendizado" }, agenda: { max: 6, nome: "item na agenda" }
+    aprendizado: { max: 3, nome: "aprendizado" }, agenda: { max: 6, nome: "item na agenda" }, topico: { max: 6, nome: "item no novo tópico" }
   };
   function grupoDe(el) { var m = /^([a-z]+)-\d+$/.exec(el.getAttribute("data-item") || ""); return m && GRUPOS[m[1]] ? m[1] : ""; }
   function itensDo(g) { var re = new RegExp("^" + g + "-\\d+$"); return Array.prototype.filter.call(ED.doc.querySelectorAll('[data-item^="' + g + '-"]'), function (x) { return re.test(x.getAttribute("data-item")); }); }
   /* Onde cada grupo mora: a linha (tr), o corpo da tabela (tbody) ou a coluna (td). Guardado ao abrir. */
   function localizarGrupos() {
     ED.grupos = {};
-    Object.keys(GRUPOS).forEach(function (g) {
-      var it = itensDo(g); if (!it.length) return;
-      var f = it[0], cont = /^(numero|aprendizado)$/.test(g) ? f.parentNode : /^(bem|melhorar)$/.test(g) ? f.parentNode : g === "transformation" ? f.parentNode : f.parentNode.parentNode;
-      var total = 600;
-      if (g === "resultado") total = it.reduce(function (s2, x) { return s2 + (+x.getAttribute("width") || 0); }, 0) + 24 * (it.length - 1);
-      ED.grupos[g] = { cont: cont, total: total };
-      var div = ED.doc.createElement("div"); div.className = "ed-mais"; div.setAttribute("data-editor", ""); div.setAttribute("contenteditable", "false");
-      div.innerHTML = '<button type="button" data-grupo="' + g + '"></button>';
-      if (/^(bem|melhorar)$/.test(g)) cont.appendChild(div); else { var tab = cont.closest("table"); tab.parentNode.insertBefore(div, tab.nextSibling); }
-    });
+    Object.keys(GRUPOS).forEach(prepararGrupo);
     atualizarMais();
+  }
+  function prepararGrupo(g) {
+    var it = itensDo(g); if (!it.length || ED.grupos[g]) return;
+    var f = it[0], cont = /^(numero|aprendizado|bem|melhorar|transformation|topico)$/.test(g) ? f.parentNode : f.parentNode.parentNode;
+    var total = 600;
+    if (g === "resultado") total = it.reduce(function (s2, x) { return s2 + (+x.getAttribute("width") || 0); }, 0) + 24 * (it.length - 1);
+    ED.grupos[g] = { cont: cont, total: total };
+    var div = ED.doc.createElement("div"); div.className = "ed-mais"; div.setAttribute("data-editor", ""); div.setAttribute("contenteditable", "false");
+    div.innerHTML = '<button type="button" data-grupo="' + g + '"></button>';
+    if (/^(bem|melhorar)$/.test(g)) cont.appendChild(div); else { var tab = cont.closest("table"); tab.parentNode.insertBefore(div, tab.nextSibling); }
   }
   function atualizarMais() {
     Array.prototype.forEach.call(ED.doc.querySelectorAll(".ed-mais button"), function (b) {
@@ -714,6 +869,11 @@
         cont.appendChild(tr);
       }
       if (cabeca) { var cc = cabeca.querySelector("td[colspan]"); if (cc) cc.setAttribute("colspan", String(Math.min(Math.max(n, 1), 3) * 2 - 1)); }
+    } else if (g === "topico") {
+      it.forEach(function (x, i) {
+        var b = x.querySelector("td[data-bloco]"); if (!b) return;
+        b.setAttribute("style", (b.getAttribute("style") || "").replace(/border-top:1px solid #[0-9a-f]{3,6};?/i, "") + "border-top:1px solid " + (i ? COR.linha : COR.texto) + ";");
+      });
     } else if (g === "transformation") {
       it.forEach(function (x, i) {
         var b = x.querySelector("td[data-bloco]"); if (!b) return;
@@ -737,7 +897,7 @@
     var volta = desfazGrupo(G), ref = depois || it[it.length - 1];
     if (ref) ref.parentNode.insertBefore(novo, ref.nextSibling);
     else if (/^(bem|melhorar)$/.test(g)) G.cont.insertBefore(novo, G.cont.querySelector(".ed-mais"));
-    else if (/^(numero|aprendizado|transformation)$/.test(g)) G.cont.appendChild(novo);
+    else if (/^(numero|aprendizado|transformation|topico)$/.test(g)) G.cont.appendChild(novo);
     else (g === "resultado" ? G.cont.lastElementChild : G.cont.appendChild(ED.doc.createElement("tr"))).appendChild(novo);
     editavel(novo); renumerar(g); refazer(g); atualizarMais();
     /* "[Item da agenda 1]" do modelo vira "[Item da agenda 3]": o número da posição nova */
@@ -756,7 +916,10 @@
     ED.doc.getElementById("ed-barra").hidden = true;
     marcarSujo("Item ocultado: a grade se ajustou. Para voltar: Desfazer.");
   }
-  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
+  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", topico: "Novo tópico (ex.: Testes)", foco: "Foco do próximo mês", agenda: "Também vem aí" };
+  /* Seções que o emulador acrescenta mesmo quando a página não tem (vêm do modelo em branco). */
+  var SECOES_NOVAS = ["topico"];
+  function marcaSecao(doc, id) { var w = doc.createTreeWalker(doc.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:" + id) return n; return null; }
   function nosDaSecao(id) {
     var w = ED.doc.createTreeWalker(ED.doc.body, NodeFilter.SHOW_COMMENT), n, ini = null, prox = null;
     while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue); if (!m) continue; if (ini && !prox) { prox = n; break; } if (m[1] === id) ini = n; }
@@ -767,19 +930,50 @@
   function montarSecoes() {
     var box = $("#secoesRep"); box.textContent = "";
     Object.keys(NOMES_SEC).forEach(function (id) {
-      var nos = ED.ocultas[id] || nosDaSecao(id); if (!nos.length && !ED.ocultas[id]) return;
-      var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.checked = !ED.ocultas[id]; c.value = id;
-      c.addEventListener("change", function () { mostrarSecao(id, c.checked); });
+      var nos = ED.ocultas[id] || nosDaSecao(id), nova = !nos.length && !ED.ocultas[id];
+      if (nova && SECOES_NOVAS.indexOf(id) < 0) return;
+      var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.checked = !nova && !ED.ocultas[id]; c.value = id;
+      c.addEventListener("change", function () { if (nova) { c.checked = ligarSecaoNova(id); montarSecoes(); } else mostrarSecao(id, c.checked); });
       l.appendChild(c); l.appendChild(document.createTextNode(" " + NOMES_SEC[id])); box.appendChild(l);
     });
   }
-  function mostrarSecao(id, mostrar) {
+  /* Número de cada seção (01, 02…) na ordem do que está à mostra, como fica no arquivo salvo. */
+  function renumerarPilulas() {
+    var n = 0;
+    Array.prototype.forEach.call(ED.doc.querySelectorAll("span"), function (sp) {
+      if (!/border-radius:\s*999px;\s*padding:\s*0(px)? 7px;\s*letter-spacing:\s*1px/.test(sp.getAttribute("style") || "") || !/^\d{2}$/.test(sp.textContent.trim()) || sp.closest("[data-ed-oculta]")) return;
+      n++; sp.textContent = (n < 10 ? "0" : "") + n;
+    });
+  }
+  function mostrarSecao(id, mostrar, quieto) {
     if (!mostrar) {
       var nos = nosDaSecao(id).filter(function (n) { return n.nodeType === 1; });
       nos.forEach(function (n) { n.setAttribute("data-ed-oculta", ""); n.style.display = "none"; });
       ED.ocultas[id] = nos;
     } else { (ED.ocultas[id] || []).forEach(function (n) { n.removeAttribute("data-ed-oculta"); n.style.display = ""; }); delete ED.ocultas[id]; }
-    marcarSujo();
+    renumerarPilulas();
+    if (!quieto) marcarSujo(mostrar ? "Seção à mostra: " + NOMES_SEC[id] + "." : "Seção oculta: " + NOMES_SEC[id] + " (não vai no arquivo salvo).");
+  }
+  /* Seção que a página ainda não tem (ex.: Novo tópico): vem do modelo em branco, antes do Foco do próximo mês. */
+  function ligarSecaoNova(id) {
+    if (!window.CORINGA_HTML) { perguntar("Modelo não encontrado", "<p>O modelo em branco não está junto deste emulador. Use a versão avulsa (kit/emulador-report.html).</p>", "Entendi"); return false; }
+    if (!ED.coringa) ED.coringa = new DOMParser().parseFromString(window.CORINGA_HTML, "text/html");
+    var ini = marcaSecao(ED.coringa, id); if (!ini) return false;
+    var nos = [ini];
+    for (var el = ini.nextSibling; el && !(el.nodeType === 8 && /^secao:/.test(el.nodeValue.trim())); el = el.nextSibling) nos.push(el);
+    var ref = null; ["foco", "agenda", "rodape", "fim"].some(function (x) { ref = marcaSecao(ED.doc, x); return !!ref; });
+    if (!ref) return false;
+    var novos = nos.map(function (n) { var x = ED.doc.importNode(n, true); ref.parentNode.insertBefore(x, ref); return x; });
+    novos.forEach(function (n) { if (n.nodeType === 1) editavel(n); });
+    prepararGrupo(id); atualizarMais(); renumerarPilulas();
+    pilha(function () {
+      novos.forEach(function (n) { if (n.parentNode) n.remove(); });
+      var b = ED.doc.querySelector('.ed-mais button[data-grupo="' + id + '"]'); if (b) b.parentNode.remove();
+      delete ED.grupos[id]; renumerarPilulas(); montarSecoes();
+    });
+    var alvo = novos.filter(function (n) { return n.nodeType === 1; })[0]; if (alvo) alvo.scrollIntoView({ block: "start" });
+    marcarSujo(NOMES_SEC[id] + " ligado: troque os textos [entre colchetes]; use + Adicionar, + Link e + Imagem nos itens. Para tirar: Desfazer ou desmarque a seção.");
+    return true;
   }
 
   /* ---------- importar conteúdo (Copilot) ---------- */
@@ -820,8 +1014,8 @@
     var doc = ED.doc.cloneNode(true);
     Array.prototype.forEach.call(doc.querySelectorAll("[data-editor], #ed-css"), function (n) { n.remove(); });
     Array.prototype.forEach.call(doc.querySelectorAll("[data-ed-oculta]"), function (n) { n.remove(); });
-    Array.prototype.forEach.call(doc.querySelectorAll("[contenteditable], [data-ed-campo], [data-ed-alterado], [spellcheck]"), function (n) {
-      n.removeAttribute("contenteditable"); n.removeAttribute("data-ed-campo"); n.removeAttribute("data-ed-alterado"); n.removeAttribute("spellcheck");
+    Array.prototype.forEach.call(doc.querySelectorAll("[contenteditable], [data-ed-campo], [data-ed-alterado], [spellcheck], [data-ed-bloco]"), function (n) {
+      n.removeAttribute("contenteditable"); n.removeAttribute("data-ed-campo"); n.removeAttribute("data-ed-alterado"); n.removeAttribute("spellcheck"); n.removeAttribute("data-ed-bloco");
     });
     /* título (assunto) e texto da caixa de entrada acompanham o período e a frase */
     var per = doc.querySelector('[data-campo="periodo"]'), frase = doc.querySelector('[data-campo="frase"]'), prev = doc.querySelector('[data-campo="previa"]');
