@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.9 (2026-10-21)";
+  var VERSAO = "4.10 (2026-10-22)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */

@@ -77,6 +77,18 @@ A edição e a prévia do e-mail crescem até o tamanho do conteúdo: rolando a 
 
 **Desempenho (4.9):** fotos, vídeos e PDFs ficam como arquivos na memória do navegador enquanto você edita; o report em edição guarda só uma referência curta a cada um. Por isso editar, conferir e montar o resumo não passam mais pela mídia a cada mudança, e a página não trava, mesmo com reports de dezenas de MB e em notebooks modestos. A mídia volta para dentro do arquivo ao salvar, e o `.eml` é montado ao baixar. O rascunho guarda cada mídia uma vez só.
 
+**Arquivos grandes (4.10):** abrir e salvar um report pesado é feito por um *Web Worker* (um processo do navegador ao lado da página), em blocos de 16 MB: a tela não trava e não há limite de texto do navegador (antes, um `.html` acima de ~500 MB dava "não parece um report"). Durante o trabalho pesado (abrir, salvar, otimizar imagens, recuperar a edição), um aviso discreto no canto da tela mostra o que está acontecendo e quanto falta.
+
+| Report | Abrir | Salvar |
+|---|---|---|
+| 27 MB (notebook modesto, CPU 6× mais lenta) | 0,7 s, sem travar | 0,3 s, sem travar |
+| 441 MB (vídeo de 330 MB) | 3,6 s | 2,3 s |
+| 801 MB (vídeo de 600 MB) | 5,6 s | 4,1 s |
+
+Se uma mídia passar da memória que o navegador consegue usar para arquivos (na prática, vídeo acima de ~1 GB), o emulador avisa ao abrir, deixa editar os textos e, ao salvar, diz qual mídia trocar: **nada é gravado pela metade**. Troque por um vídeo mais leve (passe o mouse › **Trocar vídeo**; o emulador otimiza ao colocar).
+
+**Memória:** imagem trocada e desfeita sai da memória (a original volta); o **Desfazer** guarda os últimos 100 passos; as imagens originais pesadas, trocadas pelas otimizadas ao abrir, também saem. A prévia só recarrega quando muda.
+
 **Identidade:** a aba do emulador se chama **Emulador Report PF**, e o símbolo **Santander + PF** fica no cabeçalho, numa placa branca (a chama vermelha não vai sobre o vermelho). O mesmo símbolo é o ícone da aba do emulador, do `gerar-report.html` e do report (`.html`): no report, só na aba, sem mudar o conteúdo. Os e-mails não levam ícone. Arquivos: `assets/marca/svg/santander-pf.svg` e `assets/marca/santander-pf-16.png`, `-32.png`, `-180.png`.
 
 ## E-mail-resumo
