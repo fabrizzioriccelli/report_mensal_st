@@ -3,6 +3,9 @@
  * com fotos grandes no lugar das imagens, vídeo e PDF embutidos, ~27 MB) e mede, com a CPU 4× mais lenta (notebook
  * modesto): abrir o report, editar um texto e salvar. "Tarefa longa" = a página parada, sem responder.
  * Falha se voltar a travar: maior tarefa longa acima de 1 s, status depois de uma edição acima de 3 s, ou edição com travamento.
+ * Confere também: o aviso de andamento aparece e some; vídeo e PDF voltam idênticos no arquivo salvo; a imagem trocada e
+ * desfeita sai da memória (a original continua).
+ * GIGANTE=1 acrescenta um report de ~600 MB (acima do limite de texto do navegador): abre, edita e salva sem travar.
  *   Requer Node.js + Playwright e ffmpeg:  node tests/desempenho.e2e.js [pasta-de-saida]
  *   Versão avulsa:  EMULADOR=kit/emulador-report.html node tests/desempenho.e2e.js
  */
@@ -32,7 +35,9 @@ function confere(ok, msg) { console.log((ok ? "  ok   " : "  FALHA ") + msg); if
   p.on("pageerror", function (e) { erros.push(e.message); }); p.on("dialog", function (d) { d.dismiss(); });
   await p.addInitScript(function () {
     window.__lt = []; try { new PerformanceObserver(function (l) { l.getEntries().forEach(function (e) { window.__lt.push([e.startTime, e.duration]); }); }).observe({ type: "longtask", buffered: true }); } catch (e) {}
-    window.showSaveFilePicker = async function (o) { return { name: o.suggestedName, createWritable: async function () { var n = 0; return { write: async function (x) { n += x.size || 0; }, close: async function () { window.__salvo = n; } }; } }; };
+    window.showSaveFilePicker = async function (o) { return { name: o.suggestedName, createWritable: async function () { var n = 0; return { write: async function (x) { n += x.size || 0; window.__blob = x; }, close: async function () { window.__salvo = n; } }; } }; };
+    /* o aviso de andamento (canto da tela) apareceu? */
+    document.addEventListener("DOMContentLoaded", function () { var t = document.getElementById("tarefa"); if (t) new MutationObserver(function () { if (!t.hidden) window.__tarefaVista = (window.__tarefaVista || 0) + 1; }).observe(t, { attributes: true }); });
   });
   function agora() { return p.evaluate(function () { return performance.now(); }); }
   function longas(a, z) { return p.evaluate(function (o) { var l = window.__lt.filter(function (x) { return x[0] >= o[0] && x[0] < o[1]; }); return { n: l.length, max: Math.round(Math.max.apply(null, [0].concat(l.map(function (x) { return x[1]; })))), soma: Math.round(l.reduce(function (s, x) { return s + x[1]; }, 0)) }; }, [a, z]); }
@@ -56,6 +61,49 @@ function confere(ok, msg) { console.log((ok ? "  ok   " : "  FALHA ") + msg); if
   await p.click("#bSalvar"); await p.waitForFunction(function () { return window.__salvo; }, null, { timeout: 600000, polling: 100 });
   var tS = Date.now() - t, l3 = await longas(s0, await agora());
   confere(l3.max < 1000, "salvar: " + tS + " ms · maior travamento " + l3.max + " ms · arquivo " + Math.round(await p.evaluate(function () { return window.__salvo; }) / 1048576 * 10) / 10 + " MB");
+  var aviso = await p.evaluate(function () { return { visto: window.__tarefaVista || 0, escondido: document.getElementById("tarefa").hidden }; });
+  await p.waitForFunction(function () { return document.getElementById("tarefa").hidden; }, null, { timeout: 10000 }).catch(function () {});
+  confere(aviso.visto > 0 && await p.evaluate(function () { return document.getElementById("tarefa").hidden; }), "aviso de andamento apareceu durante o trabalho pesado e sumiu no fim");
+  var salvo = await p.evaluate(function () { return window.__blob.text(); });
+  confere(salvo.indexOf(v64) > 0 && salvo.indexOf(pdf) > 0, "vídeo e PDF voltam idênticos no arquivo salvo (" + Math.round(v64.length / 1048576) + " MB + " + Math.round(pdf.length / 1048576) + " MB de base64)");
+  salvo = null;
+
+  /* imagem trocada e desfeita: a nova sai da memória (a original continua) */
+  await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+  var alvo = 'img[data-img="principal"]', todas = function () { return f.evaluate(function () { return Array.prototype.map.call(document.querySelectorAll("img[data-img]"), function (i) { return i.getAttribute("src"); }); }); };
+  await f.evaluate(function (a) { document.querySelector(a).scrollIntoView({ block: "center" }); }, alvo);
+  await p.mouse.move(2, 2); await f.hover(alvo); await p.waitForTimeout(300);
+  var antes = await todas();
+  await p.evaluate(function () { document.querySelector("#estado").textContent = ""; });
+  var fc = await Promise.all([p.waitForEvent("filechooser"), f.evaluate(function () { Array.prototype.find.call(document.querySelectorAll("#ed-barra button"), function (x) { return x.textContent === "Trocar imagem"; }).click(); })]);
+  await fc[0].setFiles(foto);
+  await p.waitForFunction(function () { return /Imagem trocada/.test(document.querySelector("#estado").textContent); }, null, { timeout: 60000 });
+  var depois = await todas(), ix = depois.findIndex(function (u, i) { return u !== antes[i]; }), original = antes[ix], nova = depois[ix];
+  await p.click("#bDesfazer"); await p.waitForTimeout(6500);
+  var abre = function (u) { return p.evaluate(function (x) { return fetch(x).then(function () { return true; }, function () { return false; }); }, u); };
+  var volta = (await todas())[ix];
+  confere(volta === original && await abre(original) && !(await abre(nova)), "trocar e desfazer: a original volta e a imagem nova sai da memória");
+
+  if (process.env.GIGANTE) {
+    /* acima do limite de texto do navegador (~512 MB): antes, dava "não parece um report" */
+    var gig = path.join(SAIDA, "desemp-gigante.html"), fd = fs.openSync(gig, "w"), partes = h.split(v64);
+    fs.writeSync(fd, partes[0] + "data:video/webm;base64,");
+    for (var k = 0; k < 150; k++) fs.writeSync(fd, require("crypto").randomBytes(3 << 20).toString("base64").replace(/=+$/, ""));
+    fs.writeSync(fd, partes.slice(1).join(v64)); fs.closeSync(fd);
+    var gmb = Math.round(fs.statSync(gig).size / 1048576), g0 = await agora(); t = Date.now();
+    await p.evaluate(function () { window.__salvo = 0; });
+    await p.setInputFiles("#arquivo", gig);
+    /* havia edição não salva (o desfazer acima): confirma a troca de report */
+    await p.waitForFunction(function () { return !document.querySelector("#modal").hidden; }, null, { timeout: 10000 }).then(function () { return p.click("#modalOk"); }, function () {});
+    await p.waitForFunction(function () { return /^Aberto: desemp-gigante/.test(document.querySelector("#estado").textContent) || !document.querySelector("#modal").hidden; }, null, { timeout: 600000, polling: 200 });
+    var tG = Date.now() - t, modal = await p.evaluate(function () { return document.querySelector("#modal").hidden ? "" : document.querySelector("#modal").textContent; });
+    await espera(); var lG = await longas(g0, await agora());
+    confere(!modal && lG.max < 1000, "abrir um report de " + gmb + " MB: " + tG + " ms · maior travamento " + lG.max + " ms" + (modal ? " · " + modal.slice(0, 80) : ""));
+    t = Date.now(); var s1 = await agora(); await p.click("#bSalvar"); await p.waitForFunction(function () { return window.__salvo; }, null, { timeout: 600000, polling: 200 });
+    var lS = await longas(s1, await agora());
+    confere(lS.max < 1000 && await p.evaluate(function () { return window.__salvo; }) > 150 * (4 << 20), "salvar o report de " + gmb + " MB (o vídeo de 600 MB vai junto): " + (Date.now() - t) + " ms · maior travamento " + lS.max + " ms");
+    fs.unlinkSync(gig);
+  }
 
   await b.close();
   if (erros.length) { console.log("ERROS NA PÁGINA:", erros.slice(0, 5)); falhas++; }

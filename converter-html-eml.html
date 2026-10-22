@@ -120,6 +120,13 @@
   .layout svg{width:100%;height:auto;background:#fff;border:1px solid #F0ECE9;border-radius:6px}
   .layout span{font-size:12px;color:var(--gray);line-height:1.35}
   .novoTopico{font-size:13px}
+  /* trabalho pesado em andamento (abrir, salvar, otimizar, montar o .eml): aviso discreto no canto, com a barra do quanto falta */
+  .tarefa{position:fixed;right:16px;bottom:16px;z-index:25;width:min(320px,calc(100% - 32px));background:#fff;border:1px solid var(--rule);border-radius:12px;box-shadow:0 4px 18px rgba(0,0,0,.16);padding:10px 14px 12px;font-size:13px;line-height:1.35;color:var(--ink)}
+  .tarefa i{display:block;height:4px;border-radius:2px;background:#F0ECE9;margin-top:8px;overflow:hidden}
+  .tarefa i b{display:block;height:100%;width:0;background:var(--red);transition:width .25s}
+  .tarefa.indefinida i b{width:30%;animation:tarefaVai 1.1s ease-in-out infinite}
+  @keyframes tarefaVai{0%{margin-left:-30%}100%{margin-left:100%}}
+  @media (prefers-reduced-motion:reduce){.tarefa.indefinida i b{animation:none;width:100%;opacity:.35}}
   [hidden]{display:none !important}
 </style>
 </head>
@@ -280,6 +287,7 @@
   <h3 id="modalTit"></h3><div id="modalCorpo"></div>
   <div class="row"><button type="button" class="pri" id="modalOk"></button><button type="button" id="modalCancela"></button></div>
 </div></div>
+<div class="tarefa" id="tarefa" role="status" aria-live="polite" hidden><span id="tarefaTxt"></span><i><b></b></i></div>
 <input type="file" id="fImagem" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
 <input type="file" id="fVideo" accept="video/mp4,video/webm,.mp4,.webm" hidden>
 <input type="file" id="fPdf" accept="application/pdf,.pdf" hidden>
@@ -352,8 +360,13 @@
     var db = await abrirDB(), html = r.html;
     for (var i = 0; i < r.midias.length; i++) {
       var u = r.midias[i], b = await new Promise(function (ok) { try { var q = db.transaction("rascunho").objectStore("rascunho").get("m:" + u); q.onsuccess = function () { ok(q.result); }; q.onerror = function () { ok(null); }; } catch (e) { ok(null); } });
-      if (b) { var novo = guardarMidia(new Blob([await b.arrayBuffer()], { type: b.type })); html = html.split(u).join(novo); }
+      if (b) {
+        if (r.midias.length > 2) tarefa("Recuperando a edição: imagens e vídeos…", (i + 1) / r.midias.length);
+        var copia; try { copia = await noTrabalhador("copiar", { blob: b }); } catch (e) { copia = new Blob([await b.arrayBuffer()], { type: b.type }); }
+        var novo = guardarMidia(copia); html = html.split(u).join(novo);
+      }
     }
+    fimTarefa();
     r.html = html; r.separado = true; return r;
   }
   function lerRascunho() { return abrirDB().then(function (db) { return db ? new Promise(function (ok) { try { var q = db.transaction("rascunho").objectStore("rascunho").get("atual"); q.onsuccess = function () { ok(q.result || null); }; q.onerror = function () { ok(null); }; } catch (e) { ok(null); } }) : null; }); }
@@ -401,7 +414,7 @@
     if (!jaSeparado) html = await separarMidia(html);
     if (minha !== ED.abertura) return;
     if ($("#link").dataset.auto === "1") { $("#link").value = ""; $("#linkInfo").textContent = ""; }
-    ED.nome = nome; ED.origem = origem; ED.desfazer = []; ED.ocultas = {}; ED.alterados = {}; ED.sujo = false; ED.nomeSalvo = ""; CIENTES = {};
+    ED.nome = nome; ED.origem = origem; ED.desfazer = []; ED.vistas = null; ED.ocultas = {}; ED.alterados = {}; ED.sujo = false; ED.nomeSalvo = ""; CIENTES = {};
     $("#bDesfazer").disabled = true;
     var fr = $("#edFrame");
     fr.onload = function () {
@@ -414,13 +427,16 @@
         var m = marcaSecao(ED.doc, id); nosDaSecao(id).forEach(function (n) { n.remove(); }); if (m) m.remove();
         return true;
       });
-      instrumentar();
+      instrumentar(); ED.vistas = midiasNaPagina();
       if (tirou.length) renumerarPilulas();
       ED.periodoInicial = periodoInicial !== undefined ? periodoInicial : periodoAtual();
       $("#secEditar").hidden = false; $("#secLink").hidden = false; $("#secResumo").hidden = false; $("#secStatus").hidden = false;
       $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
       montarSecoes(); reconverter(true);
-      otimizarAoAbrir().then(function (o) { if (o.n) marcarSujo("Otimizei " + o.n + " imagem(ns) pesada(s) deste report (−" + kb(o.economia) + "): ele fica mais leve para abrir e enviar. Salve para gravar"); });
+      otimizarAoAbrir().then(function (o) {
+        /* as originais pesadas trocadas pelas otimizadas não voltam (otimizar não entra no Desfazer): saem da memória */
+        var antes = ED.vistas; ED.vistas = midiasNaPagina(); soltarSemUso(Array.from(antes || []).filter(function (u) { return !ED.vistas.has(u); }));
+        if (o.n) marcarSujo("Otimizei " + o.n + " imagem(ns) pesada(s) deste report (−" + kb(o.economia) + "): ele fica mais leve para abrir e enviar. Salve para gravar"); });
       document.querySelector(".ferramentas").scrollIntoView({ behavior: "smooth", block: "start" });
     };
     fr.srcdoc = paraEditar(html);
@@ -548,8 +564,27 @@
     var c = chip.closest("[data-campo]"); if (c) { c.setAttribute("data-ed-alterado", ""); ED.alterados[c.getAttribute("data-campo")] = true; }
     marcarSujo();
   }
-  function pilha(fn) { ED.desfazer.push(fn); $("#bDesfazer").disabled = false; }
-  $("#bDesfazer").addEventListener("click", function () { var f = ED.desfazer.pop(); if (f) { f(); marcarSujo("Desfeito."); } $("#bDesfazer").disabled = !ED.desfazer.length; });
+  /* Desfazer: cada passo guarda as mídias que tirou da página (para voltar com elas). Mídia que nem a página nem um passo
+     guardado usa mais sai da memória. Ficam os últimos LIMITE_DESFAZER passos. */
+  var LIMITE_DESFAZER = 100;
+  function pilha(fn) {
+    var agora = midiasNaPagina(); fn.midias = []; (ED.vistas || agora).forEach(function (u) { if (!agora.has(u)) fn.midias.push(u); }); ED.vistas = agora;
+    ED.desfazer.push(fn);
+    if (ED.desfazer.length > LIMITE_DESFAZER) soltarSemUso(ED.desfazer.shift().midias);
+    $("#bDesfazer").disabled = false;
+  }
+  $("#bDesfazer").addEventListener("click", function () {
+    var f = ED.desfazer.pop();
+    if (f) { var antes = ED.vistas; f(); ED.vistas = midiasNaPagina(); soltarSemUso(Array.from(antes || []).filter(function (u) { return !ED.vistas.has(u); })); marcarSujo("Desfeito."); }
+    $("#bDesfazer").disabled = !ED.desfazer.length;
+  });
+  function midiasNaPagina() { return new Set(ED.doc && ED.doc.documentElement ? ED.doc.documentElement.outerHTML.match(RE_BLOB) || [] : []); }
+  function emUso(u) { return (ED.vistas && ED.vistas.has(u)) || ED.desfazer.some(function (f) { return f.midias && f.midias.indexOf(u) >= 0; }); }
+  function soltarSemUso(lista) {
+    var sai = (lista || []).filter(function (u) { return MIDIA[u] && !MIDIA[u].fixa && !emUso(u); });
+    /* espera um pouco: a prévia e o status da última conversão ainda podem estar mostrando a mídia */
+    if (sai.length) setTimeout(function () { sai.forEach(function (u) { if (MIDIA[u] && !MIDIA[u].fixa && !emUso(u)) { URL.revokeObjectURL(u); delete MIDIA[u]; } }); }, 5000);
+  }
 
   /* ---------- imagens ---------- */
   function ferramentasImagem(img) {
@@ -582,6 +617,164 @@
   function midiaDe(uri) { return uri && /^data:/.test(uri) && uri.length > MIDIA_MIN ? guardarMidia(blobDeData(uri)) : uri; }
   function tamanhoDe(v) { return MIDIA[v] ? MIDIA[v].blob.size : v && /^data:/.test(v) ? Math.round(v.length * 0.75) : 0; }
   var RE_DATA = /data:[a-z]+\/[a-z0-9.+-]+(?:;[a-z0-9.+=_-]+)*;base64,[A-Za-z0-9+\/=]+/gi, RE_BLOB = /blob:[^"'\s)<>]+/g;
+
+  /* Trabalho pesado fora da página (Web Worker), em blocos de 16 MB: ao abrir, separa a mídia (data:…;base64 → binário) sem
+     montar o arquivo inteiro como texto; ao salvar, refaz o base64 de cada mídia direto num Blob. A tela não trava e não há
+     limite de texto do navegador (um .html de 800 MB abre). Sem Worker, valem separarMidia/juntarMidia (o caminho de antes). */
+  function TRABALHADOR() {
+    var MIN = 2048, BLOCO = 16 << 20, LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var VAL = new Int16Array(256).fill(-1), E64 = new Uint8Array(64), q;
+    for (q = 0; q < 64; q++) { VAL[LETRAS.charCodeAt(q)] = q; E64[q] = LETRAS.charCodeAt(q); }
+    function b64(c) { return VAL[c] >= 0 || c === 61; }
+    function letra(c) { c |= 32; return c >= 97 && c <= 122; }
+    function deTipo(c) { return letra(c) || (c >= 48 && c <= 57) || c === 46 || c === 43 || c === 45; }
+    function deParam(c) { return deTipo(c) || c === 61 || c === 95; }
+    function ascii(b, a, z) { return String.fromCharCode.apply(null, b.subarray(a, z)).toLowerCase(); }
+    /* "data:tipo/sub;…;base64," a partir de j (o mesmo que RE_DATA): {fim, tipo}; null se não é; 0 se o bloco acabou no meio */
+    function cabecalho(b, j, n) {
+      if (j + 5 > n) return 0;
+      if ((b[j] | 32) !== 100 || (b[j + 1] | 32) !== 97 || (b[j + 2] | 32) !== 116 || (b[j + 3] | 32) !== 97 || b[j + 4] !== 58) return null;
+      var i = j + 5, a = i;
+      while (i < n && letra(b[i])) i++;
+      if (i === n) return 0; if (i === a || b[i] !== 47) return null;
+      a = ++i; while (i < n && deTipo(b[i])) i++;
+      if (i === n) return 0; if (i === a) return null;
+      for (;;) {
+        if (b[i] !== 59) return null;
+        a = ++i; while (i < n && deParam(b[i])) i++;
+        if (i === n) return 0; if (i === a) return null;
+        /* o tipo leva os parâmetros que houver (ex.: ;charset=utf-8), para o arquivo salvo voltar igual */
+        if (b[i] === 44 && i - a === 6 && ascii(b, a, i) === "base64") return { fim: i + 1, tipo: ascii(b, j + 5, a - 1) };
+      }
+    }
+    function quatro(s, x, out, o) {
+      var a = VAL[s[x]], b = VAL[s[x + 1]], c = VAL[s[x + 2]], d = VAL[s[x + 3]];
+      if (a < 0 || b < 0) return o;
+      out[o++] = (a << 2) | (b >> 4);
+      if (c >= 0) { out[o++] = ((b & 15) << 4) | (c >> 2); if (d >= 0) out[o++] = ((c & 3) << 6) | d; }
+      return o;
+    }
+    /* uma mídia sendo decodificada aos pedaços, numa passada só (acha o fim do base64, tira a impressão digital que acha as
+       repetidas e decodifica); a saída vira Blob a cada 16 MB, para não segurar tudo na memória do Worker */
+    function novaMidia(tipo) {
+      var partes = [], junta = [], nj = 0, sobra = new Uint8Array(4), ns = 0, h = 2166136261, tam = 0;
+      function guarda(out, o, fim) { if (o) { junta.push(out.subarray(0, o)); nj += o; } if (nj && (fim || nj >= 16 << 20)) { partes.push(new Blob(junta)); junta = []; nj = 0; } }
+      return {
+        /* decodifica de x enquanto for base64; devolve onde parou (z = o bloco acabou e a mídia pode continuar no próximo) */
+        poe: function (b, x, z) {
+          var out = new Uint8Array(Math.floor((z - x + ns) / 4) * 3 + 3), o = 0, y = x, c, v, a0, a1, a2, a3;
+          for (;;) {
+            if (!ns) for (; y + 3 < z; y += 4) {
+              a0 = VAL[b[y]]; a1 = VAL[b[y + 1]]; a2 = VAL[b[y + 2]]; a3 = VAL[b[y + 3]];
+              if ((a0 | a1 | a2 | a3) < 0) break;
+              h = Math.imul(Math.imul(Math.imul(Math.imul(h ^ b[y], 16777619) ^ b[y + 1], 16777619) ^ b[y + 2], 16777619) ^ b[y + 3], 16777619);
+              v = (a0 << 18) | (a1 << 12) | (a2 << 6) | a3; out[o++] = v >> 16; out[o++] = (v >> 8) & 255; out[o++] = v & 255;
+            }
+            if (y >= z) break;
+            c = b[y]; if (!b64(c)) break;  /* fim do base64 */
+            h = Math.imul(h ^ c, 16777619); sobra[ns++] = c; y++;
+            if (ns === 4) { o = quatro(sobra, 0, out, o); ns = 0; }
+          }
+          tam += y - x; guarda(out, o, false);
+          return y;
+        },
+        fim: function () {
+          var out = new Uint8Array(3), o = 0;
+          if (ns > 1) { for (var y = ns; y < 4; y++) sobra[y] = 61; o = quatro(sobra, 0, out, 0); }
+          guarda(out, o, true);
+          return { blob: new Blob(partes, { type: tipo }), chave: tipo + "|" + tam + "|" + (h >>> 0) };
+        }
+      };
+    }
+    async function separar(arq, avisa) {
+      var n = arq.size, pos = 0, resto = null, dec = new TextDecoder("utf-8"), partes = [], texto = [], midias = [], ilegiveis = [], iguais = {}, md = null;
+      function poeTexto(b) { if (b.length) texto.push(dec.decode(b, { stream: true })); }
+      while (pos < n || resto) {
+        var pedaco = pos < n ? new Uint8Array(await arq.slice(pos, Math.min(n, pos + BLOCO)).arrayBuffer()) : new Uint8Array(0);
+        pos = Math.min(n, pos + BLOCO);
+        var b = pedaco; if (resto) { b = new Uint8Array(resto.length + pedaco.length); b.set(resto); b.set(pedaco, resto.length); resto = null; }
+        var fim = pos >= n, L = b.length, i = 0, ti = 0;
+        while (i < L) {
+          if (md) {
+            var k = md.poe(b, i, L); i = k;
+            if (k < L || fim) {
+              var r = md.fim(), ix = iguais[r.chave];
+              if (ix === undefined) { ix = iguais[r.chave] = midias.length; midias.push(r.blob); if (!(await legivel(r.blob))) ilegiveis.push(ix); }
+              partes.push({ k: ix }); md = null; ti = i;
+            }
+            continue;
+          }
+          var j = i; while (j < L && (b[j] | 32) !== 100) j++;
+          if (j >= L) break;
+          var c = cabecalho(b, j, L);
+          if (c === 0 && !fim) { poeTexto(b.subarray(ti, j)); resto = b.slice(j); ti = L; break; }
+          if (!c) { i = j + 1; continue; }
+          var k2 = c.fim; while (k2 < L && k2 - c.fim < MIN && b64(b[k2])) k2++;
+          if (k2 - c.fim < MIN) {
+            if (k2 === L && !fim) { poeTexto(b.subarray(ti, j)); resto = b.slice(j); ti = L; break; }
+            i = k2; continue;  /* pequena (ícone): fica no texto */
+          }
+          poeTexto(b.subarray(ti, j)); partes.push(texto.join("")); texto = [];
+          md = novaMidia(c.tipo); i = c.fim;
+        }
+        if (!md && ti < L) poeTexto(b.subarray(ti, L));
+        avisa(n ? pos / n : 1);
+      }
+      texto.push(dec.decode()); partes.push(texto.join(""));
+      return { partes: partes, midias: midias, ilegiveis: ilegiveis };
+    }
+    /* acima da memória que o navegador reserva para arquivos, o Blob existe mas não se lê: isso é avisado, nunca salvo pela metade */
+    async function legivel(b) { if (!b.size) return true; try { await b.slice(0, 1).arrayBuffer(); await b.slice(b.size - 1).arrayBuffer(); return true; } catch (e) { return false; } }
+    function para64(b) {
+      var n = b.length, out = new Uint8Array(Math.ceil(n / 3) * 4), o = 0, i = 0, lim = n - n % 3, v;
+      for (; i < lim; i += 3) { v = (b[i] << 16) | (b[i + 1] << 8) | b[i + 2]; out[o++] = E64[v >> 18]; out[o++] = E64[(v >> 12) & 63]; out[o++] = E64[(v >> 6) & 63]; out[o++] = E64[v & 63]; }
+      if (n % 3 === 1) { v = b[i] << 16; out[o++] = E64[v >> 18]; out[o++] = E64[(v >> 12) & 63]; out[o++] = 61; out[o++] = 61; }
+      else if (n % 3 === 2) { v = (b[i] << 16) | (b[i + 1] << 8); out[o++] = E64[v >> 18]; out[o++] = E64[(v >> 12) & 63]; out[o++] = E64[(v >> 6) & 63]; out[o++] = 61; }
+      return out;
+    }
+    /* mídia → Blob com "data:tipo;base64,…" (blocos de 6 MB, múltiplo de 3: o base64 emenda sem "=" no meio) */
+    async function codificar(blob, avisa) {
+      var partes = ["data:" + (blob.type || "application/octet-stream") + ";base64,"], n = blob.size, BL = 6 << 20;
+      for (var pos = 0; pos < n; pos += BL) {
+        var b = new Uint8Array(await blob.slice(pos, Math.min(n, pos + BL)).arrayBuffer());
+        partes.push(new Blob([typeof b.toBase64 === "function" ? b.toBase64() : para64(b)])); avisa(Math.min(n, pos + BL) / n);
+      }
+      return new Blob(partes, { type: "text/plain" });
+    }
+    async function copiar(blob) { return new Blob([await blob.arrayBuffer()], { type: blob.type }); }
+    self.onmessage = function (e) {
+      var m = e.data, avisa = function (f) { self.postMessage({ id: m.id, progresso: f }); };
+      (m.tipo === "separar" ? separar(m.arquivo, avisa) : m.tipo === "codificar" ? codificar(m.blob, avisa) : copiar(m.blob))
+        .then(function (r) { self.postMessage({ id: m.id, r: r }); }, function (err) { self.postMessage({ id: m.id, erro: String(err && err.message || err) }); });
+    };
+  }
+  var TRAB = null, TRAB_N = 0, TRAB_ESPERA = {};
+  function trabalhador() {
+    if (TRAB !== null) return TRAB;
+    try {
+      TRAB = new Worker(URL.createObjectURL(new Blob(["(" + TRABALHADOR.toString() + ")()"], { type: "text/javascript" })));
+      TRAB.onmessage = function (e) {
+        var m = e.data, w = TRAB_ESPERA[m.id]; if (!w) return;
+        if (m.progresso !== undefined) { if (w.progresso) w.progresso(m.progresso); return; }
+        delete TRAB_ESPERA[m.id]; if (m.erro) w.falha(new Error(m.erro)); else w.ok(m.r);
+      };
+      /* Worker bloqueado ou com falha: quem espera cai no caminho de antes; daqui em diante, sem Worker */
+      TRAB.onerror = function (e) { if (e && e.preventDefault) e.preventDefault(); Object.keys(TRAB_ESPERA).forEach(function (k) { TRAB_ESPERA[k].falha(new Error("sem trabalhador")); delete TRAB_ESPERA[k]; }); try { TRAB.terminate(); } catch (x) {} TRAB = false; };
+    } catch (e) { TRAB = false; }
+    return TRAB;
+  }
+  function noTrabalhador(tipo, dados, progresso) {
+    var t = trabalhador(); if (!t) return Promise.reject(new Error("sem trabalhador"));
+    return new Promise(function (ok, falha) { var id = ++TRAB_N; TRAB_ESPERA[id] = { ok: ok, falha: falha, progresso: progresso }; dados.tipo = tipo; dados.id = id; t.postMessage(dados); });
+  }
+  /* aviso discreto de trabalho pesado: texto + barra (fração de 0 a 1; sem fração, a barra só anda) */
+  var tarefaSome = null;
+  function tarefa(txt, fracao) {
+    clearTimeout(tarefaSome); var t = $("#tarefa"), sem = fracao === undefined || fracao === null;
+    $("#tarefaTxt").textContent = txt + (sem ? "" : " " + Math.round(Math.max(0, Math.min(1, fracao)) * 100) + "%");
+    t.classList.toggle("indefinida", sem); t.querySelector("b").style.width = sem ? "" : Math.round(Math.max(0, Math.min(1, fracao)) * 100) + "%"; t.hidden = false;
+  }
+  function fimTarefa(txt) { if (txt) tarefa(txt); tarefaSome = setTimeout(function () { $("#tarefa").hidden = true; }, txt ? 1800 : 0); }
   /* Ao abrir: cada data:…;base64 grande vira Blob (decodificado pelo navegador, sem travar a página); repetidas viram uma só. */
   async function separarMidia(html, fixa) {
     var partes = [], ult = 0, m, iguais = new Map(), tarefas = [];
@@ -601,10 +794,36 @@
     for (var i = 0; i < tarefas.length; i += 4) { var lote = await Promise.all(tarefas.slice(i, i + 4).map(function (f) { return f(); })); urls = urls.concat(lote); }
     return partes.map(function (x) { return typeof x === "string" ? x : urls[x.k]; }).join("");
   }
-  /* Ao salvar: a mídia volta para dentro do arquivo (conversão feita pelo navegador, sem travar). */
+  /* "um vídeo de 1,3 GB" / "2 mídias (1,9 GB no total)": para os avisos de mídia que não cabe na memória */
+  function midiaRuim(us) {
+    var tam = us.reduce(function (t, u) { return t + (MIDIA[u] ? MIDIA[u].blob.size : 0); }, 0), gb = function (n) { return n >= 1073741824 ? (n / 1073741824).toFixed(1).replace(".", ",") + " GB" : kb(n); };
+    var tipo = us.length === 1 && MIDIA[us[0]] ? (/^video\//.test(MIDIA[us[0]].blob.type) ? "Um vídeo" : /^image\//.test(MIDIA[us[0]].blob.type) ? "Uma imagem" : "Um arquivo") : us.length + " mídias";
+    return tipo + " deste report (" + gb(tam) + (us.length > 1 ? " no total" : "") + ") " + (us.length > 1 ? "passam" : "passa") + " da memória que este navegador consegue usar para arquivos.";
+  }
+  /* Ao salvar: a mídia volta para dentro do arquivo (base64 feito no Worker, sem travar; sem Worker, pelo navegador). */
   async function juntarMidia(html, emPartes) {
-    var mapa = {}, us = html.match(RE_BLOB) || [];
-    for (var i = 0; i < us.length; i++) if (MIDIA[us[i]] && !mapa[us[i]]) mapa[us[i]] = await lerComo(MIDIA[us[i]].blob, "readAsDataURL");
+    var mapa = {}, us = (html.match(RE_BLOB) || []).filter(function (u, i, a) { return MIDIA[u] && a.indexOf(u) === i; });
+    var ruins = us.filter(function (u) { return MIDIA[u].ilegivel; });
+    if (ruins.length) throw new Error(midiaRuim(ruins) + " Troque por uma mais leve (passe o mouse nela › Trocar vídeo ou Trocar imagem) e salve de novo.");
+    var total = us.reduce(function (t, u) { return t + MIDIA[u].blob.size; }, 0) || 1, feito = 0, grande = total > 8 << 20;
+    for (var i = 0; i < us.length; i++) {
+      var b = MIDIA[us[i]].blob, avisa = function (f) { if (grande) tarefa("Salvando: juntando imagens e vídeos ao arquivo…", (feito + f * b.size) / total); };
+      /* no arquivo final (em partes), o base64 vem pronto do Worker, já como Blob: nenhum texto gigante passa pela página */
+      if (emPartes) {
+        try { mapa[us[i]] = await noTrabalhador("codificar", { blob: b }, avisa); }
+        catch (e) {
+          mapa[us[i]] = null; log("Juntar mídia no Worker: " + e.message);
+          /* o Worker existe e não conseguiu ler: a mídia não cabe; tentar como texto só travaria a tela e sairia vazio */
+          if (TRAB && b.size > 64 << 20) { MIDIA[us[i]].ilegivel = true; if (grande) fimTarefa(); throw new Error(midiaRuim([us[i]]) + " Troque por uma mais leve (passe o mouse nela › Trocar vídeo ou Trocar imagem) e salve de novo."); }
+        }
+      }
+      if (!mapa[us[i]]) {
+        try { mapa[us[i]] = await lerComo(b, "readAsDataURL"); } catch (e) { mapa[us[i]] = ""; }
+        if (b.size && !/^data:/.test(mapa[us[i]] || "")) { MIDIA[us[i]].ilegivel = true; if (grande) fimTarefa(); throw new Error(midiaRuim([us[i]]) + " Troque por uma mais leve e salve de novo."); }
+      }
+      feito += b.size; avisa(0);
+    }
+    if (grande) fimTarefa();
     if (!emPartes) return html.replace(RE_BLOB, function (u) { return mapa[u] || u; });
     /* em partes (texto, mídia, texto…): o arquivo é montado direto num Blob, sem criar um texto único de vários MB */
     var partes = [], ult = 0, m; RE_BLOB.lastIndex = 0;
@@ -750,7 +969,7 @@
      Só troca quando fica pelo menos 20% menor. */
   var IMAGEM_LEVE = 160 * 1024;
   async function otimizarAoAbrir() {
-    var ims = Array.prototype.slice.call(ED.doc.querySelectorAll("img")), antes = 0, depois = 0, n = 0, cache = {};
+    var ims = Array.prototype.slice.call(ED.doc.querySelectorAll("img")), antes = 0, depois = 0, n = 0, cache = {}, avisou = false;
     for (var k = 0; k < ims.length; k++) {
       var i = ims[k], w = +i.getAttribute("width") || 0, h = +i.getAttribute("height") || 0;
       for (var at of ["src", "data-thumb", "data-ampliar"]) {
@@ -758,6 +977,7 @@
         if (!val || !/^image\//.test(tipo) || tam < IMAGEM_LEVE) continue;
         var chave = at + "|" + w + "|" + h + "|" + val, novo = cache[chave];
         if (novo === undefined) {
+          avisou = true; tarefa("Otimizando imagens pesadas do report…", k / ims.length);
           await new Promise(function (r) { setTimeout(r, 0); });  /* uma imagem por vez, devolvendo a vez à página */
           try { var el = await carregar(val); novo = at === "data-ampliar" ? ampliada(el, w * 2) : w ? desenhar(el, w, h, /png|webp|gif/.test(tipo), false) : null; } catch (e) { novo = null; }
           if (novo !== null) novo = novo.length * 0.75 < tam * 0.8 ? midiaDe(novo) : null;
@@ -766,6 +986,7 @@
         if (novo !== null) { i.setAttribute(at, novo); antes += tam; depois += tamanhoDe(novo); n++; }
       }
     }
+    if (avisou) fimTarefa();
     return { n: n, economia: Math.round(antes - depois) };
   }
   /* Imagem opcional (selo, logo e prints do Transformation Hub): sai com o espaço dela. */
@@ -901,7 +1122,11 @@
   }
   function fonteTexto(area) { var p = area.querySelector("p.fx") || ED.doc.querySelector("p.fx"), m = p && /font-family:([^;]+)/.exec(p.getAttribute("style") || ""); return m ? m[1].trim() : "Arial,sans-serif"; }
   /* Várias ações viram um "Desfazer" só. */
-  function agrupar(desde) { var fns = ED.desfazer.splice(desde); if (fns.length) pilha(function () { for (var i = fns.length - 1; i >= 0; i--) fns[i](); }); }
+  function agrupar(desde) {
+    var fns = ED.desfazer.splice(desde); if (!fns.length) return;
+    var g = function () { for (var i = fns.length - 1; i >= 0; i--) fns[i](); };
+    pilha(g); fns.forEach(function (f) { g.midias = g.midias.concat(f.midias || []); });
+  }
   /* A linha de links do item (a do Transformation Hub já existe); sem ela, cria uma no fim da coluna de texto. */
   function linhaDeLinks(area, criar) {
     var p = area.querySelector("[data-links]") || Array.prototype.filter.call(area.querySelectorAll("p:not([data-campo])"), function (x) {
@@ -1374,7 +1599,13 @@
     if (!ED.doc) return;
     if (!(await conferirAntesDeSalvar())) return;
     $("#estado").className = "estado"; $("#estado").textContent = "Salvando…";
-    var blobHtml = await htmlFinal(), nome = Motor.nomeDoReport(periodoAtual()), salvo = "";
+    var blobHtml, nome = Motor.nomeDoReport(periodoAtual()), salvo = "";
+    try { blobHtml = await htmlFinal(); }
+    catch (e) {
+      $("#estado").className = "estado sujo"; $("#estado").textContent = "Não salvei: " + e.message;
+      await perguntar("Não deu para salvar", "<p>" + esc(e.message) + "</p><p>Nada foi gravado pela metade. A edição continua aberta (e guardada neste navegador).</p>", "Entendi");
+      return;
+    }
     if (window.showSaveFilePicker) {
       try {
         var h = await window.showSaveFilePicker({ suggestedName: nome, types: [{ description: "Report (página HTML)", accept: { "text/html": [".html"] } }] });
@@ -1401,10 +1632,34 @@
   });
   async function abrirArquivo(file) {
     if (ED.sujo && !(await perguntar("Trocar de report?", "<p>Há alterações não salvas no report aberto.</p>", "Abrir o outro", "Voltar"))) return;
-    var html = await file.text();
-    if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) { await perguntar("Arquivo não reconhecido", "<p>Este arquivo não parece um report (.html).</p>", "Entendi"); return; }
-    abrirNoEditor(html, file.name, "arquivo");
-    log("Aberto: " + file.name + " (" + kb(file.size) + ").");
+    var nome = esc(file.name), html = null, sep = null, t0 = performance.now();
+    tarefa("Abrindo " + file.name + " (" + kb(file.size) + ")…", 0);
+    try {
+      /* no Worker: o texto vem sem a mídia (só os lugares dela), a mídia vem pronta em binário */
+      sep = await noTrabalhador("separar", { arquivo: file }, function (f) { tarefa("Abrindo " + file.name + " (" + kb(file.size) + ")…", f); });
+      html = sep.partes.map(function (x) { return typeof x === "string" ? x : "blob:pendente"; }).join("");
+    } catch (e) {
+      sep = null;
+      try { html = await file.text(); } catch (e2) { html = null; }
+      if (html !== null && !html.length && file.size) html = null;  /* o navegador devolve vazio quando o texto passa do limite dele */
+    }
+    fimTarefa();
+    if (html === null) {
+      await perguntar("Não deu para abrir este arquivo", file.size > 400 << 20
+        ? "<p><b>" + nome + "</b> (" + kb(file.size) + ") é grande demais para este navegador abrir de uma vez.</p><p>Abra o report original e troque o vídeo mais pesado por um mais leve (no emulador, ele é otimizado ao colocar), ou use outro computador com mais memória.</p>"
+        : "<p>Não consegui ler <b>" + nome + "</b>. Ele pode ter sido movido, estar sendo baixado ou estar numa pasta de rede sem acesso agora.</p><p>Copie o arquivo para a Área de Trabalho e abra de novo.</p>", "Entendi");
+      return;
+    }
+    if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) { await perguntar("Arquivo não reconhecido", "<p>" + nome + " não parece um report (.html).</p>", "Entendi"); return; }
+    if (sep) {
+      soltarMidia(); GUARDADAS = {};
+      var urls = sep.midias.map(function (b) { return guardarMidia(b); });
+      html = sep.partes.map(function (x) { return typeof x === "string" ? x : urls[x.k]; }).join("");
+      var ruins = (sep.ilegiveis || []).map(function (k) { MIDIA[urls[k]].ilegivel = true; return urls[k]; });
+    }
+    abrirNoEditor(html, file.name, "arquivo", undefined, !!sep);
+    if (ruins && ruins.length) perguntar("Mídia pesada demais neste computador", "<p>" + midiaRuim(ruins) + "</p><p>Os textos podem ser editados normalmente. Para <b>salvar</b>, troque " + (ruins.length > 1 ? "essas mídias" : "essa mídia") + " por uma mais leve: passe o mouse nela › <b>Trocar vídeo</b> (ou <b>Trocar imagem</b>); o emulador otimiza ao colocar.</p>", "Entendi");
+    log("Aberto: " + file.name + " (" + kb(file.size) + (sep ? ", " + sep.midias.length + " mídia(s) separada(s) em " + seg(performance.now() - t0) : "") + ").");
   }
   $("#arquivo").addEventListener("change", function () { if (this.files[0]) abrirArquivo(this.files[0]); this.value = ""; });
   var drop = $("#drop");
@@ -1688,7 +1943,8 @@
   var alturaEdicao = ajustarAltura($("#edFrame")), alturaPrevia = ajustarAltura($("#prev"));
   $("#bEml").addEventListener("click", function () { baixarEml(resultado, "#emlInfo"); });
   $("#bEmlRes").addEventListener("click", function () { baixarEml(resumido, "#emlResInfo"); });
-  function mostrarPrevia() { $("#prev").srcdoc = previas[qualPrev] || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">A prévia aparece quando o report estiver aberto.</p>'; }
+  /* a prévia só recarrega quando muda (editar um texto que não entra no resumo não refaz o quadro do resumo) */
+  function mostrarPrevia() { var h = previas[qualPrev] || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">A prévia aparece quando o report estiver aberto.</p>'; if ($("#prev").srcdoc !== h) $("#prev").srcdoc = h; }
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (b) {
     b.addEventListener("click", function () { Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (x) { x.setAttribute("aria-pressed", x === b); }); qualPrev = b.dataset.qual; mostrarPrevia(); });
   });
