@@ -43,16 +43,30 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   await p.goto(URL_EMULADOR);
   await p.evaluate(salvarComo);
   async function noQuadro(fn, arg) { return p.evaluate(function (o) { var d = document.querySelector("#edFrame").contentDocument; return new Function("d", "arg", "return (" + o.fn + ")(d, arg);")(d, o.arg); }, { fn: fn.toString(), arg: arg === undefined ? null : arg }); }
+  /* Até o botão como uma pessoa: em passos (~8 px a cada 10 ms), não pulando direto; a barra não pode trocar no caminho. */
+  async function ateBotao(p, de, c) {
+    var n = Math.max(5, Math.round(Math.hypot(c.x - de.x, c.y - de.y) / 8));
+    for (var k = 1; k <= n; k++) { await p.mouse.move(de.x + (c.x - de.x) * k / n, de.y + (c.y - de.y) * k / n); await p.waitForTimeout(10); }
+    await p.mouse.click(c.x, c.y);
+  }
+  /* Ponto do alvo na tela (centro, ou dx/dy do canto), lido pela página do emulador: o quadro não roda script, nem o do Playwright. */
+  async function pontoDoAlvo(alvo, dx, dy) {
+    return noQuadro(function (d, o) {
+      var q = document.querySelector("#edFrame").getBoundingClientRect(), r = Array.prototype.map.call(d.querySelectorAll(o.sel), function (e) { return e.getBoundingClientRect(); }).filter(function (x) { return x.width > 0 && x.height > 0; })[0];
+      return { x: q.left + r.left + (o.dx === null ? r.width / 2 : o.dx), y: q.top + r.top + (o.dy === null ? r.height / 2 : o.dy) };
+    }, { sel: alvo.replace(/\s*>>\s*visible=true$/, ""), dx: dx === undefined ? null : dx, dy: dy === undefined ? null : dy });
+  }
   async function ferramenta(f, alvo, botao) {
     await p.mouse.move(2, 2);
     await noQuadro(function (d, a) { d.querySelector(a).scrollIntoView({ block: "center" }); }, alvo);
     await f.hover(alvo, { position: { x: 6, y: 6 } }); await p.waitForTimeout(150);
+    var de = await pontoDoAlvo(alvo, 6, 6);
     var c = await noQuadro(function (d, b) {
       var bt = Array.prototype.find.call(d.getElementById("ed-barra").querySelectorAll("button"), function (y) { return y.textContent === b; }); if (!bt) return null;
       var q = document.querySelector("#edFrame").getBoundingClientRect(), x = bt.getBoundingClientRect(); return { x: q.left + x.left + x.width / 2, y: q.top + x.top + x.height / 2 };
     }, botao);
     if (!c) throw new Error("sem o botão " + botao + " em " + alvo);
-    await p.mouse.click(c.x, c.y);
+    await ateBotao(p, de, c);
   }
 
   /* 1. Aba do emulador: nome e ícone Santander + PF (PNG 16 e 32, SVG e celular), todos carregando; símbolo no cabeçalho */

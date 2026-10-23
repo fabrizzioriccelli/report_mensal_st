@@ -498,39 +498,100 @@
     }, true);
     /* barra flutuante: imagem, link ou item */
     var barra = d.createElement("div"); barra.id = "ed-barra"; barra.setAttribute("data-editor", ""); barra.hidden = true; d.body.appendChild(barra);
-    var esconder = null;
+    var esconder = null, w = d.defaultView;
     /* Um temporizador só: agendar de novo cancela o anterior (dois ao mesmo tempo deixavam um órfão, que escondia a barra do próximo item). */
     function agendarEsconder(ms) { clearTimeout(esconder); esconder = setTimeout(function () { barra.hidden = true; }, ms); }
-    barra.addEventListener("mouseenter", function () { clearTimeout(esconder); });
+    var LINKS = 'a.cta, a[data-anexo], span[title="Link ainda não definido"]', ALVOS_BARRA = "img[data-img], " + LINKS + ", [data-item], [data-ed-bloco]";
+    /* Dono da barra no ponto: imagem, link ou item (null: nada, ou dentro do campo em edição, onde a barra fica como está). */
+    function alvoDe(t) {
+      if (!t || !t.closest || t.closest("#ed-barra")) return null;
+      var img = t.closest("img[data-img]") || t.closest(LINKS); if (img) return img;
+      if (d.activeElement && d.activeElement.hasAttribute("data-ed-campo") && d.activeElement.contains(t)) return null;
+      return t.closest("[data-item], [data-ed-bloco]");
+    }
+    function mostrarFerramentas(alvo) {
+      if (alvo.tagName === "IMG") return mostrarBarra(alvo, ferramentasImagem(alvo), alvo.getBoundingClientRect().width < 200 ? "abaixo" : "");
+      if (alvo.matches(LINKS)) return mostrarBarra(alvo, ferramentasLink(alvo));
+      var item = alvo, gi = grupoDe(item), numeros = gi && GRUPOS[gi].layout === "numeros", bi = numeros ? [] : [["+ Link", function () { adicionarLink(item); }]];
+      if (item.tagName !== "P" && !numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
+      if (item.hasAttribute("data-item")) {
+        if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
+        /* o último item de um grupo fica (a seção não fica vazia): para tirar o grupo todo, oculte a seção */
+        if (!gi || itensDo(gi).length > 1) bi.push(["Tirar item", function () { ocultarItem(item); }, "cinza"]);
+      }
+      mostrarBarra(item, bi, item.getBoundingClientRect().width < 320 ? "acima" : "direita");
+    }
+    /* Caminho até a barra: indo do dono até ela, o mouse passa por cima de outras coisas (o cartão em volta da imagem,
+       a imagem dentro do cartão, outro item). Se ele saiu do dono (ou da própria barra, escorregando ao ir de um botão
+       a outro) rumo à barra, ela fica enquanto ele segue no corredor entre o ponto de saída e a barra (ou não se afasta
+       dela mais que 16 px, mesmo fazendo curva); se afasta ou para no meio do caminho (0,4 s): vale o que está embaixo. */
+    var corredor = null, doCorredor = null, parado = null, mx = 0, my = 0, saida = null, perto = 0;
+    function casco(p) {
+      function giro(o, a, b) { return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); }
+      p.sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+      var baixo = [], cima = [];
+      p.forEach(function (q) { while (baixo.length > 1 && giro(baixo[baixo.length - 2], baixo[baixo.length - 1], q) <= 0) baixo.pop(); baixo.push(q); });
+      p.slice().reverse().forEach(function (q) { while (cima.length > 1 && giro(cima[cima.length - 2], cima[cima.length - 1], q) <= 0) cima.pop(); cima.push(q); });
+      return baixo.slice(0, -1).concat(cima.slice(0, -1));
+    }
+    function noCorredor(x, y) {
+      for (var i = 0; i < corredor.length; i++) { var a = corredor[i], b = corredor[(i + 1) % corredor.length]; if ((b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0]) < 0) return false; }
+      return true;
+    }
+    function caixaBarra() { var r = barra.getBoundingClientRect(); return [r.left + w.scrollX, r.top + w.scrollY, r.right + w.scrollX, r.bottom + w.scrollY]; }
+    function distBarra(x, y) { var c = caixaBarra(); return Math.hypot(Math.max(c[0] - x, 0, x - c[2]), Math.max(c[1] - y, 0, y - c[3])); }
+    function soltar() { corredor = doCorredor = null; clearTimeout(parado); }
+    function esperarParado() { clearTimeout(parado); parado = setTimeout(valeOQueEstaEmbaixo, 400); }
+    /* Vindo do dono (ou da barra) e indo para ela? (dentro do corredor ou sem se afastar mais que 16 px) */
+    function abrirCorredor(x, y) {
+      if (!saida || saida[3] !== barra.dono || Date.now() - saida[2] > 1500) return false;
+      var c = caixaBarra(), m = 16, sx = saida[0], sy = saida[1];
+      corredor = casco([[sx - 6, sy - 6], [sx + 6, sy - 6], [sx + 6, sy + 6], [sx - 6, sy + 6], [c[0] - m, c[1] - m], [c[2] + m, c[1] - m], [c[2] + m, c[3] + m], [c[0] - m, c[3] + m]]);
+      perto = Math.min(distBarra(sx, sy), distBarra(x, y));
+      if (!noCorredor(x, y) && distBarra(x, y) > perto + 16) { soltar(); return false; }
+      doCorredor = barra.dono; clearTimeout(esconder); esperarParado(); return true;
+    }
+    function valeOQueEstaEmbaixo() {
+      /* a barra mudou de dono no caminho (ex.: clique numa etiqueta): ela fica */
+      var mudou = doCorredor !== barra.dono; soltar(); if (mudou) return;
+      var el = d.elementFromPoint(mx, my); if (el && el.closest && el.closest("#ed-barra")) return;
+      var alvo = alvoDe(el);
+      if (alvo) { mostrarFerramentas(alvo); clearTimeout(esconder); }
+      else if (!(el && el.closest && el.closest(ALVOS_BARRA))) agendarEsconder(700);
+    }
+    barra.addEventListener("mouseenter", function () { clearTimeout(esconder); soltar(); });
     /* Saindo da barra para outro item, imagem ou link: quem decide é o mouseover dele (senão a barra do próximo item some). */
-    var ALVOS_BARRA = 'img[data-img], a.cta, a[data-anexo], span[title="Link ainda não definido"], [data-item], [data-ed-bloco]';
     barra.addEventListener("mouseleave", function (e) {
-      if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(ALVOS_BARRA)) return;
+      if (corredor || e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(ALVOS_BARRA)) return;
       agendarEsconder(500);
     });
-    d.addEventListener("mouseover", function (e) {
-      var t = e.target; if (!t.closest || t.closest("#ed-barra")) return;
-      var img = t.closest("img[data-img]"), a = t.closest('a.cta, a[data-anexo], span[title="Link ainda não definido"]'), item = t.closest("[data-item], [data-ed-bloco]");
-      if (img) mostrarBarra(img, ferramentasImagem(img), img.getBoundingClientRect().width < 200 ? "abaixo" : "");
-      else if (a) mostrarBarra(a, ferramentasLink(a));
-      else if (d.activeElement && d.activeElement.hasAttribute("data-ed-campo") && d.activeElement.contains(t)) return;
-      else if (item) {
-        var gi = grupoDe(item), numeros = gi && GRUPOS[gi].layout === "numeros", bi = numeros ? [] : [["+ Link", function () { adicionarLink(item); }]];
-        if (item.tagName !== "P" && !numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
-        if (item.hasAttribute("data-item")) {
-          if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
-          /* o último item de um grupo fica (a seção não fica vazia): para tirar o grupo todo, oculte a seção */
-          if (!gi || itensDo(gi).length > 1) bi.push(["Tirar item", function () { ocultarItem(item); }, "cinza"]);
-        }
-        mostrarBarra(item, bi, item.getBoundingClientRect().width < 320 ? "acima" : "direita");
+    d.addEventListener("mousemove", function (e) {
+      mx = e.clientX; my = e.clientY;
+      if (barra.hidden) { if (corredor) soltar(); return; }
+      if (!corredor) {
+        /* último ponto em cima do dono (no campo em edição, o próprio campo) ou da barra */
+        var dono = barra.dono, a; if (dono && (barra.contains(e.target) || dono.contains(e.target) && (!(a = alvoDe(e.target)) || a === dono))) saida = [e.pageX, e.pageY, Date.now(), dono];
+        return;
       }
-      else return;
-      clearTimeout(esconder);
+      var dist = distBarra(e.pageX, e.pageY);
+      if (noCorredor(e.pageX, e.pageY) || dist <= perto + 16) { perto = Math.min(perto, dist); esperarParado(); }
+      else valeOQueEstaEmbaixo();
+    });
+    d.addEventListener("mouseover", function (e) {
+      mx = e.clientX; my = e.clientY;
+      var alvo = alvoDe(e.target); if (!alvo) return;
+      var dono = barra.dono;
+      /* outro alvo no caminho, vindo do dono ou da barra */
+      if (alvo !== dono && !barra.hidden && dono && dono.isConnected && (corredor || abrirCorredor(e.pageX, e.pageY))) return;
+      soltar(); mostrarFerramentas(alvo); clearTimeout(esconder);
     });
     d.addEventListener("mouseout", function (e) {
       var rt = e.relatedTarget;
       if (rt && rt.closest && (rt.closest("#ed-barra") || rt.closest(ALVOS_BARRA))) return;
-      agendarEsconder(700);
+      /* um vão no caminho até a barra (mesmo devagar): o corredor decide */
+      mx = e.clientX; my = e.clientY;
+      if (rt && (corredor || !barra.hidden && barra.dono && barra.dono.isConnected && abrirCorredor(e.pageX, e.pageY))) return;
+      soltar(); agendarEsconder(700);
     });
   }
   /* onde: (padrão) dentro, no canto de cima à esquerda · "acima" · "abaixo" (imagem pequena) · "direita" (dentro, no canto de cima à direita, longe do começo do texto) */
@@ -545,10 +606,11 @@
   }
   function mostrarBarra(alvo, botoes, onde) {
     var d = ED.doc, barra = d.getElementById("ed-barra"), r = alvo.getBoundingClientRect(), w = d.defaultView;
-    barra.textContent = "";
+    barra.textContent = ""; barra.dono = alvo; barra.style.left = barra.style.top = "0px";
     botoes.forEach(function (b) { var x = d.createElement("button"); x.type = "button"; x.textContent = b[0]; if (b[2]) x.className = b[2]; x.addEventListener("mousedown", function (e) { e.preventDefault(); }); x.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); b[1](); }); barra.appendChild(x); });
     barra.hidden = false;
-    var top = r.top + w.scrollY + (onde === "acima" ? -33 : onde === "direita" ? 4 : onde === "abaixo" ? r.height + 4 : 8);
+    /* "acima": a barra inteira fica em cima, mesmo quando quebra em duas linhas (não cobre a imagem do cartão) */
+    var top = r.top + w.scrollY + (onde === "acima" ? -barra.offsetHeight - 7 : onde === "direita" ? 4 : onde === "abaixo" ? r.height + 4 : 8);
     var left = onde === "direita" ? r.right + w.scrollX - barra.offsetWidth - 4 : r.left + w.scrollX + 8;
     left = Math.max(4, Math.min(left, w.scrollX + d.documentElement.clientWidth - barra.offsetWidth - 4));
     barra.style.top = Math.max(w.scrollY + 4, top) + "px"; barra.style.left = left + "px";

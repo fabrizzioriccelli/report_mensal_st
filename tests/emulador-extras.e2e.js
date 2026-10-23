@@ -55,14 +55,27 @@ function salvarComo() {
     await p.waitForTimeout(150);
     return noQuadro(p, function (d) { var b = d.getElementById("ed-barra"); return b.hidden ? [] : Array.prototype.map.call(b.querySelectorAll("button"), function (x) { return x.textContent; }); });
   }
+  /* Até o botão como uma pessoa: em passos (~8 px a cada 10 ms), não pulando direto; a barra não pode trocar no caminho. */
+  async function ateBotao(p, de, c) {
+    var n = Math.max(5, Math.round(Math.hypot(c.x - de.x, c.y - de.y) / 8));
+    for (var k = 1; k <= n; k++) { await p.mouse.move(de.x + (c.x - de.x) * k / n, de.y + (c.y - de.y) * k / n); await p.waitForTimeout(10); }
+    await p.mouse.click(c.x, c.y);
+  }
+  /* Ponto do alvo na tela (centro, ou dx/dy do canto), lido pela página do emulador: o quadro não roda script, nem o do Playwright. */
+  async function pontoDoAlvo(p, alvo, dx, dy) {
+    return noQuadro(p, function (d, o) {
+      var q = document.querySelector("#edFrame").getBoundingClientRect(), r = Array.prototype.map.call(d.querySelectorAll(o.sel), function (e) { return e.getBoundingClientRect(); }).filter(function (x) { return x.width > 0 && x.height > 0; })[0];
+      return { x: q.left + r.left + (o.dx === null ? r.width / 2 : o.dx), y: q.top + r.top + (o.dy === null ? r.height / 2 : o.dy) };
+    }, { sel: alvo.replace(/\s*>>\s*visible=true$/, ""), dx: dx === undefined ? null : dx, dy: dy === undefined ? null : dy });
+  }
   async function ferramenta(p, f, alvo, botao) {
-    var lista = await botoes(p, f, alvo);
+    var lista = await botoes(p, f, alvo), de = await pontoDoAlvo(p, alvo, 6, 6);
     if (lista.indexOf(botao) < 0) throw new Error("sem o botão \"" + botao + "\" em " + alvo + " (há: " + lista.join(", ") + ")");
     var c = await noQuadro(p, function (d, b) {
       var q = document.querySelector("#edFrame").getBoundingClientRect(), x = Array.prototype.find.call(d.getElementById("ed-barra").querySelectorAll("button"), function (y) { return y.textContent === b; }).getBoundingClientRect();
       return { x: q.left + x.left + x.width / 2, y: q.top + x.top + x.height / 2 };
     }, botao);
-    await p.mouse.click(c.x, c.y);
+    await ateBotao(p, de, c);
   }
   async function comArquivo(p, f, alvo, botao, arquivo) {
     var fc = await Promise.all([p.waitForEvent("filechooser"), ferramenta(p, f, alvo, botao)]);
