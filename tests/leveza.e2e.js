@@ -164,7 +164,7 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   async function etapaRes(pg) { return pg.$eval("#et-resumir", function (li) { return { estado: li.dataset.estado, itens: Array.prototype.map.call(li.querySelectorAll("ul li"), function (x) { return x.textContent; }) }; }); }
   async function espera(pg) { await pg.waitForTimeout(1300); await pg.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 60000 }); }
   await p3.goto(URL_EMULADOR); await p3.click("#bModelo"); await p3.fill("#link", "https://www.example.com/r"); await espera(p3);
-  var e1 = await etapaRes(p3), irs = await p3.$$("#et-resumir ul li button");
+  var e1 = await etapaRes(p3);
   confere(e1.estado === "aviso" && e1.itens.some(function (x) { return /texto do modelo/.test(x) && /Ir até lá/.test(x); }), "modelo em branco: cada texto do modelo no status tem \"Ir até lá\" · " + e1.itens.length + " item(ns)");
   var primeiro = await p3.$eval("#et-resumir ul li:has(button)", function (li) { return li.firstChild.textContent.replace(/^Ainda é texto do modelo: /, ""); });
   await p3.click("#et-resumir ul li:has(button) button"); await p3.waitForTimeout(300);
@@ -195,9 +195,9 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   await p5.close({ runBeforeUnload: false });
   var f4 = await (await p4.$("#edFrame")).contentFrame();
   await f4.locator('[data-campo="numero-1.detalhe"][data-ed-campo]').first().click({ position: { x: 4, y: 6 } }); await p4.waitForTimeout(150);
-  await p4.keyboard.press("Control+A"); await p4.keyboard.type("Creative X 79%"); await p4.keyboard.press("Enter"); await espera(p4);
+  await p4.keyboard.press("Control+A"); await p4.keyboard.type("Creative X 64%"); await p4.keyboard.press("Enter"); await espera(p4);
   var e5 = await etapaRes(p4);
-  confere(e5.estado === "ok" && !e5.itens.some(function (x) { return /texto do modelo/.test(x); }), "\"Creative X 79%\" não é texto do modelo (o X só conta no lugar de um número)");
+  confere(e5.estado === "ok" && !e5.itens.some(function (x) { return /texto do modelo/.test(x); }), "\"Creative X 64%\" não é texto do modelo (o X só conta no lugar de um número)");
   await p4.close({ runBeforeUnload: false });
 
   await browser.close();

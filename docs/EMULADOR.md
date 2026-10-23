@@ -61,7 +61,7 @@ Amarelo só aparece quando há algo a resolver no report. Link válido, imagem d
 | Nota do Outlook no e-mail-resumo | Leia e, se estiver tudo certo, **Ok, ciente** |
 | Vermelho (✕) | Erro: o e-mail não é montado até resolver (ex.: imagem em arquivo que falta) |
 
-O "ciente" vale enquanto o aviso for o mesmo e até abrir outro report. O "X" só conta como texto do modelo no lugar de um número (X%, +X p.p., R$ X); "Creative X 79%" é texto real.
+O "ciente" vale enquanto o aviso for o mesmo e até abrir outro report. O "X" só conta como texto do modelo no lugar de um número (X%, +X p.p., R$ X); "Creative X 64%" é texto real.
 
 ## Arquivos leves (4.8)
 
@@ -99,14 +99,14 @@ Curto de propósito, na identidade do report (vermelho Santander, Lisboa, chama)
 | Bloco | O que mostra |
 |---|---|
 | Abertura (vermelha) | Chama, "Creative Strategy PF", REPORT MENSAL · período, a frase do mês e uma linha de contexto |
-| Principais resultados | **Até 3 indicadores**, cada um com valor, título, base e variação. Quando todos vêm do mesmo projeto, uma linha diz o nome dele (ex.: Milheiros). Sem repetição (4.8): o detalhe que só repete o número sai, e o nome do projeto não aparece de novo se a frase ou o título já o dizem |
+| Principais resultados | **Até 3 indicadores**, cada um com valor, título, base e variação. Quando todos vêm do mesmo projeto, uma linha diz o nome dele (ex.: Alfa). Sem repetição (4.8): o detalhe que só repete o número sai, e o nome do projeto não aparece de novo se a frase ou o título já o dizem |
 | Tópicos novos (4.7) | Cada tópico novo do report (ex.: TESTES): rótulo, título e até 4 itens (nome e status; em Números, o número antes). Mais itens: "E mais N no report completo". Sem link: o link do e-mail continua sendo só o botão. A chamada cita os tópicos ("Campanhas, …, testes e os próximos passos") |
 | Chamada | "Acesse o report completo." e o botão **Acessar report completo**, o **único link** do e-mail: célula vermelha com link de texto, que continua clicável depois que o Outlook envia |
 | Assinatura | CUSTOMER INTERACTIONS · RESUMO DO REPORT MENSAL |
 
 Sem vídeo, carrossel, botões secundários nem script. **Cantos retos de propósito** (4.5): ao enviar, o Outlook para Windows tira os cantos arredondados para todos que recebem, então a prévia já mostra o e-mail como ele chega.
 
-**Indicadores:** cada um aparece com o nome do projeto, ex.: "28 · Contas abertas (Milheiros)" (4.8). O número que a frase do mês já diz não vem marcado e mostra "já está na frase do mês"; marcado mesmo assim, o status avisa "Repete a frase do mês". Os candidatos são os números da página (projeto principal, resultados do destaque, Creative X e os números dos tópicos novos no layout Números); vêm marcados os do projeto principal. A pessoa escolhe até 3 (o 4º fica bloqueado). Nenhum número é criado: sem indicador na página, o e-mail sai só com a frase e a chamada.
+**Indicadores:** cada um aparece com o nome do projeto, ex.: "12 · Contas abertas (Alfa)" (4.8). O número que a frase do mês já diz não vem marcado e mostra "já está na frase do mês"; marcado mesmo assim, o status avisa "Repete a frase do mês". Os candidatos são os números da página (projeto principal, resultados do destaque, Creative X e os números dos tópicos novos no layout Números); vêm marcados os do projeto principal. A pessoa escolhe até 3 (o 4º fica bloqueado). Nenhum número é criado: sem indicador na página, o e-mail sai só com a frase e a chamada.
 
 **Link:** vem do report, se já estiver gravado nele; senão, cole no passo 3. **Vale qualquer link, sem aviso** (4.9): `https://…` (ambiente autorizado), `http://`, endereço sem `https://` (ex.: `empresa.sharepoint.com/…`, ganha o `https://`), texto com o link dentro (ex.: "Link do report: https://…": vale o link), o caminho do arquivo, que vira `file:///…`, `mailto:`, `msteams:` ou um endereço relativo (ex.: `report-2026-10.html`). Espaço vira `%20`. Para caminho de arquivo e endereço relativo, uma nota cinza no campo diz onde ele abre (não é aviso). Só endereço que executa código (`javascript:`, `data:`, `vbscript:`) é recusado. O link é aplicado ao botão do e-mail-resumo na hora e **gravado no report ao salvar**: ao reabrir o arquivo, o campo já vem preenchido. Sem link válido, a prévia mostra "FALTA O LINK DO REPORT COMPLETO" no lugar do botão e o `.eml` do resumo não é liberado.
 

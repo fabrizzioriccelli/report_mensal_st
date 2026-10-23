@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.10.1 (2026-10-23)";
+  var VERSAO = "4.10.2 (2026-10-23)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -205,7 +205,7 @@
      Aparece com visual de template, mas conta como pendência: a versão final só sai com dados reais. */
   var CAMPOS_NUMERICOS = ["valor", "detalhe", "variacao", "anterior", "atual", "data", "status", "resultado", "periodo", "referencia"];
   /* "X" no lugar de um número (X%, +X p.p., R$ X, XX, X,X): texto do modelo. Não conta quando faz parte de um nome
-     ("Creative X 79%") ou de um número ("3X mais"). */
+     ("Creative X 64%") ou de um número ("3X mais"). */
   function xDeExemplo(t) {
     t = String(t || ""); var re = /X{1,2}(?:[,.]X{1,2})?/g, m;
     while ((m = re.exec(t))) {
@@ -578,13 +578,13 @@
     if (LG.arquivo) {
       var lw = parseInt(LG.largura || "32", 10);
       if (!(lw >= 20 && lw <= 200)) { problema(prob, "aviso", arqM, LG._linhas.largura, "Logo: largura deve ficar entre 20 e 200 px. Usei 32."); lw = 32; }
-      var lc = LG.arquivo.replace(/\\/g, "/").replace(/^\.?\/+/, "");
-      if (existe(lc)) {
-        logo = { img: imagem(lc, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" }), placeholder: null };
-        rodapeLogo = imagem(lc, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" });
+      var caminhoLogo = LG.arquivo.replace(/\\/g, "/").replace(/^\.?\/+/, "");
+      if (existe(caminhoLogo)) {
+        logo = { img: imagem(caminhoLogo, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" }), placeholder: null };
+        rodapeLogo = imagem(caminhoLogo, lw, 0, { alt: LG.descricao || "Santander", papel: "logo" });
       }
       else {
-        problema(prob, "pendencia", arqM, LG._linhas.arquivo, "Logo não encontrado: " + lc + ". Salve o logo oficial (versão branca, PNG) nesse caminho ou ajuste o nome em config/marca.txt.");
+        problema(prob, "pendencia", arqM, LG._linhas.arquivo, "Logo não encontrado: " + caminhoLogo + ". Salve o logo oficial (versão branca, PNG) nesse caminho ou ajuste o nome em config/marca.txt.");
         logo = { img: null, placeholder: seguro('<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td height="20" align="center" valign="middle" style="height:20px;width:' + lw + "px;border:1px dashed " + cor.foco_rotulo.s +
           ';border-radius:4px;"><p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:12px;font-weight:bold;color:' + cor.foco_rotulo.s + ';letter-spacing:1.5px;">LOGO</p></td></tr></table>') };
       }
@@ -707,7 +707,7 @@
           anexos.push({ id: anexos.length + 1, caminho: camA });
           return '<a href="#" data-anexo="@@ANX' + anexos.length + '@@" target="_blank" class="cta" title="Abre o documento (PDF) em nova aba" style="color:' + cor.marca.s + ';font-weight:bold;text-decoration:none;">' + esc(rot) + "&nbsp;&#8594;</a>";
         }
-        if (!rot) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: escreva \"Texto do link | endereço\" (ex.: Briefing Agent | https://…). Vários, separados por ;"); return ""; }
+        if (!rot) { problema(prob, "erro", arqD, v._linhas.links, "[" + nb + "] links: escreva \"Texto do link | endereço\" (ex.: Agente de exemplo | https://…). Vários, separados por ;"); return ""; }
         var lk = qualquerLink(url), ok = !!lk.url;
         lk.problemas.forEach(function (x) { problema(prob, x.nivel, arqD, v._linhas.links, "[" + nb + "] links (" + rot + "): " + x.msg); });
         url = lk.url;
@@ -1407,7 +1407,7 @@
     html = html.replace(/<link rel="(?:icon|apple-touch-icon)"[^>]*>\n?/g, "");
     var partes = html.split(/(<!--secao:[a-z]+-->)/);
     if (partes.length < 3) return { erro: "Este arquivo não tem as marcas de seção (foi gerado antes da versão 3.9). Gere a página de novo pelo gerar-report.html." };
-    var manter = op.manter || SECOES_RESUMO, mantidas = [], fora = [], out = partes[0], atual = null, bloco = false;
+    var manter = op.manter || SECOES_RESUMO, mantidas = [], fora = [], out = partes[0], bloco = false;
     var temVideo = /data-video="/.test(html) || /alt="Vídeo: /.test(html);
     for (var i = 1; i < partes.length; i += 2) {
       var id = /secao:([a-z]+)/.exec(partes[i])[1], corpo = partes[i + 1] || "";

@@ -699,16 +699,16 @@ teste("normalizarLink: aceita qualquer link válido sem aviso (https, http, arqu
 });
 
 teste("e-mail-resumo sem repetição: nome do projeto (não \"Projeto principal\"), detalhe que só repete o número sai, número que a frase já diz não vem marcado", function () {
-  var base = MINIMO.replace("nome: Projeto", "nome: Milheiros").replace("valor: 10%\ntitulo: CTR\ndetalhe: era 5%", "valor: 28\ntitulo: Contas abertas\ndetalhe: 28 contas abertas no Milheiros") +
+  var base = MINIMO.replace("nome: Projeto", "nome: Alfa").replace("valor: 10%\ntitulo: CTR\ndetalhe: era 5%", "valor: 12\ntitulo: Contas abertas\ndetalhe: 12 contas abertas no Alfa") +
     "\n[NUMERO 2]\nvalor: R$ 1,20\ntitulo: Custo por conta\ndetalhe: Referência: R$ 1,50";
   var r = montar(base), res = M.emailResumo(r.html, { link: "https://example.com/r" }), txt = res.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-  assert.ok(/PRINCIPAIS RESULTADOS Milheiros 28 Contas abertas/.test(txt) && !/Projeto principal/.test(txt), "o nome do projeto, sem \"Projeto principal:\" · " + txt.slice(txt.indexOf("PRINCIPAIS"), txt.indexOf("PRINCIPAIS") + 90));
-  assert.ok(!/28 contas abertas no Milheiros/.test(txt) && /Referência: R\$ 1,50/.test(txt), "o detalhe que repete o número sai; o que acrescenta fica");
-  var r2 = montar(base.replace("frase: Um mês", "frase: Milheiros: 28 contas abertas")), res2 = M.emailResumo(r2.html, { link: "https://example.com/r" }), t2 = res2.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  assert.ok(/PRINCIPAIS RESULTADOS Alfa 12 Contas abertas/.test(txt) && !/Projeto principal/.test(txt), "o nome do projeto, sem \"Projeto principal:\" · " + txt.slice(txt.indexOf("PRINCIPAIS"), txt.indexOf("PRINCIPAIS") + 90));
+  assert.ok(!/12 contas abertas no Alfa/.test(txt) && /Referência: R\$ 1,50/.test(txt), "o detalhe que repete o número sai; o que acrescenta fica");
+  var r2 = montar(base.replace("frase: Um mês", "frase: Alfa: 12 contas abertas")), res2 = M.emailResumo(r2.html, { link: "https://example.com/r" }), t2 = res2.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
   assert.deepStrictEqual(res2.indicadores, ["numero-2"], "o número da frase não vem marcado");
   assert.ok(res2.candidatos.filter(function (x) { return x.chave === "numero-1"; })[0].na_frase, "o candidato fica marcado como \"já está na frase\"");
   var corpo2 = t2.slice(t2.indexOf("REPORT MENSAL"));
-  assert.ok(!/PRINCIPAIS RESULTADOS Milheiros/.test(corpo2) && (corpo2.match(/28 contas abertas/gi) || []).length === 1 && !/ 28 Contas abertas/.test(corpo2), "nem o número nem o nome do projeto se repetem · " + corpo2.slice(0, 220));
+  assert.ok(!/PRINCIPAIS RESULTADOS Alfa/.test(corpo2) && (corpo2.match(/12 contas abertas/gi) || []).length === 1 && !/ 12 Contas abertas/.test(corpo2), "nem o número nem o nome do projeto se repetem · " + corpo2.slice(0, 220));
   var r3 = M.emailResumo(r2.html, { link: "https://example.com/r", indicadores: ["numero-1"] });
   assert.deepStrictEqual(r3.indicadores, ["numero-1"], "se a pessoa escolhe, vale a escolha (o emulador avisa)");
 });

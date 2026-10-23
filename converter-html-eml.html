@@ -192,7 +192,7 @@
     </div>
     <div id="painelImportar" hidden>
       <p class="muted" style="margin-bottom:8px"><b>Cole aqui a resposta do Copilot</b> (formato do Prompt 11 do guia: blocos como <code>[NUMERO 1]</code> e linhas <code>valor: 12,5%</code>). Os campos correspondentes da página são preenchidos; nada mais muda. Confira depois, campo a campo.</p>
-      <textarea id="txtImportar" spellcheck="false" placeholder="[EDICAO]&#10;mes: Novembro&#10;ano: 2026&#10;&#10;[NUMERO 1]&#10;valor: 12,5%&#10;titulo: Taxa de clique&#10;detalhe: Outras peças: 10%"></textarea>
+      <textarea id="txtImportar" spellcheck="false" aria-label="Conteúdo do Copilot para importar" placeholder="[EDICAO]&#10;mes: Novembro&#10;ano: 2026&#10;&#10;[NUMERO 1]&#10;valor: 12,5%&#10;titulo: Taxa de clique&#10;detalhe: Outras peças: 10%"></textarea>
       <div class="row"><button type="button" class="pri" id="bAplicar">Aplicar na página</button><button type="button" id="bFecharImportar">Fechar</button><span class="muted" id="importarInfo"></span></div>
     </div>
     <details>
@@ -1096,7 +1096,7 @@
   function ferramentasLink(a) {
     var pend = a.tagName !== "A", b = [[pend ? "Colocar link" : "Trocar link", function () { trocarLink(a); }], ["Anexar PDF", function () { escolher("#fPdf", function (f) { anexarPdf(a, f); }); }, "cinza"]];
     if (a.closest('[data-item^="transformation-"], [data-item^="topico"], [data-links]')) b.push(["Texto do link", function () {
-      var atual = a.textContent.replace(/\s*→\s*$/, "").trim(), n = prompt("Texto do link (ex.: Documento One Brief):", /^\[.*\]$/.test(atual) ? "" : atual);
+      var atual = a.textContent.replace(/\s*→\s*$/, "").trim(), n = prompt("Texto do link (ex.: Documento do projeto):", /^\[.*\]$/.test(atual) ? "" : atual);
       if (n === null || !n.trim()) return; var antes = a.innerHTML; a.innerHTML = esc(n.trim()) + "&nbsp;&#8594;"; pilha(function () { a.innerHTML = antes; }); marcarSujo();
     }, "cinza"]);
     b.push(["Tirar link", function () { tirarLink(a); }, "cinza"]);
@@ -1203,7 +1203,7 @@
     return p;
   }
   async function adicionarLink(alvo) {
-    var rot = prompt("Texto do novo link (ex.: Plano do teste, Documento One Brief):", "");
+    var rot = prompt("Texto do novo link (ex.: Plano do teste, Documento do projeto):", "");
     if (rot === null || !rot.trim()) return;
     var d = ED.doc, area = areaDoAlvo(alvo), escuro = fundoEscuro(area), corApoio = escuro ? "#F5DECF" : "#767676";
     var desde = ED.desfazer.length, criada = !linhaDeLinks(area, false), linha = linhaDeLinks(area, true), sep = null;
@@ -1628,7 +1628,7 @@
     }
     /* título (assunto) e texto da caixa de entrada acompanham o período e a frase */
     var per = doc.querySelector('[data-campo="periodo"]'), frase = doc.querySelector('[data-campo="frase"]'), prev = doc.querySelector('[data-campo="previa"]');
-    if (per) { var t = per.textContent.replace(/\s+/g, " ").trim(), mes = t.charAt(0) + t.slice(1).toLocaleLowerCase("pt-BR"); doc.title = "Creative Strategy PF | Report de " + mes.replace(/(\d{4})$/, "$1"); }
+    if (per) { var periodo = per.textContent.replace(/\s+/g, " ").trim(), mes = periodo.charAt(0) + periodo.slice(1).toLocaleLowerCase("pt-BR"); doc.title = "Creative Strategy PF | Report de " + mes.replace(/(\d{4})$/, "$1"); }
     var fraseFinal = doc.querySelector('[data-campo="frase_final"]');
     if (frase && prev && Object.keys(ED.alterados).some(function (k) { return /^frase/.test(k); })) prev.textContent = (frase.textContent + " " + (fraseFinal ? fraseFinal.textContent : "")).replace(/\s+/g, " ").trim();
     var html = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
@@ -1761,7 +1761,7 @@
   ];
   var FALTA = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120"><rect width="100%" height="100%" fill="#E3DFDC"/><text x="50%" y="54%" font-family="Arial" font-size="13" fill="#5F5F5F" text-anchor="middle">imagem faltando</text></svg>');
   var ICONE = { espera: "", rodando: "", ok: "✓", aviso: "!", erro: "✕" };
-  var pastaArquivos = {}, execucao = 0, resultado = null, resumido = null, previas = {}, qualPrev = "resumido", urls = [], inicio = 0, relogioTimer = null, ultimo = null;
+  var pastaArquivos = {}, execucao = 0, resultado = null, resumido = null, previas = {}, qualPrev = "resumido", urls = [], inicio = 0, relogioTimer = null;
   function banner(cls, txt) { var b = $("#banner"); b.className = "banner " + cls; b.textContent = txt; }
   function progresso(p, fim) { p = Math.max(0, Math.min(100, Math.round(p))); $("#barra i").style.width = p + "%"; $("#barra").setAttribute("aria-valuenow", p); $("#pct").textContent = p + "%"; $("#barra").classList.toggle("fim", !!fim); }
   function montarEtapas() {
@@ -1820,7 +1820,7 @@
     cand.forEach(function (x) {
       var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.value = x.chave;
       c.checked = x.chave in antes ? antes[x.chave] : escolha.indexOf(x.chave) >= 0;
-      /* o nome do projeto (ex.: Milheiros), não "Projeto principal"; sem repetir o nome que o título já tem */
+      /* o nome do projeto (ex.: Alfa), não "Projeto principal"; sem repetir o nome que o título já tem */
       var de = x.origem && x.origem !== x.titulo && x.titulo.indexOf(x.origem) < 0 ? " (" + x.origem + ")" : "";
       l.appendChild(c); l.appendChild(document.createTextNode(" " + x.valor + " · " + x.titulo + de));
       if (x.na_frase) { var av = document.createElement("span"); av.className = "muted"; av.textContent = " · já está na frase do mês"; l.appendChild(av); l.title = "A frase do mês já diz este número: no e-mail ele apareceria duas vezes."; }
@@ -1848,7 +1848,7 @@
   $("#botao").addEventListener("input", function () { reconverter(); });
 
   async function converter(file) {
-    var minha = ++execucao, t0 = performance.now(); ultimo = file;
+    var minha = ++execucao, t0 = performance.now();
     function parou() { return minha !== execucao; }
     var erros = [], avisos = [];
     resultado = null; resumido = null; previas = {};
@@ -1912,7 +1912,7 @@
         if (tipo === "blob") {
           /* mídia separada: só o tamanho agora; os bytes entram no .eml quando baixar */
           var md = MIDIA[src]; if (!md) { erros.push("img"); probs.push(rot + ": a imagem não está mais na memória. Abra o report de novo."); continue; }
-          ext = (/image\/(png|gif|jpe?g)/.exec(md.blob.type) || [, "jpg"])[1].replace("jpeg", "jpg");
+          ext = (/image\/(png|gif|jpe?g)/.exec(md.blob.type) || ["", "jpg"])[1].replace("jpeg", "jpg");
           if (!/^image\/(png|gif|jpe?g)$/.test(md.blob.type)) { bytes = await paraPng(src); ext = "png"; }
           else { var cidB = "img" + String(n).padStart(2, "0") + "@report", arqB = String(n).padStart(2, "0") + "-imagem." + ext;
             porSrc[src] = { cid: cidB, nome: arqB, blob: md.blob }; mapa[src] = "cid:" + cidB; total += md.blob.size; mapaPrev[src] = src;

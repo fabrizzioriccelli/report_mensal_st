@@ -2,6 +2,14 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.10.2 · 2026-10-23 · Check-up final: dados reais fora do repositório, código limpo
+
+- **Dados reais fora do repositório:** exemplos em comentários, documentação, histórico de versões e testes ainda traziam um nome de projeto e dois resultados reais de outubro (contas abertas e o Creative X do mês) e dois nomes internos de projetos do Transformation Hub nos exemplos de link. Trocados por exemplos fictícios ("Alfa: 12 contas abertas", "Creative X 64%", "Documento do projeto", "Agente de exemplo"). Os PDFs e PPTX do kit foram conferidos: sem esses dados.
+- **Código limpo:** revisão com lint (ESLint) do emulador, do `gerar-report.html`, do motor, do script que vai dentro do report e dos testes: sem erros; variáveis sem uso e nomes repetidos na mesma função saíram (sem mudar o comportamento). Sem `console.log`, `debugger` ou pendências esquecidas.
+- **Acessibilidade:** o campo de colar a resposta do Copilot ganhou nome para leitor de tela.
+- **Conferido:** sessão longa no emulador (abrir o report 40 vezes, editar, passar o mouse, trocar Computador/Celular e as prévias): documentos, elementos e ouvintes ficam iguais e a memória estabiliza em ~5 MB, sem vazamento. Tempo de abrir o emulador do kit: 58 ms (228 ms com a CPU 4× mais lenta); modelo em branco editável em 0,14 s (0,42 s). Sem erros no console nas 6 páginas.
+- Modelo em branco, exemplo e emulador avulso do kit gerados de novo (versão).
+
 ## 4.10.1 · 2026-10-23 · Barras de botões que não trocam no caminho
 
 - **Barras do emulador (causa corrigida):** ao passar o mouse numa imagem, num link, numa etiqueta ou num item, aparece a barra de botões; indo até ela, o mouse passava por cima de outra coisa (o cartão em volta da imagem, a imagem dentro do cartão, outro item, o vão entre eles) e a barra trocava na hora para a desse outro alvo, e o botão sumia antes do clique (ex.: indo da imagem de um lançamento até "Trocar imagem", a barra virava "+ Adicionar depois / + Link / + Imagem / Tirar item"). Agora a barra fica enquanto o mouse segue em direção a ela, mesmo em curva, devagar ou escorregando de um botão para o outro; se ele se afasta ou para em outro lugar (0,4 s), aparece a barra do que está embaixo dele. A barra de cima do cartão, quando quebra em duas linhas, fica inteira em cima (antes, "Tirar item" caía em cima da imagem).
@@ -35,18 +43,18 @@ A versão atual aparece na página `gerar-report.html`, no topo de `report_backu
 
 - **"Ir até lá"** em cada pendência do status: leva ao texto do modelo que falta trocar (rolando até ele, com o cursor dentro), ao link (passo 3) ou aos indicadores (passo 4). Cada texto do modelo aparece separado (até 6), não mais numa linha só.
 - **"Ok, ciente"** nos avisos informativos (tipo de link, notas do Outlook, imagem da internet, report não reconhecido): a etapa fica verde, com "ciente ✓", e o banner volta a "Pronto", enquanto o aviso for o mesmo. Texto do modelo não tem "ciente": precisa ser trocado.
-- **"X" de exemplo:** o emulador marcava como texto do modelo qualquer "X" sozinho em números e detalhes, e o amarelo não saía em textos reais como "Creative X 79%" ou "3X mais". Agora o X só conta no lugar de um número (X%, +X p.p., R$ X, XX, X,X). Vale também na conferência do arquivo de dados.
+- **"X" de exemplo:** o emulador marcava como texto do modelo qualquer "X" sozinho em números e detalhes, e o amarelo não saía em textos reais como "Creative X 64%" ou "3X mais". Agora o X só conta no lugar de um número (X%, +X p.p., R$ X, XX, X,X). Vale também na conferência do arquivo de dados.
 - **Status na hora:** depois de editar, o status e as prévias se refazem em 0,6 s (antes esperavam também o rascunho ser guardado, ~2 s, e mostravam o estado antigo nesse meio tempo).
 - Status dos indicadores com o nome do projeto (como no passo 4).
-- Teste `tests/leveza.e2e.js` ampliado: "Ir até lá" leva ao campo e o item sai depois de editado; "Ok, ciente" deixa a etapa verde; "Creative X 79%" não é pendência.
+- Teste `tests/leveza.e2e.js` ampliado: "Ir até lá" leva ao campo e o item sai depois de editado; "Ok, ciente" deixa a etapa verde; "Creative X 64%" não é pendência.
 
 ## 4.8 · 2026-10-21 · Resumo sem repetição, arquivos leves, celular inteiro e ícones
 
-- **E-mail-resumo com o nome do projeto:** no passo 4 e no e-mail, o indicador diz de qual projeto é (ex.: "28 · Contas abertas (Milheiros)"), não "Projeto principal" ou "Destaque do mês". Quando todos vêm do mesmo projeto, a linha embaixo de PRINCIPAIS RESULTADOS traz só o nome.
+- **E-mail-resumo com o nome do projeto:** no passo 4 e no e-mail, o indicador diz de qual projeto é (ex.: "12 · Contas abertas (Alfa)"), não "Projeto principal" ou "Destaque do mês". Quando todos vêm do mesmo projeto, a linha embaixo de PRINCIPAIS RESULTADOS traz só o nome.
 - **Sem repetição no resumo:**
-  - o detalhe que só repete o número (ex.: "28 contas abertas no Milheiros" embaixo de 28 · Contas abertas) sai;
+  - o detalhe que só repete o número (ex.: "12 contas abertas no Alfa" embaixo de 12 · Contas abertas) sai;
   - o nome do projeto não aparece de novo quando a frase do mês ou o título já o dizem;
-  - o número que a frase do mês já diz (ex.: "Milheiros: 28 contas abertas") não vem marcado como indicador; na lista, ele mostra "já está na frase do mês" e, se for marcado mesmo assim, o status avisa "Repete a frase do mês".
+  - o número que a frase do mês já diz (ex.: "Alfa: 12 contas abertas") não vem marcado como indicador; na lista, ele mostra "já está na frase do mês" e, se for marcado mesmo assim, o status avisa "Repete a frase do mês".
 - **Arquivos leves, sem pensar nisso:**
   - imagem: entra no tamanho de uso, em JPEG quando não tem transparência (um print PNG de 3000 px vira poucos KB); a versão ampliada (clique) vai até 1200 px e não é guardada quando não é maior que a imagem da página;
   - vídeo acima de 4 MB: o emulador oferece **otimizar** (refaz no navegador, até 960 px, com som, com barra de andamento; "Usar o original" para). No teste, 4,5 MB → 0,7 MB. O player do report acerta a duração do vídeo otimizado;

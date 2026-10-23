@@ -254,7 +254,7 @@ texto: Lorem ipsum dolor sit amet.
 #          agente), na pasta do mês. Aparece com 56 px, no lugar dos
 #          ícones. descricao_logo: o que o logo é (texto alternativo).
 #  links:  (opcional) links extras, "Texto | endereço", vários separados
-#          por ";" (ex.: Documento One Brief | https://… ; Briefing Agent | https://…).
+#          por ";" (ex.: Documento do projeto | https://… ; Agente de exemplo | https://…).
 #  status: use para a previsão (ex.: Previsão de lançamento: nov/26).
 # ----------------------------------------------------------------------
 [TRANSFORMATION]
