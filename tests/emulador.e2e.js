@@ -270,7 +270,7 @@ function salvarComo() {
   var d = await Promise.all([p.waitForEvent("download"), p.click("#bEmlRes")]);
   var arqRes = path.join(SAIDA, d[0].suggestedFilename());
   await d[0].saveAs(arqRes);
-  var eml = fs.readFileSync(arqRes, "latin1"), html = htmlDoEml(eml), htmlTxt = Buffer.from(html, "latin1").toString("utf8");
+  var eml = fs.readFileSync(arqRes, "latin1"), html = htmlDoEml(eml);
   console.log("EML RESUMO: " + d[0].suggestedFilename() + " (" + Math.round(eml.length / 1024) + " KB)");
   confere(/^X-Unsent: 1\r\n/.test(eml) && /^MIME-Version: 1\.0\r\n/m.test(eml) && /multipart\/related/.test(eml), "MIME válido: abre como mensagem nova (X-Unsent), multipart/related");
   confere(/^Subject: Creative Strategy PF \| Report de Janeiro 2099\r\n/m.test(eml), "assunto: Creative Strategy PF | Report de Janeiro 2099");

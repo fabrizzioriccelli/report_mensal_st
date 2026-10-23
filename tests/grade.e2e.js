@@ -19,7 +19,7 @@ function confere(ok, msg) { if (!ok || process.env.DEPURAR) console.log((ok ? " 
 
 /* Medição dentro do quadro de edição: devolve a lista de problemas de grid e alinhamento. */
 function medir(d, celular) {
-  var prob = [], w = d.defaultView, barra = d.getElementById("ed-barra");
+  var prob = [], barra = d.getElementById("ed-barra");
   if (barra) barra.hidden = true;
   function vis(el) { if (el.closest("[data-ed-oculta]")) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
   function ret(el) { var r = el.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom, w: r.width }; }
@@ -62,7 +62,6 @@ function medir(d, celular) {
       rs.forEach(function (r, i) { if (Math.abs(r.w - C.w) > 2) prob.push(g + "-" + (i + 1) + " não ocupa a largura no celular (" + Math.round(r.w) + " de " + Math.round(C.w) + ")"); });
       var ord = rs.slice().sort(function (a, b) { return a.t - b.t; });
       for (var z = 1; z < ord.length; z++) {
-        var conteudo = function (r) { return r; };
         if (ord[z].t - ord[z - 1].b < -1) prob.push(g + ": itens sobrepostos no celular");
       }
       /* respiro: do fim do texto de um item até o começo do próximo */
@@ -100,7 +99,6 @@ function medir(d, celular) {
   await p.waitForTimeout(400);
   var f = await (await p.$("#edFrame")).contentFrame();
   async function noQuadro(fn, arg) { return p.evaluate(function (o) { var d = document.querySelector("#edFrame").contentDocument; return new Function("d", "arg", "return (" + o.fn + ")(d, arg);")(d, o.arg); }, { fn: fn.toString(), arg: arg === undefined ? null : arg }); }
-  async function modo(cel) { await p.click('button[data-ew="' + (cel ? "390px" : "100%") + '"], button[data-ew]:not([data-ew="390px"])' ); }
   async function auditar(rotulo) {
     passos++;
     var pd = await noQuadro(medir, false);
