@@ -61,16 +61,30 @@ function salvarComo() {
     if (process.env.DEPURAR) console.log("  [" + chave + "] " + await p.evaluate(function () { var d = document.querySelector("#edFrame").contentDocument; return d.activeElement.getAttribute("data-campo") + " = " + d.activeElement.textContent; }));
     await p.keyboard.press("Enter");
   }
+  /* Até o botão como uma pessoa: em passos (~8 px a cada 10 ms), não pulando direto; a barra não pode trocar no caminho. */
+  async function ateBotao(p, de, c) {
+    var n = Math.max(5, Math.round(Math.hypot(c.x - de.x, c.y - de.y) / 8));
+    for (var k = 1; k <= n; k++) { await p.mouse.move(de.x + (c.x - de.x) * k / n, de.y + (c.y - de.y) * k / n); await p.waitForTimeout(10); }
+    await p.mouse.click(c.x, c.y);
+  }
+  /* Ponto do alvo na tela (centro, ou dx/dy do canto), lido pela página do emulador: o quadro não roda script, nem o do Playwright. */
+  async function pontoDoAlvo(p, alvo, dx, dy) {
+    return noQuadro(p, function (d, o) {
+      var q = document.querySelector("#edFrame").getBoundingClientRect(), r = Array.prototype.map.call(d.querySelectorAll(o.sel), function (e) { return e.getBoundingClientRect(); }).filter(function (x) { return x.width > 0 && x.height > 0; })[0];
+      return { x: q.left + r.left + (o.dx === null ? r.width / 2 : o.dx), y: q.top + r.top + (o.dy === null ? r.height / 2 : o.dy) };
+    }, { sel: alvo.replace(/\s*>>\s*visible=true$/, ""), dx: dx === undefined ? null : dx, dy: dy === undefined ? null : dy });
+  }
   async function ferramenta(p, f, alvo, botao) {
     await p.mouse.move(2, 2);
     await f.hover(alvo);
+    var de = await pontoDoAlvo(p, alvo);
     await p.waitForFunction(function (b) { var x = document.querySelector("#edFrame").contentDocument.getElementById("ed-barra"); return x && !x.hidden && Array.prototype.some.call(x.querySelectorAll("button"), function (y) { return y.textContent === b; }); }, botao, { timeout: 5000 });
     /* clique de mouse no botão da barra (coordenadas da tela), sem rolar nada antes */
     var c = await noQuadro(p, function (d, b) {
       var q = document.querySelector("#edFrame").getBoundingClientRect(), x = Array.prototype.find.call(d.getElementById("ed-barra").querySelectorAll("button"), function (y) { return y.textContent === b; }).getBoundingClientRect();
       return { x: q.left + x.left + x.width / 2, y: q.top + x.top + x.height / 2 };
     }, botao);
-    await p.mouse.click(c.x, c.y);
+    await ateBotao(p, de, c);
   }
   /* Lê o quadro de edição pela página do emulador: o quadro não roda script (sandbox), então o teste não avalia nada dentro dele. */
   async function noQuadro(p, fn, arg) { return p.evaluate(function (o) { var d = document.querySelector("#edFrame").contentDocument; return new Function("d", "arg", "return (" + o.fn + ")(d, arg);")(d, o.arg); }, { fn: fn.toString(), arg: arg === undefined ? null : arg }); }

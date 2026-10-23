@@ -118,6 +118,7 @@ Testes (Node.js; os `e2e` também precisam do Playwright):
 - `node tests/trabalhador.test.js`: o trabalho pesado do emulador (Web Worker) sem navegador: separar e juntar a mídia devolve o arquivo idêntico, byte a byte.
 - `node tests/celular.e2e.js`: conteúdo longo (valores de 15 caracteres, títulos e nomes longos, palavras sem espaço) em 320, 375, 390 e 430 px: report, e-mail-resumo e emulador sem passar da tela; os 3 indicadores normais seguem lado a lado.
 - `node tests/leveza.e2e.js`: imagem e vídeo pesados otimizados, report pesado mais leve ao abrir, edição e prévia sem rolagem dentro do quadro, nomes dos projetos e aviso de repetição no resumo, ícones da aba (precisa do ffmpeg para gerar os arquivos de teste).
+- `node tests/barras.e2e.js`: as barras de botões que aparecem ao passar o mouse (imagem, link, item, bloco, etiqueta), em todos os alvos, no computador e no Celular: o mouse anda como uma pessoa (em passos, reto, em curva e devagar) até cada botão, e a barra não pode trocar no caminho.
 - `node tests/grade.e2e.js`: o grid depois de cada adicionar e tirar (itens de todos os grupos, os 4 layouts de tópico, imagens, links, seções), medido no computador e no celular (100 passos).
 - `node tests/ferramenta.e2e.js`: geração pelo arquivo de dados, em 7 larguras de tela.
 - `node tests/movimento.e2e.js`: o movimento da página (números contando, seções aparecendo, "reduzir movimento").
