@@ -143,21 +143,6 @@ referencia: Texto de exemplo: o que explica a variação.
 significado: Texto de exemplo: o que fazer com essa informação.
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: RESUMO DAS CAMPANHAS
-# ----------------------------------------------------------------------
-[FOI BEM 1]
-texto: Exemplo: o que foi bem na campanha A.
-
-[FOI BEM 2]
-texto: Exemplo: o que foi bem na campanha B.
-
-[A MELHORAR 1]
-texto: Exemplo: o que precisa melhorar na campanha A.
-
-[A MELHORAR 2]
-texto: Exemplo: o que precisa melhorar na campanha B.
-
-# ----------------------------------------------------------------------
 #  EDITAR AQUI: 04 · TRANSFORMATION HUB
 # ----------------------------------------------------------------------
 [TRANSFORMATION]

@@ -1,9 +1,10 @@
 /*
  * Teste de ponta a ponta dos recursos 4.6 do emulador (uso técnico, opcional), só com conteúdo fictício:
- *   + Link e + Imagem em qualquer item (projeto, lançamento, destaque, "foi bem"…), até 3 imagens por item,
+ *   + Link e + Imagem em qualquer item (projeto, lançamento, destaque…), até 3 imagens por item,
  *   tirar link/imagem, Desfazer, e os tópicos novos (ex.: Testes): "+ Novo tópico" pergunta o nome e o layout
  *   (lista, colunas, cartões, números, com miniaturas), até 4 por página, numa página nova ou antiga, com a
- *   numeração refeita; os tópicos vão no arquivo salvo e no e-mail-resumo.
+ *   numeração refeita; os tópicos vão no arquivo salvo e no e-mail-resumo. "Resumo das campanhas" (saiu na 4.11):
+ *   o report de antes que ainda tem a seção a perde ao abrir, sem vão no layout, e o salvo e o e-mail-resumo seguem certos.
  *   Requer Node.js + Playwright:  node tests/emulador-extras.e2e.js [pasta-de-saida]
  *   Versão avulsa:  EMULADOR=kit/emulador-report.html node tests/emulador-extras.e2e.js
  */
@@ -149,12 +150,8 @@ function salvarComo() {
   confere(await noQuadro(p, function (d) { return !d.querySelector('[data-item="lancamento-1"] p[data-links]'); }), "tirar o único link: a linha vazia sai");
   await p.click("#bDesfazer");
   confere(await noQuadro(p, function (d) { return !!d.querySelector('[data-item="lancamento-1"] p[data-links] a[href="https://www.example.com/peca"]'); }), "Desfazer: o link volta");
-  /* "foi bem" (linha de texto): link no fim da linha, sem "+ Imagem" */
-  var bBem = await botoes(p, f, '[data-item="bem-1"]');
-  confere(bBem.indexOf("+ Link") >= 0 && bBem.indexOf("+ Imagem") < 0, "\"foi bem\": + Link sim, + Imagem não (é uma linha de texto) · " + bBem.join(", "));
-  p.__respostas = ["Ver dados", "https://www.example.com/dados"];
-  await ferramenta(p, f, '[data-item="bem-1"]', "+ Link");
-  confere(await noQuadro(p, function (d) { return !!d.querySelector('[data-item="bem-1"] span[data-links] a[href="https://www.example.com/dados"]'); }), "\"foi bem\": link no fim da linha");
+  /* "Resumo das campanhas" saiu do report (4.11): nem a seção, nem os itens "foi bem"/"a melhorar", nem a opção em Seções do report */
+  confere(await noQuadro(p, function (d) { return !d.querySelector('[data-item^="bem-"], [data-item^="melhorar-"]') && d.body.textContent.indexOf("RESUMO DAS CAMPANHAS") < 0; }) && !(await p.$('#secoesRep input[value="resumo"]')) && (await p.$eval("#secoesRep", function (e) { return e.textContent; })).indexOf("Resumo das campanhas") < 0, "modelo em branco: sem \"Resumo das campanhas\" (nem a seção, nem em Seções do report)");
   /* destaque (bloco sem data-item) e capa (fundo vermelho: link claro) */
   p.__respostas = ["Estudo completo", "https://www.example.com/estudo"];
   await ferramenta(p, f, '[data-campo="destaque.titulo"]', "+ Link");
@@ -242,7 +239,7 @@ function salvarComo() {
   confere(/<!--secao:topico-->/.test(h) && />TESTES</.test(h) && /Teste A\/B fictício/.test(h), "arquivo: novo tópico com rótulo e textos");
   confere(["lista", "cartoes", "numeros", "colunas"].every(function (l) { return h.indexOf('data-layout="' + l + '"') > 0; }) && />EVENTOS</.test(h) && />MÍDIA</.test(h) && />PESQUISAS</.test(h), "arquivo: os 4 tópicos, cada um no seu layout");
   confere(emOrdem(nums.join(",")), "arquivo: seções numeradas em ordem (" + nums.join(",") + ")");
-  confere(["guia-agente", "plano", "peca", "dados", "estudo", "apresentacao"].every(function (x) { return h.indexOf('href="https://www.example.com/' + x + '"') > 0; }), "arquivo: todos os links novos");
+  confere(["guia-agente", "plano", "peca", "estudo", "apresentacao"].every(function (x) { return h.indexOf('href="https://www.example.com/' + x + '"') > 0; }), "arquivo: todos os links novos");
   confere(/data-img="lancamento-1-print-2"[^>]*|[^>]*data-img="lancamento-1-print-2"/.test(h) && /data-img="destaque-print-1"/.test(h) && (h.match(/data-ampliar="data:image/g) || []).length >= 5, "arquivo: imagens novas, ampliáveis no clique");
   confere(!/data-ed-bloco|ed-barra|contenteditable/.test(h), "arquivo: nenhuma marca do editor");
   /* o arquivo salvo segue para o e-mail: a conversão (imagens dentro, conferência do Outlook) não pode dar erro */
@@ -286,6 +283,39 @@ function salvarComo() {
   confere(!!(await f.locator('.ed-mais button[data-grupo="topico"]').count()), "itens do novo tópico já podem ser adicionados");
   await p.click("#bDesfazer");
   confere(!(await noQuadro(p, function (d) { return !!d.querySelector('[data-item^="topico-"]'); })) && await pilulas(p) === antes && !(await p.$('#secoesRep input[value="topico"]')), "Desfazer: a seção sai e a numeração volta");
+  await p.close({ runBeforeUnload: false });
+
+  /* 8. Report de antes da 4.11, ainda com o "Resumo das campanhas": a seção sai ao abrir, sem vão entre o Creative X e o
+     Transformation Hub (a mesma distância de um report novo), e o arquivo salvo e o e-mail-resumo saem sem ela. */
+  fase = "8";
+  var novo = fs.readFileSync(path.join(RAIZ, "kit/report-exemplo.html"), "utf8"), secaoAntiga = fs.readFileSync(path.join(RAIZ, "tests/dados/secao-resumo-4.10.html"), "utf8");
+  var arqAntigo = path.join(SAIDA, "extras-antigo-com-resumo.html");
+  fs.writeFileSync(arqAntigo, novo.replace("<!--secao:transformation-->", secaoAntiga + "<!--secao:transformation-->"));
+  /* vão entre a última linha antes do Transformation Hub (Creative X) e a primeira dele */
+  async function vao(p) { return noQuadro(p, function (d) { var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode()) && n.nodeValue.trim() !== "secao:transformation"); var antes = n.previousElementSibling || n.previousSibling, depois = n.nextElementSibling || n.nextSibling; while (antes && antes.nodeType !== 1) antes = antes.previousSibling; while (depois && depois.nodeType !== 1) depois = depois.nextSibling; return antes.querySelector('[data-campo="cx.atual"]') ? Math.round(depois.getBoundingClientRect().top - antes.getBoundingClientRect().bottom) : "a linha de antes não é o Creative X"; }); }
+  p = await abrirEmulador();
+  await p.setInputFiles("#arquivo", path.join(RAIZ, "kit/report-exemplo.html"));
+  await quadro(p);
+  var vaoNovo = await vao(p);
+  await p.close({ runBeforeUnload: false });
+  p = await abrirEmulador();
+  await p.setInputFiles("#arquivo", arqAntigo);
+  await quadro(p);
+  var tem = await noQuadro(p, function (d) {
+    var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n, r = []; while ((n = w.nextNode())) { var m = /^secao:(\w+)$/.exec(n.nodeValue.trim()); if (m) r.push(m[1]); }
+    return { secoes: r.join(","), texto: d.body.textContent.indexOf("RESUMO DAS CAMPANHAS") >= 0, itens: d.querySelectorAll('[data-item^="bem-"], [data-item^="melhorar-"]').length };
+  });
+  confere(fs.readFileSync(arqAntigo, "utf8").indexOf("<!--secao:resumo-->") > 0 && tem.secoes.indexOf("resumo") < 0 && !tem.texto && !tem.itens, "report antigo: a seção \"Resumo das campanhas\" sai ao abrir · " + tem.secoes);
+  var vaoAntigo = await vao(p);
+  confere(vaoAntigo === vaoNovo, "sem vão no lugar da seção: Creative X → Transformation Hub como num report novo (" + vaoAntigo + " px · " + vaoNovo + " px)");
+  confere(/Resumo das campanhas" saiu do report/.test(await p.$eval("#estado", function (e) { return e.textContent; })) && (await p.$eval("#secoesRep", function (e) { return e.textContent; })).indexOf("Resumo das campanhas") < 0, "aviso para salvar; Seções do report sem a opção");
+  await p.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 60000 });
+  var prevA = await p.$eval("#prev", function (e) { return e.srcdoc; });
+  confere(prevA.length > 1000 && prevA.indexOf("Acessar report completo") > 0 && prevA.indexOf("RESUMO DAS CAMPANHAS") < 0, "e-mail-resumo continua saindo (com o botão para o report completo)");
+  await p.click("#bSalvar");
+  await p.waitForFunction(function () { return window.__salvos.length === 1; }, null, { timeout: 20000 });
+  var hA = (await p.evaluate(function () { return window.__salvos[0]; })).html;
+  confere(hA.indexOf("<!--secao:resumo-->") < 0 && hA.indexOf("RESUMO DAS CAMPANHAS") < 0 && /<!--secao:cx-->[\s\S]*<!--secao:transformation-->/.test(hA), "arquivo salvo sem a seção, com o Creative X e o Transformation Hub");
   await p.close({ runBeforeUnload: false });
 
   await browser.close();

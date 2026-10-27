@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.10.2 (2026-10-23)";
+  var VERSAO = "4.11 (2026-10-27)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -78,13 +78,13 @@
   var PECA = { imagem: 0, descricao_imagem: 0, enquadramento: 0, tipo: 0, link: 0, video: 0 };
   function junta() { var o = {}; for (var i = 0; i < arguments.length; i++) for (var k in arguments[i]) o[k] = arguments[i][k]; return o; }
 
+  /* [FOI BEM] e [A MELHORAR] eram o "Resumo das campanhas", que saiu do report na 4.11. */
+  var RESUMO_SAIU = /^(FOI BEM|A MELHORAR)$/, RESUMO_AVISO = "[FOI BEM] e [A MELHORAR] (Resumo das campanhas) saíram do report na versão 4.11 e foram ignorados. Pode apagar esses blocos.";
   var ESQUEMA_DADOS = [
     { bloco: "EDICAO", obrigatorio: true, campos: { mes: 1, ano: 1, proximo_mes: 1, pasta_imagens: 1, contato: 0, link_report_completo: 0 } },
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
     { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
-    { bloco: "FOI BEM", max: 4, campos: { texto: 1 } },
-    { bloco: "A MELHORAR", max: 4, campos: { texto: 1 } },
     { bloco: "LANCAMOS", campos: { titulo: 0 } },
     { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0 }, PECA) },
     { bloco: "RESULTADO", max: 3, campos: NUM },
@@ -156,10 +156,15 @@
 
   /* Confere blocos e campos contra o esquema. Devolve { simples: {BLOCO: campos}, listas: {BLOCO: [campos…]} } */
   function conferirEsquema(lido, esquema, prob) {
-    var simples = {}, listas = {};
+    var simples = {}, listas = {}, avisouResumo = false;
     lido.ordem.forEach(function (k) {
       var b = lido.blocos[k], m = k.match(/^(.*?)\s+(\d+)$/), base = m ? m[1] : k, idx = m ? +m[2] : 0;
       var def = esquema.filter(function (e) { return e.bloco === base && (idx ? e.max : !e.max); })[0];
+      /* arquivo de dados de antes da 4.11: o "Resumo das campanhas" saiu do report; os blocos são ignorados, sem erro */
+      if (!def && RESUMO_SAIU.test(base)) {
+        if (!avisouResumo) problema(prob, "aviso", lido.arquivo, b.linha, RESUMO_AVISO);
+        avisouResumo = true; return;
+      }
       if (!def) {
         var nomes = esquema.map(function (e) { return "[" + e.bloco + (e.max ? " 1" : "") + "]"; }).join(", ");
         problema(prob, "erro", lido.arquivo, b.linha, "Bloco [" + b.nome + "] desconhecido. Os blocos possíveis são: " + nomes + ".");
@@ -622,19 +627,6 @@
       sobra: sobra
     };
 
-    /* Resumo das campanhas (sem número de seção, depois do Creative X): o que foi bem (verde do guia) e o que precisa melhorar (âmbar).
-       Duas colunas de 288 px no computador; no celular, uma embaixo da outra. */
-    var fb = L["FOI BEM"] || [], am = L["A MELHORAR"] || [], balanco = null;
-    if (fb.length || am.length) {
-      var lb = fb.length && am.length ? colunas(LARGURA, 2) : [LARGURA, LARGURA];
-      function itensBalanco(lista, nome) { return lista.map(function (v, i) { curto(v, "texto", 90, nome + " " + (i + 1)); return { idx: i + 1, texto: texto(v.texto) }; }); }
-      balanco = {
-        bem: fb.length ? { itens: itensBalanco(fb, "FOI BEM"), largura: lb[0] } : null,
-        melhorar: am.length ? { itens: itensBalanco(am, "A MELHORAR"), largura: fb.length ? lb[1] : lb[0] } : null,
-        dois: !!(fb.length && am.length)
-      };
-    }
-
     /* 02 · O que lançamos */
     var DS = D.simples.DESTAQUE, lanc = L.LANCAMENTO || [], res = L.RESULTADO || [];
     var lancamos = null;
@@ -879,7 +871,7 @@
       assunto: assunto, icone: seguro(ICONE_TAG), css_celular: seguro(CSS_CELULAR), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
-      abertura: abertura, balanco: balanco, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topicos: topicos, foco: foco, agenda: agenda
+      abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topicos: topicos, foco: foco, agenda: agenda
     };
 
     if (prob.some(function (p) { return p.nivel === "erro"; })) return { ok: false, problemas: prob };
@@ -927,8 +919,6 @@
     o.push("PROJETO PRINCIPAL: " + t(S["PROJETO PRINCIPAL"].nome), t(S["PROJETO PRINCIPAL"].resumo));
     (L.NUMERO || []).forEach(function (v) { o.push(num(v)); });
     var l = lk(S["PROJETO PRINCIPAL"]); if (l) o.push(l);
-    if ((L["FOI BEM"] || []).length) { o.push("", "FOI BEM"); L["FOI BEM"].forEach(function (v) { o.push("+ " + t(v.texto)); }); }
-    if ((L["A MELHORAR"] || []).length) { o.push("", "A MELHORAR"); L["A MELHORAR"].forEach(function (v) { o.push("! " + t(v.texto)); }); }
     if (S.DESTAQUE || (L.LANCAMENTO || []).length) {
       o.push("", "O QUE LANÇAMOS" + (S.LANCAMOS && S.LANCAMOS.titulo ? ": " + t(S.LANCAMOS.titulo) : ""));
       if (S.DESTAQUE) {
@@ -1314,12 +1304,12 @@
 
   /* Nome de cada seção (marcas <!--secao:nome--> do template) e as que o e-mail resumido leva. */
   var SECOES = {
-    capa: "Capa e números do projeto principal", lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas",
+    capa: "Capa e números do projeto principal", lancamos: "O que lançamos", cx: "Creative X",
     transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês",
     agenda: "Também vem aí", rodape: "Encerramento e assinatura"
   };
   TOPICOS.forEach(function (t, i) { SECOES[t[1]] = "Novo tópico " + (i + 1); });
-  var SECOES_RESUMO = ["capa", "resumo", "foco", "rodape"];
+  var SECOES_RESUMO = ["capa", "foco", "rodape"];
   var MARCA_SECAO = /<!--secao:([a-z]+)-->/g;
 
   /* Nome da seção; o de um tópico novo é o rótulo que ele tem na página (ex.: "Tópico: TESTES"). */
@@ -1787,7 +1777,7 @@
   };
   var IMPORTA_LISTA = {
     "NUMERO": ["numero", ["valor", "titulo", "detalhe", "variacao"]], "RESULTADO": ["resultado", ["valor", "titulo", "detalhe", "variacao"]],
-    "LANCAMENTO": ["lancamento", ["status", "nome", "texto"]], "FOI BEM": ["bem", ["texto"]], "A MELHORAR": ["melhorar", ["texto"]],
+    "LANCAMENTO": ["lancamento", ["status", "nome", "texto"]],
     "TRANSFORMATION": ["transformation", ["status", "nome", "texto", "resultado"]], "APRENDIZADO": ["aprendizado", ["titulo", "texto", "levamos"]], "AGENDA": ["agenda", ["data", "titulo", "detalhe"]]
   };
   TOPICOS.forEach(function (t) {
@@ -1807,7 +1797,7 @@
         return;
       }
       var mapa = !idx ? IMPORTA[base] : null, lista = idx ? IMPORTA_LISTA[base] : null;
-      if (!mapa && !lista) { problemas.push({ nivel: "aviso", linha: b.linha, msg: "Bloco [" + b.nome + "] não existe na página e foi ignorado." }); return; }
+      if (!mapa && !lista) { problemas.push({ nivel: "aviso", linha: b.linha, msg: RESUMO_SAIU.test(base) ? RESUMO_AVISO : "Bloco [" + b.nome + "] não existe na página e foi ignorado." }); return; }
       Object.keys(v).forEach(function (c) {
         var val = v[c]; if (!val) return;
         var chave = mapa ? mapa[c] : (lista[1].indexOf(c) >= 0 ? lista[0] + "-" + idx + "." + c : "");

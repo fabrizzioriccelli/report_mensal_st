@@ -113,13 +113,13 @@ Testes (Node.js; os `e2e` também precisam do Playwright):
 
 - `node tests/motor.test.js`: motor (71 testes).
 - `node tests/emulador.e2e.js`: o fluxo completo do emulador como uma pessoa faria (abrir, editar, imagem, link, ocultar, importar, salvar, reabrir, recuperar, resumo, `.eml`). Com `EMULADOR=kit/emulador-report.html`, testa a versão avulsa.
-- `node tests/emulador-extras.e2e.js`: + Link e + Imagem em vários tipos de item (até 3 imagens), tirar e desfazer, e os tópicos novos (+ Novo tópico com os 4 layouts, numa página nova e numa antiga, adicionar e ocultar itens, numeração, salvar, e-mail-resumo, reabrir, celular).
+- `node tests/emulador-extras.e2e.js`: + Link e + Imagem em vários tipos de item (até 3 imagens), tirar e desfazer, os tópicos novos (+ Novo tópico com os 4 layouts, numa página nova e numa antiga, adicionar e ocultar itens, numeração, salvar, e-mail-resumo, reabrir, celular) e o report de antes da 4.11 com o "Resumo das campanhas" (a seção sai ao abrir, sem vão).
 - `node tests/desempenho.e2e.js`: abrir, editar e salvar um report sintético pesado (~27 MB) com a CPU 4× mais lenta; falha se a página voltar a travar. Confere também o aviso de andamento, vídeo e PDF idênticos no arquivo salvo e a imagem desfeita saindo da memória. Com `GIGANTE=1`, abre, edita e salva um report de ~600 MB (precisa do ffmpeg).
 - `node tests/trabalhador.test.js`: o trabalho pesado do emulador (Web Worker) sem navegador: separar e juntar a mídia devolve o arquivo idêntico, byte a byte.
 - `node tests/celular.e2e.js`: conteúdo longo (valores de 15 caracteres, títulos e nomes longos, palavras sem espaço) em 320, 375, 390 e 430 px: report, e-mail-resumo e emulador sem passar da tela; os 3 indicadores normais seguem lado a lado.
 - `node tests/leveza.e2e.js`: imagem e vídeo pesados otimizados, report pesado mais leve ao abrir, edição e prévia sem rolagem dentro do quadro, nomes dos projetos e aviso de repetição no resumo, ícones da aba (precisa do ffmpeg para gerar os arquivos de teste).
 - `node tests/barras.e2e.js`: as barras de botões que aparecem ao passar o mouse (imagem, link, item, bloco, etiqueta), em todos os alvos, no computador e no Celular: o mouse anda como uma pessoa (em passos, reto, em curva e devagar) até cada botão, e a barra não pode trocar no caminho.
-- `node tests/grade.e2e.js`: o grid depois de cada adicionar e tirar (itens de todos os grupos, os 4 layouts de tópico, imagens, links, seções), medido no computador e no celular (100 passos).
+- `node tests/grade.e2e.js`: o grid depois de cada adicionar e tirar (itens de todos os grupos, os 4 layouts de tópico, imagens, links, seções), medido no computador e no celular (89 passos).
 - `node tests/ferramenta.e2e.js`: geração pelo arquivo de dados, em 7 larguras de tela.
 - `node tests/movimento.e2e.js`: o movimento da página (números contando, seções aparecendo, "reduzir movimento").
 

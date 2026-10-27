@@ -427,12 +427,16 @@
         var m = marcaSecao(ED.doc, id); nosDaSecao(id).forEach(function (n) { n.remove(); }); if (m) m.remove();
         return true;
       });
+      /* "Resumo das campanhas" saiu do report (4.11): o report de antes que ainda tem a seção a perde ao abrir. */
+      var resumo = marcaSecao(ED.doc, "resumo");
+      if (resumo) { nosDaSecao("resumo").forEach(function (n) { n.remove(); }); resumo.remove(); }
       instrumentar(); ED.vistas = midiasNaPagina();
       if (tirou.length) renumerarPilulas();
       ED.periodoInicial = periodoInicial !== undefined ? periodoInicial : periodoAtual();
       $("#secEditar").hidden = false; $("#secLink").hidden = false; $("#secResumo").hidden = false; $("#secStatus").hidden = false;
       $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
       montarSecoes(); reconverter(true);
+      if (resumo) marcarSujo("A seção \"Resumo das campanhas\" saiu do report. Salve para gravar");
       otimizarAoAbrir().then(function (o) {
         /* as originais pesadas trocadas pelas otimizadas não voltam (otimizar não entra no Desfazer): saem da memória */
         var antes = ED.vistas; ED.vistas = midiasNaPagina(); soltarSemUso(Array.from(antes || []).filter(function (u) { return !ED.vistas.has(u); }));
@@ -513,7 +517,7 @@
       if (alvo.tagName === "IMG") return mostrarBarra(alvo, ferramentasImagem(alvo), alvo.getBoundingClientRect().width < 200 ? "abaixo" : "");
       if (alvo.matches(LINKS)) return mostrarBarra(alvo, ferramentasLink(alvo));
       var item = alvo, gi = grupoDe(item), numeros = gi && GRUPOS[gi].layout === "numeros", bi = numeros ? [] : [["+ Link", function () { adicionarLink(item); }]];
-      if (item.tagName !== "P" && !numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
+      if (!numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
       if (item.hasAttribute("data-item")) {
         if (gi && itensDo(gi).length < GRUPOS[gi].max) bi.unshift(["+ Adicionar depois", function () { adicionarItem(gi, item); }]);
         /* o último item de um grupo fica (a seção não fica vazia): para tirar o grupo todo, oculte a seção */
@@ -1157,9 +1161,9 @@
     });
   }
   function chaveDoAlvo(alvo) { return alvo.getAttribute("data-item") || alvo.getAttribute("data-ed-bloco"); }
-  /* Onde entram os links e as imagens novas: a coluna de texto do item ("foi bem"/"a melhorar": a própria linha). */
+  /* Onde entram os links e as imagens novas: a coluna de texto do item. */
   function areaDoAlvo(alvo) {
-    if (alvo.tagName === "P" || alvo.hasAttribute("data-ed-bloco")) return alvo;
+    if (alvo.hasAttribute("data-ed-bloco")) return alvo;
     var b = alvo.querySelector("td[data-bloco]"), nome = alvo.querySelector('[data-campo$=".nome"]');
     if (/^topico[a-z]?-/.test(chaveDoAlvo(alvo)) && b) return b;
     if (alvo.tagName === "TR") return nome ? nome.closest("td") : alvo.querySelector("td");
@@ -1195,7 +1199,6 @@
       return !x.querySelector("[data-campo]") && x.querySelector('a.cta, span[title="Link ainda não definido"]');
     })[0];
     if (p || !criar) return p || null;
-    if (area.tagName === "P") { p = ED.doc.createElement("span"); p.setAttribute("data-links", ""); area.appendChild(p); return p; }
     p = ED.doc.createElement("p"); p.className = "fx ts"; p.setAttribute("data-links", "");
     p.setAttribute("style", "margin:8px 0 0 0;font-family:" + fonteTexto(area) + ";font-size:12px;line-height:22px;");
     var cx = area.querySelector("table[data-imagens]");
@@ -1207,8 +1210,8 @@
     if (rot === null || !rot.trim()) return;
     var d = ED.doc, area = areaDoAlvo(alvo), escuro = fundoEscuro(area), corApoio = escuro ? "#F5DECF" : "#767676";
     var desde = ED.desfazer.length, criada = !linhaDeLinks(area, false), linha = linhaDeLinks(area, true), sep = null;
-    /* um link por linha (na frase de "foi bem"/"a melhorar", o primeiro também vai para a linha de baixo) */
-    if (linha.tagName === "SPAN" || linha.querySelector('a, span[title="Link ainda não definido"]')) { sep = d.createElement("br"); linha.appendChild(sep); }
+    /* um link por linha */
+    if (linha.querySelector('a, span[title="Link ainda não definido"]')) { sep = d.createElement("br"); linha.appendChild(sep); }
     var sp = d.createElement("span"); sp.setAttribute("title", "Link ainda não definido");
     sp.setAttribute("style", "color:" + corApoio + ";font-weight:bold;white-space:nowrap;"); sp.innerHTML = esc(rot.trim()) + "&nbsp;&#8594;";
     linha.appendChild(sp);
@@ -1292,7 +1295,7 @@
   var COR = { marca: "#EC0000", texto: "#000000", linha: "#E2E2E2", transf_linha: "#F5DECF" };
   var GRUPOS = {
     numero: { max: 4, nome: "indicador" }, resultado: { max: 3, nome: "resultado" }, lancamento: { max: 6, nome: "lançamento" },
-    bem: { max: 4, nome: "\"foi bem\"" }, melhorar: { max: 4, nome: "\"a melhorar\"" }, transformation: { max: 3, nome: "projeto" },
+    transformation: { max: 3, nome: "projeto" },
     aprendizado: { max: 3, nome: "aprendizado" }, agenda: { max: 6, nome: "item na agenda" }
   };
   /* Novos tópicos (até 4): o id da seção é o grupo dos itens (topico-1, topicob-1…), e o layout vem da página
@@ -1325,13 +1328,13 @@
   }
   function prepararGrupo(g) {
     var it = itensDo(g); if (!it.length || ED.grupos[g]) return;
-    var lay = GRUPOS[g].layout, f = it[0], cont = /^(numero|aprendizado|bem|melhorar|transformation)$/.test(g) || /^(lista|colunas|numeros)$/.test(lay) ? f.parentNode : f.parentNode.parentNode;
+    var lay = GRUPOS[g].layout, f = it[0], cont = /^(numero|aprendizado|transformation)$/.test(g) || /^(lista|colunas|numeros)$/.test(lay) ? f.parentNode : f.parentNode.parentNode;
     var total = 600;
     if (g === "resultado") total = it.reduce(function (s2, x) { return s2 + (+x.getAttribute("width") || 0); }, 0) + 24 * (it.length - 1);
     ED.grupos[g] = { cont: cont, total: total };
     var div = ED.doc.createElement("div"); div.className = "ed-mais"; div.setAttribute("data-editor", ""); div.setAttribute("contenteditable", "false");
     div.innerHTML = '<button type="button" data-grupo="' + g + '"></button>';
-    if (/^(bem|melhorar)$/.test(g)) cont.appendChild(div); else { var tab = cont.closest("table"); tab.parentNode.insertBefore(div, tab.nextSibling); }
+    var tab = cont.closest("table"); tab.parentNode.insertBefore(div, tab.nextSibling);
   }
   function atualizarMais() {
     Array.prototype.forEach.call(ED.doc.querySelectorAll(".ed-mais button"), function (b) {
@@ -1456,7 +1459,6 @@
     if (!novo) { await perguntar("Modelo não encontrado", "<p>O modelo em branco não está junto deste emulador. Use a versão avulsa (kit/emulador-report.html).</p>", "Entendi"); return; }
     var volta = desfazGrupo(G), ref = depois || it[it.length - 1];
     if (ref) ref.parentNode.insertBefore(novo, ref.nextSibling);
-    else if (/^(bem|melhorar)$/.test(g)) G.cont.insertBefore(novo, G.cont.querySelector(".ed-mais"));
     else if (/^(numero|aprendizado|transformation)$/.test(g) || /^(lista|colunas|numeros)$/.test(GRUPOS[g].layout)) G.cont.appendChild(novo);
     else (g === "resultado" ? G.cont.lastElementChild : G.cont.appendChild(ED.doc.createElement("tr"))).appendChild(novo);
     editavel(novo); renumerar(g); refazer(g); atualizarMais();
@@ -1476,7 +1478,7 @@
     ED.doc.getElementById("ed-barra").hidden = true;
     marcarSujo("Item tirado: a grade se ajustou. Para voltar: Desfazer.");
   }
-  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", resumo: "Resumo das campanhas", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
+  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
   function marcaSecao(doc, id) { var w = doc.createTreeWalker(doc.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:" + id) return n; return null; }
   function nosDaSecao(id) {
     var w = ED.doc.createTreeWalker(ED.doc.body, NodeFilter.SHOW_COMMENT), n, ini = null, prox = null;

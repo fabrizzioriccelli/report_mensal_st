@@ -2,6 +2,13 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.11 · 2026-10-27 · "Resumo das campanhas" sai do report e do emulador
+
+- **"Resumo das campanhas" removido por completo:** a seção (foi bem / a melhorar) saiu do template, do motor e do emulador. No emulador, sai da lista "Seções do report", os botões "+ Adicionar" de "foi bem" e "a melhorar" deixam de existir, e o código que só servia a esses itens (linha de links dentro da frase) saiu junto. Um report de antes que ainda tem a seção a perde ao abrir, sem deixar vão entre o Creative X e o Transformation Hub (a mesma distância de um report novo), com o aviso para salvar. O **e-mail-resumo** (o e-mail curto com o botão para o report completo) continua igual.
+- Arquivo de dados ou conteúdo do Copilot com `[FOI BEM]`/`[A MELHORAR]`: os blocos são ignorados com um aviso só, sem erro (o mês continua sendo gerado).
+- Modelo em branco, exemplo do kit, `dados/MODELO.txt` e a biblioteca de prompts (Prompt 7 agora é só o Creative X, com causa e ação) sem a seção; documentação atualizada.
+- Testes: motor (seção removida, aviso dos blocos antigos), `tests/emulador-extras.e2e.js` (report de antes com a seção: sai ao abrir, sem vão, salvo e e-mail-resumo certos), `tests/grade.e2e.js` sem os dois grupos (89 passos).
+
 ## 4.10.2 · 2026-10-23 · Check-up final: dados reais fora do repositório, código limpo
 
 - **Dados reais fora do repositório:** exemplos em comentários, documentação, histórico de versões e testes ainda traziam um nome de projeto e dois resultados reais de outubro (contas abertas e o Creative X do mês) e dois nomes internos de projetos do Transformation Hub nos exemplos de link. Trocados por exemplos fictícios ("Alfa: 12 contas abertas", "Creative X 64%", "Documento do projeto", "Agente de exemplo"). Os PDFs e PPTX do kit foram conferidos: sem esses dados.

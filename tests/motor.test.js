@@ -316,14 +316,14 @@ teste("destaque: número longo em 3 resultados gera aviso (não cabe no celular)
   assert.ok(!niveis(r, "aviso").some(function (p) { return /RESULTADO/.test(p.msg); }));
 });
 
-teste("resumo das campanhas: foi bem (verde) e a melhorar (âmbar), em duas colunas", function () {
-  var r = montar(MINIMO + "\n[FOI BEM 1]\ntexto: Ponto bom\n[A MELHORAR 1]\ntexto: Ponto fraco");
+teste("\"Resumo das campanhas\" saiu (4.11): [FOI BEM] e [A MELHORAR] de arquivo antigo são ignorados com um aviso, sem erro", function () {
+  var r = montar(MINIMO + "\n[FOI BEM 1]\ntexto: Ponto bom\n[FOI BEM 2]\ntexto: Outro\n[A MELHORAR 1]\ntexto: Ponto fraco");
   assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
-  assert.ok(r.html.indexOf("FOI BEM") > 0 && r.html.indexOf("A MELHORAR") > 0 && r.html.indexOf("RESUMO DAS CAMPANHAS") > 0);
-  assert.ok(/border-top:2px solid #21634F/.test(r.html) && /border-top:2px solid #945400/.test(r.html));
-  assert.ok((r.html.match(/width="288"/g) || []).length >= 2, "duas colunas de 288 px");
-  assert.ok(r.texto.indexOf("+ Ponto bom") >= 0 && r.texto.indexOf("! Ponto fraco") >= 0);
-  assert.ok(montar(MINIMO).html.indexOf("RESUMO DAS CAMPANHAS") < 0, "sem os blocos, o resumo não aparece");
+  assert.strictEqual(niveis(r, "aviso").filter(function (p) { return /Resumo das campanhas/.test(p.msg); }).length, 1, "um aviso só");
+  assert.ok(r.html.indexOf("RESUMO DAS CAMPANHAS") < 0 && r.html.indexOf("<!--secao:resumo-->") < 0 && r.html.indexOf("Ponto bom") < 0, "a seção não aparece");
+  assert.ok(r.texto.indexOf("Ponto bom") < 0 && r.texto.indexOf("Ponto fraco") < 0, "nem no texto puro");
+  var imp = M.importarDados("[FOI BEM 1]\ntexto: Ponto bom");
+  assert.ok(!Object.keys(imp.campos).length && imp.problemas.length === 1 && /Resumo das campanhas/.test(imp.problemas[0].msg), "importar: avisa e não aplica");
 });
 
 teste("variação em texto com seta para baixo não ganha sinal de menos", function () {
@@ -418,7 +418,7 @@ function modeloHtml() {
 
 teste("o report sai com as marcas de seção, na ordem do template", function () {
   assert.deepStrictEqual(M.secoesDoHtml(modeloHtml()).map(function (x) { return x.id; }),
-    ["capa", "lancamos", "cx", "resumo", "transformation", "aprendizados", "foco", "agenda", "rodape"]);
+    ["capa", "lancamos", "cx", "transformation", "aprendizados", "foco", "agenda", "rodape"]);
   assert.ok(/<!--secao:fim-->/.test(modeloHtml()));
   /* Os "EDITAR AQUI" ficam na página (guia para quem abre no editor), mas não vão para o e-mail. */
   assert.ok(/<!-- EDITAR AQUI: PERÍODO/.test(modeloHtml()) && /<!-- EDITAR AQUI: APRENDIZADO/.test(modeloHtml()), "EDITAR AQUI na página");
@@ -429,7 +429,7 @@ teste("o report sai com as marcas de seção, na ordem do template", function ()
 teste("emailResumido: só as seções escolhidas, botão com o link antes do encerramento, seções renumeradas", function () {
   var link = "https://empresa.sharepoint.com/sites/x/report.html?a=1&b=2";
   var r = M.emailResumido(modeloHtml(), { link: link });
-  assert.deepStrictEqual(r.mantidas, ["capa", "resumo", "foco", "rodape"]);
+  assert.deepStrictEqual(r.mantidas, ["capa", "foco", "rodape"]);
   assert.deepStrictEqual(r.fora, ["lancamos", "cx", "transformation", "aprendizados", "agenda"]);
   assert.ok(r.html.indexOf('href="https://empresa.sharepoint.com/sites/x/report.html?a=1&amp;b=2"') > 0, "link escapado no href");
   assert.ok(r.html.indexOf("<!--secao:interativo-->") < r.html.indexOf("<!--secao:rodape-->"), "botão antes do encerramento");
@@ -550,8 +550,6 @@ var COMPLETO = [
   "[LANCAMENTO 3]", "nome: Lançamento Três", "imagem: icone-lupa.png",
   "[LANCAMENTO 4]", "nome: Lançamento Quatro", "imagem: icone-lupa.png",
   "[CREATIVE X]", "anterior: 70%", "atual: 75%", "periodo: fev vs. mar", "significado: Frase do CX.",
-  "[FOI BEM 1]", "texto: Bem um.", "[FOI BEM 2]", "texto: Bem dois.", "[FOI BEM 3]", "texto: Bem três.",
-  "[A MELHORAR 1]", "texto: Melhorar um.",
   "[TRANSFORMATION]", "titulo: Como estamos transformando<br>a forma de criar.",
   "[TRANSFORMATION 1]", "nome: Agente Um", "texto: Apoio aos pedidos.", "logo: icone-prancheta.png", "descricao_logo: Logo do Agente Um",
   "links: Documento modelo | https://empresa.sharepoint.com/:w:/s/site/doc ; Agente | https://empresa.sharepoint.com/sites/agente",
