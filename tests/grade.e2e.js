@@ -158,7 +158,7 @@ function medir(d, celular) {
   }
 
   await auditar("modelo em branco ao abrir");
-  var GR = [["numero", ' [data-campo$=".titulo"]'], ["resultado", ' [data-campo$=".titulo"]'], ["lancamento", ' [data-campo$=".nome"]'], ["bem", ""], ["melhorar", ""],
+  var GR = [["numero", ' [data-campo$=".titulo"]'], ["resultado", ' [data-campo$=".titulo"]'], ["lancamento", ' [data-campo$=".nome"]'],
     ["transformation", ' [data-campo$=".nome"]'], ["aprendizado", ' [data-campo$=".titulo"]'], ["agenda", ' [data-campo$=".titulo"]']];
   for (var i = 0; i < GR.length; i++) await grupo(GR[i][0], GR[i][1]);
 

@@ -157,30 +157,6 @@ periodo: [Mês anterior vs. mês atual]
 referencia: [Referência: X%]
 significado: [O que o score significa neste mês.]
 
-[FOI BEM 1]
-texto: [O que foi bem 1.]
-
-[FOI BEM 2]
-texto: [O que foi bem 2.]
-
-[FOI BEM 3]
-texto: [O que foi bem 3.]
-
-[FOI BEM 4]
-texto: [O que foi bem 4.]
-
-[A MELHORAR 1]
-texto: [O que melhorar 1.]
-
-[A MELHORAR 2]
-texto: [O que melhorar 2.]
-
-[A MELHORAR 3]
-texto: [O que melhorar 3.]
-
-[A MELHORAR 4]
-texto: [O que melhorar 4.]
-
 [TRANSFORMATION]
 titulo: [Título da seção Transformation Hub.]
 

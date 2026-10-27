@@ -219,25 +219,6 @@ significado: Lorem ipsum dolor sit amet, consectetur adipiscing.
 
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: RESUMO DAS CAMPANHAS (depois do Creative X, antes do
-#  Transformation Hub; sem número de seção)
-#  Até 4 frases em cada lado. Uma frase curta por bloco (até ~90 caracteres).
-#  FOI BEM aparece em verde; A MELHORAR, em âmbar. Para tirar, apague os blocos.
-# ----------------------------------------------------------------------
-[FOI BEM 1]
-texto: Lorem ipsum dolor sit amet: X%.
-
-[FOI BEM 2]
-texto: Lorem ipsum dolor sit amet.
-
-[A MELHORAR 1]
-texto: Lorem ipsum dolor sit amet: X%.
-
-[A MELHORAR 2]
-texto: Lorem ipsum dolor sit amet.
-
-
-# ----------------------------------------------------------------------
 #  EDITAR AQUI: 04 · TRANSFORMATION HUB (até 3 projetos)
 #  icones: nomes de assets/icones/ separados por vírgula
 #          (icone-prancheta, icone-lupa), OU

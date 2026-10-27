@@ -10,7 +10,7 @@ Os prompts 5 a 11 devolvem o conteúdo no **formato de blocos** do report (`[NUM
 
 1. Use **só o Copilot corporativo**, com a sua conta do banco. Dados internos não vão para ferramentas externas nem para IAs públicas.
 2. Abra uma conversa nova por mês. Envie primeiro o **Prompt 0 (regras)**, uma vez só.
-3. Anexe ou cole a base do mês (planilha, painel exportado, resumo das campanhas, mensagens do time).
+3. Anexe ou cole a base do mês (planilha, painel exportado, relatórios das campanhas, mensagens do time).
 4. Copie o prompt, troque o que está `[ENTRE COLCHETES]` e envie.
 5. Confira a resposta (veja **Validação** em cada prompt) e só então leve para o report.
 
@@ -42,8 +42,6 @@ O que a importação **não** faz: não traz imagens, links nem PDFs (esses são
 [RESULTADO 1] a [3] valor · titulo · detalhe · variacao · variacao_cor
 [LANCAMENTO 1] a [6] status · status_cor · nome · texto
 [CREATIVE X]        subtitulo · anterior · atual · variacao · periodo · referencia · significado
-[FOI BEM 1] a [4]   texto
-[A MELHORAR 1] a [4] texto
 [TRANSFORMATION]    titulo
 [TRANSFORMATION 1] a [3] status · status_cor · nome · texto · resultado
 [APRENDIZADO 1] a [3] titulo · texto · levamos
@@ -265,22 +263,21 @@ texto: ...
 (repita os blocos numerados conforme os itens aprovados)
 ```
 
-## Prompt 7 · Creative X e resumo das campanhas
+## Prompt 7 · Creative X
 
 | | |
 |---|---|
-| **Objetivo** | Escrever o Creative X (score) e o que foi bem / o que melhorar |
+| **Objetivo** | Escrever o Creative X (score), com a causa da variação e o que fazer |
 | **Quando usar** | Com o score do mês e do mês anterior em mãos |
 | **Entradas** | Score anterior e atual; tabela de variações |
-| **Formato de saída** | Blocos `[CREATIVE X]`, `[FOI BEM 1]` a `[4]`, `[A MELHORAR 1]` a `[4]` |
-| **Validação** | Variação do score em p.p. (não em %); cada frase com o dado que a sustenta |
-| **Onde entra no report** | Seções "Creative X" e "Resumo das campanhas" |
+| **Formato de saída** | Bloco `[CREATIVE X]` |
+| **Validação** | Variação do score em p.p. (não em %); causa e ação com o dado que as sustenta |
+| **Onde entra no report** | Seção "Creative X" |
 
 ```text
 Creative X: anterior [SCORE ANTERIOR], atual [SCORE ATUAL], período
-[EX.: SET VS. OUT]. Calcule a diferença em p.p. e escreva o significado em
-1 frase. Depois, escreva até 4 frases de "foi bem" e até 4 de "a melhorar"
-(até 90 caracteres cada, com o número que sustenta).
+[EX.: SET VS. OUT]. Calcule a diferença em p.p., escreva a causa da variação
+em 1 frase (referencia) e o que fazer com ela em 1 frase (significado).
 Responda SOMENTE neste formato, sem comentários:
 [CREATIVE X]
 subtitulo: Score criativo · ...
@@ -288,14 +285,8 @@ anterior: ...
 atual: ...
 variacao: ...
 periodo: ...
-significado: ...
-
-[FOI BEM 1]
-texto: ...
-
-[A MELHORAR 1]
-texto: ...
-(repita os blocos numerados)
+referencia: Causa: ...
+significado: Ação: ...
 ```
 
 ## Prompt 8 · Transformation Hub
@@ -395,7 +386,7 @@ detalhe: ...
 ```text
 Junte as versões APROVADAS dos blocos desta conversa num único texto, na
 ordem: EDICAO, ABERTURA, PROJETO PRINCIPAL, NUMERO 1 a 3, LANCAMOS, DESTAQUE,
-RESULTADO 1 a 3, LANCAMENTO 1 a 6, CREATIVE X, FOI BEM, A MELHORAR,
+RESULTADO 1 a 3, LANCAMENTO 1 a 6, CREATIVE X,
 TRANSFORMATION, TRANSFORMATION 1 a 3, APRENDIZADO 1 a 3, FOCO, AGENDA 1 a 6.
 Regras:
 - copie os textos exatamente como aprovados (não reescreva);

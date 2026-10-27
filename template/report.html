@@ -363,35 +363,6 @@
   </tr>
   {{/cx}}
 
-  {{#balanco}}
-  <!--secao:resumo-->
-  <!-- RESUMO DAS CAMPANHAS · o que foi bem (verde do guia) e o que precisa melhorar (âmbar), na grade: 288 + 24 + 288.
-       Cada coluna tem o filete no topo, como os números e a agenda. No celular, uma embaixo da outra. -->
-  <!-- EDITAR AQUI: RESUMO DAS CAMPANHAS → dados/AAAA-MM.txt › [FOI BEM 1..4] e [A MELHORAR 1..4] texto -->
-  <tr>
-    <td class="px" style="padding:40px 40px 0 40px;">
-      <p class="fx" style="margin:0 0 14px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;">RESUMO DAS CAMPANHAS</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          {{#bem}}
-          <td class="col{{#dois}} gap{{/dois}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.positivo}};padding-top:12px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.positivo_fundo}};color:{{cor.positivo}};border-radius:999px;padding:0 8px;">&#9650; FOI BEM</span></p>
-            {{#itens}}<p class="fx tm" data-item="bem-{{idx}}" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.positivo}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="bem-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
-          </td>
-          {{/bem}}
-          {{#dois}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/dois}}
-          {{#melhorar}}
-          <td class="col" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor.atencao}};padding-top:12px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;font-weight:bold;letter-spacing:1.5px;"><span style="display:inline-block;background:{{cor.atencao_fundo}};color:{{cor.atencao}};border-radius:999px;padding:0 8px;">&#9660; A MELHORAR</span></p>
-            {{#itens}}<p class="fx tm" data-item="melhorar-{{idx}}" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.texto}};"><span style="color:{{cor.atencao}};font-weight:bold;">&#9679;</span>&nbsp; <span data-campo="melhorar-{{idx}}.texto">{{texto}}</span></p>{{/itens}}
-          </td>
-          {{/melhorar}}
-        </tr>
-      </table>
-    </td>
-  </tr>
-  {{/balanco}}
-
   {{#transformation}}
   <!--secao:transformation-->
   <!-- 04 · TRANSFORMATION HUB · superfície Lisboa com cartão branco -->
