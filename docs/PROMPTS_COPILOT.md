@@ -41,7 +41,9 @@ O que a importação **não** faz: não traz imagens, links nem PDFs (esses são
 [DESTAQUE]          categoria · titulo · texto · nota
 [RESULTADO 1] a [3] valor · titulo · detalhe · variacao · variacao_cor
 [LANCAMENTO 1] a [6] status · status_cor · nome · texto
-[CREATIVE X]        subtitulo · anterior · atual · variacao · periodo · referencia · significado
+[CREATIVE X]        subtitulo · anterior · atual · variacao · periodo · referencia · significado · nota
+[CREATIVE X TRIMESTRE] rotulo · titulo · texto · estimativa
+[CREATIVE X TRIMESTRE 1] a [3] valor · titulo · detalhe · variacao · variacao_cor
 [TRANSFORMATION]    titulo
 [TRANSFORMATION 1] a [3] status · status_cor · nome · texto · resultado
 [APRENDIZADO 1] a [3] titulo · texto · levamos
@@ -267,12 +269,12 @@ texto: ...
 
 | | |
 |---|---|
-| **Objetivo** | Escrever o Creative X (score), com a causa da variação e o que fazer |
-| **Quando usar** | Com o score do mês e do mês anterior em mãos |
-| **Entradas** | Score anterior e atual; tabela de variações |
-| **Formato de saída** | Bloco `[CREATIVE X]` |
-| **Validação** | Variação do score em p.p. (não em %); causa e ação com o dado que as sustenta |
-| **Onde entra no report** | Seção "Creative X" |
+| **Objetivo** | Escrever o Creative X (score), com a causa da variação e o que fazer; no mês que fecha o trimestre, também o resultado trimestral |
+| **Quando usar** | Com o score do mês e do mês anterior em mãos (e, no fim do trimestre, o report trimestral de qualidade criativa) |
+| **Entradas** | Score anterior e atual; tabela de variações; report trimestral (opcional) |
+| **Formato de saída** | Bloco `[CREATIVE X]` e, no fim do trimestre, `[CREATIVE X TRIMESTRE]` e `[CREATIVE X TRIMESTRE 1]` a `[3]` |
+| **Validação** | Variação em p.p. (não em %); causa e ação com o dado que as sustenta; no trimestral, só números do report, e o que é modelo/projeção vai em `estimativa` (nunca como resultado) |
+| **Onde entra no report** | Seção "Creative X" (o trimestral fica abaixo do resultado do mês) |
 
 ```text
 Creative X: anterior [SCORE ANTERIOR], atual [SCORE ATUAL], período
@@ -287,6 +289,31 @@ variacao: ...
 periodo: ...
 referencia: Causa: ...
 significado: Ação: ...
+nota: *[SIGLA]: [o que mede, em uma linha].
+```
+
+No mês que fecha o trimestre, peça também (anexe o report trimestral):
+
+```text
+Com base SOMENTE no report trimestral anexado, escolha os 2 ou 3 indicadores
+mais relevantes (ex.: CQR, QSR) e escreva: um título forte (até 60
+caracteres), uma leitura curta (o que alcançamos, como evoluímos, a posição
+frente à meta e à média, o principal aprendizado) e, separado, o impacto
+estimado/modelado (estimativa), nunca como resultado alcançado.
+Não invente números: use só os do report.
+Responda SOMENTE neste formato, sem comentários:
+[CREATIVE X TRIMESTRE]
+rotulo: Trimestral · ... · ...
+titulo: ...
+texto: ...
+estimativa: ...
+
+[CREATIVE X TRIMESTRE 1]
+valor: ...
+titulo: ...
+detalhe: ...
+variacao: ...
+(repita até [CREATIVE X TRIMESTRE 3])
 ```
 
 ## Prompt 8 · Transformation Hub
@@ -386,8 +413,8 @@ detalhe: ...
 ```text
 Junte as versões APROVADAS dos blocos desta conversa num único texto, na
 ordem: EDICAO, ABERTURA, PROJETO PRINCIPAL, NUMERO 1 a 3, LANCAMOS, DESTAQUE,
-RESULTADO 1 a 3, LANCAMENTO 1 a 6, CREATIVE X,
-TRANSFORMATION, TRANSFORMATION 1 a 3, APRENDIZADO 1 a 3, FOCO, AGENDA 1 a 6.
+RESULTADO 1 a 3, LANCAMENTO 1 a 6, CREATIVE X, CREATIVE X TRIMESTRE e
+CREATIVE X TRIMESTRE 1 a 3 (se houver), TRANSFORMATION, TRANSFORMATION 1 a 3, APRENDIZADO 1 a 3, FOCO, AGENDA 1 a 6.
 Regras:
 - copie os textos exatamente como aprovados (não reescreva);
 - um campo por linha, no formato "campo: valor";

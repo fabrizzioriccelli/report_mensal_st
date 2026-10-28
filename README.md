@@ -7,7 +7,7 @@ Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas
 
 O time atualiza tudo no **emulador**: um arquivo só, que abre no Chrome ou no Edge, sem instalar nada.
 
-**Versão 4.5 (2026-10-16).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 4.12 (2026-10-28).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -37,14 +37,14 @@ Tudo o que o time usa está em **[`kit/`](kit/)**:
 
 1. **Organizar:** imagens do mês numa pasta, com nomes no padrão (`black_friday_selo.png`, `one_brief_icone.png`).
 2. **Abrir** o `emulador-report.html` no Chrome ou no Edge.
-3. **Editar** na própria página: clique no texto e escreva; passe o mouse na imagem e "Trocar imagem"; **+ Adicionar** (embaixo de cada grupo) para mais um item e "Tirar item" no que não vale no mês (a grade se ajusta no computador e no celular). Ou cole o conteúdo organizado pelo Copilot em **Importar conteúdo**.
+3. **Editar** na própria página: clique no texto e escreva; passe o mouse na imagem e "Trocar imagem"; **+ Adicionar item** (assistente: tipo, onde entra, conteúdo e prévia antes de confirmar) ou **+ Adicionar** embaixo de cada grupo; "← Antes / Depois →" para mudar um item de lugar; a alça **⠿ Mover seção** (ou ↑ ↓ Posição… em "Seções do report") para mudar a ordem das seções; "Tirar item" no que não vale no mês (a grade se ajusta no computador e no celular). Ou cole o conteúdo organizado pelo Copilot em **Importar conteúdo**.
 4. **Salvar** o report do mês (`report-AAAA-MM.html`).
 5. **Conferir:** reabrir o arquivo salvo, no computador e no celular.
-6. **Publicar** no ambiente corporativo autorizado e colar o link no emulador (para testar no seu computador, vale também o caminho do arquivo: `C:\…` ou `file:///…`).
+6. **Link do report:** colar no emulador **qualquer link**: o caminho do arquivo salvo (`C:\…`, ex.: a pasta do OneDrive no computador; Explorador › botão direito › Copiar como caminho) ou o link de compartilhamento (`https://…`). O botão do e-mail sai no formato que o Outlook abre (espaço e acento funcionam). O caminho de arquivo abre onde o arquivo existe; para quem não tem a pasta, use o link de compartilhamento.
 7. **E-mail-resumo:** escolher até 3 indicadores e baixar o `.eml`.
 8. **Enviar** pelo Outlook: primeiro para você, depois para a área.
 
-Regras que o emulador segue: não cria nem calcula número; indicador sem dado é ocultado (nunca 0 nem o número do mês anterior); ao mudar o período de um report antigo, lista os números que ninguém mexeu antes de salvar; sem o link do report completo, o e-mail-resumo não é liberado.
+Regras que o emulador segue: não cria nem calcula número; indicador sem dado é ocultado (nunca 0 nem o número do mês anterior); ao mudar o período de um report antigo, lista os números que ninguém mexeu antes de salvar; sem o link do report completo, o e-mail-resumo não é liberado: nunca sai um botão vazio.
 
 ## Como o report conta o mês
 
@@ -111,7 +111,9 @@ Sempre na mesma ordem:
 
 Testes (Node.js; os `e2e` também precisam do Playwright):
 
-- `node tests/motor.test.js`: motor (71 testes).
+- `node tests/motor.test.js`: motor (74 testes).
+- `node tests/assistente.e2e.js`: + Adicionar item (os 7 tipos, posição, prévia, Voltar e ajustar, Cancelar, campos obrigatórios, Creative X trimestral), mover itens e a ordem das seções (↑ ↓ Posição…, arrastar no painel e na página, Esc, rolagem automática), leveza do arrasto com a CPU 4× mais lenta, salvar, reabrir, e-mail-resumo e celular.
+- `node tests/escuro.e2e.js`: e-mail-resumo no modo escuro: igual ao claro (pixel a pixel) no modo escuro do sistema e, numa simulação do Outlook.com / novo Outlook, as cores aprovadas voltam.
 - `node tests/emulador.e2e.js`: o fluxo completo do emulador como uma pessoa faria (abrir, editar, imagem, link, ocultar, importar, salvar, reabrir, recuperar, resumo, `.eml`). Com `EMULADOR=kit/emulador-report.html`, testa a versão avulsa.
 - `node tests/emulador-extras.e2e.js`: + Link e + Imagem em vários tipos de item (até 3 imagens), tirar e desfazer, os tópicos novos (+ Novo tópico com os 4 layouts, numa página nova e numa antiga, adicionar e ocultar itens, numeração, salvar, e-mail-resumo, reabrir, celular) e o report de antes da 4.11 com o "Resumo das campanhas" (a seção sai ao abrir, sem vão).
 - `node tests/desempenho.e2e.js`: abrir, editar e salvar um report sintético pesado (~27 MB) com a CPU 4× mais lenta; falha se a página voltar a travar. Confere também o aviso de andamento, vídeo e PDF idênticos no arquivo salvo e a imagem desfeita saindo da memória. Com `GIGANTE=1`, abre, edita e salva um report de ~600 MB (precisa do ffmpeg).

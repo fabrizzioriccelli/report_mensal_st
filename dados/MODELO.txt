@@ -216,6 +216,41 @@ variacao: +X p.p.
 periodo: Lorem ipsum vs. dolor sit
 referencia: Lorem ipsum dolor: X%
 significado: Lorem ipsum dolor sit amet, consectetur adipiscing.
+# nota (opcional): linha pequena no fim da seção, para siglas (ex.: CQR, QSR) e fonte.
+nota: *Lorem ipsum: dolor sit amet. Consectetur: adipiscing elit.
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 03 · CREATIVE X · TRIMESTRAL (opcional)
+#  Só no mês que fecha o trimestre: entra na mesma seção, abaixo do
+#  resultado do mês, e o mês ganha o rótulo "MENSAL · MÊS ANO".
+#  Até 3 indicadores [CREATIVE X TRIMESTRE 1..3] (valor, titulo, detalhe,
+#  variacao). "estimativa" sai com a etiqueta "Estimativa": use para
+#  oportunidade ou impacto modelado, nunca para resultado alcançado.
+#  Nos outros meses, apague estes blocos.
+# ----------------------------------------------------------------------
+[CREATIVE X TRIMESTRE]
+rotulo: Trimestral · Lorem ipsum · dolor
+titulo: Lorem ipsum dolor sit amet X p.p.
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
+estimativa: Lorem ipsum dolor sit amet, consectetur (modelo, não é resultado).
+
+[CREATIVE X TRIMESTRE 1]
+valor: X%
+titulo: Lorem*
+detalhe: Lorem ipsum: X%
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 2]
+valor: X%
+titulo: Ipsum*
+detalhe: Lorem ipsum: X%
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 3]
+valor: X
+titulo: Dolor sit amet
+detalhe: Lorem ipsum: X
+variacao: +X%
 
 
 # ----------------------------------------------------------------------

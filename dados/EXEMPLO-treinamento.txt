@@ -141,6 +141,34 @@ variacao:
 periodo: dezembro vs. janeiro
 referencia: Texto de exemplo: o que explica a variação.
 significado: Texto de exemplo: o que fazer com essa informação.
+nota: *Indicador A e Indicador B: siglas de exemplo, explicadas aqui em uma linha. Fonte: report de exemplo.
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: 03 · CREATIVE X · TRIMESTRAL (só no mês que fecha o trimestre)
+# ----------------------------------------------------------------------
+[CREATIVE X TRIMESTRE]
+rotulo: Trimestral · 4º tri (out–dez) · exemplo
+titulo: Título de exemplo do trimestre
+texto: Texto de exemplo: o que alcançamos no trimestre, como evoluímos e o principal aprendizado.
+estimativa: Texto de exemplo: oportunidade estimada por um modelo (não é resultado).
+
+[CREATIVE X TRIMESTRE 1]
+valor: 60%
+titulo: Indicador A*
+detalhe: Trimestre anterior: 50%
+variacao: +10 p.p.
+
+[CREATIVE X TRIMESTRE 2]
+valor: 55%
+titulo: Indicador B*
+detalhe: Trimestre anterior: 52%
+variacao: +3 p.p.
+
+[CREATIVE X TRIMESTRE 3]
+valor: 1.000
+titulo: Indicador C
+detalhe: Trimestre anterior: 800
+variacao: +25%
 
 # ----------------------------------------------------------------------
 #  EDITAR AQUI: 04 · TRANSFORMATION HUB

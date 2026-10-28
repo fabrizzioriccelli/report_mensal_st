@@ -156,6 +156,31 @@ variacao: +X p.p.
 periodo: [Mês anterior vs. mês atual]
 referencia: [Referência: X%]
 significado: [O que o score significa neste mês.]
+nota: [*Siglas e fonte, em uma ou duas linhas.]
+
+[CREATIVE X TRIMESTRE]
+rotulo: [Trimestral · trimestre · mercado]
+titulo: [Título do resultado do trimestre]
+texto: [O que alcançamos, como evoluímos e o principal aprendizado.]
+estimativa: [Oportunidade estimada (modelo), separada do resultado.]
+
+[CREATIVE X TRIMESTRE 1]
+valor: X%
+titulo: [Indicador 1]
+detalhe: [Base de comparação]
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 2]
+valor: X%
+titulo: [Indicador 2]
+detalhe: [Base de comparação]
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 3]
+valor: X
+titulo: [Indicador 3]
+detalhe: [Base de comparação]
+variacao: +X%
 
 [TRANSFORMATION]
 titulo: [Título da seção Transformation Hub.]

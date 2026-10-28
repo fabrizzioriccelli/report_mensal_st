@@ -240,6 +240,36 @@ teste("Creative X: variação e barra calculadas", function () {
   assert.ok(r.html.indexOf('width="80%" height="8"') > 0 && r.html.indexOf('width="20%" height="8"') > 0);
 });
 
+teste("Creative X trimestral: abaixo do mês, com rótulos, até 3 indicadores, estimativa etiquetada e nota das siglas", function () {
+  var cx = "\n[CREATIVE X]\nanterior: 72%\natual: 80%\nnota: *Sigla A: o que mede.";
+  var tri = "\n[CREATIVE X TRIMESTRE]\nrotulo: Trimestral · 4º tri\ntitulo: Título do trimestre 9 p.p. acima\ntexto: Leitura curta.\nestimativa: Oportunidade de um modelo." +
+    "\n[CREATIVE X TRIMESTRE 1]\nvalor: 60%\ntitulo: Sigla A*\ndetalhe: Antes: 50%\nvariacao: +10 p.p.\n[CREATIVE X TRIMESTRE 2]\nvalor: 1.000\ntitulo: Indicador B\nvariacao: +25%";
+  var so = montar(MINIMO + cx), r = montar(MINIMO + cx + tri);
+  assert.ok(r.ok, JSON.stringify(niveis(r, "erro")));
+  /* sem o trimestral: o mês fica como sempre (sem rótulo "MENSAL"), a nota aparece */
+  assert.ok(so.html.indexOf('data-item="cx-trimestre"') < 0 && so.html.indexOf('data-campo="cx.rotulo"') < 0);
+  assert.ok(so.html.indexOf('data-campo="cx.nota"') > 0);
+  /* com ele: rótulo do mês automático, trimestral depois do resultado do mês e antes do fim da seção */
+  var h = r.html, iMes = h.indexOf('data-campo="cx.atual"'), iTri = h.indexOf('data-item="cx-trimestre"'), iNota = h.indexOf('data-campo="cx.nota"'), iFim = h.indexOf("<!--secao:transformation-->");
+  assert.ok(/data-campo="cx\.rotulo"[^>]*>MENSAL · OUTUBRO 2026</.test(h), "rótulo do mês");
+  assert.ok(/data-campo="cxt\.rotulo"[^>]*>TRIMESTRAL · 4º TRI</.test(h), "rótulo do trimestre em maiúsculas");
+  assert.ok(iMes > 0 && iTri > iMes && iNota > iTri && (iFim < 0 || iNota < iFim), "ordem: mês, trimestral, nota");
+  assert.ok(/data-item="cxt-1" width="288"[\s\S]*data-item="cxt-2" width="288"/.test(h), "2 indicadores dividem os 600 px");
+  assert.ok(/class="half" data-item="cxt-1"/.test(h), "no celular, 2 indicadores em metades");
+  assert.ok(/Estimativa&nbsp;·<\/b> <span data-campo="cxt\.estimativa">Oportunidade de um modelo\.</.test(h), "estimativa sempre com a etiqueta");
+  assert.ok(h.indexOf("9&nbsp;p.p. acima") > 0, "p.p. não se separa do número");
+  assert.ok(r.texto.indexOf("CREATIVE X · TRIMESTRAL · 4º TRI: Título do trimestre") >= 0 && r.texto.indexOf("Estimativa: Oportunidade") >= 0 && r.texto.indexOf("*Sigla A") >= 0, "texto puro");
+  /* trimestral sem [CREATIVE X] não aparece e avisa */
+  var sem = montar(MINIMO + tri);
+  assert.ok(sem.html.indexOf("cx-trimestre") < 0 && niveis(sem, "aviso").some(function (p) { return /CREATIVE X TRIMESTRE/.test(p.msg); }));
+  /* 4º indicador é erro (no máximo 3) */
+  assert.ok(niveis(montar(MINIMO + cx + tri + "\n[CREATIVE X TRIMESTRE 4]\nvalor: 1%"), "erro").length > 0);
+  /* importar (Copilot): campos do trimestral e da nota */
+  var c = M.importarDados(tri + "\n[CREATIVE X]\nnota: *Sigla.").campos;
+  assert.strictEqual(c["cxt.rotulo"].texto, "TRIMESTRAL · 4º TRI"); assert.strictEqual(c["cxt-1.valor"].texto, "60%");
+  assert.ok(/^▲ \+10 p\.p\.$/.test(c["cxt-1.variacao"].texto)); assert.strictEqual(c["cx.nota"].texto, "*Sigla.");
+});
+
 teste("marca: cor inválida vira erro", function () {
   var r = M.montar({ dados: MINIMO, marca: MARCA.replace("marca: #EC0000", "marca: vermelho"), template: TEMPLATE, existe: existe });
   assert.ok(!r.ok && r.problemas.some(function (p) { return /Cor "marca"/.test(p.msg); }));
@@ -585,6 +615,38 @@ teste("link_report_completo vira a meta da página e sai do e-mail; caminho loca
   assert.ok(!/report-completo/.test(js.html) && niveis(js, "erro").some(function (p) { return /link_report_completo/.test(p.msg); }));
 });
 
+teste("e-mail-resumo no modo escuro: cores aprovadas reafirmadas (prefers-color-scheme e Outlook.com/novo Outlook), \"light only\" para o Apple Mail", function () {
+  var r = M.emailResumo(montar(COMPLETO).html, { link: "https://empresa.sharepoint.com/:u:/r/sites/cs/r.html" }), h = r.html, css = (/<style>(\s*:root[\s\S]*?)<\/style>/.exec(h) || [])[1] || "";
+  assert.ok(/<meta name="color-scheme" content="light only">/.test(h) && /:root\{color-scheme:light only;/.test(css));
+  var escuro = (/@media \(prefers-color-scheme:dark\)\{([\s\S]*?)\n  \}/.exec(css) || [])[1] || "";
+  [["dm-marca-bg", "background-color:#EC0000"], ["dm-lisboa", "background-color:#FBF1EA"], ["dm-branco-bg", "background-color:#FFFFFF"], ["dm-txt-branco", "color:#FFFFFF"], ["dm-txt-texto", "color:#000000"], ["dm-chip-verde", "color:#21634F"]].forEach(function (c) {
+    assert.ok(new RegExp("\\." + c[0] + "\\{[^}]*" + c[1] + " !important").test(escuro), "modo escuro do sistema: " + c[0]);
+  });
+  assert.ok(/\[data-ogsb\] \.dm-marca-bg,\.dm-marca-bg\[data-ogsb\][^{]*\{background:#EC0000 !important;background-color:#EC0000 !important;\}/.test(css), "Outlook.com: fundo vermelho");
+  assert.ok(/\[data-ogsc\] \.dm-txt-branco,\.dm-txt-branco\[data-ogsc\][^{]*\{color:#FFFFFF !important;\}/.test(css), "Outlook.com: texto branco");
+  /* cada cor do e-mail tem a sua classe: faixas, selo, título, indicadores, botão e assinatura */
+  assert.strictEqual((h.match(/class="px dm-marca-bg"/g) || []).length, 2, "cabeçalho e assinatura");
+  assert.ok(/class="ft h1 dm-txt-branco"/.test(h) && /class="kpi dm-borda-marca"/.test(h) && /class="ft kpiv dm-txt-marca"/.test(h) && /class="cta fx dm-txt-branco"/.test(h) && /class="fx dm-txt-marca"[^>]*>REPORT MENSAL/.test(h));
+  /* o texto branco do cabeçalho não tem elemento sem classe: todo color:#FFFFFF visível está protegido */
+  var semClasse = (h.split("<body")[1].match(/<(p|a|td)\b(?![^>]*dm-)[^>]*color:#FFFFFF[^>]*>/g) || []).filter(function (t) { return !/display:none/.test(t); });
+  assert.deepStrictEqual(semClasse, [], "texto branco sem proteção");
+});
+
+teste("linkDoReport (botão do e-mail-resumo): qualquer link; caminho do Windows (OneDrive, espaço, acento) vira file:/// no formato do Outlook e volta ao mesmo caminho; só o que executa código é recusado", function () {
+  var L = M.linkDoReport;
+  var od = L("C:\\Users\\t000000\\OneDrive - Empresa\\Report PF\\Produção\\Outubro_26\\HTML\\report-2026-10.html");
+  assert.deepStrictEqual([od.url, od.tipo, od.erro], ["file:///C:/Users/t000000/OneDrive%20-%20Empresa/Report%20PF/Produção/Outubro_26/HTML/report-2026-10.html", "arquivo", ""]);
+  assert.strictEqual(decodeURIComponent(new URL(od.url).pathname), "/C:/Users/t000000/OneDrive - Empresa/Report PF/Produção/Outubro_26/HTML/report-2026-10.html", "volta ao caminho colado");
+  assert.ok(/Caminho de arquivo/.test(od.info) && /novo Outlook/.test(od.info), "nota (não erro) sobre onde abre");
+  assert.strictEqual(L("file:///C:/Users/x/Produ%C3%A7%C3%A3o/report%202026.html").url, "file:///C:/Users/x/Produção/report%202026.html", "endereço copiado do navegador: acento volta a ser letra");
+  assert.strictEqual(L("\\\\servidor\\área\\report.html").url, "file://servidor/área/report.html");
+  assert.strictEqual(L("C:\\Pasta\\Relatório #1 [v2] 100%.html").url, "file:///C:/Pasta/Relatório%20%231%20%5Bv2%5D%20100%25.html");
+  [["https://empresa.sharepoint.com/:u:/r/sites/cs/r.html?csf=1&web=1", "https://empresa.sharepoint.com/:u:/r/sites/cs/r.html?csf=1&web=1"], ["http://intranet/report.html", "http://intranet/report.html"], ["empresa.sharepoint.com/sites/cs/r.html", "https://empresa.sharepoint.com/sites/cs/r.html"], ["mailto:time@empresa.com", "mailto:time@empresa.com"]].forEach(function (c) { assert.deepStrictEqual([L(c[0]).url, L(c[0]).erro, L(c[0]).info], [c[1], "", ""], c[0]); });
+  assert.ok(L("report-2026-10.html").url === "report-2026-10.html" && /só o nome do arquivo não abre/.test(L("report-2026-10.html").info), "relativo: aceito, com a nota");
+  ["javascript:alert(1)", "data:text/html,x", "vbscript:x"].forEach(function (x) { assert.ok(!L(x).url && L(x).erro, x); });
+  assert.deepStrictEqual([L("").url, L("").erro], ["", ""]);
+});
+
 teste("dadosDoResumo: lê da página cada campo e lista os indicadores candidatos (sem criar nenhum)", function () {
   var r = M.dadosDoResumo(montar(COMPLETO).html), d = r.d;
   assert.strictEqual(d.periodo, "MARÇO 2027");
@@ -607,7 +669,7 @@ teste("emailResumo: curto, até 3 indicadores, um único destino (o botão \"Ace
   assert.ok(hrefs.length === 1 && hrefs[0] === 'href="' + LINK + '"', hrefs.join(" "));
   /* Botão que sobrevive ao envio pelo Outlook: célula com fundo e link de texto, sem VML (o Outlook vira imagem sem link). */
   assert.ok(/Acessar report completo/.test(r.html) && !/<v:|\bvml\b|\[if mso\]><v/i.test(r.html.replace(/xmlns:v="[^"]*"/, "")), "botão sem VML");
-  assert.ok(/<td align="center" bgcolor="#EC0000"[^>]*><a class="cta fx" href="/.test(r.html), "botão: célula vermelha com o link no texto");
+  assert.ok(/<td class="dm-marca-bg" align="center" bgcolor="#EC0000"[^>]*><a class="cta fx dm-txt-branco" href="/.test(r.html), "botão: célula vermelha com o link no texto");
   /* Cantos retos de propósito: o que a prévia mostra é o que chega depois que o Outlook reescreve o e-mail. */
   assert.ok(!/border-radius/.test(r.html), "sem cantos arredondados no resumo");
   assert.ok(!/<p[^>]*line-height:\d+px;(?!mso-line-height-rule)/.test(r.html), "altura de linha exata também no Outlook");
@@ -670,7 +732,7 @@ teste("importarDados: todos os blocos da biblioteca de prompts (docs/PROMPTS_COP
   assert.deepStrictEqual(faltam, [], "campos sem lugar no modelo em branco");
 });
 
-teste("normalizarLink: aceita qualquer link válido sem aviso (https, http, arquivo, mailto/tel/msteams, sem https://, relativo, link dentro de um texto); só recusa o que executa código", function () {
+teste("normalizarLink (links dos itens): aceita qualquer link válido sem aviso (https, http, arquivo, mailto/tel/msteams, sem https://, relativo, link dentro de um texto); só recusa o que executa código", function () {
   var n = M.normalizarLink;
   assert.deepStrictEqual([n("https://empresa.sharepoint.com/x").url, n("https://empresa.sharepoint.com/x").avisos.length], ["https://empresa.sharepoint.com/x", 0]);
   assert.deepStrictEqual([n("http://intranet/x").url, n("http://intranet/x").avisos.length], ["http://intranet/x", 0]);
@@ -678,10 +740,10 @@ teste("normalizarLink: aceita qualquer link válido sem aviso (https, http, arqu
   assert.strictEqual(n("<https://empresa.sharepoint.com/x>").url, "https://empresa.sharepoint.com/x");
   assert.strictEqual(n("//empresa.sharepoint.com/x").url, "https://empresa.sharepoint.com/x");
   assert.strictEqual(n('"C:\\Users\\Fulano Silva\\Downloads\\report-2026-10.html"').url, "file:///C:/Users/Fulano%20Silva/Downloads/report-2026-10.html");
-  assert.strictEqual(n("C:\\Pasta\\Relatório #1.html").url, "file:///C:/Pasta/Relat%C3%B3rio%20%231.html");
+  assert.strictEqual(n("C:\\Pasta\\Relatório #1.html").url, "file:///C:/Pasta/Relatório%20%231.html");
   assert.strictEqual(n("\\\\servidor\\area\\report.html").url, "file://servidor/area/report.html");
   assert.strictEqual(n("file:///C:/Users/x/report%202026.html").url, "file:///C:/Users/x/report%202026.html");
-  assert.ok(n("C:\\x.html").tipo === "arquivo" && !n("C:\\x.html").avisos.length && /onde esse caminho existe/.test(n("C:\\x.html").info), "arquivo: nota informativa, não aviso");
+  assert.ok(n("C:\\x.html").tipo === "arquivo" && !n("C:\\x.html").avisos.length && /onde esse arquivo existe/.test(n("C:\\x.html").info), "arquivo: nota informativa, não aviso");
   ["javascript:alert(1)", " JavaScript:x", "data:text/html,x", "vbscript:x"].forEach(function (x) { assert.ok(n(x).erro && !n(x).url, x); });
   assert.strictEqual(n("https://tem espaço.com/a b").url, "https://tem%20espaço.com/a%20b");
   [["mailto:time@empresa.com", "outro"], ["tel:+551100000000", "outro"], ["msteams://teams.microsoft.com/l/x", "outro"]].forEach(function (c) { assert.deepStrictEqual([n(c[0]).url, n(c[0]).tipo, n(c[0]).avisos.length], [c[0], c[1], 0], c[0]); });
@@ -689,11 +751,14 @@ teste("normalizarLink: aceita qualquer link válido sem aviso (https, http, arqu
   assert.strictEqual(n("empresa.sharepoint.com/sites/cs/r.html").url, "https://empresa.sharepoint.com/sites/cs/r.html");
   [["report-2026-10.html", "report-2026-10.html"], ["pasta/plano.pdf#p2", "pasta/plano.pdf#p2"], ["abc", "abc"], ["/sites/area/r.html", "/sites/area/r.html"]].forEach(function (c) { assert.deepStrictEqual([n(c[0]).url, n(c[0]).tipo, n(c[0]).avisos.length, !!n(c[0]).info], [c[1], "relativo", 0, true], c[0]); });
   assert.deepStrictEqual(n(""), { url: "", tipo: "", avisos: [], info: "", erro: "" });
-  /* o botão do e-mail-resumo aceita o link de arquivo; a conferência avisa, sem bloquear */
-  var r = M.emailResumo(montar(COMPLETO).html, { link: "C:\\Users\\Fulano\\report.html" });
-  assert.ok(r.temLink && (r.html.match(/href="file:\/\/\/C:\/Users\/Fulano\/report\.html"/g) || []).length === 1 && !/FALTA O LINK/.test(r.html));
+  /* o botão do e-mail-resumo aceita o link de arquivo (4.12: no formato do Outlook); a conferência só informa, sem bloquear */
+  var r = M.emailResumo(montar(COMPLETO).html, { link: "C:\\Users\\Fulano Silva\\OneDrive - Empresa\\Produção\\report.html" });
+  assert.ok(r.temLink && (r.html.match(/href="file:\/\/\/C:\/Users\/Fulano%20Silva\/OneDrive%20-%20Empresa\/Produção\/report\.html"/g) || []).length === 1 && !/FALTA O LINK/.test(r.html), "caminho de arquivo vira o botão");
   var conf = M.conferirHtml(r.html).filter(function (x) { return /arquivo local/.test(x.msg); });
   assert.ok(conf.length === 1 && conf[0].nivel === "info", "link de arquivo: informação, não aviso");
+  var ok = M.emailResumo(montar(COMPLETO).html, { link: "https://empresa.sharepoint.com/:u:/r/sites/cs/r.html" });
+  assert.ok(ok.temLink && (ok.html.match(/href="https:\/\/empresa\.sharepoint\.com\/:u:\/r\/sites\/cs\/r\.html"/g) || []).length === 1 && !/FALTA O LINK/.test(ok.html));
+  assert.ok(!M.emailResumo(montar(COMPLETO).html, { link: "" }).temLink && !M.emailResumo(montar(COMPLETO).html, { link: "javascript:alert(1)" }).temLink, "sem link (ou recusado): sem botão");
 });
 
 teste("e-mail-resumo sem repetição: nome do projeto (não \"Projeto principal\"), detalhe que só repete o número sai, número que a frase já diz não vem marcado", function () {

@@ -178,7 +178,8 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   await p4.goto(URL_EMULADOR); await p4.setInputFiles("#arquivo", path.join(RAIZ, "kit/report-exemplo.html")); await espera(p4);
   await p4.fill("#link", "report-2099-01.html"); await espera(p4);
   var e3 = await etapaRes(p4), b3 = await p4.$eval("#banner", function (b) { return b.className + " · " + b.textContent; }), i3 = await p4.$eval("#linkInfo", function (e) { return e.textContent; });
-  confere(e3.estado === "ok" && /banner ok/.test(b3) && !e3.itens.some(function (x) { return /Ok, ciente/.test(x); }) && /relativo/.test(i3), "link relativo (URL válida): sem aviso, status verde; só uma nota no campo · " + i3.slice(0, 70));
+  /* só o nome do arquivo: aceito (vale qualquer link), mas no e-mail ele não abre: o status avisa (nunca um botão quebrado em silêncio) */
+  confere(/relativo/.test(i3) && e3.itens.some(function (x) { return /só o nome do arquivo não abre/.test(x); }) && !(await p4.$eval("#bEmlRes", function (b) { return b.disabled; })), "link relativo: aceito, com nota no campo e aviso no status (no e-mail, só o nome não abre) · " + i3.slice(0, 70));
   for (var lv of ["empresa.sharepoint.com/sites/cs/report.html", "http://intranet/report.html", "Link do report: https://empresa.sharepoint.com/:u:/r/sites/cs/r.html?csf=1&web=1", "mailto:time@example.com"]) {
     await p4.fill("#link", lv); await espera(p4);
     var ev = await etapaRes(p4), bv = await p4.$eval("#banner", function (b) { return b.className; }), hv = ((await p4.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1];
@@ -193,6 +194,14 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   var p5 = await ctx.newPage(); await p5.goto(URL_EMULADOR); await p5.setInputFiles("#arquivo", arqL); await espera(p5);
   confere(await p5.$eval("#link", function (e) { return e.value; }) === "https://empresa.sharepoint.com/sites/cs/report-ficticio.html", "reaberto: o campo do link já vem preenchido");
   await p5.close({ runBeforeUnload: false });
+  /* report com o caminho do computador gravado (pasta do OneDrive): reabre com o caminho no campo e o e-mail-resumo liberado */
+  var arqV = path.join(SAIDA, "leveza-link-local.html"), caminhoV = "file:///C:/Users/t000000/OneDrive%20-%20Empresa/Report%20PF/Produção/report-2099-01.html";
+  fs.writeFileSync(arqV, hs.replace(/(<meta name="report-completo" content=")[^"]*"/, "$1" + caminhoV + "\""));
+  var p6 = await ctx.newPage(); await p6.goto(URL_EMULADOR); await p6.setInputFiles("#arquivo", arqV); await espera(p6);
+  await p6.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
+  var hv6 = ((await p6.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1];
+  confere(await p6.$eval("#link", function (e) { return e.value; }) === caminhoV && hv6 === caminhoV, "reaberto com o caminho do computador gravado: campo preenchido e o botão com o mesmo caminho · " + hv6);
+  await p6.close({ runBeforeUnload: false });
   var f4 = await (await p4.$("#edFrame")).contentFrame();
   await f4.locator('[data-campo="numero-1.detalhe"][data-ed-campo]').first().click({ position: { x: 4, y: 6 } }); await p4.waitForTimeout(150);
   await p4.keyboard.press("Control+A"); await p4.keyboard.type("Creative X 64%"); await p4.keyboard.press("Enter"); await espera(p4);
