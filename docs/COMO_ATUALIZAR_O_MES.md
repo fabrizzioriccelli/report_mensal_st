@@ -53,17 +53,20 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 
 **Abrir:** "Começar do modelo em branco" (todas as seções, com textos de exemplo [entre colchetes]) ou "Abrir um report salvo (.html)" (por exemplo, o do mês anterior). O report aparece logo abaixo, pronto para editar.
 
-**Barra de ferramentas:** Salvar report (.html) · Importar conteúdo (Copilot) · Desfazer · Computador / Celular. A linha ao lado diz o que aconteceu.
+**Barra de ferramentas:** Salvar report (.html) · Importar conteúdo (Copilot) · + Adicionar item · + Novo tópico · Desfazer · Computador / Celular. A linha ao lado diz o que aconteceu.
 
 | Quero… | Faço… |
 |---|---|
 | Mudar um texto | Clico no texto (contorno tracejado) e escrevo. O exemplo [entre colchetes] fica selecionado: o que eu digito entra no lugar. **Enter** confirma; **Shift+Enter** quebra a linha |
 | Mudar um indicador | Clico no valor, no título e na base de comparação e escrevo. Na variação: `▲ +25%` ou `▼ −20%`. Ao clicar na etiqueta aparecem **Cor: verde** (positivo; custo que caiu também é positivo) e **Cor: âmbar** (atenção) |
 | Mudar o período | Clico no período (ex.: `NOVEMBRO 2026`): ele muda em todos os lugares |
-| Pôr mais um item | Embaixo do grupo (indicadores, resultados, lançamentos, projetos, aprendizados, agenda), clico em **+ Adicionar …**; ou passo o mouse num item › **+ Adicionar depois**. O item novo vem com textos [entre colchetes] (e imagem neutra) para trocar. A grade se ajusta sozinha, no computador e no celular |
+| Pôr mais um item | **+ Adicionar item** (barra de ferramentas): escolho o tipo (indicador, card, texto, destaque, imagem, vídeo ou conteúdo complementar), onde entra e em que posição, preencho os campos (e a imagem, se tiver) e confiro a **prévia** na página antes de **Confirmar** (ou **Voltar e ajustar** / **Cancelar**). Atalho: embaixo do grupo, **+ Adicionar …**; ou passo o mouse num item › **+ Adicionar depois** (vem com textos [entre colchetes] para trocar). A grade se ajusta sozinha, no computador e no celular |
+| Mudar um item de lugar | Passo o mouse no item › **← Antes** / **Depois →** (ou **↑ Subir** / **↓ Descer**) |
+| Mudar a ordem das seções | Passo o mouse na seção › arrasto a alça **⠿ Mover seção** até a linha vermelha do lugar novo (Esc cancela), ou uso **↑** / **↓** / **Posição…**. Também em **Seções do report** (arrastando a linha pela ⠿ ou com ↑ ↓ Posição…). A capa e o encerramento não mudam |
+| Creative X do trimestre | No mês que fecha o trimestre: o bloco trimestral fica abaixo do resultado do mês (até 3 indicadores, leitura curta e a estimativa, sempre marcada como estimativa). Nos outros meses: passo o mouse no bloco › **Tirar trimestral**. Para trazer de volta: **+ Adicionar item › Indicador › Creative X: indicadores do trimestre** |
 | Tirar um item sem dado | Passo o mouse no item › **Tirar item** (canto de cima, à direita). A grade se ajusta. Nunca deixo o número do mês anterior nem escrevo 0 |
 | Tirar uma seção inteira | **Seções do report** › desmarco a seção. A numeração se ajusta |
-| Voltar atrás | **Desfazer** (imagem, link, cor, item); **Ctrl+Z** (texto) |
+| Voltar atrás | **Desfazer** (imagem, link, cor, item, item novo, ordem); **Ctrl+Z** (texto) |
 
 `%` é variação relativa (+30%); `p.p.` é diferença entre duas porcentagens (de 40% para 52% = +12 p.p.). Não troque um pelo outro.
 
@@ -118,12 +121,12 @@ Imagens, links e PDF não vêm pelo Copilot: troque na página.
 
 **Publicar:**
 
-1. Publique o `report-AAAA-MM.html` no **ambiente corporativo autorizado** da área, com acesso para quem vai receber o e-mail.
-2. Copie o link de compartilhamento (começa com `https://`).
-3. No emulador, passo 3, cole em **Link do report completo**.
-4. Teste numa janela anônima (Chrome) ou InPrivate (Edge): **Ctrl+Shift+N**, cole e aperte Enter. O report precisa abrir.
+No passo 3 do emulador, cole **qualquer link** do report do mês:
 
-**Para testar no seu computador** (antes de publicar): no passo 3 vale o caminho do arquivo. Abra o report salvo no Chrome ou no Edge e copie o endereço da barra (`file:///…`), ou, no Explorador, botão direito no arquivo › **Copiar como caminho** (`C:\…`). O emulador avisa: esse link abre só onde o arquivo está (no seu computador ou numa pasta de rede, para quem tem acesso). Para enviar à área, troque pelo link do ambiente autorizado.
+- **Caminho do arquivo** (o mais rápido): no Explorador de Arquivos, botão direito no `report-AAAA-MM.html` salvo › **Copiar como caminho** (ex.: `C:\Users\…\OneDrive - …\Report PF\Produção\…\report-AAAA-MM.html`) e cole. Espaço e acento funcionam: o botão vai no formato que o Outlook abre. Ele abre o report no Outlook para Windows de quem tem esse arquivo (ou a mesma pasta sincronizada ou de rede). Confira se o arquivo está mesmo nessa pasta, com esse nome.
+- **Link de compartilhamento**: no arquivo publicado (SharePoint ou OneDrive), **Compartilhar › Copiar link** (`https://…`) e cole. É o que abre para quem não tem a pasta, no Outlook na Web, no novo Outlook e no celular.
+
+O link fica gravado no report ao salvar: no mês seguinte, é só trocar. Teste o botão no e-mail enviado para você (passo 4).
 
 ## 4. E-mail-resumo e envio
 
@@ -144,8 +147,9 @@ Imagens, links e PDF não vêm pelo Copilot: troque na página.
 | Não consigo escrever no texto | Clique dentro do contorno tracejado. Rótulos fixos (ex.: "O QUE LANÇAMOS") não mudam |
 | "A imagem não abriu" | Use `.png` ou `.jpg` |
 | "pode ficar borrada" | A imagem é menor que o espaço: peça a versão em alta |
-| "Link não aceito" | O endereço começa com `javascript:`, `data:` ou `vbscript:` (pode executar código). Qualquer outro link vale: `https://`, caminho do arquivo, `mailto:`… |
-| "é um arquivo: abre só onde esse caminho existe" | Normal para testar no seu computador. Para enviar à área, use o link do ambiente autorizado |
+| "Link não aceito" | O endereço começa com `javascript:`, `data:` ou `vbscript:` (pode executar código) |
+| No Outlook: "Não conseguimos localizar 'C:\…\report-AAAA-MM.html'" | Confira se o report está nessa pasta, com esse nome (Copiar como caminho no arquivo e cole de novo). `.eml` gerado antes da 4.12 com acento no caminho: gere de novo. Outlook na Web, novo Outlook e celular não abrem link de arquivo: use o link de compartilhamento |
+| No modo escuro, o Outlook mudou as cores do e-mail | No Outlook.com, no novo Outlook, no Apple Mail e nos apps do celular, o e-mail-resumo mantém as cores aprovadas. No Outlook clássico para Windows, as cores do modo escuro são escolhidas pelo próprio Outlook: use o botão de sol/lua da mensagem ("Mudar fundo") para ver como foi enviado |
 | Fechei sem salvar | Abra o emulador: **Recuperar a edição** |
 | Não acho o arquivo salvo | Downloads ou a pasta escolhida; pesquise `report-` no Explorador |
 | "Confira os números antes de salvar" | O período mudou e há números iguais ao mês anterior: atualize ou oculte |

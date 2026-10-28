@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.11 (2026-10-27)";
+  var VERSAO = "4.12 (2026-10-28)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -89,7 +89,10 @@
     { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0 }, PECA) },
     { bloco: "RESULTADO", max: 3, campos: NUM },
     { bloco: "LANCAMENTO", max: 6, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0 }, PECA) },
-    { bloco: "CREATIVE X", campos: { subtitulo: 0, anterior: 0, atual: 1, variacao: 0, periodo: 0, referencia: 0, significado: 0 } },
+    { bloco: "CREATIVE X", campos: { subtitulo: 0, rotulo: 0, anterior: 0, atual: 1, variacao: 0, periodo: 0, referencia: 0, significado: 0, nota: 0 } },
+    /* Creative X trimestral (opcional, no mês que fecha o trimestre): entra na mesma seção, abaixo do resultado do mês. */
+    { bloco: "CREATIVE X TRIMESTRE", campos: { rotulo: 0, titulo: 0, texto: 0, estimativa: 0 } },
+    { bloco: "CREATIVE X TRIMESTRE", max: 3, campos: NUM },
     { bloco: "TRANSFORMATION", campos: { titulo: 0 } },
     { bloco: "TRANSFORMATION", max: 3, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, citacao: 0, resultado: 0, icones: 0, logo: 0, descricao_logo: 0, links: 0, prints: 0, descricao_prints: 0 }, PECA) },
     { bloco: "APRENDIZADO", max: 3, campos: { titulo: 1, texto: 0, levamos: 0 } },
@@ -270,18 +273,34 @@
     /* texto com um link no meio (ex.: "Link do report: https://…"): vale o link */
     var dentro = /\s/.test(s) && !/^(https?:|file:|[a-z]:[\\/]|\\\\)/i.test(s) && /(https?:\/\/[^\s"'<>]+)/i.exec(s);
     if (dentro) s = dentro[1].replace(/[.,;)\]]+$/, "");
-    function semEspeciais(x) { return encodeURI(x).replace(/#/g, "%23").replace(/\?/g, "%3F"); }
+    /* Caminho de arquivo vira file:/// no formato que o Outlook (Word) grava num link para arquivo: espaço e os
+       caracteres que não podem ir num endereço viram %XX, mas os acentos ficam como estão (Produção, não
+       Produ%C3%A7%C3%A3o), porque o Office pode ler %XX acima de 127 na página de código do Windows e não achar o arquivo. */
+    function caminho(x) { return x.replace(/[\s%#?"<>`{}|^\[\]]/g, function (c) { return "%" + ("0" + c.charCodeAt(0).toString(16).toUpperCase()).slice(-2); }); }
+    function acentos(x) { return x.replace(/(?:%[89a-f][0-9a-f])+/gi, function (m) { try { return decodeURIComponent(m); } catch (e) { return m; } }); }
     function espacos(x) { return x.replace(/\s/g, "%20"); }
     if (/^https?:\/\//i.test(s)) { url = espacos(s); tipo = "web"; }
-    else if (/^file:/i.test(s)) { url = espacos(s.replace(/\\/g, "/")); tipo = "arquivo"; }
-    else if (/^[a-z]:[\\/]/i.test(s)) { url = "file:///" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
-    else if (/^\\\\[^\\/]+/.test(s)) { url = "file:" + semEspeciais(s.replace(/\\/g, "/")); tipo = "arquivo"; }
+    else if (/^file:/i.test(s)) { url = acentos(espacos(s.replace(/\\/g, "/"))); tipo = "arquivo"; }
+    else if (/^[a-z]:[\\/]/i.test(s)) { url = "file:///" + caminho(s.replace(/\\/g, "/")); tipo = "arquivo"; }
+    else if (/^\\\\[^\\/]+/.test(s)) { url = "file:" + caminho(s.replace(/\\/g, "/")); tipo = "arquivo"; }
     else if (/^\/\/[\w-]+(\.[\w-]+)+/.test(s)) { url = "https:" + espacos(s); tipo = "web"; }
     else if (/^[a-z][a-z0-9+.-]*:/i.test(s) && !/^[^:]+:\d+(\/|$)/.test(s)) { url = espacos(s); tipo = "outro"; }
     else if (/^www\./i.test(s) || /^[\w-]+:\d+/.test(s) || (/^[\w-]+(\.[\w-]+)*\.[a-z]{2,24}(:\d+)?([\/?#]|$)/i.test(s) && !/^[^\/?#]*\.(html?|pdf|eml|msg|txt|csv|png|jpe?g|gif|svg|webp|mp4|zip|docx?|xlsx?|pptx?)([?#]|$)/i.test(s))) { url = "https://" + espacos(s); tipo = "web"; }
     else { url = espacos(s.replace(/\\/g, "/")); tipo = "relativo"; info = "Endereço relativo: abre a partir da pasta onde o report estiver publicado."; }
-    if (tipo === "arquivo") info = "Caminho de arquivo: abre onde esse caminho existe (neste computador ou na pasta de rede da área).";
+    if (tipo === "arquivo") info = "Caminho de arquivo: abre onde esse arquivo existe (neste computador, ou para quem tem a mesma pasta sincronizada ou de rede).";
     return { url: url, tipo: tipo, avisos: [], info: info, erro: "" };
+  }
+
+  /* Link do report completo (o botão do e-mail-resumo e a meta "report-completo"): vale qualquer link, como nos itens:
+     o link de compartilhamento (https://…) ou o caminho do arquivo (C:\…, \\servidor\…, file:///…, ex.: a pasta do OneDrive
+     no computador), que vai para o botão no formato que o Outlook abre (normalizarLink). Só o que executa código é recusado.
+     A nota (info) diz onde o caminho de arquivo abre; sem link, o e-mail-resumo não sai (nunca um botão vazio). Nada é
+     publicado por aqui: o report fica onde a pessoa salvou ou publicou. */
+  function linkDoReport(entrada) {
+    var nl = normalizarLink(entrada);
+    return { url: nl.erro ? "" : nl.url, erro: nl.erro ? "não é permitido (pode executar código)." : "", tipo: nl.tipo,
+      info: nl.tipo === "arquivo" ? "Caminho de arquivo: o botão do e-mail abre o report onde esse arquivo existe (neste computador, ou para quem tem a mesma pasta sincronizada ou de rede). O Outlook na Web, o novo Outlook e o celular não abrem link de arquivo: para eles, use o link de compartilhamento (https://…)." :
+        nl.tipo === "relativo" ? "Endereço relativo: no e-mail, só o nome do arquivo não abre o report. Cole o caminho completo (C:\\…) ou o link de compartilhamento (https://…)." : "" };
   }
 
   /* =================================================================== */
@@ -416,7 +435,8 @@
        A versão final nunca tem pendências: a ferramenta não deixa gerar. */
     var PEND = "background:" + cor.atencao_fundo + ";color:" + cor.atencao + ";border-radius:3px;";
     function marcarPendencias(html) { return html.replace(/\[[^\]<]*\]/g, function (m) { return '<span style="' + PEND + '">' + m + "</span>"; }); }
-    function texto(s) { return seguro(marcarPendencias(textoSeguro(s).s).replace(/R\$ (?=\d)/g, function () { return "R$&nbsp;"; })); }
+    /* "R$ 10" e "29 p.p." não quebram no meio da linha */
+    function texto(s) { return seguro(marcarPendencias(textoSeguro(s).s).replace(/R\$ (?=\d)/g, function () { return "R$&nbsp;"; }).replace(/(\d) (?=p\.p\.)/g, "$1&nbsp;")); }
     function chip(s) {
       return seguro('<span style="display:inline-block;' + PEND + "font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:15px;font-weight:bold;font-style:normal;letter-spacing:0;white-space:normal;vertical-align:middle;padding:3px 6px;border:1px dashed " + cor.placeholder_borda + ';">' + esc(s) + "</span>");
     }
@@ -669,7 +689,8 @@
     }
 
     /* 03 · Creative X */
-    var CX = D.simples["CREATIVE X"], cx = null;
+    var CX = D.simples["CREATIVE X"], cx = null, CXT = D.simples["CREATIVE X TRIMESTRE"], cxi = L["CREATIVE X TRIMESTRE"] || [];
+    if (!CX && (CXT || cxi.length)) problema(prob, "aviso", arqD, (CXT || cxi[0])._linha, "[CREATIVE X TRIMESTRE] entra na seção Creative X, abaixo do resultado do mês: preencha também o bloco [CREATIVE X]. O trimestral ficou de fora.");
     if (CX) {
       var at = lerNumero(CX.atual), an = lerNumero(CX.anterior);
       if (at === null && !provisorio(CX.atual, "atual") && !ehPendencia(CX.atual)) problema(prob, "aviso", arqD, CX._linhas.atual, "[CREATIVE X] atual \"" + CX.atual + "\" não é um número em %: a barra fica vazia.");
@@ -683,9 +704,29 @@
         n: proxSecao(), subtitulo: texto(CX.subtitulo), anterior: numero(CX.anterior), atual: numero(CX.atual),
         variacao: pend ? chip(vari) : seguro(esc(vari).replace(/^[-−]\s*/, "&minus;")), variacao_pendente: pend,
         variacao_cor: queda ? cor.atencao : cor.positivo, variacao_fundo: queda ? cor.atencao_fundo : cor.positivo_fundo, variacao_tom: queda ? "ambar" : "verde",
-        periodo: texto(CX.periodo), referencia: texto(CX.referencia), significado: texto(CX.significado),
-        tem_barra: barra > 0, barra: barra + "%", resto: (100 - barra) + "%"
+        periodo: texto(CX.periodo), referencia: texto(CX.referencia), significado: texto(CX.significado), nota: texto(CX.nota),
+        tem_barra: barra > 0, barra: barra + "%", resto: (100 - barra) + "%", trimestre: null
       };
+      /* Trimestral: rótulo, título, até 3 indicadores (como os resultados do destaque, com separador fino), uma leitura curta
+         e a estimativa, que sai com a etiqueta "Estimativa" para não se misturar ao que foi alcançado. Com ele, o resultado do
+         mês ganha o rótulo "MENSAL · <MÊS> <ANO>" (ou o "rotulo" de [CREATIVE X]), e os dois ficam fáceis de separar. */
+      if (CXT || cxi.length) {
+        var T = CXT || { _linhas: {} }, lt = cxi.length ? colunas(LARGURA, cxi.length) : [];
+        curto(T, "titulo", 60, "CREATIVE X TRIMESTRE");
+        cx.trimestre = {
+          rotulo: texto(maiusculas(T.rotulo || "Trimestral")), titulo: texto(T.titulo), texto: texto(T.texto), estimativa: texto(T.estimativa),
+          tem_indicadores: cxi.length > 0,
+          indicadores: cxi.map(function (v, i) {
+            var nb = "CREATIVE X TRIMESTRE " + (i + 1);
+            curto(v, "valor", cxi.length === 3 ? 7 : 11, nb);
+            return {
+              idx: i + 1, valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, nb),
+              largura: lt[i], primeiro: i === 0, classe_m: cxi.length === 3 ? "third" : "half"
+            };
+          })
+        };
+      }
+      cx.rotulo = texto(maiusculas(CX.rotulo || (cx.trimestre ? "Mensal · " + mes + " " + ano : "")));
     }
 
     /* Links extras de um item (Transformation Hub, novo tópico): "Texto | https://…", vários separados por ";" (na página, um embaixo do outro).
@@ -928,7 +969,18 @@
       }
       (L.LANCAMENTO || []).forEach(function (v) { o.push("", t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto)); l = lk(v); if (l) o.push(l); });
     }
-    if (S["CREATIVE X"]) { var c = S["CREATIVE X"]; o.push("", "CREATIVE X: " + (c.anterior ? t(c.anterior) + " -> " : "") + t(c.atual) + (c.periodo ? " (" + t(c.periodo) + ")" : ""), t(c.referencia), t(c.significado)); }
+    if (S["CREATIVE X"]) {
+      var c = S["CREATIVE X"], ct = S["CREATIVE X TRIMESTRE"], ci = L["CREATIVE X TRIMESTRE"] || [];
+      o.push("", "CREATIVE X" + (c.rotulo || ct || ci.length ? " · " + maiusculas(c.rotulo || "Mensal · " + E.mes + " " + E.ano) : "") + ": " + (c.anterior ? t(c.anterior) + " -> " : "") + t(c.atual) + (c.periodo ? " (" + t(c.periodo) + ")" : ""), t(c.referencia), t(c.significado));
+      if (ct || ci.length) {
+        ct = ct || {};
+        o.push("", "CREATIVE X · " + maiusculas(ct.rotulo || "Trimestral") + (ct.titulo ? ": " + t(ct.titulo) : ""));
+        ci.forEach(function (v) { o.push(num(v)); });
+        if (ct.texto) o.push(t(ct.texto));
+        if (ct.estimativa) o.push("Estimativa: " + t(ct.estimativa));
+      }
+      if (c.nota) o.push(t(c.nota));
+    }
     if ((L.TRANSFORMATION || []).length) {
       o.push("", "TRANSFORMATION HUB");
       L.TRANSFORMATION.forEach(function (v) {
@@ -1541,7 +1593,7 @@
   function etiquetaResumo(texto, tomCampo, fx) {
     if (!texto) return "";
     var ambar = tomCampo === "ambar", corT = ambar ? CR.atencao : CR.positivo, corF = ambar ? CR.atencao_fundo : CR.positivo_fundo;
-    return seguro('<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td class="fx" bgcolor="' + corF + '" style="background:' + corF + ";padding:0 7px;color:" + corT + ";font-family:" + fx +
+    return seguro('<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td class="fx ' + (ambar ? "dm-chip-ambar" : "dm-chip-verde") + '" bgcolor="' + corF + '" style="background:' + corF + ";padding:0 7px;color:" + corT + ";font-family:" + fx +
       ';font-size:10px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;white-space:nowrap;">' + esc(texto) + "</td></tr></table>");
   }
 
@@ -1571,6 +1623,7 @@
     '<title>{{assunto}}</title>',
     '{{mso}}',
     '<style>',
+    '  :root{color-scheme:light only;supported-color-schemes:light only;}',
     '  body{margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}',
     '  table{border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;}',
     '  img{border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;}',
@@ -1592,44 +1645,45 @@
     '    .selo{float:none !important;margin-top:12px !important;}',
     '    .al-l{text-align:left !important;}',
     '  }',
+    '{{css_escuro}}',
     '</style>',
     '</head>',
-    '<body style="margin:0;padding:0;background:{{cor.lisboa}};" bgcolor="{{cor.lisboa}}">',
+    '<body class="dm-lisboa" style="margin:0;padding:0;background:{{cor.lisboa}};" bgcolor="{{cor.lisboa}}">',
     '<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;mso-line-height-rule:exactly;color:{{cor.lisboa}};">{{previa}}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>',
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" style="background:{{cor.lisboa}};"><tr><td align="center" style="padding:24px 0;">',
+    '<table role="presentation" class="dm-lisboa" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" style="background:{{cor.lisboa}};"><tr><td align="center" style="padding:24px 0;">',
     '<!--[if mso]><table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->',
-    '<table role="presentation" class="container" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.branco}}" style="width:680px;max-width:680px;background:{{cor.branco}};">',
+    '<table role="presentation" class="container dm-branco-bg" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.branco}}" style="width:680px;max-width:680px;background:{{cor.branco}};">',
     '',
     '  <!-- CABEÇALHO: identidade, período e a frase do mês (contexto) -->',
-    '  <tr><td class="px" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};padding:22px 40px 26px 40px;">',
+    '  <tr><td class="px dm-marca-bg" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};padding:22px 40px 26px 40px;">',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>',
     '      <td class="col" valign="middle">',
     '        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>',
     '          {{#logo}}<td valign="middle" style="padding-right:14px;"><img src="{{src}}" width="{{w}}" alt="Santander" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#FFFFFF;"></td>{{/logo}}',
-    '          <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid #FFFFFF;{{/logo}}"><p class="ft" style="margin:0;font-family:{{ft}};font-size:19px;line-height:22px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;">Creative Strategy PF</p></td>',
+    '          <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid #FFFFFF;{{/logo}}"><p class="ft dm-txt-branco" style="margin:0;font-family:{{ft}};font-size:19px;line-height:22px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;">Creative Strategy PF</p></td>',
     '        </tr></table>',
     '      </td>',
-    '      <td class="col al-l" valign="middle" align="right"><table role="presentation" class="selo" align="right" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#FFFFFF" style="background:#FFFFFF;padding:6px 12px;"><p class="fx" style="margin:0;font-family:{{fx}};font-size:9px;line-height:12px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;">REPORT MENSAL{{#periodo}}&nbsp;&nbsp;·&nbsp;&nbsp;{{periodo}}{{/periodo}}</p></td></tr></table></td>',
+    '      <td class="col al-l" valign="middle" align="right"><table role="presentation" class="selo" align="right" cellpadding="0" cellspacing="0" border="0"><tr><td class="dm-branco-bg" bgcolor="#FFFFFF" style="background:#FFFFFF;padding:6px 12px;"><p class="fx dm-txt-marca" style="margin:0;font-family:{{fx}};font-size:9px;line-height:12px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;">REPORT MENSAL{{#periodo}}&nbsp;&nbsp;·&nbsp;&nbsp;{{periodo}}{{/periodo}}</p></td></tr></table></td>',
     '    </tr>',
-    '    <tr><td colspan="2" style="padding:16px 0 18px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="#FFFFFF" style="height:1px;background:#FFFFFF;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>',
+    '    <tr><td colspan="2" style="padding:16px 0 18px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="dm-branco-bg" height="1" bgcolor="#FFFFFF" style="height:1px;background:#FFFFFF;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>',
     '    <tr><td colspan="2">',
-    '      <p class="ft h1" style="margin:0;font-family:{{fti}};font-size:32px;line-height:36px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;letter-spacing:-0.8px;">{{frase}}{{#frase_final}}<br><span style="font-weight:normal;">{{frase_final}}</span>{{/frase_final}}</p>',
-    '      <p class="fx" style="margin:10px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;mso-line-height-rule:exactly;color:#FFFFFF;">{{intro}}</p>',
+    '      <p class="ft h1 dm-txt-branco" style="margin:0;font-family:{{fti}};font-size:32px;line-height:36px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;letter-spacing:-0.8px;">{{frase}}{{#frase_final}}<br><span style="font-weight:normal;">{{frase_final}}</span>{{/frase_final}}</p>',
+    '      <p class="fx dm-txt-branco" style="margin:10px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;mso-line-height-rule:exactly;color:#FFFFFF;">{{intro}}</p>',
     '    </td></tr></table>',
     '  </td></tr>',
     '',
     '  {{#tem_indicadores}}',
     '  <!-- PRINCIPAIS RESULTADOS: dois ou três indicadores -->',
     '  <tr><td class="px" style="padding:26px 40px 0 40px;">',
-    '    <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">PRINCIPAIS RESULTADOS</p>',
-    '    {{#origem_unica}}<p class="fx" style="margin:4px 0 0 0;font-family:{{fx}};font-size:13px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};"><b>{{origem_unica}}</b></p>{{/origem_unica}}',
+    '    <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">PRINCIPAIS RESULTADOS</p>',
+    '    {{#origem_unica}}<p class="fx dm-txt-texto" style="margin:4px 0 0 0;font-family:{{fx}};font-size:13px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};"><b>{{origem_unica}}</b></p>{{/origem_unica}}',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>',
     '      {{#indicadores}}{{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}',
-    '      <td class="kpi" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor_valor}};padding-top:12px;">',
-    '        <p class="ft kpiv" style="margin:0;font-family:{{ft}};font-size:30px;line-height:34px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>',
-    '        <p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>',
-    '        {{#detalhe}}<p class="fx" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;mso-line-height-rule:exactly;color:{{cor.apoio}};">{{detalhe}}</p>{{/detalhe}}',
-    '        {{#origem}}<p class="fx" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;mso-line-height-rule:exactly;color:{{cor.apoio}};">{{origem}}</p>{{/origem}}',
+    '      <td class="kpi dm-borda-{{dm_valor}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor_valor}};padding-top:12px;">',
+    '        <p class="ft kpiv dm-txt-{{dm_valor}}" style="margin:0;font-family:{{ft}};font-size:30px;line-height:34px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>',
+    '        <p class="fx dm-txt-texto" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>',
+    '        {{#detalhe}}<p class="fx dm-txt-apoio" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;mso-line-height-rule:exactly;color:{{cor.apoio}};">{{detalhe}}</p>{{/detalhe}}',
+    '        {{#origem}}<p class="fx dm-txt-apoio" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;mso-line-height-rule:exactly;color:{{cor.apoio}};">{{origem}}</p>{{/origem}}',
     '        {{#variacao}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:8px;">{{variacao}}</td></tr></table>{{/variacao}}',
     '      </td>{{/indicadores}}',
     '    </tr></table>',
@@ -1641,11 +1695,11 @@
     '  <tr><td class="px" style="padding:26px 40px 0 40px;">',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">',
     '      {{#topicos}}{{^primeiro}}<tr><td height="18" style="height:18px;font-size:0;line-height:0;">&nbsp;</td></tr>{{/primeiro}}',
-    '      <tr><td style="border-top:1px solid {{cor.texto}};padding-top:12px;">',
-    '        <p class="fx" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">{{rotulo}}</p>',
-    '        {{#titulo}}<p class="ft" style="margin:4px 0 0 0;font-family:{{ft}};font-size:17px;line-height:22px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>{{/titulo}}',
-    '        {{#itens}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;mso-line-height-rule:exactly;color:{{cor.texto}};"><span style="color:{{cor.marca}};font-weight:bold;">&#9679;</span>&nbsp; {{#valor}}<b style="color:{{cor.marca}};">{{valor}}</b>&nbsp;·&nbsp;{{/valor}}<b>{{nome}}</b>{{#status}}<span style="color:{{cor.apoio}};">&nbsp;·&nbsp;{{status}}</span>{{/status}}</p>{{/itens}}',
-    '        {{#mais}}<p class="fx" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.apoio}};">E mais {{mais}} no report completo.</p>{{/mais}}',
+    '      <tr><td class="dm-borda-texto" style="border-top:1px solid {{cor.texto}};padding-top:12px;">',
+    '        <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">{{rotulo}}</p>',
+    '        {{#titulo}}<p class="ft dm-txt-texto" style="margin:4px 0 0 0;font-family:{{ft}};font-size:17px;line-height:22px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>{{/titulo}}',
+    '        {{#itens}}<p class="fx dm-txt-texto" style="margin:6px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;mso-line-height-rule:exactly;color:{{cor.texto}};"><span class="dm-txt-marca" style="color:{{cor.marca}};font-weight:bold;">&#9679;</span>&nbsp; {{#valor}}<b class="dm-txt-marca" style="color:{{cor.marca}};">{{valor}}</b>&nbsp;·&nbsp;{{/valor}}<b>{{nome}}</b>{{#status}}<span class="dm-txt-apoio" style="color:{{cor.apoio}};">&nbsp;·&nbsp;{{status}}</span>{{/status}}</p>{{/itens}}',
+    '        {{#mais}}<p class="fx dm-txt-apoio" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.apoio}};">E mais {{mais}} no report completo.</p>{{/mais}}',
     '      </td></tr>{{/topicos}}',
     '    </table>',
     '  </td></tr>',
@@ -1653,21 +1707,21 @@
     '',
     '  <!-- CHAMADA PRINCIPAL: o único link do e-mail -->',
     '  <tr><td class="px" style="padding:26px 40px 28px 40px;">',
-    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" style="background:{{cor.lisboa}};"><tr>',
+    '    <table role="presentation" class="dm-lisboa" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" style="background:{{cor.lisboa}};"><tr>',
     '      <td class="ctat" valign="middle" style="padding:20px 0 20px 26px;">',
-    '        <p class="ft" style="margin:0;font-family:{{ft}};font-size:19px;line-height:24px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.marca}};">{{cta_titulo}}</p>',
-    '        <p class="fx" style="margin:4px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};">{{cta_texto}}</p>',
+    '        <p class="ft dm-txt-marca" style="margin:0;font-family:{{ft}};font-size:19px;line-height:24px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.marca}};">{{cta_titulo}}</p>',
+    '        <p class="fx dm-txt-texto" style="margin:4px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};">{{cta_texto}}</p>',
     '      </td>',
     '      <td class="ctab" width="{{botao_w}}" valign="middle" align="right" style="width:{{botao_w}}px;padding:20px 26px 20px 16px;white-space:nowrap;">{{botao_html}}</td>',
     '    </tr></table>',
     '  </td></tr>',
     '',
     '  <!-- ASSINATURA: Vermelho Santander, chama no canto inferior direito (Brand Guide 3.10) -->',
-    '  <tr><td class="px" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};padding:18px 40px 20px 40px;">',
+    '  <tr><td class="px dm-marca-bg" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};padding:18px 40px 20px 40px;">',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>',
     '      <td valign="middle" style="padding-right:16px;">',
-    '        <p class="ft" style="margin:0;font-family:{{ft}};font-size:14px;line-height:18px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;">Creative Strategy PF</p>',
-    '        <p class="fx" style="margin:2px 0 0 0;font-family:{{fx}};font-size:9px;line-height:13px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;">CUSTOMER INTERACTIONS&nbsp;&nbsp;·&nbsp;&nbsp;RESUMO DO REPORT MENSAL{{#contato}}&nbsp;&nbsp;·&nbsp;&nbsp;{{contato}}{{/contato}}</p>',
+    '        <p class="ft dm-txt-branco" style="margin:0;font-family:{{ft}};font-size:14px;line-height:18px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;">Creative Strategy PF</p>',
+    '        <p class="fx dm-txt-branco" style="margin:2px 0 0 0;font-family:{{fx}};font-size:9px;line-height:13px;mso-line-height-rule:exactly;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;">CUSTOMER INTERACTIONS&nbsp;&nbsp;·&nbsp;&nbsp;RESUMO DO REPORT MENSAL{{#contato}}&nbsp;&nbsp;·&nbsp;&nbsp;{{contato}}{{/contato}}</p>',
     '      </td>',
     '      {{#logo}}<td valign="middle" align="right" width="{{w}}"><img src="{{src}}" width="{{w}}" alt="Santander" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#FFFFFF;"></td>{{/logo}}',
     '    </tr></table>',
@@ -1679,6 +1733,29 @@
     '</html>'
   ].join("\n");
 
+  /* Modo escuro (4.12): o e-mail-resumo mantém as cores aprovadas (fundo Lisboa, cartão branco, faixas e botão em
+     Vermelho Santander com texto branco, indicadores, etiquetas e bordas). Cada elemento colorido tem uma classe dm-…
+     e a cor dela é reafirmada (!important) onde o programa de e-mail deixa: no modo escuro do sistema (Apple Mail,
+     Outlook para Mac, iOS e Android, que leem prefers-color-scheme) e no Outlook.com / novo Outlook para Windows
+     (que marcam o que recoloriram com data-ogsc / data-ogsb). O "light only" do cabeçalho já pede ao Apple Mail para
+     não inverter. O Outlook clássico para Windows não aceita nenhum desses recursos: lá vale o botão do próprio
+     Outlook para trocar o fundo da mensagem (docs/EMULADOR.md). */
+  var DM_FUNDOS = { "dm-lisboa": CR.lisboa, "dm-branco-bg": CR.branco, "dm-marca-bg": CR.marca, "dm-chip-verde": CR.positivo_fundo, "dm-chip-ambar": CR.atencao_fundo };
+  var DM_TEXTOS = { "dm-txt-branco": CR.branco, "dm-txt-marca": CR.marca, "dm-txt-texto": CR.texto, "dm-txt-apoio": CR.apoio, "dm-txt-turquesa": CR.turquesa, "dm-chip-verde": CR.positivo, "dm-chip-ambar": CR.atencao };
+  var DM_BORDAS = { "dm-borda-marca": CR.marca, "dm-borda-texto": CR.texto };
+  var CSS_ESCURO = (function () {
+    function regras(mapa, prop, sel) {
+      return Object.keys(mapa).map(function (c) {
+        var v = mapa[c], d = prop === "bg" ? "background:" + v + " !important;background-color:" + v + " !important;" : prop === "cor" ? "color:" + v + " !important;" : "border-color:" + v + " !important;";
+        return "  " + sel(c) + "{" + d + "}";
+      });
+    }
+    function solto(c) { return "." + c; }
+    function ogs(at) { return function (c) { return at.map(function (a) { return "[" + a + "] ." + c + ",." + c + "[" + a + "]"; }).join(","); }; }
+    return ["  @media (prefers-color-scheme:dark){"].concat(regras(DM_FUNDOS, "bg", solto), regras(DM_TEXTOS, "cor", solto), regras(DM_BORDAS, "borda", solto), ["  }"],
+      regras(DM_FUNDOS, "bg", ogs(["data-ogsb", "data-ogab"])), regras(DM_TEXTOS, "cor", ogs(["data-ogsc", "data-ogac"])), regras(DM_BORDAS, "borda", ogs(["data-ogsc", "data-ogsb"]))).join("\n");
+  })();
+
   /* Largura do botão (px), pelo tamanho do texto (Arial negrito 15px: ~8,6px por letra, mais a seta e a margem
      interna). A coluna do botão reserva esse espaço e o texto não quebra. */
   function larguraBotao(texto) { return Math.max(180, Math.round(texto.length * 8.6) + 56); }
@@ -1688,8 +1765,8 @@
   function botaoResumo(link, texto, fx) {
     var w = larguraBotao(texto), t = esc(texto) + "&nbsp;&#8594;", l = esc(link);
     return '<table role="presentation" class="btn" width="' + w + '" cellpadding="0" cellspacing="0" border="0" style="width:' + w + 'px;"><tr>' +
-      '<td align="center" bgcolor="' + CR.marca + '" style="background:' + CR.marca + ';padding:13px 16px;">' +
-      '<a class="cta fx" href="' + l + '" target="_blank" style="color:#FFFFFF;font-family:' + fx + ';font-size:15px;line-height:20px;mso-line-height-rule:exactly;font-weight:bold;text-decoration:none;">' + t + "</a></td></tr></table>";
+      '<td class="dm-marca-bg" align="center" bgcolor="' + CR.marca + '" style="background:' + CR.marca + ';padding:13px 16px;">' +
+      '<a class="cta fx dm-txt-branco" href="' + l + '" target="_blank" style="color:#FFFFFF;font-family:' + fx + ';font-size:15px;line-height:20px;mso-line-height-rule:exactly;font-weight:bold;text-decoration:none;">' + t + "</a></td></tr></table>";
   }
 
   /*
@@ -1721,7 +1798,8 @@
     var partes = [d.tem.campanhas ? "as campanhas" : "", d.tem.aprendizados ? "os aprendizados" : "", d.tem.transformation ? "o Transformation Hub" : ""].concat(nomesTop, [d.tem.proximos ? "os próximos passos" : ""]).filter(Boolean);
     var lista = partes.length > 1 ? partes.slice(0, -1).join(", ") + " e " + partes[partes.length - 1] : partes[0] || "";
     var temVideo = /data-video="/.test(html) || /alt="Vídeo: /.test(html);
-    var nl = normalizarLink(op.link), link = !nl.erro && nl.url ? nl.url : "", txtBotao = op.botao || "Acessar report completo";
+    /* qualquer link (o que executa código, não); sem link, no lugar do botão vai o aviso (e o .eml não é liberado) */
+    var link = linkDoReport(op.link).url, txtBotao = op.botao || "Acessar report completo";
     var botao = link ? botaoResumo(link, txtBotao, fx) :
       '<span class="fx" style="display:inline-block;background:' + CR.atencao_fundo + ";color:" + CR.atencao + ";font-family:" + fx + ';font-size:12px;line-height:16px;font-weight:bold;padding:12px 18px;border:1px dashed ' + CR.atencao + ';">FALTA O LINK DO REPORT COMPLETO</span>';
     var m = {
@@ -1738,7 +1816,7 @@
            o nome do projeto embaixo do indicador também, se o título ou a frase já o dizem */
         var detalhe = x.detalhe && !repete(x.detalhe, x) && !contemTexto(x.titulo, x.detalhe) ? x.detalhe : "";
         var origem = unica || contemTexto(x.titulo + " " + detalhe + " " + fraseMes, x.origem) ? "" : x.origem;
-        return { valor: x.valor, titulo: x.titulo, detalhe: detalhe, origem: origem, variacao: etiquetaResumo(x.variacao, x.tom, fx), primeiro: i === 0, largura: larg[i], cor_valor: i === 0 ? CR.marca : CR.texto };
+        return { valor: x.valor, titulo: x.titulo, detalhe: detalhe, origem: origem, variacao: etiquetaResumo(x.variacao, x.tom, fx), primeiro: i === 0, largura: larg[i], cor_valor: i === 0 ? CR.marca : CR.texto, dm_valor: i === 0 ? "marca" : "texto" };
       }),
       tem_topicos: d.topicos.length > 0,
       topicos: d.topicos.map(function (t, i) {
@@ -1750,7 +1828,7 @@
       }),
       cta_titulo: op.titulo || "Acesse o report completo.",
       cta_texto: op.chamada || ((lista ? lista.charAt(0).toUpperCase() + lista.slice(1) : "Todas as seções") + ", com as peças" + (temVideo ? " e os vídeos" : "") + "."),
-      botao_html: seguro(botao), botao_w: link ? larguraBotao(txtBotao) : 260, contato: ""
+      botao_html: seguro(botao), css_escuro: seguro(CSS_ESCURO), botao_w: link ? larguraBotao(txtBotao) : 260, contato: ""
     };
     var out = aplicar(RESUMO_TPL, m).replace(/\n[ \t]*\n(\s*\n)+/g, "\n\n");
     return { html: out, indicadores: escolha, candidatos: cand, pendencias: lido.pendencias, temVideo: temVideo, temLink: !!link, dados: d };
@@ -1771,12 +1849,14 @@
     "PROJETO PRINCIPAL": { nome: "principal.nome", resumo: "principal.resumo" },
     "LANCAMOS": { titulo: "lancamos.titulo" },
     "DESTAQUE": { categoria: "destaque.categoria", titulo: "destaque.titulo", texto: "destaque.texto", nota: "destaque.nota" },
-    "CREATIVE X": { subtitulo: "cx.subtitulo", anterior: "cx.anterior", atual: "cx.atual", variacao: "cx.variacao", periodo: "cx.periodo", referencia: "cx.referencia", significado: "cx.significado" },
+    "CREATIVE X": { subtitulo: "cx.subtitulo", rotulo: "cx.rotulo", anterior: "cx.anterior", atual: "cx.atual", variacao: "cx.variacao", periodo: "cx.periodo", referencia: "cx.referencia", significado: "cx.significado", nota: "cx.nota" },
+    "CREATIVE X TRIMESTRE": { rotulo: "cxt.rotulo", titulo: "cxt.titulo", texto: "cxt.texto", estimativa: "cxt.estimativa" },
     "TRANSFORMATION": { titulo: "transformation.titulo" },
     "FOCO": { prioridade: "foco.prioridade", texto: "foco.texto" }
   };
   var IMPORTA_LISTA = {
     "NUMERO": ["numero", ["valor", "titulo", "detalhe", "variacao"]], "RESULTADO": ["resultado", ["valor", "titulo", "detalhe", "variacao"]],
+    "CREATIVE X TRIMESTRE": ["cxt", ["valor", "titulo", "detalhe", "variacao"]],
     "LANCAMENTO": ["lancamento", ["status", "nome", "texto"]],
     "TRANSFORMATION": ["transformation", ["status", "nome", "texto", "resultado"]], "APRENDIZADO": ["aprendizado", ["titulo", "texto", "levamos"]], "AGENDA": ["agenda", ["data", "titulo", "detalhe"]]
   };
@@ -1831,7 +1911,7 @@
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
-    RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, CSS_CELULAR: CSS_CELULAR, xDeExemplo: xDeExemplo, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
+    RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, CSS_CELULAR: CSS_CELULAR, xDeExemplo: xDeExemplo, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, linkDoReport: linkDoReport, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

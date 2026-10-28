@@ -324,8 +324,8 @@
 
   {{#cx}}
   <!--secao:cx-->
-  <!-- 03 · CREATIVE X · anterior → atual, variação, barra e uma frase -->
-  <!-- EDITAR AQUI: CREATIVE X → dados/AAAA-MM.txt › [CREATIVE X] anterior, atual, variacao, periodo, referencia, significado -->
+  <!-- 03 · CREATIVE X · anterior → atual, variação, barra e uma frase; no fim do trimestre, o trimestral embaixo -->
+  <!-- EDITAR AQUI: CREATIVE X → dados/AAAA-MM.txt › [CREATIVE X] anterior, atual, variacao, periodo, referencia, significado, nota · [CREATIVE X TRIMESTRE] rotulo, titulo, texto, estimativa · [CREATIVE X TRIMESTRE 1..3] valor, titulo, detalhe, variacao -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -336,6 +336,7 @@
                 <td class="col gap" width="184" valign="middle" style="width:184px;">
                   <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_evolucao}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;CREATIVE X</p>
                   {{#subtitulo}}<p class="fx ts" data-campo="cx.subtitulo" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{subtitulo}}</p>{{/subtitulo}}
+                  {{#rotulo}}<p class="fx" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cx.rotulo" style="display:inline-block;border:1px solid {{cor.linha}};border-radius:999px;padding:1px 8px;font-weight:bold;letter-spacing:1px;color:{{cor.texto_apoio}};">{{rotulo}}</span></p>{{/rotulo}}
                   <p class="ft wrap-m" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:58px;color:{{cor.creative_x_anterior}};white-space:nowrap;">{{#anterior}}<span data-campo="cx.anterior">{{anterior}}</span> <span style="color:{{cor.marca}};">&#8594;</span> {{/anterior}}<span data-campo="cx.atual" style="font-size:54px;color:{{cor.marca}};letter-spacing:-2px;">{{atual}}</span></p>
                 </td>
                 <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
@@ -356,6 +357,39 @@
                 </td>
               </tr>
             </table>
+            {{#trimestre}}
+            <!-- Creative X trimestral: rótulo, título, até 3 indicadores (como os resultados do destaque), leitura curta e estimativa (sempre com a etiqueta) -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-item="cx-trimestre">
+              <tr><td height="20" style="height:20px;font-size:0;line-height:0;border-bottom:1px solid {{cor.linha}};">&nbsp;</td></tr>
+              <tr>
+                <td style="padding:18px 0 0 0;">
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cxt.rotulo" style="display:inline-block;border:1px solid {{cor.linha}};border-radius:999px;padding:1px 8px;font-weight:bold;letter-spacing:1px;color:{{cor.texto_apoio}};">{{rotulo}}</span></p>
+                  {{#titulo}}<p class="ft" data-campo="cxt.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:19px;line-height:24px;color:{{cor.titulo}};">{{titulo}}</p>{{/titulo}}
+                </td>
+              </tr>
+              {{#tem_indicadores}}
+              <tr>
+                <td style="padding:2px 0 0 0;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      {{#indicadores}}
+                      {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
+                      <td class="{{classe_m}}" data-item="cxt-{{idx}}" width="{{largura}}" valign="top" style="width:{{largura}}px;padding:14px 0 0 0;">
+                        <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.texto}};" data-campo="cxt-{{idx}}.valor">{{valor}}</p>
+                        <p class="fx ts" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_corpo}};"><b data-campo="cxt-{{idx}}.titulo" style="color:{{cor.texto}};">{{titulo}}</b>{{#detalhe}}<br><span data-campo="cxt-{{idx}}.detalhe">{{detalhe}}</span>{{/detalhe}}</p>
+                        {{#variacao}}<p class="fx" data-campo="cxt-{{idx}}.variacao" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
+                      </td>
+                      {{/indicadores}}
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              {{/tem_indicadores}}
+              {{#texto}}<tr><td style="padding:14px 0 0 0;"><p class="fx tm" data-campo="cxt.texto" style="margin:0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto}};">{{texto}}</p></td></tr>{{/texto}}
+              {{#estimativa}}<tr><td style="padding:8px 0 0 0;"><p class="fx ts" style="margin:0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};"><b style="color:{{cor.texto_corpo}};">Estimativa&nbsp;·</b> <span data-campo="cxt.estimativa">{{estimativa}}</span></p></td></tr>{{/estimativa}}
+            </table>
+            {{/trimestre}}
+            {{#nota}}<p class="fx" data-campo="cx.nota" style="margin:14px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;color:{{cor.texto_apoio}};">{{nota}}</p>{{/nota}}
           </td>
         </tr>
       </table>

@@ -130,7 +130,7 @@ function salvarComo() {
   p.__resposta = "\"C:\\Users\\fulano\\peça 2.png\"";
   await ferramenta(p, f, '[data-item="lancamento-2"] span[title="Link ainda não definido"]', "Colocar link");
   var hrefArq = await noQuadro(p, function (d) { var a2 = d.querySelector('[data-item="lancamento-2"] a.cta'); return a2 ? a2.getAttribute("href") : "(sem link)"; }), estArq = await p.$eval("#estado", function (e) { return e.textContent; });
-  confere(hrefArq === "file:///C:/Users/fulano/pe%C3%A7a%202.png" && !/Atenção/.test(estArq) && /Caminho de arquivo/.test(estArq), "caminho do computador (com aspas, espaço e acento) aceito como link de arquivo, sem aviso (só uma nota) · " + hrefArq);
+  confere(hrefArq === "file:///C:/Users/fulano/peça%202.png" && !/Atenção/.test(estArq) && /Caminho de arquivo/.test(estArq), "caminho do computador (com aspas, espaço e acento) aceito como link de arquivo, sem aviso (só uma nota) · " + hrefArq);
   p.__resposta = "javascript:alert(1)";
   await ferramenta(p, f, '[data-item="lancamento-3"] span[title="Link ainda não definido"]', "Colocar link");
   await p.waitForSelector("#modal:not([hidden])");
@@ -255,11 +255,26 @@ function salvarComo() {
   confere(marcados.join(",") === "numero-1,numero-2,numero-3", "indicadores: os 3 números do projeto principal por padrão");
   confere(await p.$$eval("#indicadores input:disabled", function (l) { return l.length; }) > 0, "no máximo 3 indicadores (os outros ficam bloqueados)");
   confere(await p.$eval("#bEmlRes", function (b) { return b.disabled; }) && /FALTA O LINK DO REPORT COMPLETO/.test(await p.$eval("#prev", function (e) { return e.srcdoc; })), "sem o link: e-mail-resumo bloqueado e a prévia avisa");
-  /* link de arquivo (caminho do Windows, como "Copiar como caminho"): libera o e-mail, com aviso */
-  await p.fill("#link", "\"C:\\Users\\Fulano\\Downloads\\report-2099-01.html\"");
-  await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
+  /* qualquer link vale (4.12). Caminho do Windows com espaço e acento (pasta do OneDrive, "Copiar como caminho"): vira
+     file:/// no formato que o Outlook grava (espaço %20, acento como está) e o e-mail-resumo é liberado, com uma nota. */
+  await p.fill("#link", "\"C:\\Users\\t000000\\OneDrive - Empresa\\Report PF\\Produção\\Outubro_26\\HTML\\report-2099-01.html\"");
+  await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled && /file:/.test(document.querySelector("#prev").srcdoc); }, null, { timeout: 30000 });
   var hrefRes = ((await p.$eval("#prev", function (e) { return e.srcdoc; })).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1], infoRes = await p.$eval("#linkInfo", function (e) { return e.textContent; });
-  confere(hrefRes === "file:///C:/Users/Fulano/Downloads/report-2099-01.html" && !/Atenção/.test(infoRes) && /Caminho de arquivo/.test(infoRes), "link de arquivo (C:\\…) aceito: vira file:///… no botão, sem aviso (só uma nota) · " + hrefRes + " · " + infoRes.slice(0, 60));
+  confere(hrefRes === "file:///C:/Users/t000000/OneDrive%20-%20Empresa/Report%20PF/Produção/Outubro_26/HTML/report-2099-01.html" && /Caminho de arquivo/.test(infoRes) && !/Não dá para usar/.test(infoRes),
+    "caminho do Windows (OneDrive, com espaço e acento) aceito: botão com file:/// no formato do Outlook, nota no campo · " + hrefRes);
+  confere(decodeURIComponent(new URL(hrefRes).pathname) === "/C:/Users/t000000/OneDrive - Empresa/Report PF/Produção/Outubro_26/HTML/report-2099-01.html", "o endereço do botão volta exatamente ao caminho colado");
+  /* o link do .eml abre o arquivo de verdade: o report salvo numa pasta com espaço e acento, o endereço copiado da barra do
+     navegador (com %C3%A7…), o .eml baixado e o link de dentro dele aberto no navegador */
+  var pastaAc = path.join(SAIDA, "OneDrive - Empresa", "Report PF", "Produção");
+  fs.mkdirSync(pastaAc, { recursive: true }); fs.copyFileSync(path.join(SAIDA, salvo.nome), path.join(pastaAc, salvo.nome));
+  var urlArq = "file://" + path.join(pastaAc, salvo.nome).split("/").map(encodeURIComponent).join("/");
+  await p.fill("#link", urlArq);
+  await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled && /Produção/.test(document.querySelector("#prev").srcdoc); }, null, { timeout: 30000 });
+  await p.waitForTimeout(800);
+  var dArq = await Promise.all([p.waitForEvent("download"), p.click("#bEmlRes")]), emlArq = path.join(SAIDA, "resumo-link-arquivo.eml"); await dArq[0].saveAs(emlArq);
+  var hrefEml = (htmlDoEml(fs.readFileSync(emlArq, "utf8")).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1] || "";
+  var pa = await ctx.newPage(); await pa.goto(hrefEml); var tituloA = await pa.title(); await pa.close();
+  confere(/Produção/.test(hrefEml) && !/%C3%A7/i.test(hrefEml) && /Report de Janeiro 2099/.test(tituloA), "o link do botão no .eml abre o report salvo (pasta com espaço e acento) · " + hrefEml.slice(-60) + " → " + tituloA);
   var LINK = "https://www.example.com/report-ficticio";
   await p.fill("#link", LINK);
   await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
@@ -276,7 +291,7 @@ function salvarComo() {
   confere(/^Subject: Creative Strategy PF \| Report de Janeiro 2099\r\n/m.test(eml), "assunto: Creative Strategy PF | Report de Janeiro 2099");
   var hrefs = html.match(/href="[^"]*"/g) || [];
   confere(hrefs.length === 1 && hrefs[0] === 'href="' + LINK + '"', "um único link: o botão do report completo (" + hrefs.length + " href)");
-  confere(!/<v:roundrect|<w:anchorlock/.test(html) && /<td align="center" bgcolor="#EC0000"[^>]*><a class="cta fx" href="/.test(html), "botão sem VML (célula vermelha + link de texto): continua clicável depois que o Outlook envia");
+  confere(!/<v:roundrect|<w:anchorlock/.test(html) && /<td class="dm-marca-bg" align="center" bgcolor="#EC0000"[^>]*><a class="cta fx dm-txt-branco" href="/.test(html), "botão sem VML (célula vermelha + link de texto): continua clicável depois que o Outlook envia");
   confere(/Acessar report completo/.test(html), "botão: \"Acessar report completo\"");
   confere(/12,5%/.test(html) && /R\$ 1,20/.test(html) && /Indicador fictício A/.test(html), "indicadores escolhidos estão no resumo");
   confere(!/<script|data-campo|contenteditable/.test(html), "resumo estático, sem marcas");
