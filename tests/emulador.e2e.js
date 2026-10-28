@@ -265,7 +265,8 @@ function salvarComo() {
   confere(decodeURIComponent(new URL(hrefRes).pathname) === "/C:/Users/t000000/OneDrive - Empresa/Report PF/Produção/Outubro_26/HTML/report-2099-01.html", "o endereço do botão volta exatamente ao caminho colado");
   /* o link do .eml abre o arquivo de verdade: o report salvo numa pasta com espaço e acento, o endereço copiado da barra do
      navegador (com %C3%A7…), o .eml baixado e o link de dentro dele aberto no navegador */
-  var pastaAc = path.join(SAIDA, "OneDrive - Empresa", "Report PF", "Produção");
+  /* (pasta temporária fora do projeto: a página de geração lê a pasta do projeto inteira nos outros testes) */
+  var tmpAc = fs.mkdtempSync(path.join(require("os").tmpdir(), "report-link-")), pastaAc = path.join(tmpAc, "OneDrive - Empresa", "Report PF", "Produção");
   fs.mkdirSync(pastaAc, { recursive: true }); fs.copyFileSync(path.join(SAIDA, salvo.nome), path.join(pastaAc, salvo.nome));
   var urlArq = "file://" + path.join(pastaAc, salvo.nome).split("/").map(encodeURIComponent).join("/");
   await p.fill("#link", urlArq);
@@ -274,6 +275,7 @@ function salvarComo() {
   var dArq = await Promise.all([p.waitForEvent("download"), p.click("#bEmlRes")]), emlArq = path.join(SAIDA, "resumo-link-arquivo.eml"); await dArq[0].saveAs(emlArq);
   var hrefEml = (htmlDoEml(fs.readFileSync(emlArq, "utf8")).match(/<a class="cta[^"]*" href="([^"]*)"/) || [])[1] || "";
   var pa = await ctx.newPage(); await pa.goto(hrefEml); var tituloA = await pa.title(); await pa.close();
+  fs.rmSync(tmpAc, { recursive: true, force: true });
   confere(/Produção/.test(hrefEml) && !/%C3%A7/i.test(hrefEml) && /Report de Janeiro 2099/.test(tituloA), "o link do botão no .eml abre o report salvo (pasta com espaço e acento) · " + hrefEml.slice(-60) + " → " + tituloA);
   var LINK = "https://www.example.com/report-ficticio";
   await p.fill("#link", LINK);
