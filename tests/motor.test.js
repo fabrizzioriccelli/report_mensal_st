@@ -632,6 +632,14 @@ teste("e-mail-resumo no modo escuro: cores aprovadas reafirmadas (prefers-color-
   assert.deepStrictEqual(semClasse, [], "texto branco sem proteção");
 });
 
+teste("e-mail-resumo: espaços entre indicadores e entre tópicos são células vazias (sem &nbsp;, que o Outlook clássico pinta no modo escuro)", function () {
+  var r = M.emailResumo(montar(COMPLETO).html, { link: "https://empresa.sharepoint.com/:u:/r/sites/cs/r.html" }), h = r.html.split("<body")[1];
+  var n = (h.match(/<td class="kpi /g) || []).length;
+  assert.ok(n >= 2, "o exemplo tem indicadores");
+  assert.strictEqual((h.match(/<td class="hide-m" width="24" style="width:24px;"><\/td>/g) || []).length, n - 1, "um espaço vazio entre cada par de indicadores");
+  assert.ok(!/<td[^>]*>&nbsp;<\/td>/.test(h.replace(/<td class="dm-branco-bg" height="1"[^>]*>&nbsp;<\/td>/, "")), "nenhuma célula de espaço com caractere (o filete branco do cabeçalho tem fundo próprio)");
+});
+
 teste("linkDoReport (botão do e-mail-resumo): qualquer link; caminho do Windows (OneDrive, espaço, acento) vira file:/// no formato do Outlook e volta ao mesmo caminho; só o que executa código é recusado", function () {
   var L = M.linkDoReport;
   var od = L("C:\\Users\\t000000\\OneDrive - Empresa\\Report PF\\Produção\\Outubro_26\\HTML\\report-2026-10.html");

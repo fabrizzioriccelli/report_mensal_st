@@ -2,6 +2,12 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.12.1 · 2026-10-29 · E-mail-resumo: sem quadrados no Outlook clássico (modo escuro)
+
+- **Quadrados entre os indicadores:** no Outlook clássico para Windows com o modo escuro ligado, apareciam quadrados entre os indicadores do e-mail-resumo, na altura da linha de detalhe. Os espaços entre as colunas (e entre os tópicos) eram células com um caractere invisível (`&nbsp;`) e letra tamanho 0, e o Outlook pinta esse caractere. Agora são células vazias, com a mesma largura: o modo claro não muda.
+- **Cores no Outlook clássico (modo escuro):** continuam a cargo do Outlook. Ele recolore o e-mail na tela de quem lê (vermelho mais claro, texto do cabeçalho escuro, texto do botão rosado) e não aceita nenhum recurso do e-mail para impedir. Os truques conhecidos (desenho VML atrás do vermelho, preenchimento de texto do Word) não sobrevivem ao fluxo de abrir o `.eml` no Outlook e enviar: o Outlook regrava a mensagem ao enviar, e o desenho vira imagem (sem link e com largura fixa no celular). O modo escuro não muda o que é enviado: quem lê no modo claro vê as cores aprovadas. Documentado em `docs/EMULADOR.md`, com o botão do Outlook que mostra as cores originais.
+- Teste novo no motor: espaços do e-mail-resumo sem caractere (75).
+
 ## 4.12 · 2026-10-28 · Creative X trimestral, + Adicionar item, ordem das seções, link do report e modo escuro
 
 - **Creative X trimestral (sem tirar nada do mês):** blocos opcionais `[CREATIVE X TRIMESTRE]` (rótulo, título, leitura curta, estimativa) e `[CREATIVE X TRIMESTRE 1..3]` (como os números). Entram na mesma seção, abaixo do resultado do mês, depois de um filete fino, na mesma grade (3 colunas de 184 px; terços no celular). O mês ganha o rótulo "MENSAL · MÊS ANO" e o trimestral o seu ("TRIMESTRAL · …"), para separar os dois. A estimativa sai sempre com a etiqueta "Estimativa" (fixa no template): o que é modelo não se mistura ao que foi alcançado. `[CREATIVE X] nota`: linha pequena no fim da seção para as siglas (ex.: CQR, QSR) e a fonte. "29 p.p." não quebra no meio. Importação do Copilot, texto puro do `.eml`, modelo em branco, `MODELO.txt`, exemplo e Prompt 7 atualizados. No emulador: **Tirar trimestral** (sai com o rótulo MENSAL) e o bloco volta por **+ Adicionar item**.

@@ -7,7 +7,7 @@ Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas
 
 O time atualiza tudo no **emulador**: um arquivo só, que abre no Chrome ou no Edge, sem instalar nada.
 
-**Versão 4.12 (2026-10-28).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 4.12.1 (2026-10-29).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">

@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.12 (2026-10-28)";
+  var VERSAO = "4.12.1 (2026-10-29)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -1607,6 +1607,8 @@
     return !ps.length || ps.filter(function (w) { return t.indexOf(" " + w + " ") >= 0 || t.indexOf(" " + w.replace(/s$/, "") + " ") >= 0; }).length * 2 >= ps.length;
   }
 
+  /* Espaços entre colunas e entre tópicos: células vazias, sem &nbsp;. No modo escuro, o Outlook clássico para Windows
+     pinta o caractere invisível e aparecem quadrados entre os indicadores (4.12.1). */
   /* Cantos retos de propósito: ao enviar, o Outlook para Windows reescreve o e-mail e tira os cantos arredondados para
      todos que recebem. Assim a prévia do emulador mostra o que chega na caixa de entrada. */
   var RESUMO_TPL = [
@@ -1678,7 +1680,7 @@
     '    <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">PRINCIPAIS RESULTADOS</p>',
     '    {{#origem_unica}}<p class="fx dm-txt-texto" style="margin:4px 0 0 0;font-family:{{fx}};font-size:13px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};"><b>{{origem_unica}}</b></p>{{/origem_unica}}',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>',
-    '      {{#indicadores}}{{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}',
+    '      {{#indicadores}}{{^primeiro}}<td class="hide-m" width="24" style="width:24px;"></td>{{/primeiro}}',
     '      <td class="kpi dm-borda-{{dm_valor}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor_valor}};padding-top:12px;">',
     '        <p class="ft kpiv dm-txt-{{dm_valor}}" style="margin:0;font-family:{{ft}};font-size:30px;line-height:34px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>',
     '        <p class="fx dm-txt-texto" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>',
@@ -1694,7 +1696,7 @@
     '  <!-- NOVOS TÓPICOS (ex.: Testes): rótulo, título e os itens de cada um, sem link (o link do e-mail é o botão) -->',
     '  <tr><td class="px" style="padding:26px 40px 0 40px;">',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">',
-    '      {{#topicos}}{{^primeiro}}<tr><td height="18" style="height:18px;font-size:0;line-height:0;">&nbsp;</td></tr>{{/primeiro}}',
+    '      {{#topicos}}{{^primeiro}}<tr><td height="18" style="height:18px;"></td></tr>{{/primeiro}}',
     '      <tr><td class="dm-borda-texto" style="border-top:1px solid {{cor.texto}};padding-top:12px;">',
     '        <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">{{rotulo}}</p>',
     '        {{#titulo}}<p class="ft dm-txt-texto" style="margin:4px 0 0 0;font-family:{{ft}};font-size:17px;line-height:22px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>{{/titulo}}',
