@@ -149,6 +149,7 @@ O link fica gravado no report ao salvar: no mês seguinte, é só trocar. Teste 
 | "pode ficar borrada" | A imagem é menor que o espaço: peça a versão em alta |
 | "Link não aceito" | O endereço começa com `javascript:`, `data:` ou `vbscript:` (pode executar código) |
 | No Outlook: "Não conseguimos localizar 'C:\…\report-AAAA-MM.html'" | Confira se o report está nessa pasta, com esse nome (Copiar como caminho no arquivo e cole de novo). `.eml` gerado antes da 4.12 com acento no caminho: gere de novo. Outlook na Web, novo Outlook e celular não abrem link de arquivo: use o link de compartilhamento |
+| No Outlook: "O Outlook bloqueou o acesso a links para os arquivos de zona da Internet" | O botão do e-mail aponta para um caminho de arquivo (`C:\…`). O Outlook bloqueia link para arquivo no e-mail recebido, e esse caminho só existe no seu computador. Use o link do OneDrive: botão direito no `report-AAAA-MM.html` › Compartilhar › Copiar link; cole no passo 3 do emulador e gere o e-mail-resumo de novo |
 | No modo escuro, o Outlook mudou as cores do e-mail | No Outlook.com, no novo Outlook, no Apple Mail e nos apps do celular, o e-mail-resumo mantém as cores aprovadas. No Outlook clássico para Windows, as cores do modo escuro são escolhidas pelo próprio Outlook: use o botão de sol/lua da mensagem ("Mudar fundo") para ver como foi enviado |
 | Fechei sem salvar | Abra o emulador: **Recuperar a edição** |
 | Não acho o arquivo salvo | Downloads ou a pasta escolhida; pesquise `report-` no Explorador |

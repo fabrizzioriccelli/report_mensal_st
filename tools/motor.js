@@ -287,19 +287,19 @@
     else if (/^[a-z][a-z0-9+.-]*:/i.test(s) && !/^[^:]+:\d+(\/|$)/.test(s)) { url = espacos(s); tipo = "outro"; }
     else if (/^www\./i.test(s) || /^[\w-]+:\d+/.test(s) || (/^[\w-]+(\.[\w-]+)*\.[a-z]{2,24}(:\d+)?([\/?#]|$)/i.test(s) && !/^[^\/?#]*\.(html?|pdf|eml|msg|txt|csv|png|jpe?g|gif|svg|webp|mp4|zip|docx?|xlsx?|pptx?)([?#]|$)/i.test(s))) { url = "https://" + espacos(s); tipo = "web"; }
     else { url = espacos(s.replace(/\\/g, "/")); tipo = "relativo"; info = "Endereço relativo: abre a partir da pasta onde o report estiver publicado."; }
-    if (tipo === "arquivo") info = "Caminho de arquivo: abre onde esse arquivo existe (neste computador, ou para quem tem a mesma pasta sincronizada ou de rede).";
+    if (tipo === "arquivo") info = "Caminho de arquivo: abre onde esse arquivo existe (neste computador, ou na mesma pasta de rede). No e-mail recebido, o Outlook pode bloquear link para arquivo: para quem recebe, prefira o link de compartilhamento (https://…).";
     return { url: url, tipo: tipo, avisos: [], info: info, erro: "" };
   }
 
   /* Link do report completo (o botão do e-mail-resumo e a meta "report-completo"): vale qualquer link, como nos itens:
      o link de compartilhamento (https://…) ou o caminho do arquivo (C:\…, \\servidor\…, file:///…, ex.: a pasta do OneDrive
      no computador), que vai para o botão no formato que o Outlook abre (normalizarLink). Só o que executa código é recusado.
-     A nota (info) diz onde o caminho de arquivo abre; sem link, o e-mail-resumo não sai (nunca um botão vazio). Nada é
+     A nota (info) avisa que o caminho de arquivo não abre no e-mail recebido (o Outlook bloqueia; 4.12.1); sem link, o e-mail-resumo não sai (nunca um botão vazio). Nada é
      publicado por aqui: o report fica onde a pessoa salvou ou publicou. */
   function linkDoReport(entrada) {
     var nl = normalizarLink(entrada);
     return { url: nl.erro ? "" : nl.url, erro: nl.erro ? "não é permitido (pode executar código)." : "", tipo: nl.tipo,
-      info: nl.tipo === "arquivo" ? "Caminho de arquivo: o botão do e-mail abre o report onde esse arquivo existe (neste computador, ou para quem tem a mesma pasta sincronizada ou de rede). O Outlook na Web, o novo Outlook e o celular não abrem link de arquivo: para eles, use o link de compartilhamento (https://…)." :
+      info: nl.tipo === "arquivo" ? "Caminho de arquivo: no e-mail recebido, o Outlook para Windows bloqueia esse link (aviso \"O Outlook bloqueou o acesso a links para os arquivos de zona da Internet\"), e um caminho C:\\… só existe no seu computador. O Outlook na Web, o novo Outlook e o celular também não abrem link de arquivo. Para quem recebe, use o link do OneDrive: botão direito no arquivo › Compartilhar › Copiar link (https://…)." :
         nl.tipo === "relativo" ? "Endereço relativo: no e-mail, só o nome do arquivo não abre o report. Cole o caminho completo (C:\\…) ou o link de compartilhamento (https://…)." : "" };
   }
 

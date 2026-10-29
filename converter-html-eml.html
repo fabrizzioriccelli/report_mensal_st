@@ -225,7 +225,7 @@
   <!-- 3 · LINK -->
   <section aria-labelledby="s3" id="secLink" hidden>
     <h2 id="s3"><b>3</b>Link do report completo</h2>
-    <p class="muted">O botão do e-mail-resumo leva quem lê ao report completo (o arquivo salvo no passo 2). Vale <b>qualquer link</b>: o <b>caminho do arquivo</b> (<code>C:\…</code>, como a pasta do OneDrive no computador, <code>\\servidor\…</code> ou <code>file:///…</code>) ou o link de compartilhamento (<code>https://…</code>; só <code>empresa.sharepoint.com/…</code> também vale e ganha o <code>https://</code>). Caminho com espaço e acento funciona: o botão vai no formato que o Outlook abre. O caminho de arquivo abre onde o arquivo existe (no seu computador, ou para quem tem a mesma pasta sincronizada ou de rede); o Outlook na Web, o novo Outlook e o celular não abrem link de arquivo. Só endereço que executa código (<code>javascript:</code>) é recusado. Sem link, o e-mail-resumo não sai (nada de botão vazio).</p>
+    <p class="muted">O botão do e-mail-resumo leva quem lê ao report completo (o arquivo salvo no passo 2). Vale <b>qualquer link</b>: o <b>caminho do arquivo</b> (<code>C:\…</code>, como a pasta do OneDrive no computador, <code>\\servidor\…</code> ou <code>file:///…</code>) ou o link de compartilhamento (<code>https://…</code>; só <code>empresa.sharepoint.com/…</code> também vale e ganha o <code>https://</code>). Para quem recebe, use o <b>link do OneDrive</b> (botão direito no arquivo › Compartilhar › Copiar link): no e-mail recebido, o Outlook para Windows bloqueia link para arquivo ("O Outlook bloqueou o acesso a links para os arquivos de zona da Internet"), um caminho <code>C:\…</code> só existe no seu computador, e o Outlook na Web, o novo Outlook e o celular não abrem link de arquivo. Só endereço que executa código (<code>javascript:</code>) é recusado. Sem link, o e-mail-resumo não sai (nada de botão vazio).</p>
     <div class="campo">
       <label for="link">Link do report completo</label>
       <input type="text" id="link" inputmode="url" placeholder="qualquer link: C:\…\report-AAAA-MM.html  ·  https://…" autocomplete="off" aria-describedby="linkInfo">
@@ -2462,7 +2462,7 @@
       if (res.pendencias.length > 6) itens.push({ t: "E mais " + (res.pendencias.length - 6) + " texto(s) do modelo no report.", aviso: true });
       if (lk.erro) resErro = "O link do report completo (passo 3) " + lk.erro;
       else if (!link) resErro = "Falta o link do report completo (passo 3).";
-      if (linkOk && lk.tipo === "arquivo") itens.push("Link: caminho de arquivo. Abre no Outlook para Windows de quem tem esse arquivo (ou a mesma pasta); para os outros, use o link de compartilhamento.");
+      if (linkOk && lk.tipo === "arquivo") itens.push({ t: "Link: caminho de arquivo. No e-mail recebido, o Outlook bloqueia esse link (e um caminho C:\\… só existe no seu computador). Para quem recebe, cole o link do OneDrive: botão direito no arquivo › Compartilhar › Copiar link.", aviso: true, ir: irPara("#link"), ciente: "arq|" + link });
       if (linkOk && lk.tipo === "relativo") itens.push({ t: "Link: só o nome do arquivo não abre no e-mail. Cole o caminho completo (C:\\…) ou o link de compartilhamento.", aviso: true, ir: irPara("#link"), ciente: "rel|" + link });
       if (!resErro && !res.temLink) resErro = "O botão ficou sem o link: confira o endereço no passo 3.";
       var abR = abertos(itens); if (abR.length) avisos.push("resumo");

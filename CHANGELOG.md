@@ -2,10 +2,11 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
-## 4.12.1 · 2026-10-29 · E-mail-resumo: sem quadrados no Outlook clássico (modo escuro)
+## 4.12.1 · 2026-10-29 · E-mail-resumo: sem quadrados no Outlook clássico (modo escuro) e aviso do link de arquivo
 
 - **Quadrados entre os indicadores:** no Outlook clássico para Windows com o modo escuro ligado, apareciam quadrados entre os indicadores do e-mail-resumo, na altura da linha de detalhe. Os espaços entre as colunas (e entre os tópicos) eram células com um caractere invisível (`&nbsp;`) e letra tamanho 0, e o Outlook pinta esse caractere. Agora são células vazias, com a mesma largura: o modo claro não muda.
 - **Cores no Outlook clássico (modo escuro):** continuam a cargo do Outlook. Ele recolore o e-mail na tela de quem lê (vermelho mais claro, texto do cabeçalho escuro, texto do botão rosado) e não aceita nenhum recurso do e-mail para impedir. Os truques conhecidos (desenho VML atrás do vermelho, preenchimento de texto do Word) não sobrevivem ao fluxo de abrir o `.eml` no Outlook e enviar: o Outlook regrava a mensagem ao enviar, e o desenho vira imagem (sem link e com largura fixa no celular). O modo escuro não muda o que é enviado: quem lê no modo claro vê as cores aprovadas. Documentado em `docs/EMULADOR.md`, com o botão do Outlook que mostra as cores originais.
+- **Link do report como caminho de arquivo:** no e-mail recebido, o Outlook para Windows bloqueia o botão ("O Outlook bloqueou o acesso a links para os arquivos de zona da Internet", proteção do próprio Outlook), e um caminho `C:\…` só existe no computador de quem fez. O caminho continua aceito, mas a nota do campo e um aviso no passo 4 ("Ok, ciente", não trava o `.eml`) dizem isso e indicam o link do OneDrive (botão direito no arquivo › Compartilhar › Copiar link). Documentação e solução de problemas atualizadas.
 - Teste novo no motor: espaços do e-mail-resumo sem caractere (75).
 
 ## 4.12 · 2026-10-28 · Creative X trimestral, + Adicionar item, ordem das seções, link do report e modo escuro

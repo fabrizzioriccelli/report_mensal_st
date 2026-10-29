@@ -646,6 +646,7 @@ teste("linkDoReport (botão do e-mail-resumo): qualquer link; caminho do Windows
   assert.deepStrictEqual([od.url, od.tipo, od.erro], ["file:///C:/Users/t000000/OneDrive%20-%20Empresa/Report%20PF/Produção/Outubro_26/HTML/report-2026-10.html", "arquivo", ""]);
   assert.strictEqual(decodeURIComponent(new URL(od.url).pathname), "/C:/Users/t000000/OneDrive - Empresa/Report PF/Produção/Outubro_26/HTML/report-2026-10.html", "volta ao caminho colado");
   assert.ok(/Caminho de arquivo/.test(od.info) && /novo Outlook/.test(od.info), "nota (não erro) sobre onde abre");
+  assert.ok(/Outlook para Windows bloqueia/.test(od.info) && /zona da Internet/.test(od.info) && /Copiar link/.test(od.info), "a nota diz que o Outlook bloqueia no e-mail recebido e indica o link do OneDrive (4.12.1)");
   assert.strictEqual(L("file:///C:/Users/x/Produ%C3%A7%C3%A3o/report%202026.html").url, "file:///C:/Users/x/Produção/report%202026.html", "endereço copiado do navegador: acento volta a ser letra");
   assert.strictEqual(L("\\\\servidor\\área\\report.html").url, "file://servidor/área/report.html");
   assert.strictEqual(L("C:\\Pasta\\Relatório #1 [v2] 100%.html").url, "file:///C:/Pasta/Relatório%20%231%20%5Bv2%5D%20100%25.html");

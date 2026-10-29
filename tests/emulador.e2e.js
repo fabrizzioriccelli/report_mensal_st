@@ -263,6 +263,10 @@ function salvarComo() {
   confere(hrefRes === "file:///C:/Users/t000000/OneDrive%20-%20Empresa/Report%20PF/Produção/Outubro_26/HTML/report-2099-01.html" && /Caminho de arquivo/.test(infoRes) && !/Não dá para usar/.test(infoRes),
     "caminho do Windows (OneDrive, com espaço e acento) aceito: botão com file:/// no formato do Outlook, nota no campo · " + hrefRes);
   confere(decodeURIComponent(new URL(hrefRes).pathname) === "/C:/Users/t000000/OneDrive - Empresa/Report PF/Produção/Outubro_26/HTML/report-2099-01.html", "o endereço do botão volta exatamente ao caminho colado");
+  /* 4.12.1: no e-mail recebido, o Outlook bloqueia link para arquivo. O passo 4 avisa (com "Ok, ciente") e indica o link do
+     OneDrive, sem travar o .eml */
+  var etArq = await p.$eval("#et-resumir", function (e) { return { t: e.textContent, ciente: !!Array.prototype.filter.call(e.querySelectorAll("button"), function (b) { return /Ok, ciente/.test(b.textContent); }).length }; });
+  confere(/o Outlook bloqueia esse link/.test(etArq.t) && /Copiar link/.test(etArq.t) && etArq.ciente && !(await p.$eval("#bEmlRes", function (b) { return b.disabled; })), "caminho de arquivo: aviso de que o Outlook bloqueia no e-mail recebido, com o link do OneDrive e \"Ok, ciente\" (o .eml continua liberado)");
   /* o link do .eml abre o arquivo de verdade: o report salvo numa pasta com espaço e acento, o endereço copiado da barra do
      navegador (com %C3%A7…), o .eml baixado e o link de dentro dele aberto no navegador */
   /* (pasta temporária fora do projeto: a página de geração lê a pasta do projeto inteira nos outros testes) */
