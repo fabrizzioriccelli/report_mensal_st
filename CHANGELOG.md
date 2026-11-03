@@ -12,6 +12,8 @@ A versão atual aparece na página `gerar-report.html`, no topo de `report_backu
 - **Layout novo dos destaques:** cartões em dois por linha (com número ímpar, o primeiro ocupa a largura toda), fundo Lisboa, etiqueta com o nome curto da campanha, chamada final num painel Rio. Sem VML; imagens dentro do `.eml`; modo escuro protegido como na 4.12.
 - **Imagem do resumo (.png):** "Baixar imagem do resumo (.png)" no passo 6: uma foto do e-mail-resumo no dobro da largura (1360 px), para prévia ou para usar junto. O `.eml` continua sendo o e-mail.
 - **O report continua sendo a fonte:** valores dos destaques vêm sempre da página (mudar um número no report muda o e-mail). A escolha do e-mail fica gravada no report salvo num bloco de dados à parte (`<script type="application/json" id="resumo-email">`), que não muda o conteúdo da página e não vai para nenhum dos dois e-mails.
+- **Barra do item visível em item alto:** com o começo do item já acima da tela (ex.: o destaque no modo Celular), a barra dele ficava embaixo da barra de ferramentas do emulador, presa no alto da janela, e sumia ao ir até ela. Agora fica logo abaixo da barra do emulador, dentro do item (era a falha intermitente de `tests/barras.e2e.js`).
+- **Painel de destaques no celular:** a lista "+ Imagem do report…" não passa mais da largura do cartão com nomes de peça longos.
 - Modelo em branco, `dados/MODELO.txt`, `dados/CORINGA.txt` e o emulador avulso do kit gerados de novo.
 - Testes: `tests/resumo.e2e.js` (novo), `tests/aprendizado.e2e.js` (novo), motor com o aprendizado e os destaques (77), `tests/escuro.e2e.js` com os destaques escolhidos, `tests/emulador.e2e.js`, `tests/leveza.e2e.js` e `tests/emulador-extras.e2e.js` na tela nova.
 
