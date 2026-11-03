@@ -66,7 +66,7 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 | Creative X do trimestre | No mês que fecha o trimestre: o bloco trimestral fica abaixo do resultado do mês (até 3 indicadores, leitura curta e a estimativa, sempre marcada como estimativa). Nos outros meses: passo o mouse no bloco › **Tirar trimestral**. Para trazer de volta: **+ Adicionar item › Indicador › Creative X: indicadores do trimestre** |
 | O que aprendemos numa campanha | Passo o mouse nos números do projeto principal, nos resultados do destaque ou no card do lançamento › **+ O que aprendemos** e escrevo uma ou duas frases: o que fizemos, o que vimos e o que fazemos melhor. Pelo Copilot: campo `aprendizado` no bloco da campanha |
 | Tirar um item sem dado | Passo o mouse no item › **Tirar item** (canto de cima, à direita). A grade se ajusta. Nunca deixo o número do mês anterior nem escrevo 0 |
-| Tirar uma seção inteira | **Seções do report** › desmarco a seção. A numeração se ajusta |
+| Tirar uma seção inteira | Passo o mouse na seção › **Tirar seção** (na alça, ao lado de **⠿ Mover seção**), ou **Seções do report** › desmarco a seção. Pela importação do Copilot: bloco `[SECOES]` com `tirar: O que aprendemos` (o nome como aparece em Seções do report). A numeração se ajusta; **Desfazer** traz de volta |
 | Voltar atrás | **Desfazer** (imagem, link, cor, item, item novo, ordem); **Ctrl+Z** (texto) |
 
 `%` é variação relativa (+30%); `p.p.` é diferença entre duas porcentagens (de 40% para 52% = +12 p.p.). Não troque um pelo outro.

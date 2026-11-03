@@ -241,7 +241,7 @@
       <div class="row"><button type="button" class="pri" id="bAplicar">Aplicar na página</button><button type="button" id="bFecharImportar">Fechar</button><span class="muted" id="importarInfo"></span></div>
     </div>
     <details>
-      <summary>Seções do report (ordem, mostrar, ocultar ou criar um tópico novo)</summary>
+      <summary>Seções do report (ordem, mostrar, tirar ou criar um tópico novo)</summary>
       <div class="lista" id="secoesRep"></div>
     </details>
     <div class="previaItem" id="previaItem" role="status" aria-live="polite" hidden><span id="previaTxt"></span><span class="botoes"><button type="button" class="pri" id="previaOk">Confirmar</button><button type="button" id="previaAjustar">Voltar e ajustar</button><button type="button" id="previaCancela">Cancelar</button></span></div>
@@ -2355,7 +2355,7 @@
     IMPORTA_LISTA[t[0]] = [t[1], ["status", "nome", "texto", "valor"]];
   });
   function importarDados(texto) {
-    var lido = ler(texto, "conteúdo colado"), campos = {}, problemas = lido.problemas.slice(), n = 0;
+    var lido = ler(texto, "conteúdo colado"), campos = {}, problemas = lido.problemas.slice(), n = 0, secoes = { tirar: [], mostrar: [] };
     function poe(chave, valor, tipo, tom) { campos[chave] = { texto: valor, tipo: tipo || "texto", tom: tom || "" }; n++; }
     lido.ordem.forEach(function (k) {
       var b = lido.blocos[k], m = k.match(/^(.*?)\s+(\d+)$/), base = m ? m[1] : k, idx = m ? m[2] : "";
@@ -2364,6 +2364,12 @@
         if (v.mes && v.ano) poe("periodo", maiusculas(v.mes + " " + v.ano));
         if (v.proximo_mes) { poe("foco.mes", maiusculas(v.proximo_mes)); poe("ate", "Até " + v.proximo_mes.toLocaleLowerCase("pt-BR") + "."); }
         if (v.contato) poe("contato", v.contato);
+        return;
+      }
+      /* [SECOES] tirar: O que aprendemos, Também vem aí · mostrar: … (4.13): seções que a página tira ou volta a mostrar,
+         pelo nome que aparece em "Seções do report". Quem aplica é o emulador. */
+      if ((base === "SECOES" || base === "SEÇÕES") && !idx) {
+        ["tirar", "mostrar"].forEach(function (c) { if (v[c]) String(v[c]).split(/\s*[,;|]\s*/).forEach(function (nome) { if (nome.trim()) secoes[c].push(nome.trim()); }); });
         return;
       }
       var mapa = !idx ? IMPORTA[base] : null, lista = idx ? IMPORTA_LISTA[base] : null;
@@ -2386,7 +2392,7 @@
         else poe(chave, val);
       });
     });
-    return { campos: campos, lidos: n, problemas: problemas };
+    return { campos: campos, lidos: n, problemas: problemas, secoes: secoes };
   }
   /* Nome de arquivo sugerido para a página editada, a partir do período (ex.: "OUTUBRO 2026"). */
   function nomeDoReport(periodo) {
@@ -2513,7 +2519,7 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
     ".ed-mais button:hover{background:#FFF1F1}.ed-mais button[disabled]{color:#767676;border-color:#BBBBBB;cursor:default;background:#FFFFFF}" +
     "#ed-secao{position:absolute;z-index:98;display:flex;gap:4px;font:700 12px/1 Arial,sans-serif}#ed-secao[hidden]{display:none !important}" +
     "#ed-secao button{all:unset;background:#222;color:#fff;border-radius:999px;padding:6px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);font:700 12px/1 Arial,sans-serif}" +
-    "#ed-secao button.pega{cursor:grab;touch-action:none;background:#EC0000}#ed-secao button[disabled]{opacity:.35;cursor:default}#ed-secao button:focus-visible{outline:2px solid #EC0000;outline-offset:2px}" +
+    "#ed-secao button.pega{cursor:grab;touch-action:none;background:#EC0000}#ed-secao button.tira{background:#5F5F5F}#ed-secao button[disabled]{opacity:.35;cursor:default}#ed-secao button:focus-visible{outline:2px solid #EC0000;outline-offset:2px}" +
     "#ed-solta{position:absolute;top:0;height:4px;background:#EC0000;border-radius:2px;z-index:100;pointer-events:none;box-shadow:0 0 0 3px rgba(236,0,0,.18);margin-top:18px}" +
     "#ed-solta span{position:absolute;left:0;top:-11px;background:#EC0000;color:#fff;font:700 12px/1 Arial,sans-serif;padding:6px 10px;border-radius:999px;white-space:nowrap}" +
     "#ed-solta.mesmo{background:#767676;box-shadow:none}#ed-solta.mesmo span{background:#767676}" +
@@ -3818,7 +3824,7 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
   }
   function ligarAlcaSecoes(d) {
     var alca = d.createElement("div"); alca.id = "ed-secao"; alca.setAttribute("data-editor", ""); alca.setAttribute("contenteditable", "false"); alca.hidden = true;
-    alca.innerHTML = '<button type="button" class="pega" title="Arraste para mudar a seção de lugar">&#10303; Mover seção</button><button type="button" data-a="sobe" title="Subir a seção" aria-label="Subir a seção">&#8593;</button><button type="button" data-a="desce" title="Descer a seção" aria-label="Descer a seção">&#8595;</button><button type="button" data-a="pos">Posição…</button>';
+    alca.innerHTML = '<button type="button" class="pega" title="Arraste para mudar a seção de lugar">&#10303; Mover seção</button><button type="button" data-a="sobe" title="Subir a seção" aria-label="Subir a seção">&#8593;</button><button type="button" data-a="desce" title="Descer a seção" aria-label="Descer a seção">&#8595;</button><button type="button" data-a="pos">Posição…</button><button type="button" data-a="tira" class="tira" title="Tirar a seção do report (Desfazer ou Seções do report trazem de volta)">Tirar seção</button>';
     d.body.appendChild(alca);
     var atual = "";
     /* a largura do quadro mudou (Computador/Celular): a alça sai; volta no próximo passar do mouse, já no lugar certo */
@@ -3849,6 +3855,7 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
       if (b.dataset.a === "sobe" && i > 0) moverSecaoComAviso(id, ids[i - 1], true);
       else if (b.dataset.a === "desce" && i < ids.length - 1) moverSecaoComAviso(id, ids[i + 2] || null, true);
       else if (b.dataset.a === "pos") escolherPosicaoSecao(id);
+      else if (b.dataset.a === "tira") tirarSecao(id);
     });
     var arrasto = null;
     alca.querySelector(".pega").addEventListener("pointerdown", function (e) {
@@ -3952,6 +3959,29 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
     } else { (ED.ocultas[id] || []).forEach(function (n) { n.removeAttribute("data-ed-oculta"); n.style.display = ""; }); delete ED.ocultas[id]; }
     renumerarPilulas();
     if (!quieto) marcarSujo(mostrar ? "Seção à mostra: " + nomeSec(id) + "." : "Seção oculta: " + nomeSec(id) + " (não vai no arquivo salvo).");
+  }
+  /* Tirar uma seção (alça "Tirar seção" ou [SECOES] tirar: na importação): sai do arquivo salvo; o Desfazer devolve. */
+  function tirarSecao(id) {
+    if (ED.ocultas[id]) return false;
+    mostrarSecao(id, false, true);
+    pilha(function () { mostrarSecao(id, true, true); montarSecoes(); });
+    montarSecoes();
+    marcarSujo("Seção tirada: " + nomeSec(id) + ". Para trazer de volta: Desfazer, ou marque em Seções do report.");
+    return true;
+  }
+  function voltarSecao(id) {
+    if (!ED.ocultas[id]) return false;
+    mostrarSecao(id, true, true);
+    pilha(function () { mostrarSecao(id, false, true); montarSecoes(); });
+    montarSecoes();
+    return true;
+  }
+  /* Seção pelo nome que aparece em "Seções do report" (sem diferença de acento e maiúscula), ou pelo id. */
+  function secaoPeloNome(nome) {
+    function n(t) { return String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/^topico:\s*/, "").replace(/\s+/g, " ").trim(); }
+    var alvo = n(nome), ids = secoesMoveis();
+    return ids.filter(function (id) { return n(nomeSec(id)) === alvo || id === alvo; })[0] ||
+      ids.filter(function (id) { return alvo.length >= 5 && n(nomeSec(id)).indexOf(alvo) === 0; })[0] || "";
   }
   /* Troca o id de um tópico nas chaves (topicoc-2.nome → topicob-2.nome) e na marca da seção. */
   function trocarChaves(raiz, de, para) {
@@ -4293,10 +4323,16 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
   $("#bFecharImportar").addEventListener("click", function () { $("#painelImportar").hidden = true; });
   $("#bAplicar").addEventListener("click", function () {
     var r = Motor.importarDados($("#txtImportar").value), a = aplicarCampos(r.campos), feitos = a.feitos, faltam = a.faltam;
+    /* [SECOES] tirar / mostrar */
+    var tiradas = [], voltaram = [], semSecao = [], sc = r.secoes || { tirar: [], mostrar: [] };
+    sc.tirar.forEach(function (nome) { var id = secaoPeloNome(nome); if (!id) semSecao.push(nome); else if (tirarSecao(id)) tiradas.push(nomeSec(id)); });
+    sc.mostrar.forEach(function (nome) { var id = secaoPeloNome(nome); if (!id) semSecao.push(nome); else if (voltarSecao(id)) voltaram.push(nomeSec(id)); });
     var msg = feitos.length + " campo(s) preenchido(s)." + (faltam.length ? " Não existem nesta página (ficaram de fora): " + faltam.join(", ") + "." : "") +
+      (tiradas.length ? " Seção tirada: " + tiradas.join(", ") + " (Desfazer traz de volta)." : "") + (voltaram.length ? " Seção de volta: " + voltaram.join(", ") + "." : "") +
+      (semSecao.length ? " Seção não encontrada: " + semSecao.join(", ") + " (veja os nomes em Seções do report)." : "") +
       (r.problemas.length ? " Observações: " + r.problemas.map(function (p) { return p.msg; }).join(" ") : "");
     $("#importarInfo").textContent = msg; log("Importação: " + msg);
-    if (feitos.length) marcarSujo();
+    if (feitos.length || tiradas.length || voltaram.length) marcarSujo();
   });
   /* Campos no formato do Motor.importarDados ({ chave: { texto, tipo, tom } }) aplicados na página (importar e "+ Adicionar item"). */
   function aplicarCampos(campos) {

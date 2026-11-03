@@ -240,6 +240,15 @@ function salvarComo() {
   await alca("foco");
   await noQuadro(p, function (d) { d.querySelector('#ed-secao button[data-a="sobe"]').click(); }); await p.waitForTimeout(200);
   confere(/,foco,aprendizados,/.test(await ordem(p)), "↑ na alça: Foco sobe uma posição · " + await ordem(p));
+  /* "Tirar seção" na alça (4.13): a seção sai (e fica desmarcada em Seções do report); o Desfazer devolve */
+  function agendaOculta(d) { var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:agenda") { var e = n.nextSibling; while (e.nodeType !== 1) e = e.nextSibling; return e.hasAttribute("data-ed-oculta"); } return null; }
+  var aT = await alca("agenda");
+  var temTira = await noQuadro(p, function (d) { var b = d.querySelector('#ed-secao button[data-a="tira"]'); return !!b && b.textContent; });
+  await noQuadro(p, function (d) { d.querySelector('#ed-secao button[data-a="tira"]').click(); }); await p.waitForTimeout(250);
+  var ocT = await noQuadro(p, agendaOculta), mkT = await p.$eval('#secoesRep input[value="agenda"]', function (e) { return e.checked; });
+  confere(aT && temTira === "Tirar seção" && ocT === true && !mkT, "\"Tirar seção\" na alça: Também vem aí sai da página e fica desmarcada em Seções do report");
+  await p.click("#bDesfazer"); await p.waitForTimeout(200);
+  confere(await noQuadro(p, agendaOculta) === false && await p.$eval('#secoesRep input[value="agenda"]', function (e) { return e.checked; }), "Desfazer: a seção tirada volta");
 
   /* ================= 4. salvar, reabrir, e-mail e celular ================= */
   fase = "salvar";

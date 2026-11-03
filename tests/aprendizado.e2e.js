@@ -93,6 +93,21 @@ function salvarComo() {
   confere(porChave["destaque.aprendizado"] && porChave["destaque.aprendizado"].antesDaNota && /ensinou algo,em duas linhas/.test(porChave["destaque.aprendizado"].texto), "destaque: bloco abaixo dos resultados e antes da nota (com a quebra de linha)");
   confere(porChave["lancamento-1.aprendizado"] && porChave["lancamento-1.aprendizado"].texto === "Card atualizado pela importação.", "lançamento: o bloco que já existia foi preenchido (sem duplicar)");
 
+  /* 3b. [SECOES] na importação (4.13): tira a seção geral "O que aprendemos"; nome que não existe é avisado; Desfazer devolve */
+  function secaoAprendizados(d) {
+    var w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n, out = [];
+    while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:aprendizados") { for (var e = n.nextSibling; e && !(e.nodeType === 8 && /^secao:/.test(e.nodeValue.trim())); e = e.nextSibling) if (e.nodeType === 1) out.push(e.hasAttribute("data-ed-oculta")); }
+    return out;
+  }
+  await p.fill("#txtImportar", "[SECOES]\ntirar: o que aprendemos, Seção que não existe\n");
+  await p.click("#bAplicar"); await p.waitForTimeout(500);
+  var infoS = await p.$eval("#importarInfo", function (e) { return e.textContent; }), sa = await q(p, secaoAprendizados);
+  var marcada = await p.$eval('#secoesRep input[value="aprendizados"]', function (e) { return e.checked; });
+  confere(sa.length > 0 && sa.every(Boolean) && !marcada && /Seção tirada: O que aprendemos/.test(infoS) && /Seção não encontrada: Seção que não existe/.test(infoS), "[SECOES] tirar: a seção geral sai da página (e de Seções do report); nome errado é avisado · " + infoS);
+  await p.click("#bFecharImportar").catch(function () {}); await p.mouse.move(2, 2); await p.click("#bDesfazer"); await p.waitForTimeout(300);
+  sa = await q(p, secaoAprendizados);
+  confere(sa.length > 0 && !sa.some(Boolean) && await p.$eval('#secoesRep input[value="aprendizados"]', function (e) { return e.checked; }), "Desfazer: a seção volta");
+
   /* 4. tirar e desfazer */
   var bd = await barra(p, '[data-apr="destaque.aprendizado"] p');
   confere(bd.botoes.join("|") === "Tirar aprendizado", "barra do próprio bloco: Tirar aprendizado · " + bd.botoes.join(" | "));

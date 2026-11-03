@@ -795,6 +795,14 @@ teste("importarDados: resposta do Copilot (blocos do arquivo de dados) vira camp
   assert.strictEqual(M.nomeDoReport("[MÊS] [ANO]"), "report.html");
 });
 
+teste("importarDados: [SECOES] tira ou mostra seções pelo nome (4.13), sem virar campo nem aviso", function () {
+  var r = M.importarDados("[SECOES]\ntirar: O que aprendemos, Também vem aí; Tópico: Testes\nmostrar: Creative X\n");
+  assert.deepStrictEqual(r.secoes, { tirar: ["O que aprendemos", "Também vem aí", "Tópico: Testes"], mostrar: ["Creative X"] });
+  assert.deepStrictEqual(M.importarDados("[SEÇÕES]\ntirar: Agenda\n").secoes, { tirar: ["Agenda"], mostrar: [] }, "com acento também");
+  assert.deepStrictEqual(Object.keys(r.campos), []); assert.deepStrictEqual(r.problemas, []);
+  assert.deepStrictEqual(M.importarDados("[PROJETO PRINCIPAL]\nresumo: Texto.\n").secoes, { tirar: [], mostrar: [] });
+});
+
 teste("importarDados: todos os blocos da biblioteca de prompts (docs/PROMPTS_COPILOT.md) são aceitos", function () {
   var doc = ler("docs/PROMPTS_COPILOT.md"), ref = /### Formato de blocos[\s\S]*?```text\n([\s\S]*?)```/.exec(doc)[1];
   var blocos = ref.split("\n").filter(Boolean).map(function (l) {

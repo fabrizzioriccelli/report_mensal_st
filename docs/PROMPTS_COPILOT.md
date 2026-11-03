@@ -48,6 +48,7 @@ O que a importação **não** faz: não traz imagens, links nem PDFs (esses são
 [TRANSFORMATION 1] a [3] status · status_cor · nome · texto · resultado
 [APRENDIZADO 1] a [3] titulo · texto · levamos
 [TOPICO]            rotulo · titulo · texto   ([TOPICO B], [TOPICO C], [TOPICO D]: outros tópicos novos)
+[SECOES]            tirar · mostrar   (nomes como em "Seções do report", separados por vírgula)
 [TOPICO 1] a [6]    status · status_cor · nome · texto · valor   ([TOPICO B 1]…)
 [FOCO]              prioridade · texto
 [AGENDA 1] a [6]    data · titulo · detalhe

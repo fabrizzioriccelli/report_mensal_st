@@ -1996,7 +1996,7 @@
     IMPORTA_LISTA[t[0]] = [t[1], ["status", "nome", "texto", "valor"]];
   });
   function importarDados(texto) {
-    var lido = ler(texto, "conteúdo colado"), campos = {}, problemas = lido.problemas.slice(), n = 0;
+    var lido = ler(texto, "conteúdo colado"), campos = {}, problemas = lido.problemas.slice(), n = 0, secoes = { tirar: [], mostrar: [] };
     function poe(chave, valor, tipo, tom) { campos[chave] = { texto: valor, tipo: tipo || "texto", tom: tom || "" }; n++; }
     lido.ordem.forEach(function (k) {
       var b = lido.blocos[k], m = k.match(/^(.*?)\s+(\d+)$/), base = m ? m[1] : k, idx = m ? m[2] : "";
@@ -2005,6 +2005,12 @@
         if (v.mes && v.ano) poe("periodo", maiusculas(v.mes + " " + v.ano));
         if (v.proximo_mes) { poe("foco.mes", maiusculas(v.proximo_mes)); poe("ate", "Até " + v.proximo_mes.toLocaleLowerCase("pt-BR") + "."); }
         if (v.contato) poe("contato", v.contato);
+        return;
+      }
+      /* [SECOES] tirar: O que aprendemos, Também vem aí · mostrar: … (4.13): seções que a página tira ou volta a mostrar,
+         pelo nome que aparece em "Seções do report". Quem aplica é o emulador. */
+      if ((base === "SECOES" || base === "SEÇÕES") && !idx) {
+        ["tirar", "mostrar"].forEach(function (c) { if (v[c]) String(v[c]).split(/\s*[,;|]\s*/).forEach(function (nome) { if (nome.trim()) secoes[c].push(nome.trim()); }); });
         return;
       }
       var mapa = !idx ? IMPORTA[base] : null, lista = idx ? IMPORTA_LISTA[base] : null;
@@ -2027,7 +2033,7 @@
         else poe(chave, val);
       });
     });
-    return { campos: campos, lidos: n, problemas: problemas };
+    return { campos: campos, lidos: n, problemas: problemas, secoes: secoes };
   }
   /* Nome de arquivo sugerido para a página editada, a partir do período (ex.: "OUTUBRO 2026"). */
   function nomeDoReport(periodo) {

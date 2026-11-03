@@ -80,7 +80,7 @@ Apague o bloco inteiro: do `[NOME DO BLOCO]` até a linha antes do próximo bloc
 Apague o bloco dela (`[LANCAMENTO 2]`, por exemplo). Se ela era o destaque, apague `[DESTAQUE]` e os `[RESULTADO …]`.
 
 ### Como esconder uma seção inteira?
-Apague todos os blocos dela. A seção some e a numeração das seções se ajusta (03 vira 02 e assim por diante).
+No emulador: passe o mouse na seção e clique em **Tirar seção** (na alça, ao lado de **⠿ Mover seção**), ou desmarque a seção em **Seções do report**. No texto do Copilot: um bloco `[SECOES]` com `tirar: O que aprendemos` (o nome como aparece em Seções do report; vários, separados por vírgula). A seção sai do arquivo salvo e a numeração se ajusta (03 vira 02 e assim por diante). **Desfazer** traz de volta. No arquivo de dados (caminho técnico): apague todos os blocos dela.
 
 ### Como duplicar um bloco?
 Copie o bloco, cole embaixo e troque o número (`[LANCAMENTO 3]`). Limites: 4 números, 3 resultados, 3 lançamentos, 3 Transformation, 3 aprendizados, 6 agenda.

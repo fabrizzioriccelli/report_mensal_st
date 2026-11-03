@@ -111,7 +111,7 @@ Sempre na mesma ordem:
 
 Testes (Node.js; os `e2e` também precisam do Playwright):
 
-- `node tests/motor.test.js`: motor (77 testes).
+- `node tests/motor.test.js`: motor (78 testes).
 - `node tests/resumo.e2e.js`: e-mail-resumo com destaques escolhidos (sugestão, ordem, título ajustado, informação nova com revisão, imagem do computador, capa de vídeo, link, número vindo do report, `.eml`, `.png`, salvar e reabrir, celular).
 - `node tests/aprendizado.e2e.js`: "O que aprendemos" dentro de cada campanha (criar pela barra, importar do Copilot, tirar e desfazer, salvar e reabrir, celular).
 - `node tests/assistente.e2e.js`: + Adicionar item (os 7 tipos, posição, prévia, Voltar e ajustar, Cancelar, campos obrigatórios, Creative X trimestral), mover itens e a ordem das seções (↑ ↓ Posição…, arrastar no painel e na página, Esc, rolagem automática), leveza do arrasto com a CPU 4× mais lenta, salvar, reabrir, e-mail-resumo e celular.
