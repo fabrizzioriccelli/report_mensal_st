@@ -132,12 +132,14 @@ function salvarComo() {
   var arq = path.join(SAIDA, "aprendizado-salvo.html"); fs.writeFileSync(arq, salvo.html);
   confere((salvo.html.match(/class="apr" data-apr="/g) || []).length === 3 && !/contenteditable|data-ed-/.test(salvo.html), "arquivo salvo: os 3 blocos, sem marcas do editor");
   confere(/data-campo="principal\.rotulo"[^>]*>CAMPANHA</.test(salvo.html) && salvo.html.indexOf('data-campo="numero-1.variacao"') < salvo.html.indexOf('data-campo="numero-1.titulo"') && /var-vazia/.test(salvo.html), "arquivo salvo: CAMPANHA e a ordem nova dos números");
+  confere(/max-width:700px/.test(salvo.html) && !/max-width:620px/.test(salvo.html), "arquivo salvo: o layout de celular vale até 700 px (de 621 a 700 px não rola para o lado)");
   var p2 = await abrir(arq), bl2 = await q(p2, blocos);
   confere(bl2.length === 3 && bl2.every(function (x) { return x.editavel; }), "reaberto: os 3 blocos voltam editáveis");
   var cel = await browser.newPage({ viewport: { width: 320, height: 800 } });
   await cel.goto("file://" + arq); await cel.waitForTimeout(500);
   var larg = await cel.evaluate(function () { return document.documentElement.scrollWidth; });
   confere(larg <= 320, "celular 320 px: sem rolagem para o lado (" + larg + " px)");
+  for (var wm of [640, 690]) { await cel.setViewportSize({ width: wm, height: 800 }); await cel.waitForTimeout(200); var lm = await cel.evaluate(function () { return document.documentElement.scrollWidth; }); confere(lm <= wm, wm + " px: sem rolagem para o lado (" + lm + " px)"); }
   await browser.close();
   confere(!erros.length, "sem erro na página" + (erros.length ? ": " + erros.join(" | ") : ""));
   console.log(falhas ? "\n" + falhas + " falha(s)." : "\nTudo certo.");

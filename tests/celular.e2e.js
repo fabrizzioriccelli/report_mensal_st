@@ -89,6 +89,17 @@ function resumo(lista) { return lista.length ? lista.length + " problema(s): " +
     await c.ctx.close();
   }
 
+  /* Entre o celular e o computador (621 a 700 px, ex.: celular deitado): nada rola para o lado (4.13; antes, de 621 a ~680 px rolava). */
+  for (var wm of [640, 690]) {
+    var cm = await celular(wm);
+    for (var am of [arqNormal, arqResumo]) {
+      await cm.p.goto("file://" + am); await cm.p.waitForTimeout(300); await revelar(cm.p);
+      var lm = await cm.p.evaluate(function () { return document.documentElement.scrollWidth; });
+      confere(lm <= wm, wm + " px · " + path.basename(am) + ": sem rolagem para o lado (" + lm + " px)");
+    }
+    await cm.ctx.close();
+  }
+
   /* Report antigo no emulador: celular de verdade (320 e 430) e computador no modo Celular. */
   var casos = [[320, true], [430, true], [1366, false]];
   for (var j = 0; j < casos.length; j++) {
@@ -99,7 +110,8 @@ function resumo(lista) { return lista.length ? lista.length + " problema(s): " +
     await p.goto(EMU); await p.setInputFiles("#arquivo", arqAntigo);
     await p.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 120000 });
     await p.fill("#link", "https://www.example.com/report"); await p.waitForTimeout(1800);
-    if (!movel) await p.click('.ferramentas button[data-ew="390px"]');
+    /* o quadro encolhe com transição: mede depois que ele chega aos 390 px (como uma pessoa vê) */
+    if (!movel) { await p.click('.ferramentas button[data-ew="390px"]'); await p.waitForFunction(function () { return document.querySelector("#edFrame").getBoundingClientRect().width <= 392; }, null, { timeout: 10000 }); await p.waitForTimeout(300); }
     var nomeCaso = movel ? cw + " px (celular)" : "computador no modo Celular";
     var pag = await p.evaluate("(" + medir.toString() + ")(document)");
     var ed = await p.evaluate("(" + medir.toString() + ")(document.querySelector('#edFrame').contentDocument)");

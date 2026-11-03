@@ -112,7 +112,7 @@
      vai sozinho para a linha de baixo, e um valor maior que a tela quebra no espaço. */
   var CSS_CELULAR = '<style id="ajuste-celular">\n' +
     '  .container td,.container p{overflow-wrap:anywhere;word-break:break-word;}\n' +
-    '  @media screen and (max-width:620px){\n' +
+    '  @media screen and (max-width:700px){\n' +
     '    .third,.half{width:auto !important;max-width:100% !important;}\n' +
     '    .third{min-width:32% !important;}\n' +
     '    .half{min-width:49% !important;}\n' +
@@ -1763,7 +1763,7 @@
     '  img{border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;}',
     '  a[x-apple-data-detectors]{color:inherit !important;text-decoration:none !important;}',
     '  .container td,.container p{overflow-wrap:anywhere;word-break:break-word;}',
-    '  @media screen and (max-width:620px){',
+    '  @media screen and (max-width:700px){',
     '    .container{width:100% !important;}',
     '    .kpiv{white-space:normal !important;}',
     '    .px{padding-left:20px !important;padding-right:20px !important;}',

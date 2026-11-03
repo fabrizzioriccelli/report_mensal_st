@@ -81,7 +81,7 @@ Por isso a fonte é uma **lista**, configurada num lugar só ([CORPORATE_SETUP.m
 
 ## Celular
 
-Uma regra `@media (max-width:620px)`:
+Uma regra `@media (max-width:700px)` (até a 4.12, 620 px; de 621 a 700 px a página rolava para o lado):
 
 - empilha as colunas (`col`);
 - coloca 3 números lado a lado, em terços (`third`), ou 4 em pares (`half`);

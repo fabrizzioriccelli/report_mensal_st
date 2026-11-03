@@ -539,6 +539,9 @@
       }
     }
     if (ordenarNumeros(d)) feito.push("nos números, a etiqueta colorida fica logo abaixo do número");
+    /* o layout de celular entra até 700 px (antes 620): de 621 a 700 px a página rolava para o lado (ex.: celular deitado) */
+    var bp = 0; Array.prototype.forEach.call(d.querySelectorAll("style"), function (st) { var t = st.textContent; if (/\(max-width:620px\)/.test(t)) { st.textContent = t.replace(/\(max-width:620px\)/g, "(max-width:700px)"); bp++; } });
+    if (bp) feito.push("o layout de celular vale também para telas de até 700 px");
     return feito;
   }
   /* Número → etiqueta → descritivo, em cada linha de números (capa, resultados do destaque, Creative X trimestral e
