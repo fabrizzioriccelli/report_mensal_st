@@ -2586,8 +2586,11 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
       $("#secEditar").hidden = false; $("#secLink").hidden = false; $("#secResumo").hidden = false; $("#secStatus").hidden = false;
       $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
       montarSecoes(); reconverter(true);
-      if (resumo) marcarSujo("A seção \"Resumo das campanhas\" saiu do report. Salve para gravar");
-      if (novo413.length) marcarSujo("Report atualizado para o formato novo: " + novo413.join("; ") + ". Salve para gravar");
+      /* avisos de quando o report de antes muda ao abrir: juntos, numa mensagem só (um não apaga o outro) */
+      var mudou = [];
+      if (resumo) mudou.push("A seção \"Resumo das campanhas\" saiu do report");
+      if (novo413.length) mudou.push("Report atualizado para o formato novo: " + novo413.join("; "));
+      if (mudou.length) marcarSujo(mudou.join(". ") + ". Salve para gravar");
       otimizarAoAbrir().then(function (o) {
         /* as originais pesadas trocadas pelas otimizadas não voltam (otimizar não entra no Desfazer): saem da memória */
         var antes = ED.vistas; ED.vistas = midiasNaPagina(); soltarSemUso(Array.from(antes || []).filter(function (u) { return !ED.vistas.has(u); }));
