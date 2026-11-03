@@ -79,6 +79,8 @@ previa: Lorem ipsum dolor sit amet: X% de lorem ipsum no mês.
 #  na página do navegador a peça abre maior; no e-mail, não clica.
 # ----------------------------------------------------------------------
 [PROJETO PRINCIPAL]
+# rotulo: o nome acima da campanha, na capa (padrão: CAMPANHA). Ex.: Campanha do mês, Porta de entrada.
+rotulo:
 nome: Lorem ipsum dolor
 resumo: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 # aprendizado (opcional, 4.13): "O que aprendemos" logo abaixo dos números.

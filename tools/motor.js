@@ -83,7 +83,7 @@
   var ESQUEMA_DADOS = [
     { bloco: "EDICAO", obrigatorio: true, campos: { mes: 1, ano: 1, proximo_mes: 1, pasta_imagens: 1, contato: 0, link_report_completo: 0 } },
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
-    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0, aprendizado: 0 }, PECA) },
+    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ rotulo: 0, nome: 1, resumo: 0, aprendizado: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
     { bloco: "LANCAMOS", campos: { titulo: 0 } },
     { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0, aprendizado: 0 }, PECA) },
@@ -605,6 +605,9 @@
       var s = semBr(v[campo]);
       if (s.length > max && !ehPendencia(s)) problema(prob, "aviso", arqD, v._linhas[campo], "[" + nomeBloco + "] " + campo + " com " + s.length + " caracteres (recomendado até " + max + "). Pode quebrar em mais linhas.");
     }
+    /* Números (4.13): número → etiqueta colorida → descritivo. Na linha em que algum número tem etiqueta, quem não tem
+       ganha um espaço do mesmo tamanho (var_reserva), para os descritivos ficarem alinhados. */
+    function reservar(lista, campo) { var algum = lista.some(function (x) { return cheio(x[campo]); }); lista.forEach(function (x) { x.var_reserva = algum && !cheio(x[campo]); }); return lista; }
     /* "O que aprendemos" da campanha: só sai com texto (nada de bloco vazio); uma ou duas frases curtas. */
     function aprendizado(v, nomeBloco, campo, variante) {
       if (!v || !v.aprendizado) return null;
@@ -652,8 +655,10 @@
     var sobra = nums.length && nums.length < 3 ? LARGURA - nums.length * COL - (nums.length - 1) * ESP : 0;
     var abertura = {
       n: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
+      /* rótulo acima do nome (4.13): "CAMPANHA" por padrão, editável (o do mês nem sempre é um "projeto principal") */
+      rotulo: texto(maiusculas(semBr(P.rotulo || "") || "Campanha")),
       nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp, aprendizado: aprendizado(P, "PROJETO PRINCIPAL", "principal.aprendizado", "capa"),
-      numeros: nums.map(function (v, i) {
+      numeros: reservar(nums.map(function (v, i) {
         curto(v, "valor", 11, "NUMERO " + (i + 1));
         return {
           valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "NUMERO " + (i + 1)),
@@ -662,7 +667,7 @@
           classe_m: nums.length === 3 ? "third" : "half",
           estilo: "padding:0 0 20px 0;"
         };
-      }),
+      }), "variacao"),
       sobra: sobra
     };
 
@@ -682,14 +687,14 @@
           categoria: seguro(marcarPendencias(categoria(DS.categoria).s)), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
           aprendizado: aprendizado(DS, "DESTAQUE", "destaque.aprendizado", "destaque"),
           largura_texto: textoDestaque, colunas: res.length * 3 - 2,
-          resultados: res.map(function (v, i) {
+          resultados: reservar(res.map(function (v, i) {
             /* No celular os resultados ficam em terços (~110 px): número longo (ex.: "R$ 1.234,56") invade a coluna ao lado. */
             curto(v, "valor", res.length === 3 ? 7 : 11, "RESULTADO " + (i + 1));
             return {
               idx: i + 1, valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)),
               largura: lr[i], primeiro: i === 0, estilo: "padding:14px 0 0 0;", classe_m: res.length === 3 ? "third" : "half"
             };
-          })
+          }), "variacao")
         } : null,
         /* Até 3: uma linha dividida igualmente. De 4 a 6: linhas de 3 colunas de 184 px (a última completa com espaço vazio). */
         linhas_compactos: (function () {
@@ -736,14 +741,14 @@
         cx.trimestre = {
           rotulo: texto(maiusculas(T.rotulo || "Trimestral")), titulo: texto(T.titulo), texto: texto(T.texto), estimativa: texto(T.estimativa),
           tem_indicadores: cxi.length > 0,
-          indicadores: cxi.map(function (v, i) {
+          indicadores: reservar(cxi.map(function (v, i) {
             var nb = "CREATIVE X TRIMESTRE " + (i + 1);
             curto(v, "valor", cxi.length === 3 ? 7 : 11, nb);
             return {
               idx: i + 1, valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, nb),
               largura: lt[i], primeiro: i === 0, classe_m: cxi.length === 3 ? "third" : "half"
             };
-          })
+          }), "variacao")
         };
       }
       cx.rotulo = texto(maiusculas(CX.rotulo || (cx.trimestre ? "Mensal · " + mes + " " + ano : "")));
@@ -885,7 +890,7 @@
           linhas.push({ itens: lin });
         }
         tpc.cartoes = { linhas: linhas };
-      } else tpc[lay] = { itens: itens };
+      } else tpc[lay] = { itens: lay === "numeros" ? reservar(itens, "status") : itens };
       return tpc;
     }).filter(Boolean);
 
@@ -944,7 +949,7 @@
     /* Links do report (para a lista de "testar antes de enviar") */
     var links = [];
     function regLink(onde, p) { if (p && p.link) links.push({ onde: onde, tipo: p.tipo, rotulo: CTA[p.tipo].texto, url: p.link }); }
-    regLink("Projeto principal · " + semBr(P.nome), pp);
+    regLink("Capa · " + semBr(P.nome), pp);
     if (lancamos) {
       if (lancamos.destaque) regLink("Destaque · " + semBr(DS.titulo), lancamos.destaque.peca);
       lanc.forEach(function (v, i) { regLink("Lançamento " + (i + 1) + " · " + semBr(v.nome), lancamos.linhas_compactos[Math.floor(i / 3)].itens[i % 3].peca); });
@@ -977,7 +982,7 @@
     var E = S.EDICAO;
     o.push("CREATIVE STRATEGY PF · REPORT MENSAL · " + maiusculas(E.mes + " " + E.ano), "");
     o.push(t(S.ABERTURA.frase + " " + S.ABERTURA.frase_final), "");
-    o.push("PROJETO PRINCIPAL: " + t(S["PROJETO PRINCIPAL"].nome), t(S["PROJETO PRINCIPAL"].resumo));
+    o.push(maiusculas(t(S["PROJETO PRINCIPAL"].rotulo || "") || "Campanha") + ": " + t(S["PROJETO PRINCIPAL"].nome), t(S["PROJETO PRINCIPAL"].resumo));
     (L.NUMERO || []).forEach(function (v) { o.push(num(v)); });
     function apr(v) { if (v && v.aprendizado) o.push("O que aprendemos: " + t(v.aprendizado)); }
     apr(S["PROJETO PRINCIPAL"]);
@@ -1379,7 +1384,7 @@
 
   /* Nome de cada seção (marcas <!--secao:nome--> do template) e as que o e-mail resumido leva. */
   var SECOES = {
-    capa: "Capa e números do projeto principal", lancamos: "O que lançamos", cx: "Creative X",
+    capa: "Capa (frase do mês, campanha e números)", lancamos: "O que lançamos", cx: "Creative X",
     transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês",
     agenda: "Também vem aí", rodape: "Encerramento e assinatura"
   };
@@ -1634,15 +1639,17 @@
     function add(x) { if (x.titulo || x.valor || x.texto) out.push(x); }
     /* na etiqueta do cartão, o nome curto da campanha: "Campanha Beta: frase do título" vira "Campanha Beta" */
     function nomeCurto(t) { var m = /^([^:]{2,32}):\s/.exec(String(t || "")); return m ? m[1].trim() : t; }
-    var nomeP = v("principal.nome") || "Projeto principal", nomeD = v("destaque.titulo");
+    var nomeP = v("principal.nome") || "Campanha", nomeD = v("destaque.titulo");
+    /* o rótulo da capa ("CAMPANHA", editável) dá nome à seção na lista do emulador e à etiqueta do cartão no e-mail */
+    var rotP = (function (r) { r = String(r || "").trim(); r = r ? r.toLocaleLowerCase("pt-BR") : "campanha"; return r.charAt(0).toLocaleUpperCase("pt-BR") + r.slice(1); })(v("principal.rotulo"));
     d.indicadores.forEach(function (n) {
-      var sec = n.grupo === "Destaque do mês" ? "Destaque" : n.grupo === "Projeto principal" ? "Projeto principal" : n.grupo;
+      var sec = n.grupo === "Destaque do mês" ? "Destaque" : n.grupo === "Projeto principal" ? rotP : n.grupo;
       add({ origem: n.chave, secao: sec, tipo: "indicador", valor: n.valor, titulo: n.titulo, texto: n.detalhe, etiqueta: n.variacao, tom: n.tom, grupo: n.grupo === "Destaque do mês" ? nomeCurto(n.origem) : n.origem,
-        figura: n.grupo === "Projeto principal" ? "principal" : n.grupo === "Destaque do mês" ? "destaque" : "" });
+        figura: n.grupo === "Projeto principal" ? "principal" : n.grupo === "Destaque do mês" ? "destaque" : "", capa: n.grupo === "Projeto principal" });
     });
     for (var i = 1; i <= 3; i++) if (v("cxt-" + i + ".valor")) add({ origem: "cxt-" + i, secao: "Creative X", tipo: "indicador", valor: v("cxt-" + i + ".valor"), titulo: v("cxt-" + i + ".titulo"), texto: v("cxt-" + i + ".detalhe"), etiqueta: v("cxt-" + i + ".variacao"), tom: tom["cxt-" + i + ".variacao"] || "", grupo: "Creative X trimestral", figura: "" });
-    if (c["principal.nome"]) add({ origem: "principal", secao: "Projeto principal", tipo: "texto", titulo: nomeP, texto: v("principal.resumo"), grupo: "Projeto principal", figura: fig.principal ? "principal" : "" });
-    if (v("principal.aprendizado")) add({ origem: "principal.aprendizado", secao: "Projeto principal", tipo: "texto", titulo: "O que aprendemos", texto: v("principal.aprendizado"), grupo: nomeP, aprendizado: true, figura: "" });
+    if (c["principal.nome"]) add({ origem: "principal", secao: rotP, capa: true, tipo: "texto", titulo: nomeP, texto: v("principal.resumo"), grupo: rotP, figura: fig.principal ? "principal" : "" });
+    if (v("principal.aprendizado")) add({ origem: "principal.aprendizado", secao: rotP, capa: true, tipo: "texto", titulo: "O que aprendemos", texto: v("principal.aprendizado"), grupo: nomeP, aprendizado: true, figura: "" });
     if (nomeD) add({ origem: "destaque", secao: "Destaque", tipo: "texto", titulo: nomeD, texto: v("destaque.texto"), grupo: v("destaque.categoria") || "Destaque do mês", figura: fig.destaque ? "destaque" : "" });
     if (v("destaque.aprendizado")) add({ origem: "destaque.aprendizado", secao: "Destaque", tipo: "texto", titulo: "O que aprendemos", texto: v("destaque.aprendizado"), grupo: nomeCurto(nomeD) || "Destaque do mês", aprendizado: true, figura: "" });
     for (i = 1; i <= 6; i++) {
@@ -1669,7 +1676,7 @@
     var ind = cand.filter(function (x) { return x.tipo === "indicador"; });
     ind.forEach(function (x) { x.na_frase = repete(fraseMes, x); });
     var livres = ind.filter(function (x) { return !x.na_frase; });
-    var s = livres.filter(function (x) { return x.secao === "Projeto principal"; }).slice(0, RESUMO_REGRAS.indicadores);
+    var s = livres.filter(function (x) { return x.capa; }).slice(0, RESUMO_REGRAS.indicadores);
     if (!s.length) s = (livres.length ? livres : ind).slice(0, RESUMO_REGRAS.indicadores);
     return s.map(function (x) { return { origem: x.origem }; });
   }
@@ -1818,9 +1825,11 @@
     '              <td class="col" valign="top" style="padding:16px 18px 18px 18px;">',
     '                {{#grupo}}<p class="fx dm-txt-{{dm_grupo}}" style="margin:0 0 6px 0;font-family:{{fx}};font-size:9px;line-height:13px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_grupo}};letter-spacing:1.5px;">{{grupo}}</p>{{/grupo}}',
     '                {{#valor}}<p class="ft kpiv dm-txt-{{dm_valor}}" style="margin:0;font-family:{{ft}};font-size:30px;line-height:34px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>{{/valor}}',
-    '                {{#titulo}}<p class="ft dm-txt-{{dm_titulo}}" style="margin:{{#valor}}4px{{/valor}}{{^valor}}0{{/valor}} 0 0 0;font-family:{{ft}};font-size:16px;line-height:21px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_titulo}};">{{titulo}}</p>{{/titulo}}',
+    /* com número (4.13): número → etiqueta colorida → descritivo; sem número, a etiqueta (status) fica no fim */
+    '                {{#valor}}{{#etiqueta}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:6px;">{{etiqueta}}</td></tr></table>{{/etiqueta}}{{/valor}}',
+    '                {{#titulo}}<p class="ft dm-txt-{{dm_titulo}}" style="margin:{{#valor}}{{#etiqueta}}8px{{/etiqueta}}{{^etiqueta}}4px{{/etiqueta}}{{/valor}}{{^valor}}0{{/valor}} 0 0 0;font-family:{{ft}};font-size:16px;line-height:21px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_titulo}};">{{titulo}}</p>{{/titulo}}',
     '                {{#texto}}<p class="fx dm-txt-{{dm_texto}}" style="margin:4px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor_texto}};">{{texto}}</p>{{/texto}}',
-    '                {{#etiqueta}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:8px;">{{etiqueta}}</td></tr></table>{{/etiqueta}}',
+    '                {{^valor}}{{#etiqueta}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:8px;">{{etiqueta}}</td></tr></table>{{/etiqueta}}{{/valor}}',
     '                {{#link}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;"><a class="fx dm-txt-marca" href="{{link}}" target="_blank" style="color:{{cor.marca}};font-family:{{fx}};text-decoration:none;">{{link_texto}}&nbsp;&#8594;</a></p>{{/link}}',
     '              </td>',
     '            </tr>',
@@ -1977,7 +1986,7 @@
    */
   var IMPORTA = {
     "ABERTURA": { frase: "frase", frase_final: "frase_final" },
-    "PROJETO PRINCIPAL": { nome: "principal.nome", resumo: "principal.resumo", aprendizado: "principal.aprendizado" },
+    "PROJETO PRINCIPAL": { rotulo: "principal.rotulo", nome: "principal.nome", resumo: "principal.resumo", aprendizado: "principal.aprendizado" },
     "LANCAMOS": { titulo: "lancamos.titulo" },
     "DESTAQUE": { categoria: "destaque.categoria", titulo: "destaque.titulo", texto: "destaque.texto", nota: "destaque.nota", aprendizado: "destaque.aprendizado" },
     "CREATIVE X": { subtitulo: "cx.subtitulo", rotulo: "cx.rotulo", anterior: "cx.anterior", atual: "cx.atual", variacao: "cx.variacao", periodo: "cx.periodo", referencia: "cx.referencia", significado: "cx.significado", nota: "cx.nota" },

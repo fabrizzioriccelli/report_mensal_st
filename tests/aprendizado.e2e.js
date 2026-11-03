@@ -64,6 +64,16 @@ function salvarComo() {
   var p = await abrir(path.join(RAIZ, "kit/report-exemplo.html"));
   confere((await q(p, blocos)).length === 0, "report de antes: sem bloco \"O que aprendemos\" nas campanhas");
 
+  /* 0. formato novo ao abrir (4.13): "PROJETO PRINCIPAL" vira "CAMPANHA" (editável); número → etiqueta → descritivo */
+  var fmt = await q(p, function (d) {
+    function ordem(k) { var it = d.querySelector('[data-item="' + k + '"]'); if (!it) return "?"; return Array.prototype.map.call(it.querySelectorAll("p"), function (x) { return x.classList.contains("var-vazia") ? "espaco" : (x.getAttribute("data-campo") || (x.querySelector("[data-campo]") || {}).getAttribute && x.querySelector("[data-campo]").getAttribute("data-campo") || "").replace(/^[a-z]+-\d+\./, ""); }).join(">"); }
+    var rot = d.querySelector('[data-campo="principal.rotulo"]');
+    return { rotulo: rot && rot.textContent, editavel: !!(rot && rot.hasAttribute("data-ed-campo")), antigo: /PROJETO PRINCIPAL/.test(d.body.textContent), n1: ordem("numero-1"), r1: ordem("resultado-1"), r2: ordem("resultado-2") };
+  });
+  confere(fmt.rotulo === "CAMPANHA" && fmt.editavel && !fmt.antigo, "report de antes: o rótulo da capa vira CAMPANHA, editável · " + JSON.stringify(fmt.rotulo));
+  confere(fmt.n1 === "valor>variacao>titulo" && fmt.r2 === "valor>variacao>titulo" && fmt.r1 === "valor>espaco>titulo", "números: número → etiqueta → descritivo; sem etiqueta, um espaço do mesmo tamanho · " + [fmt.n1, fmt.r1, fmt.r2].join(" | "));
+  confere(/Report atualizado para o formato novo/.test(await p.$eval("#estado", function (e) { return e.textContent; })), "o emulador avisa que atualizou o report (salvar grava)");
+
   /* 1. lançamento: + O que aprendemos na barra do card */
   var b1 = await barra(p, '[data-campo="lancamento-1.nome"]');
   confere(b1.botoes.indexOf("+ O que aprendemos") >= 0, "barra do lançamento: + O que aprendemos · " + b1.botoes.join(" | "));
@@ -121,6 +131,7 @@ function salvarComo() {
   var salvo = await p.evaluate(function () { return window.__salvos[window.__salvos.length - 1]; });
   var arq = path.join(SAIDA, "aprendizado-salvo.html"); fs.writeFileSync(arq, salvo.html);
   confere((salvo.html.match(/class="apr" data-apr="/g) || []).length === 3 && !/contenteditable|data-ed-/.test(salvo.html), "arquivo salvo: os 3 blocos, sem marcas do editor");
+  confere(/data-campo="principal\.rotulo"[^>]*>CAMPANHA</.test(salvo.html) && salvo.html.indexOf('data-campo="numero-1.variacao"') < salvo.html.indexOf('data-campo="numero-1.titulo"') && /var-vazia/.test(salvo.html), "arquivo salvo: CAMPANHA e a ordem nova dos números");
   var p2 = await abrir(arq), bl2 = await q(p2, blocos);
   confere(bl2.length === 3 && bl2.every(function (x) { return x.editavel; }), "reaberto: os 3 blocos voltam editáveis");
   var cel = await browser.newPage({ viewport: { width: 320, height: 800 } });

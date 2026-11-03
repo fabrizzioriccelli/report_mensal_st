@@ -35,7 +35,7 @@ O que a importação **não** faz: não traz imagens, links nem PDFs (esses são
 ```text
 [EDICAO]            mes · ano · proximo_mes
 [ABERTURA]          frase · frase_final
-[PROJETO PRINCIPAL] nome · resumo · aprendizado
+[PROJETO PRINCIPAL] rotulo · nome · resumo · aprendizado
 [NUMERO 1] a [3]    valor · titulo · detalhe · variacao · variacao_cor
 [LANCAMOS]          titulo
 [DESTAQUE]          categoria · titulo · texto · nota · aprendizado

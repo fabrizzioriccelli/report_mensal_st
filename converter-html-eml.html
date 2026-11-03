@@ -507,6 +507,7 @@
       /* "Resumo das campanhas" saiu do report (4.11): o report de antes que ainda tem a seção a perde ao abrir. */
       var resumo = marcaSecao(ED.doc, "resumo");
       if (resumo) { nosDaSecao("resumo").forEach(function (n) { n.remove(); }); resumo.remove(); }
+      var novo413 = atualizarFormato413(ED.doc);
       instrumentar(); ED.vistas = midiasNaPagina();
       if (tirou.length) renumerarPilulas();
       ED.periodoInicial = periodoInicial !== undefined ? periodoInicial : periodoAtual();
@@ -514,6 +515,7 @@
       $("#estado").className = "estado"; $("#estado").textContent = "Aberto: " + nome + ". Clique num texto para editar.";
       montarSecoes(); reconverter(true);
       if (resumo) marcarSujo("A seção \"Resumo das campanhas\" saiu do report. Salve para gravar");
+      if (novo413.length) marcarSujo("Report atualizado para o formato novo: " + novo413.join("; ") + ". Salve para gravar");
       otimizarAoAbrir().then(function (o) {
         /* as originais pesadas trocadas pelas otimizadas não voltam (otimizar não entra no Desfazer): saem da memória */
         var antes = ED.vistas; ED.vistas = midiasNaPagina(); soltarSemUso(Array.from(antes || []).filter(function (u) { return !ED.vistas.has(u); }));
@@ -521,6 +523,57 @@
       document.querySelector(".ferramentas").scrollIntoView({ behavior: "smooth", block: "start" });
     };
     fr.srcdoc = paraEditar(html);
+  }
+  /* Report de antes (4.13): o rótulo "PROJETO PRINCIPAL" da capa vira "CAMPANHA" (editável) e, nos números, a etiqueta
+     colorida sobe para logo abaixo do número, antes do descritivo (como o template). Devolve o que mudou. */
+  function atualizarFormato413(d) {
+    var feito = [];
+    var nome = d.querySelector('[data-campo="principal.nome"]');
+    if (nome && !d.querySelector('[data-campo="principal.rotulo"]')) {
+      var ant = nome.previousElementSibling;
+      if (ant && ant.tagName === "P" && !ant.hasAttribute("data-campo") && /^projeto principal$/i.test(ant.textContent.replace(/\s+/g, " ").trim())) {
+        ant.setAttribute("data-campo", "principal.rotulo"); ant.textContent = "CAMPANHA"; feito.push("o rótulo da capa agora é CAMPANHA (clique para mudar)");
+      }
+    }
+    if (ordenarNumeros(d)) feito.push("nos números, a etiqueta colorida fica logo abaixo do número");
+    return feito;
+  }
+  /* Número → etiqueta → descritivo, em cada linha de números (capa, resultados do destaque, Creative X trimestral e
+     tópicos em Números). Na linha em que algum número tem etiqueta, quem não tem ganha um espaço do mesmo tamanho,
+     para os descritivos ficarem alinhados. Devolve se mudou algo. */
+  /* margem da etiqueta, do descritivo depois da etiqueta e do descritivo sem etiqueta na linha (como no template) */
+  var MARGENS_NUM = { numero: ["6px 0 0 0", "8px 0 0 0", "6px 0 0 0"], resultado: ["4px 0 0 0", "6px 0 0 0", "3px 0 0 0"], cxt: ["4px 0 0 0", "6px 0 0 0", "3px 0 0 0"], topico: ["6px 0 0 0", "8px 0 0 0", "4px 0 0 0"] };
+  function ordenarNumeros(d) {
+    var mudou = false, linhas = new Map();
+    Array.prototype.forEach.call(d.querySelectorAll("[data-item]"), function (it) {
+      var chave = it.getAttribute("data-item"), m = /^(numero|resultado|cxt|topico[a-z]?)-\d+$/.exec(chave); if (!m) return;
+      var valor = it.querySelector('[data-campo="' + chave + '.valor"]'); if (!valor) return;
+      var tipo = /^topico/.test(m[1]) ? "topico" : m[1], chip = it.querySelector('[data-campo="' + chave + (tipo === "topico" ? ".status" : ".variacao") + '"]');
+      if (tipo === "topico" && !it.closest('[data-layout="numeros"]')) return;
+      var tr = it.closest("tr"); if (!linhas.has(tr)) linhas.set(tr, []);
+      linhas.get(tr).push({ it: it, valor: valor, chip: chip, tipo: tipo });
+    });
+    linhas.forEach(function (itens) {
+      var algum = itens.some(function (x) { return x.chip; });
+      itens.forEach(function (x) {
+        var mg = MARGENS_NUM[x.tipo], depois = x.valor.nextElementSibling;
+        if (x.chip && depois !== x.chip) {
+          x.valor.parentNode.insertBefore(x.chip, depois); x.chip.style.margin = mg[0];
+          if (x.chip.nextElementSibling) x.chip.nextElementSibling.style.margin = mg[1];
+          mudou = true;
+        }
+        var vazio = x.it.querySelector(".var-vazia");
+        if (!x.chip && algum && !vazio) {
+          var p = d.createElement("p"); p.className = "fx var-vazia"; p.setAttribute("aria-hidden", "true");
+          p.setAttribute("style", "margin:" + mg[0] + ";height:16px;line-height:16px;font-size:10px;");
+          x.valor.parentNode.insertBefore(p, x.valor.nextElementSibling);
+          if (p.nextElementSibling) p.nextElementSibling.style.margin = mg[1];
+          mudou = true;
+        }
+        if (vazio && (x.chip || !algum)) { if (vazio.nextElementSibling && !x.chip) vazio.nextElementSibling.style.margin = mg[2]; vazio.remove(); mudou = true; }
+      });
+    });
+    return mudou;
   }
   function periodoAtual() { var p = ED.doc && ED.doc.querySelector('[data-campo="periodo"]'); return p ? p.textContent.replace(/\s+/g, " ").trim() : ""; }
 
@@ -1616,7 +1669,7 @@
     if (ref) ref.parentNode.insertBefore(novo, ref.nextSibling);
     else if (/^(numero|cxt|aprendizado|transformation)$/.test(g) || /^(lista|colunas|numeros)$/.test(GRUPOS[g].layout)) G.cont.appendChild(novo);
     else (g === "resultado" ? G.cont.lastElementChild : G.cont.appendChild(ED.doc.createElement("tr"))).appendChild(novo);
-    editavel(novo); renumerar(g); refazer(g); atualizarMais();
+    editavel(novo); renumerar(g); refazer(g); ordenarNumeros(ED.doc); atualizarMais();
     /* "[Item da agenda 1]" do modelo vira "[Item da agenda 3]": o número da posição nova */
     var pos = (novo.getAttribute("data-item").match(/\d+$/) || [""])[0], tw = ED.doc.createTreeWalker(novo, NodeFilter.SHOW_TEXT), tn;
     while ((tn = tw.nextNode())) tn.nodeValue = tn.nodeValue.replace(/\[([^\[\]]*?) \d+(\.?)\]/g, "[$1 " + pos + "$2]");
@@ -2027,7 +2080,7 @@
   /* Itens que recebem imagem ou link a mais: destaque, projeto principal, foco e os itens com texto (não os números). */
   function alvosDeConteudo() {
     var r = [];
-    [["principal", "Capa · projeto principal"], ["destaque", "O que lançamos · destaque"], ["foco", "Foco do próximo mês"]].forEach(function (b) {
+    [["principal", "Capa · campanha"], ["destaque", "O que lançamos · destaque"], ["foco", "Foco do próximo mês"]].forEach(function (b) {
       var el = ED.doc.querySelector('[data-ed-bloco="' + b[0] + '"]'); if (el && !secaoOculta(el)) r.push({ el: el, nome: b[1] + (b[0] === "foco" ? "" : ": " + rotuloItem(el)) });
     });
     Array.prototype.forEach.call(ED.doc.querySelectorAll("[data-item]"), function (el) {
@@ -2037,7 +2090,7 @@
     return r;
   }
   function alvosDeVideo() {
-    var nomes = { principal: "Capa · projeto principal", destaque: "O que lançamos · destaque" };
+    var nomes = { principal: "Capa · campanha", destaque: "O que lançamos · destaque" };
     return Array.prototype.filter.call(ED.doc.querySelectorAll("img[data-img]"), function (i) { return /^(principal|destaque|lancamento-\d+)$/.test(i.getAttribute("data-img")) && !secaoOculta(i); }).map(function (i) {
       var k = i.getAttribute("data-img"), it = i.closest("[data-item]");
       return { img: i, nome: (nomes[k] || "Também neste mês: " + (it ? rotuloItem(it) : k)) + (i.hasAttribute("data-video") ? " (trocar o vídeo)" : "") };
@@ -2531,7 +2584,7 @@
   /* a primeira mudança transforma a sugestão na lista da pessoa */
   function minhaLista() { if (!ED.resumo) ED.resumo = { destaques: null }; if (!ED.resumo.destaques) ED.resumo.destaques = listaDtq().map(function (x) { return JSON.parse(JSON.stringify(x)); }); return ED.resumo.destaques; }
   function mudouDtq(msg, refazer) { if (refazer) desenharDestaques(true); if (ED.doc) marcarSujo(msg); else reconverter(); }
-  var NOMES_FIG = { principal: "Peça do projeto principal", destaque: "Peça do destaque" };
+  var NOMES_FIG = { principal: "Peça da capa", destaque: "Peça do destaque" };
   function nomeFigura(k) {
     if (NOMES_FIG[k]) return NOMES_FIG[k];
     var c = porOrigem(k); return c ? (/^lancamento/.test(k) ? "Card: " : /^transformation/.test(k) ? "Projeto: " : "") + c.titulo : k;
@@ -2557,7 +2610,7 @@
     DTQ.assinatura = ass;
     var box = $("#dtqEscolhidos"), n = lista.length; box.textContent = "";
     $("#dtqConta").textContent = n + " de " + MAX_DTQ + (auto && n ? " · sugestão" : "");
-    $("#dtqDica").textContent = !DTQ.cand.length ? "Este report não tem itens para destacar." : auto ? "Sugestão: os números do projeto principal. Troque, tire, reordene ou inclua o que quiser (até " + MAX_DTQ + ")." : "Na ordem do e-mail. Com número ímpar, o primeiro ocupa a largura toda.";
+    $("#dtqDica").textContent = !DTQ.cand.length ? "Este report não tem itens para destacar." : auto ? "Sugestão: os números da capa. Troque, tire, reordene ou inclua o que quiser (até " + MAX_DTQ + ")." : "Na ordem do e-mail. Com número ímpar, o primeiro ocupa a largura toda.";
     $("#bDtqNovo").disabled = n >= MAX_DTQ || !DTQ.cand.length && !ED.doc; $("#bDtqSugestao").disabled = auto;
     lista.forEach(function (cf, i) {
       var c = cf.novo ? null : porOrigem(cf.origem), fora = !cf.novo && !c, ind = cf.novo ? !!cf.valor : c && c.tipo === "indicador";
@@ -2626,8 +2679,8 @@
     var usados = {}; lista.forEach(function (x) { usados[x.origem] = 1; });
     var secoes = []; DTQ.cand.forEach(function (c) { if (secoes.indexOf(c.secao) < 0) secoes.push(c.secao); });
     secoes.forEach(function (sec) {
-      /* o nome da campanha junto da seção (quem lê o e-mail conhece a campanha, não o "Projeto principal") */
-      var dono = sec === "Projeto principal" ? porOrigem("principal") : sec === "Destaque" ? porOrigem("destaque") : null;
+      /* o nome da campanha junto da seção (ex.: "Campanha · Campanha Exemplo A") */
+      var dono = DTQ.cand.some(function (c) { return c.secao === sec && c.capa; }) ? porOrigem("principal") : sec === "Destaque" ? porOrigem("destaque") : null;
       var g = el("div", { classe: "grupo" }, [el("b", { texto: sec + (dono && dono.titulo ? " · " + dono.titulo : "") })]);
       DTQ.cand.filter(function (c) { return c.secao === sec; }).forEach(function (c) {
         var ja = !!usados[c.origem];
