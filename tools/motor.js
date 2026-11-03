@@ -605,9 +605,6 @@
       var s = semBr(v[campo]);
       if (s.length > max && !ehPendencia(s)) problema(prob, "aviso", arqD, v._linhas[campo], "[" + nomeBloco + "] " + campo + " com " + s.length + " caracteres (recomendado até " + max + "). Pode quebrar em mais linhas.");
     }
-    /* Números (4.13): número → etiqueta colorida → descritivo. Na linha em que algum número tem etiqueta, quem não tem
-       ganha um espaço do mesmo tamanho (var_reserva), para os descritivos ficarem alinhados. */
-    function reservar(lista, campo) { var algum = lista.some(function (x) { return cheio(x[campo]); }); lista.forEach(function (x) { x.var_reserva = algum && !cheio(x[campo]); }); return lista; }
     /* "O que aprendemos" da campanha: só sai com texto (nada de bloco vazio); uma ou duas frases curtas. */
     function aprendizado(v, nomeBloco, campo, variante) {
       if (!v || !v.aprendizado) return null;
@@ -658,7 +655,7 @@
       /* rótulo acima do nome (4.13): "CAMPANHA" por padrão, editável (o do mês nem sempre é um "projeto principal") */
       rotulo: texto(maiusculas(semBr(P.rotulo || "") || "Campanha")),
       nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp, aprendizado: aprendizado(P, "PROJETO PRINCIPAL", "principal.aprendizado", "capa"),
-      numeros: reservar(nums.map(function (v, i) {
+      numeros: nums.map(function (v, i) {
         curto(v, "valor", 11, "NUMERO " + (i + 1));
         return {
           valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "NUMERO " + (i + 1)),
@@ -667,7 +664,7 @@
           classe_m: nums.length === 3 ? "third" : "half",
           estilo: "padding:0 0 20px 0;"
         };
-      }), "variacao"),
+      }),
       sobra: sobra
     };
 
@@ -687,14 +684,14 @@
           categoria: seguro(marcarPendencias(categoria(DS.categoria).s)), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
           aprendizado: aprendizado(DS, "DESTAQUE", "destaque.aprendizado", "destaque"),
           largura_texto: textoDestaque, colunas: res.length * 3 - 2,
-          resultados: reservar(res.map(function (v, i) {
+          resultados: res.map(function (v, i) {
             /* No celular os resultados ficam em terços (~110 px): número longo (ex.: "R$ 1.234,56") invade a coluna ao lado. */
             curto(v, "valor", res.length === 3 ? 7 : 11, "RESULTADO " + (i + 1));
             return {
               idx: i + 1, valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "RESULTADO " + (i + 1)),
               largura: lr[i], primeiro: i === 0, estilo: "padding:14px 0 0 0;", classe_m: res.length === 3 ? "third" : "half"
             };
-          }), "variacao")
+          })
         } : null,
         /* Até 3: uma linha dividida igualmente. De 4 a 6: linhas de 3 colunas de 184 px (a última completa com espaço vazio). */
         linhas_compactos: (function () {
@@ -741,14 +738,14 @@
         cx.trimestre = {
           rotulo: texto(maiusculas(T.rotulo || "Trimestral")), titulo: texto(T.titulo), texto: texto(T.texto), estimativa: texto(T.estimativa),
           tem_indicadores: cxi.length > 0,
-          indicadores: reservar(cxi.map(function (v, i) {
+          indicadores: cxi.map(function (v, i) {
             var nb = "CREATIVE X TRIMESTRE " + (i + 1);
             curto(v, "valor", cxi.length === 3 ? 7 : 11, nb);
             return {
               idx: i + 1, valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, nb),
               largura: lt[i], primeiro: i === 0, classe_m: cxi.length === 3 ? "third" : "half"
             };
-          }), "variacao")
+          })
         };
       }
       cx.rotulo = texto(maiusculas(CX.rotulo || (cx.trimestre ? "Mensal · " + mes + " " + ano : "")));
@@ -890,7 +887,7 @@
           linhas.push({ itens: lin });
         }
         tpc.cartoes = { linhas: linhas };
-      } else tpc[lay] = { itens: lay === "numeros" ? reservar(itens, "status") : itens };
+      } else tpc[lay] = { itens: itens };
       return tpc;
     }).filter(Boolean);
 
@@ -1812,7 +1809,7 @@
     '  <!-- DESTAQUES DO MÊS: até 4, escolhidos no emulador (indicador, campanha, aprendizado, informação nova), com imagem opcional.',
     '       Em pares (290 + 20 + 290); com número ímpar, o primeiro ocupa a largura toda. No celular, um embaixo do outro. -->',
     '  <tr><td class="px" style="padding:26px 40px 20px 40px;">',
-    '    <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">DESTAQUES DO MÊS</p>',
+    '    <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">DESTAQUES DO MÊS{{#campanha_unica}} · {{campanha_unica}}{{/campanha_unica}}</p>',
     '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;">',
     '      {{#linhas}}{{^primeira}}<tr><td colspan="3" height="20" style="height:20px;"></td></tr>{{/primeira}}<tr>',
     '        {{#cards}}{{^primeiro}}<td class="hide-m" width="20" style="width:20px;"></td>{{/primeiro}}',
@@ -1825,9 +1822,9 @@
     '              <td class="col" valign="top" style="padding:16px 18px 18px 18px;">',
     '                {{#grupo}}<p class="fx dm-txt-{{dm_grupo}}" style="margin:0 0 6px 0;font-family:{{fx}};font-size:9px;line-height:13px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_grupo}};letter-spacing:1.5px;">{{grupo}}</p>{{/grupo}}',
     '                {{#valor}}<p class="ft kpiv dm-txt-{{dm_valor}}" style="margin:0;font-family:{{ft}};font-size:30px;line-height:34px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>{{/valor}}',
-    /* com número (4.13): número → etiqueta colorida → descritivo; sem número, a etiqueta (status) fica no fim */
-    '                {{#valor}}{{#etiqueta}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:6px;">{{etiqueta}}</td></tr></table>{{/etiqueta}}{{/valor}}',
-    '                {{#titulo}}<p class="ft dm-txt-{{dm_titulo}}" style="margin:{{#valor}}{{#etiqueta}}8px{{/etiqueta}}{{^etiqueta}}4px{{/etiqueta}}{{/valor}}{{^valor}}0{{/valor}} 0 0 0;font-family:{{ft}};font-size:16px;line-height:21px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_titulo}};">{{titulo}}</p>{{/titulo}}',
+    /* leitura em ordem (4.13): número → o que é (título) → etiqueta colorida com a referência embaixo; sem número, a etiqueta (status) fica no fim */
+    '                {{#titulo}}<p class="ft dm-txt-{{dm_titulo}}" style="margin:{{#valor}}4px{{/valor}}{{^valor}}0{{/valor}} 0 0 0;font-family:{{ft}};font-size:16px;line-height:21px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_titulo}};">{{titulo}}</p>{{/titulo}}',
+    '                {{#valor}}{{#etiqueta}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:8px;">{{etiqueta}}</td></tr></table>{{/etiqueta}}{{/valor}}',
     '                {{#texto}}<p class="fx dm-txt-{{dm_texto}}" style="margin:4px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor_texto}};">{{texto}}</p>{{/texto}}',
     '                {{^valor}}{{#etiqueta}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:8px;">{{etiqueta}}</td></tr></table>{{/etiqueta}}{{/valor}}',
     '                {{#link}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;"><a class="fx dm-txt-marca" href="{{link}}" target="_blank" style="color:{{cor.marca}};font-family:{{fx}};text-decoration:none;">{{link_texto}}&nbsp;&#8594;</a></p>{{/link}}',
@@ -1931,6 +1928,8 @@
     var link = linkDoReport(op.link).url, txtBotao = op.botao || "Acessar report completo";
     var botao = link ? botaoResumo(link, txtBotao, fx) :
       '<span class="fx" style="display:inline-block;background:' + CR.atencao_fundo + ";color:" + CR.atencao + ";font-family:" + fx + ';font-size:12px;line-height:16px;font-weight:bold;padding:12px 18px;border:1px dashed ' + CR.atencao + ';">FALTA O LINK DO REPORT COMPLETO</span>';
+    /* todos os cartões da mesma campanha (ex.: os 3 números do SMusic): o nome vai uma vez, no título da seção */
+    var campanhaUnica = "";
     var m = {
       assunto: op.assunto || assuntoDoHtml(html), mso: seguro(mso), cor: CR, ft: ft, fx: fx, fti: fti,
       periodo: periodo, frase: d.frase, frase_final: d.frase_final,
@@ -1957,6 +1956,8 @@
             img_topo: img && !lado ? img : null, img_lado: img && lado ? img : null
           };
         }), linhas = [], k = 0;
+        var gs = cards.map(function (c) { return c.dm_grupo === "turquesa" ? c.grupo : null; });
+        if (cards.length > 1 && gs[0] && gs.every(function (g) { return g === gs[0]; })) { campanhaUnica = gs[0]; cards.forEach(function (c) { c.grupo = ""; }); }
         while (k < cards.length) {
           var lin = cards[k].largo ? [cards[k]] : cards.slice(k, k + 2);
           lin.forEach(function (c2, j) { c2.primeiro = j === 0; });
@@ -1964,6 +1965,7 @@
         }
         return linhas;
       })(),
+      campanha_unica: campanhaUnica,
       cta_titulo: op.titulo || "Acesse o report completo.",
       cta_texto: op.chamada || ((lista ? lista.charAt(0).toUpperCase() + lista.slice(1) : "Todas as seções") + ", com as peças" + (temVideo ? " e os vídeos" : "") + "."),
       botao_html: seguro(botao), css_escuro: seguro(CSS_ESCURO), botao_w: link ? larguraBotao(txtBotao) : 260, contato: ""

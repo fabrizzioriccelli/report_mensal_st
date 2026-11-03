@@ -795,25 +795,19 @@ teste("importarDados: resposta do Copilot (blocos do arquivo de dados) vira camp
   assert.strictEqual(M.nomeDoReport("[MÊS] [ANO]"), "report.html");
 });
 
-teste("capa (4.13): rótulo CAMPANHA editável no lugar de PROJETO PRINCIPAL, e números na ordem número → etiqueta → descritivo", function () {
+teste("capa (4.13): rótulo CAMPANHA editável no lugar de PROJETO PRINCIPAL, e números em ordem de leitura (número → título → etiqueta → referência)", function () {
   var html = montar(COMPLETO).html;
   assert.ok(/data-campo="principal\.rotulo"[^>]*>CAMPANHA</.test(html) && !/>PROJETO PRINCIPAL</.test(html), "rótulo padrão: CAMPANHA, com data-campo");
   var outro = montar(COMPLETO.replace("[PROJETO PRINCIPAL]", "[PROJETO PRINCIPAL]\nrotulo: Porta de entrada")).html;
   assert.ok(/data-campo="principal\.rotulo"[^>]*>PORTA DE ENTRADA</.test(outro), "rótulo do arquivo de dados, em maiúsculas");
   assert.strictEqual(M.importarDados("[PROJETO PRINCIPAL]\nrotulo: Campanha do mês\n").campos["principal.rotulo"].texto, "CAMPANHA DO MÊS", "importação do rótulo");
-  /* ordem dentro de cada número: valor, etiqueta, título */
-  var hr = montar(COMPLETO.replace("[RESULTADO 1]", "[RESULTADO 1]\nvariacao: +10%").replace("[LANCAMENTO 1]", "[RESULTADO 2]\nvalor: 2\ntitulo: Dois\n[LANCAMENTO 1]")).html;
-  assert.ok(/data-campo="resultado-1\.variacao"/.test(hr) && /data-item="resultado-2"[\s\S]*?var-vazia[\s\S]*?resultado-2\.titulo/.test(hr), "resultados: com etiqueta, e o vizinho sem etiqueta ganha o espaço");
-  ["numero-1", "numero-2", "resultado-1"].forEach(function (k) {
-    var html = /^resultado/.test(k) ? hr : montar(COMPLETO).html;
-    var iv = html.indexOf('data-campo="' + k + '.valor"'), ie = html.indexOf('data-campo="' + k + '.variacao"'), it = html.indexOf('data-campo="' + k + '.titulo"');
-    assert.ok(iv > 0 && ie > iv && it > ie, k + ": número → etiqueta → descritivo (" + [iv, ie, it].join(" < ") + ")");
-  });
-  /* número sem etiqueta numa linha com etiqueta: espaço reservado do mesmo tamanho; linha sem nenhuma etiqueta: sem espaço */
-  var semVar = montar(COMPLETO.replace(/(\[NUMERO 2\][\s\S]*?)variacao: [^\n]*\n/, "$1")).html, n2 = semVar.slice(semVar.indexOf('data-item="numero-2"'), semVar.indexOf('data-item="numero-3"'));
-  assert.ok(n2.length > 0 && /class="fx var-vazia"/.test(n2) && !/numero-2\.variacao/.test(n2), "sem etiqueta, com vizinho que tem: espaço reservado");
-  var nenhum = montar(COMPLETO.replace(/variacao: [^\n]*\n/g, "")).html;
-  assert.ok(!/var-vazia/.test(nenhum), "linha sem nenhuma etiqueta: sem espaço reservado");
+  /* leitura em ordem: valor → título → etiqueta → referência (detalhe); sem espaço reservado */
+  var hr = montar(COMPLETO.replace("[RESULTADO 1]", "[RESULTADO 1]\nvariacao: +10%").replace("[LANCAMENTO 1]", "[RESULTADO 2]\nvalor: 2\ntitulo: Dois\ndetalhe: base 1\n[LANCAMENTO 1]")).html;
+  function ordem(h, k) { var a = h.indexOf('data-item="' + k + '"'), b = h.indexOf("</td>", a), t = h.slice(a, b), r = []; t.replace(/data-campo="[a-z0-9-]+\.(valor|titulo|variacao|detalhe)"/g, function (m, c) { r.push(c); }); return r.join(">"); }
+  assert.strictEqual(ordem(html, "numero-1"), "valor>titulo>variacao>detalhe", "capa");
+  assert.strictEqual(ordem(hr, "resultado-1"), "valor>titulo>variacao>detalhe", "resultado com etiqueta");
+  assert.strictEqual(ordem(hr, "resultado-2"), "valor>titulo>detalhe", "resultado sem etiqueta: a referência logo abaixo do título");
+  assert.ok(!/var-vazia/.test(html + hr), "sem espaço reservado");
   /* e-mail-resumo: a etiqueta do cartão da campanha é o rótulo, nunca "Projeto principal" */
   var r = M.emailResumo(html, { link: "https://empresa.sharepoint.com/r", destaques: [{ origem: "principal" }, { origem: "numero-1" }] });
   var c = r.candidatos.filter(function (x) { return x.origem === "principal"; })[0];
@@ -879,7 +873,7 @@ teste("e-mail-resumo sem repetição: nome do projeto (não \"Projeto principal\
   var base = MINIMO.replace("nome: Projeto", "nome: Alfa").replace("valor: 10%\ntitulo: CTR\ndetalhe: era 5%", "valor: 12\ntitulo: Contas abertas\ndetalhe: 12 contas abertas no Alfa") +
     "\n[NUMERO 2]\nvalor: R$ 1,20\ntitulo: Custo por conta\ndetalhe: Referência: R$ 1,50";
   var r = montar(base), res = M.emailResumo(r.html, { link: "https://example.com/r" }), txt = res.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-  assert.ok(/DESTAQUES DO MÊS ALFA 12 ▲ \+100% Contas abertas/.test(txt) && !/Projeto principal/i.test(txt), "o nome do projeto, sem \"Projeto principal:\"; número → etiqueta → título (4.13) · " + txt.slice(txt.indexOf("DESTAQUES"), txt.indexOf("DESTAQUES") + 90));
+  assert.ok(/DESTAQUES DO MÊS · ALFA 12 Contas abertas ▲ \+100%/.test(txt) && (txt.match(/ALFA/g) || []).length === 1 && !/Projeto principal/i.test(txt), "o nome do projeto uma vez só, no título da seção (todos os cartões são dele), sem \"Projeto principal:\"; número → título → etiqueta (4.13) · " + txt.slice(txt.indexOf("DESTAQUES"), txt.indexOf("DESTAQUES") + 90));
   assert.ok(!/12 contas abertas no Alfa/.test(txt) && /Referência: R\$ 1,50/.test(txt), "o detalhe que repete o número sai; o que acrescenta fica");
   var r2 = montar(base.replace("frase: Um mês", "frase: Alfa: 12 contas abertas")), res2 = M.emailResumo(r2.html, { link: "https://example.com/r" }), t2 = res2.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
   assert.deepStrictEqual(res2.indicadores, ["numero-2"], "o número da frase não vem marcado");

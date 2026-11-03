@@ -64,14 +64,14 @@ function salvarComo() {
   var p = await abrir(path.join(RAIZ, "kit/report-exemplo.html"));
   confere((await q(p, blocos)).length === 0, "report de antes: sem bloco \"O que aprendemos\" nas campanhas");
 
-  /* 0. formato novo ao abrir (4.13): "PROJETO PRINCIPAL" vira "CAMPANHA" (editável); número → etiqueta → descritivo */
+  /* 0. formato novo ao abrir (4.13): "PROJETO PRINCIPAL" vira "CAMPANHA" (editável); números em ordem de leitura (número → título → etiqueta → referência) */
   var fmt = await q(p, function (d) {
-    function ordem(k) { var it = d.querySelector('[data-item="' + k + '"]'); if (!it) return "?"; return Array.prototype.map.call(it.querySelectorAll("p"), function (x) { return x.classList.contains("var-vazia") ? "espaco" : (x.getAttribute("data-campo") || (x.querySelector("[data-campo]") || {}).getAttribute && x.querySelector("[data-campo]").getAttribute("data-campo") || "").replace(/^[a-z]+-\d+\./, ""); }).join(">"); }
+    function ordem(k) { var it = d.querySelector('[data-item="' + k + '"]'); if (!it) return "?"; return Array.prototype.map.call(it.querySelectorAll("[data-campo]"), function (x) { return x.getAttribute("data-campo").replace(/^[a-z]+-\d+\./, ""); }).concat(it.querySelector(".var-vazia") ? ["espaco"] : []).join(">"); }
     var rot = d.querySelector('[data-campo="principal.rotulo"]');
     return { rotulo: rot && rot.textContent, editavel: !!(rot && rot.hasAttribute("data-ed-campo")), antigo: /PROJETO PRINCIPAL/.test(d.body.textContent), n1: ordem("numero-1"), r1: ordem("resultado-1"), r2: ordem("resultado-2") };
   });
   confere(fmt.rotulo === "CAMPANHA" && fmt.editavel && !fmt.antigo, "report de antes: o rótulo da capa vira CAMPANHA, editável · " + JSON.stringify(fmt.rotulo));
-  confere(fmt.n1 === "valor>variacao>titulo" && fmt.r2 === "valor>variacao>titulo" && fmt.r1 === "valor>espaco>titulo", "números: número → etiqueta → descritivo; sem etiqueta, um espaço do mesmo tamanho · " + [fmt.n1, fmt.r1, fmt.r2].join(" | "));
+  confere(fmt.n1 === "valor>titulo>variacao>detalhe" && fmt.r2 === "valor>titulo>variacao>detalhe" && fmt.r1 === "valor>titulo>detalhe", "números: número → título → etiqueta → referência (sem etiqueta, a referência logo abaixo do título) · " + [fmt.n1, fmt.r1, fmt.r2].join(" | "));
   confere(/Report atualizado para o formato novo/.test(await p.$eval("#estado", function (e) { return e.textContent; })), "o emulador avisa que atualizou o report (salvar grava)");
 
   /* 1. lançamento: + O que aprendemos na barra do card */
@@ -131,10 +131,16 @@ function salvarComo() {
   var salvo = await p.evaluate(function () { return window.__salvos[window.__salvos.length - 1]; });
   var arq = path.join(SAIDA, "aprendizado-salvo.html"); fs.writeFileSync(arq, salvo.html);
   confere((salvo.html.match(/class="apr" data-apr="/g) || []).length === 3 && !/contenteditable|data-ed-/.test(salvo.html), "arquivo salvo: os 3 blocos, sem marcas do editor");
-  confere(/data-campo="principal\.rotulo"[^>]*>CAMPANHA</.test(salvo.html) && salvo.html.indexOf('data-campo="numero-1.variacao"') < salvo.html.indexOf('data-campo="numero-1.titulo"') && /var-vazia/.test(salvo.html), "arquivo salvo: CAMPANHA e a ordem nova dos números");
+  confere(/data-campo="principal\.rotulo"[^>]*>CAMPANHA</.test(salvo.html) && salvo.html.indexOf('data-campo="numero-1.titulo"') < salvo.html.indexOf('data-campo="numero-1.variacao"') && salvo.html.indexOf('data-campo="numero-1.variacao"') < salvo.html.indexOf('data-campo="numero-1.detalhe"') && !/var-vazia/.test(salvo.html), "arquivo salvo: CAMPANHA e os números em ordem de leitura");
   confere(/max-width:700px/.test(salvo.html) && !/max-width:620px/.test(salvo.html), "arquivo salvo: o layout de celular vale até 700 px (de 621 a 700 px não rola para o lado)");
   var p2 = await abrir(arq), bl2 = await q(p2, blocos);
   confere(bl2.length === 3 && bl2.every(function (x) { return x.editavel; }), "reaberto: os 3 blocos voltam editáveis");
+  /* report salvo na 4.13 intermediária (etiqueta logo abaixo do número, espaço reservado): volta à ordem de leitura */
+  var inter = salvo.html, chipN1 = (/<p class="fx" data-campo="numero-1\.variacao"[\s\S]*?<\/p>/.exec(inter) || [""])[0];
+  inter = inter.replace(chipN1, "").replace(/(data-campo="numero-1\.valor"[^>]*>[^<]*<\/p>)/, "$1" + chipN1).replace(/(data-campo="resultado-1\.valor"[^>]*>[^<]*<\/p>)/, '$1<p class="fx var-vazia" aria-hidden="true" style="margin:4px 0 0 0;height:16px;line-height:16px;font-size:10px;"></p>');
+  var arqI = path.join(SAIDA, "aprendizado-intermediario.html"); fs.writeFileSync(arqI, inter);
+  var pI = await abrir(arqI), fI = await q(pI, function (d) { function ordem(k) { var it = d.querySelector('[data-item="' + k + '"]'); return Array.prototype.map.call(it.querySelectorAll("[data-campo]"), function (x) { return x.getAttribute("data-campo").replace(/^[a-z]+-\d+\./, ""); }).join(">"); } return { n1: ordem("numero-1"), r1: ordem("resultado-1"), vazio: d.querySelectorAll(".var-vazia").length }; });
+  confere(chipN1 && fI.n1 === "valor>titulo>variacao>detalhe" && fI.r1 === "valor>titulo>detalhe" && fI.vazio === 0, "report da 4.13 intermediária: volta à ordem de leitura e o espaço reservado sai · " + JSON.stringify(fI));
   var cel = await browser.newPage({ viewport: { width: 320, height: 800 } });
   await cel.goto("file://" + arq); await cel.waitForTimeout(500);
   var larg = await cel.evaluate(function () { return document.documentElement.scrollWidth; });

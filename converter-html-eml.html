@@ -527,8 +527,8 @@
     };
     fr.srcdoc = paraEditar(html);
   }
-  /* Report de antes (4.13): o rótulo "PROJETO PRINCIPAL" da capa vira "CAMPANHA" (editável) e, nos números, a etiqueta
-     colorida sobe para logo abaixo do número, antes do descritivo (como o template). Devolve o que mudou. */
+  /* Report de antes (4.13): o rótulo "PROJETO PRINCIPAL" da capa vira "CAMPANHA" (editável) e os números ficam na
+     ordem do template (número → título → etiqueta e referência). Devolve o que mudou. */
   function atualizarFormato413(d) {
     var feito = [];
     var nome = d.querySelector('[data-campo="principal.nome"]');
@@ -538,46 +538,55 @@
         ant.setAttribute("data-campo", "principal.rotulo"); ant.textContent = "CAMPANHA"; feito.push("o rótulo da capa agora é CAMPANHA (clique para mudar)");
       }
     }
-    if (ordenarNumeros(d)) feito.push("nos números, a etiqueta colorida fica logo abaixo do número");
+    if (ordenarNumeros(d)) feito.push("os números agora se leem em ordem: o número, o que ele é e a comparação (etiqueta com a referência)");
     /* o layout de celular entra até 700 px (antes 620): de 621 a 700 px a página rolava para o lado (ex.: celular deitado) */
     var bp = 0; Array.prototype.forEach.call(d.querySelectorAll("style"), function (st) { var t = st.textContent; if (/\(max-width:620px\)/.test(t)) { st.textContent = t.replace(/\(max-width:620px\)/g, "(max-width:700px)"); bp++; } });
     if (bp) feito.push("o layout de celular vale também para telas de até 700 px");
     return feito;
   }
-  /* Número → etiqueta → descritivo, em cada linha de números (capa, resultados do destaque, Creative X trimestral e
-     tópicos em Números). Na linha em que algum número tem etiqueta, quem não tem ganha um espaço do mesmo tamanho,
-     para os descritivos ficarem alinhados. Devolve se mudou algo. */
-  /* margem da etiqueta, do descritivo depois da etiqueta e do descritivo sem etiqueta na linha (como no template) */
-  var MARGENS_NUM = { numero: ["6px 0 0 0", "8px 0 0 0", "6px 0 0 0"], resultado: ["4px 0 0 0", "6px 0 0 0", "3px 0 0 0"], cxt: ["4px 0 0 0", "6px 0 0 0", "3px 0 0 0"], topico: ["6px 0 0 0", "8px 0 0 0", "4px 0 0 0"] };
+  /* Números (4.13), leitura em ordem: quanto (número) → o quê (título) → comparado com quê (etiqueta e a referência,
+     juntas), na capa, nos resultados do destaque, no Creative X trimestral e nos tópicos em Números. Converte o
+     formato de antes (título e referência no mesmo parágrafo, etiqueta no fim) e o da 4.13 intermediária (etiqueta
+     logo abaixo do número, com espaço reservado). Devolve se mudou algo. */
+  var ORDEM_NUM = {
+    numero: { tit: "6px 0px 0px", chip: "6px 0px 0px", det: ["3px 0px 0px", "0px"] },
+    resultado: { tit: "3px 0px 0px", chip: "5px 0px 0px", det: ["2px 0px 0px", "0px"] },
+    cxt: { tit: "3px 0px 0px", chip: "5px 0px 0px", det: ["2px 0px 0px", "0px"] },
+    topico: { tit: "4px 0px 0px", chip: "6px 0px 0px", det: ["3px 0px 0px", "3px 0px 0px"] }
+  };
   function ordenarNumeros(d) {
-    var mudou = false, linhas = new Map();
+    var mudou = false;
     Array.prototype.forEach.call(d.querySelectorAll("[data-item]"), function (it) {
       var chave = it.getAttribute("data-item"), m = /^(numero|resultado|cxt|topico[a-z]?)-\d+$/.exec(chave); if (!m) return;
-      var valor = it.querySelector('[data-campo="' + chave + '.valor"]'); if (!valor) return;
-      var tipo = /^topico/.test(m[1]) ? "topico" : m[1], chip = it.querySelector('[data-campo="' + chave + (tipo === "topico" ? ".status" : ".variacao") + '"]');
+      var tipo = /^topico/.test(m[1]) ? "topico" : m[1];
       if (tipo === "topico" && !it.closest('[data-layout="numeros"]')) return;
-      var tr = it.closest("tr"); if (!linhas.has(tr)) linhas.set(tr, []);
-      linhas.get(tr).push({ it: it, valor: valor, chip: chip, tipo: tipo });
-    });
-    linhas.forEach(function (itens) {
-      var algum = itens.some(function (x) { return x.chip; });
-      itens.forEach(function (x) {
-        var mg = MARGENS_NUM[x.tipo], depois = x.valor.nextElementSibling;
-        if (x.chip && depois !== x.chip) {
-          x.valor.parentNode.insertBefore(x.chip, depois); x.chip.style.margin = mg[0];
-          if (x.chip.nextElementSibling) x.chip.nextElementSibling.style.margin = mg[1];
-          mudou = true;
-        }
-        var vazio = x.it.querySelector(".var-vazia");
-        if (!x.chip && algum && !vazio) {
-          var p = d.createElement("p"); p.className = "fx var-vazia"; p.setAttribute("aria-hidden", "true");
-          p.setAttribute("style", "margin:" + mg[0] + ";height:16px;line-height:16px;font-size:10px;");
-          x.valor.parentNode.insertBefore(p, x.valor.nextElementSibling);
-          if (p.nextElementSibling) p.nextElementSibling.style.margin = mg[1];
-          mudou = true;
-        }
-        if (vazio && (x.chip || !algum)) { if (vazio.nextElementSibling && !x.chip) vazio.nextElementSibling.style.margin = mg[2]; vazio.remove(); mudou = true; }
+      var valor = it.querySelector('[data-campo="' + chave + '.valor"]'); if (!valor) return;
+      var este = false;
+      Array.prototype.forEach.call(it.querySelectorAll(".var-vazia"), function (v) { v.remove(); este = true; });
+      var tit = it.querySelector('[data-campo="' + chave + (tipo === "topico" ? ".nome" : ".titulo") + '"]');
+      var det = it.querySelector('[data-campo="' + chave + (tipo === "topico" ? ".texto" : ".detalhe") + '"]');
+      var chip = it.querySelector('[data-campo="' + chave + (tipo === "topico" ? ".status" : ".variacao") + '"]');
+      function par(el) { return el ? (el.tagName === "P" ? el : el.closest("p")) : null; }
+      var pTit = par(tit), pDet = par(det);
+      /* título e referência no mesmo parágrafo (<b>título</b><br><span>referência</span>): a referência ganha o seu */
+      if (pTit && pDet && pTit === pDet) {
+        var np = d.createElement("p"); np.className = pTit.className; np.setAttribute("style", pTit.getAttribute("style") || "");
+        var br = det.previousSibling; while (br && br.nodeType === 3 && !br.nodeValue.trim()) br = br.previousSibling;
+        if (br && br.nodeName === "BR") br.remove();
+        np.appendChild(det); pTit.parentNode.insertBefore(np, pTit.nextSibling); pDet = np; este = true;
+      }
+      var ref = valor;
+      [pTit, chip, pDet].forEach(function (el) {
+        if (!el || el.parentNode !== valor.parentNode) return;
+        if (ref.nextElementSibling !== el) { valor.parentNode.insertBefore(el, ref.nextElementSibling); este = true; }
+        ref = el;
       });
+      if (!este) return;
+      var mg = ORDEM_NUM[tipo];
+      if (pTit) pTit.style.margin = mg.tit;
+      if (chip) chip.style.margin = mg.chip;
+      if (pDet) pDet.style.margin = chip ? mg.det[0] : mg.det[1];
+      mudou = true;
     });
     return mudou;
   }
@@ -2918,6 +2927,9 @@
   /* Imagem (.png) do e-mail-resumo (4.13): a prévia desenhada numa imagem, em dobro (nítida), sem programa externo.
      Complementa o .eml (não o substitui): o e-mail continua em texto, legível e com o botão clicável. */
   async function pngDoResumo(html, largura) {
+    /* a foto é a do e-mail no computador: em 680 px a regra de celular (até 700 px) empilharia os cartões na medida
+       da altura e não no desenho; sem ela, medida e desenho ficam iguais */
+    html = html.replace(/\(max-width:\s*\d+px\)/g, "(max-width:1px)");
     var fr = document.createElement("iframe"); fr.setAttribute("aria-hidden", "true"); fr.tabIndex = -1;
     fr.style.cssText = "position:fixed;left:-10000px;top:0;width:" + largura + "px;height:400px;border:0;visibility:hidden";
     document.body.appendChild(fr);
