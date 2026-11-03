@@ -2287,7 +2287,7 @@
     var link = linkDoReport(op.link).url, txtBotao = op.botao || "Acessar report completo";
     var botao = link ? botaoResumo(link, txtBotao, fx) :
       '<span class="fx" style="display:inline-block;background:' + CR.atencao_fundo + ";color:" + CR.atencao + ";font-family:" + fx + ';font-size:12px;line-height:16px;font-weight:bold;padding:12px 18px;border:1px dashed ' + CR.atencao + ';">FALTA O LINK DO REPORT COMPLETO</span>';
-    /* todos os cartões da mesma campanha (ex.: os 3 números do SMusic): o nome vai uma vez, no título da seção */
+    /* todos os cartões da mesma campanha (ex.: os 3 números da Campanha Exemplo A): o nome vai uma vez, no título da seção */
     var campanhaUnica = "";
     var m = {
       assunto: op.assunto || assuntoDoHtml(html), mso: seguro(mso), cor: CR, ft: ft, fx: fx, fti: fti,
