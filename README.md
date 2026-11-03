@@ -3,11 +3,11 @@
 Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas experiências que saem **da mesma página**:
 
 - **o report completo** (HTML): movimento ao rolar, vídeos, peças e documentos no clique;
-- **o e-mail-resumo** (Outlook): a porta de entrada, estático, com a frase do mês, até 3 indicadores e um único botão, "Acessar report completo".
+- **o e-mail-resumo** (Outlook): a porta de entrada, estático, com a frase do mês, até 4 destaques escolhidos por você (números, campanhas, "O que aprendemos" ou uma informação nova revisada, com imagem e link opcionais) e um único botão principal, "Acessar report completo". Também sai como imagem (`.png`), para prévia.
 
 O time atualiza tudo no **emulador**: um arquivo só, que abre no Chrome ou no Edge, sem instalar nada.
 
-**Versão 4.12.1 (2026-10-29).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 4.13 (2026-11-03).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">
@@ -41,7 +41,7 @@ Tudo o que o time usa está em **[`kit/`](kit/)**:
 4. **Salvar** o report do mês (`report-AAAA-MM.html`).
 5. **Conferir:** reabrir o arquivo salvo, no computador e no celular.
 6. **Link do report:** colar no emulador **qualquer link**: o caminho do arquivo salvo (`C:\…`, ex.: a pasta do OneDrive no computador; Explorador › botão direito › Copiar como caminho) ou o link de compartilhamento (`https://…`). O botão do e-mail sai no formato que o Outlook abre (espaço e acento funcionam). Para enviar, use o **link do OneDrive** (botão direito no arquivo › Compartilhar › Copiar link): no e-mail recebido, o Outlook para Windows bloqueia link para arquivo ("O Outlook bloqueou o acesso a links para os arquivos de zona da Internet"), e um caminho `C:\…` só existe no seu computador. O emulador aceita o caminho, mas avisa.
-7. **E-mail-resumo:** escolher até 3 indicadores e baixar o `.eml`.
+7. **E-mail-resumo:** em "Selecionar destaques do e-mail", partir da sugestão (os números do projeto principal) e escolher, ordenar e ajustar até 4 destaques; incluir imagem, link ou uma informação nova (marcada para revisão); baixar o `.eml` (e, se quiser, a imagem `.png`).
 8. **Enviar** pelo Outlook: primeiro para você, depois para a área.
 
 Regras que o emulador segue: não cria nem calcula número; indicador sem dado é ocultado (nunca 0 nem o número do mês anterior); ao mudar o período de um report antigo, lista os números que ninguém mexeu antes de salvar; sem o link do report completo, o e-mail-resumo não é liberado: nunca sai um botão vazio.
@@ -56,7 +56,7 @@ Sempre na mesma ordem:
 | 02 | **O que lançamos** | O que foi para o ar e o que evoluiu? |
 | 03 | **Creative X** | Como está a qualidade criativa (antes → agora)? |
 | 04 | **Transformation Hub** | O que estamos mudando na forma de criar? |
-| 05 | **O que aprendemos** | O que os dados ensinaram? |
+| 05 | **O que aprendemos** | O que os dados ensinaram? (opcional desde a 4.13: cada campanha pode ter o seu "O que aprendemos", curto, dentro da própria seção) |
 | 06 | **Foco do próximo mês** | Qual é a prioridade agora? |
 | 07 | **Também vem aí** | O que está na agenda? |
 
@@ -111,7 +111,9 @@ Sempre na mesma ordem:
 
 Testes (Node.js; os `e2e` também precisam do Playwright):
 
-- `node tests/motor.test.js`: motor (74 testes).
+- `node tests/motor.test.js`: motor (77 testes).
+- `node tests/resumo.e2e.js`: e-mail-resumo com destaques escolhidos (sugestão, ordem, título ajustado, informação nova com revisão, imagem do computador, capa de vídeo, link, número vindo do report, `.eml`, `.png`, salvar e reabrir, celular).
+- `node tests/aprendizado.e2e.js`: "O que aprendemos" dentro de cada campanha (criar pela barra, importar do Copilot, tirar e desfazer, salvar e reabrir, celular).
 - `node tests/assistente.e2e.js`: + Adicionar item (os 7 tipos, posição, prévia, Voltar e ajustar, Cancelar, campos obrigatórios, Creative X trimestral), mover itens e a ordem das seções (↑ ↓ Posição…, arrastar no painel e na página, Esc, rolagem automática), leveza do arrasto com a CPU 4× mais lenta, salvar, reabrir, e-mail-resumo e celular.
 - `node tests/escuro.e2e.js`: e-mail-resumo no modo escuro: igual ao claro (pixel a pixel) no modo escuro do sistema e, numa simulação do Outlook.com / novo Outlook, as cores aprovadas voltam.
 - `node tests/emulador.e2e.js`: o fluxo completo do emulador como uma pessoa faria (abrir, editar, imagem, link, ocultar, importar, salvar, reabrir, recuperar, resumo, `.eml`). Com `EMULADOR=kit/emulador-report.html`, testa a versão avulsa.

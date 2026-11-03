@@ -85,6 +85,15 @@ Apague todos os blocos dela. A seção some e a numeração das seções se ajus
 ### Como duplicar um bloco?
 Copie o bloco, cole embaixo e troque o número (`[LANCAMENTO 3]`). Limites: 4 números, 3 resultados, 3 lançamentos, 3 Transformation, 3 aprendizados, 6 agenda.
 
+### Como colocar o "O que aprendemos" dentro de uma campanha?
+No emulador, passe o mouse nos números do projeto principal, nos resultados do destaque ou no card do lançamento › **+ O que aprendemos**, e escreva por cima do texto do modelo: uma ou duas frases sobre o que fizemos, o que vimos e o que fazemos melhor. Pelo Copilot, use o campo `aprendizado` no bloco da campanha (`[PROJETO PRINCIPAL]`, `[DESTAQUE]`, `[LANCAMENTO n]`). Se a seção geral "O que aprendemos" ficar repetida, oculte em **Seções do report**.
+
+### Como escolher o que vai no e-mail-resumo?
+No passo 4 do emulador, **Selecionar destaques do e-mail**: vem uma sugestão (os números do projeto principal), e você inclui, tira, reordena e ajusta até 4 destaques, com imagem e link opcionais. Informação que não está no report entra por **+ Informação nova** e precisa de **Revisei** antes do `.eml`. Detalhes em [EMULADOR.md › E-mail-resumo](EMULADOR.md#e-mail-resumo).
+
+### Dá para mandar o e-mail-resumo como imagem?
+O e-mail é o `.eml` (texto de verdade, links clicáveis, leitura no celular). A **imagem do resumo (.png)**, no passo 6, é uma foto dele para prévia ou para usar junto, não para substituir o e-mail.
+
 ### Posso criar uma seção nova?
 Não pelo arquivo do mês: uma seção nova exige mudar o template (`template/report.html`) e o motor (`tools/motor.js`), com testes no computador e no celular. Peça a quem mantém o projeto. Antes, veja se o conteúdo cabe numa seção existente.
 

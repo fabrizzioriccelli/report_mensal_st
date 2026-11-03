@@ -229,6 +229,8 @@
           {{#sobra}}<td class="hide-m" width="{{sobra}}" style="width:{{sobra}}px;font-size:0;line-height:0;">&nbsp;</td>{{/sobra}}
         </tr>
       </table>
+      <!-- EDITAR AQUI: O QUE APRENDEMOS (PROJETO PRINCIPAL) → dados/AAAA-MM.txt › [PROJETO PRINCIPAL] aprendizado (uma ou duas frases; sem texto, não aparece) -->
+      {{aprendizado}}
     </td>
   </tr>
   {{/abertura}}
@@ -282,6 +284,8 @@
               </tr>
             </table>
             {{/tem_resultados}}
+            <!-- EDITAR AQUI: O QUE APRENDEMOS (DESTAQUE) → dados/AAAA-MM.txt › [DESTAQUE] aprendizado -->
+            {{aprendizado}}
             {{#nota}}<p class="fx" data-campo="destaque.nota" style="margin:12px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;color:{{cor.texto_apoio}};">{{nota}}</p>{{/nota}}
           </td>
         </tr>
@@ -311,6 +315,7 @@
             {{#status}}<p class="fx" data-campo="lancamento-{{idx}}.status" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
             <p class="ft" data-campo="lancamento-{{idx}}.nome" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
             {{#texto_cta}}<p class="fx tm" data-campo="lancamento-{{idx}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
+            {{aprendizado}}
           </td>
           {{/vazio}}
           {{/itens}}

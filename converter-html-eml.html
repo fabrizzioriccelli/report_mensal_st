@@ -21,8 +21,9 @@
     3. SALVAR: o report completo do mês (.html), com as alterações dentro.
        É o arquivo publicado no ambiente corporativo autorizado;
     4. LINK: o endereço do report publicado (o botão do e-mail usa esse link);
-    5. E-MAIL-RESUMO: até 3 indicadores e uma única chamada, "Acessar report
-       completo";
+    5. E-MAIL-RESUMO: até 4 destaques escolhidos (números, campanhas, "O que
+       aprendemos" ou informação nova revisada), com imagem e link opcionais, e
+       uma única chamada principal, "Acessar report completo";
     6. .EML: e-mail de verdade (MIME, imagens dentro), que o Outlook abre
        como mensagem nova.
   Nada é enviado para a internet: a página só lê e grava os arquivos que
@@ -96,6 +97,29 @@
   code{background:#F3F1EF;padding:1px 5px;border-radius:4px;font-size:13px}
   .campo{margin-top:14px}.campo>label{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
   .lista{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:4px}
+  /* destaques do e-mail-resumo (4.13) */
+  .dtqCab{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.dtqCab label{font-size:14px;font-weight:600}
+  .dtqs{display:grid;gap:10px;margin-top:8px}
+  .dtq{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;background:#FCFAF8;min-width:0}
+  .dtq.novo{border-color:#F0B998;background:#FFF8F2}.dtq.fora{border-color:#E8B4B4;background:#FFF5F5}
+  .dtq .topo{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+  .dtq .num{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;font-weight:700;flex:none}
+  .dtq .tag{font-size:12px;color:var(--gray);font-weight:700;letter-spacing:.4px}
+  .selo{font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;background:#F3F1EF;color:var(--gray)}
+  .selo.novo{background:var(--warnbg);color:var(--warn)}.selo.ed{background:#EEF0F3;color:#3D4A5C}.selo.fora{background:var(--errbg);color:#990000}.selo.ok{background:var(--okbg);color:var(--ok)}
+  .dtq .acoes{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px}.dtq .acoes button,.dtq .img button{padding:4px 10px;font-size:13px}
+  .dtq .valor{font:bold 22px Arial,sans-serif;margin-top:8px}
+  .dtq .grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 12px;margin-top:8px}
+  @media (max-width:600px){.dtq .grade{grid-template-columns:minmax(0,1fr)}}
+  .dtq label.f{display:block;font-size:13px;font-weight:600;min-width:0}
+  .dtq label.f input,.dtq label.f textarea,.dtq label.f select{display:block;width:100%;box-sizing:border-box;margin-top:3px;font:inherit;font-size:14px;font-weight:400;padding:7px 9px;border:1px solid #CFC9C4;border-radius:8px;background:#fff}
+  .dtq label.f textarea{resize:vertical;min-height:52px}
+  .dtq .larga{grid-column:1/-1}
+  .dtq .img{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule)}
+  .dtq .img img{width:96px;height:auto;border-radius:6px;border:1px solid var(--rule);display:block}
+  .dtq .img .check{font-size:13px}
+  .dtqLista .grupo{margin-top:10px}.dtqLista .grupo>b{display:block;font-size:13px;color:var(--gray);margin-bottom:2px}
+  .dtqLista button{padding:4px 10px;font-size:13px;margin:4px 6px 0 0;text-align:left;max-width:100%;white-space:normal}
   .passos{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--gray)}
   .inicio{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:12px}
   .cartao{border:1px solid #CFC9C4;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff}
@@ -241,11 +265,18 @@
   <!-- 4 · E-MAIL-RESUMO -->
   <section aria-labelledby="s4" id="secResumo" hidden>
     <h2 id="s4"><b>4</b>E-mail-resumo</h2>
-    <p class="muted">Curto de propósito: o período, a frase do mês, <b>até 3 indicadores</b> e uma única chamada, "Acessar report completo". O resto fica no report completo.</p>
-    <div class="campo">
-      <label>Indicadores do e-mail (até 3)</label>
-      <div class="lista" id="indicadores"><span class="muted">Abra um report para ver os indicadores.</span></div>
-      <p class="muted" style="margin-top:6px">Vêm marcados os números do projeto da capa (cada um com o nome do projeto). O número que a frase do mês já diz não vem marcado, para não repetir. Pode trocar por outros indicadores da página. Nenhum número é criado aqui: só aparecem os que estão no report.</p>
+    <p class="muted">A porta de entrada para o report: a frase do mês, <b>até 4 destaques</b> que você escolhe e uma única chamada para o report completo.</p>
+    <div class="campo" id="dtq">
+      <div class="dtqCab"><label id="dtqTit">Selecionar destaques do e-mail</label><span id="dtqConta" class="muted">0 de 4</span></div>
+      <p class="muted" id="dtqDica">Abra um report para ver o que dá para destacar.</p>
+      <div class="dtqs" id="dtqEscolhidos" aria-labelledby="dtqTit"></div>
+      <div class="row">
+        <button type="button" id="bDtqNovo" disabled>+ Informação nova</button>
+        <button type="button" id="bDtqSugestao" disabled>Voltar para a sugestão</button>
+      </div>
+      <details id="dtqDisp" open><summary>No report: clique para incluir no e-mail</summary><div class="dtqLista" id="dtqLista"></div></details>
+      <p class="muted" style="margin-top:8px">Os números vêm sempre do report: mudou lá, muda aqui. Título e descrição podem ser ajustados só para o e-mail (o report não muda). Informação nova, que não está no report, só libera o e-mail depois de revisada.</p>
+      <input type="file" id="fDtqImg" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
     </div>
     <div class="campo">
       <label for="botao">Texto do botão</label>
@@ -274,6 +305,10 @@
     <div class="row">
       <button type="button" class="pri" id="bEmlRes" disabled>Baixar e-mail-resumo (.eml)</button>
       <span id="emlResInfo" class="muted"></span>
+    </div>
+    <div class="row">
+      <button type="button" id="bPngRes" disabled>Baixar imagem do resumo (.png)</button>
+      <span id="pngResInfo" class="muted">Uma foto do e-mail-resumo, para prévia ou para usar junto (não substitui o .eml).</span>
     </div>
     <div class="row">
       <button type="button" id="bEml" disabled>Baixar e-mail completo (.eml, opcional)</button>
@@ -446,6 +481,7 @@
     var minha = ++ED.abertura;
     $("#estado").className = "estado"; $("#estado").textContent = "Abrindo " + nome + "…";
     if (!jaSeparado) { soltarMidia(); GUARDADAS = {}; }
+    ED.resumo = lerResumoConfig(html) || { destaques: null }; DTQ.assinatura = ""; DTQ.cache = {};
     if (!jaSeparado) html = await separarMidia(html);
     if (minha !== ED.abertura) return;
     if ($("#link").dataset.auto === "1") { $("#link").value = ""; $("#linkInfo").textContent = ""; }
@@ -545,17 +581,18 @@
     var esconder = null, w = d.defaultView;
     /* Um temporizador só: agendar de novo cancela o anterior (dois ao mesmo tempo deixavam um órfão, que escondia a barra do próximo item). */
     function agendarEsconder(ms) { clearTimeout(esconder); esconder = setTimeout(function () { barra.hidden = true; }, ms); }
-    var LINKS = 'a.cta, a[data-anexo], span[title="Link ainda não definido"]', ALVOS_BARRA = "img[data-img], " + LINKS + ", [data-item], [data-ed-bloco]";
+    var LINKS = 'a.cta, a[data-anexo], span[title="Link ainda não definido"]', ALVOS_BARRA = "img[data-img], " + LINKS + ", [data-apr], [data-item], [data-ed-bloco]";
     /* Dono da barra no ponto: imagem, link ou item (null: nada, ou dentro do campo em edição, onde a barra fica como está). */
     function alvoDe(t) {
       if (!t || !t.closest || t.closest("#ed-barra")) return null;
       var img = t.closest("img[data-img]") || t.closest(LINKS); if (img) return img;
       if (d.activeElement && d.activeElement.hasAttribute("data-ed-campo") && d.activeElement.contains(t)) return null;
-      return t.closest("[data-item], [data-ed-bloco]");
+      return t.closest("[data-apr], [data-item], [data-ed-bloco]");
     }
     function mostrarFerramentas(alvo) {
       if (alvo.tagName === "IMG") return mostrarBarra(alvo, ferramentasImagem(alvo), alvo.getBoundingClientRect().width < 200 ? "abaixo" : "");
       if (alvo.matches(LINKS)) return mostrarBarra(alvo, ferramentasLink(alvo));
+      if (alvo.hasAttribute("data-apr")) return mostrarBarra(alvo, [["Tirar aprendizado", function () { tirarAprendizado(alvo); }, "cinza"]], "direita");
       var item = alvo, gi = grupoDe(item), numeros = gi ? GRUPOS[gi].layout === "numeros" || GRUPOS[gi].semMidia : item.getAttribute("data-item") === "cx-trimestre";
       var bi = numeros ? [] : [["+ Link", function () { adicionarLink(item); }]];
       if (!numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
@@ -565,6 +602,9 @@
         /* o último item de um grupo fica (a seção não fica vazia): para tirar o grupo todo, oculte a seção */
         if (!gi || itensDo(gi).length > 1) bi.push([item.getAttribute("data-item") === "cx-trimestre" ? "Tirar trimestral" : "Tirar item", function () { ocultarItem(item); }, "cinza"]);
       }
+      /* "O que aprendemos" da campanha: lançamento (no card), projeto principal (números) e destaque (resultados) */
+      var ca = chaveAprendizadoDe(item);
+      if (ca && !campoExiste(ca)) bi.splice(bi.length && /^Tirar/.test(bi[bi.length - 1][0]) ? bi.length - 1 : bi.length, 0, ["+ O que aprendemos", function () { criarAprendizado(ca, null, true); }]);
       mostrarBarra(item, bi, item.getBoundingClientRect().width < 320 ? "acima" : "direita");
     }
     /* Caminho até a barra: indo do dono até ela, o mouse passa por cima de outras coisas (o cartão em volta da imagem,
@@ -958,13 +998,13 @@
   /* Recorta (se a imagem tem altura fixa) e reduz para o dobro do tamanho na tela (nitidez em telas de alta resolução).
      Otimizada para o report e os e-mails não pesarem: JPEG sempre que a imagem não tem transparência (um print em PNG
      vira JPEG); PNG só quando há transparência (logo, selo) e fica menor. */
-  function desenhar(im, w, h, png, play) {
+  function desenhar(im, w, h, png, play, anc) {
     var W = w * 2, H = h ? h * 2 : Math.round(W * im.naturalHeight / im.naturalWidth);
     if (!h && im.naturalWidth < W) { W = im.naturalWidth; H = im.naturalHeight; }
     var c = document.createElement("canvas"); c.width = W; c.height = H; var g = c.getContext("2d");
     if (!png) { g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, W, H); }
     var esc_ = Math.max(W / im.naturalWidth, H / im.naturalHeight), sw = W / esc_, sh = H / esc_;
-    g.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, 0, 0, W, H);
+    g.drawImage(im, (im.naturalWidth - sw) / 2, anc === "topo" ? 0 : anc === "base" ? im.naturalHeight - sh : (im.naturalHeight - sh) / 2, sw, sh, 0, 0, W, H);
     if (play) desenharPlay(g, W, H, "#EC0000");
     return codificar(c, png);
   }
@@ -1193,6 +1233,56 @@
     marcarSujo("Link tirado. Para voltar: Desfazer.");
   }
 
+  /* ---------- "O que aprendemos" dentro da campanha (4.13) ---------- */
+  /* Uma ou duas frases logo depois dos resultados: projeto principal (abaixo dos números), destaque (abaixo dos
+     resultados) e cada lançamento (no fim do card). Report de antes (sem o bloco): "+ O que aprendemos" na barra do
+     item, ou a importação do Copilot com o campo "aprendizado" criam o bloco no lugar certo, igual ao do motor. */
+  function campoExiste(chave) { return !!ED.doc.querySelector('[data-campo="' + chave + '"]'); }
+  function chaveAprendizadoDe(item) {
+    var di = item.getAttribute("data-item") || "", bl = item.getAttribute("data-ed-bloco") || "";
+    if (/^lancamento-\d+$/.test(di)) return di + ".aprendizado";
+    if (/^numero-\d+$/.test(di) || bl === "principal") return "principal.aprendizado";
+    if (/^resultado-\d+$/.test(di) || bl === "destaque") return "destaque.aprendizado";
+    return "";
+  }
+  function alvoAprendizado(chave) {
+    var d = ED.doc, m;
+    if (chave === "principal.aprendizado") { var n = d.querySelector('[data-item^="numero-"]'), td = n && n.closest("td.px"); return td ? { pai: td, antes: null, variante: "capa" } : null; }
+    if (chave === "destaque.aprendizado") {
+      var t = d.querySelector('[data-campo="destaque.titulo"]'), col = t && t.closest("td"), nota = col && col.querySelector('[data-campo="destaque.nota"]');
+      return col ? { pai: col, antes: nota && nota.parentNode === col ? nota : null, variante: "destaque" } : null;
+    }
+    if ((m = /^lancamento-(\d+)\.aprendizado$/.exec(chave))) { var it = d.querySelector('[data-item="lancamento-' + m[1] + '"]'); return it ? { pai: it, antes: null, variante: "card" } : null; }
+    return null;
+  }
+  function fonteTextoDaPagina() {
+    var p = ED.doc.querySelector('p.fx[style*="font-family"]'), m = p && /font-family:\s*([^;]+)/.exec(p.getAttribute("style"));
+    return m ? m[1].trim() : "Arial, Helvetica, sans-serif";
+  }
+  /* textoHtml: o texto já pronto (importação); sem ele, o texto do modelo entre colchetes, selecionado para digitar por cima. */
+  function criarAprendizado(chave, textoHtml, mostrar) {
+    var a = alvoAprendizado(chave); if (!a) return null;
+    var modelo = '<span style="background:#FFE1B9;color:#945400;border-radius:3px;">[O que a campanha ensinou, em uma ou duas frases]</span>';
+    var tmp = ED.doc.createElement("div"); tmp.innerHTML = Motor.htmlAprendizado(textoHtml || modelo, chave, a.variante, { fonte: fonteTextoDaPagina() });
+    var bloco = tmp.firstElementChild; a.pai.insertBefore(bloco, a.antes);
+    editavel(bloco);
+    pilha(function () { bloco.remove(); });
+    if (mostrar) {
+      ED.doc.getElementById("ed-barra").hidden = true;
+      bloco.scrollIntoView({ block: "center" });
+      var campo = bloco.querySelector("[data-campo]"); if (campo) campo.focus();
+      marcarSujo("O que aprendemos: escreva uma ou duas frases curtas. Para tirar: Desfazer ou Tirar aprendizado.");
+    }
+    return bloco;
+  }
+  function tirarAprendizado(bloco) {
+    var pai = bloco.parentNode, prox = bloco.nextSibling, chave = bloco.getAttribute("data-apr");
+    bloco.remove(); if (chave) delete ED.alterados[chave];
+    pilha(function () { pai.insertBefore(bloco, prox); });
+    ED.doc.getElementById("ed-barra").hidden = true;
+    marcarSujo("Aprendizado tirado. Para voltar: Desfazer.");
+  }
+
   /* ---------- mais links e mais imagens em qualquer item ---------- */
   /* Blocos que não são itens de grupo, mas também recebem links e imagens: destaque, projeto principal e foco. */
   function marcarBlocos() {
@@ -1411,8 +1501,8 @@
     itensDo(g).forEach(function (it, i) {
       var nova = g + "-" + (i + 1);
       it.setAttribute("data-item", nova);
-      [it].concat(Array.prototype.slice.call(it.querySelectorAll("[data-campo],[data-img],[data-bloco]"))).forEach(function (x) {
-        ["data-campo", "data-img", "data-bloco"].forEach(function (at) { var v = x.getAttribute(at); if (v && re.test(v)) x.setAttribute(at, v.replace(re, nova)); });
+      [it].concat(Array.prototype.slice.call(it.querySelectorAll("[data-campo],[data-img],[data-bloco],[data-apr]"))).forEach(function (x) {
+        ["data-campo", "data-img", "data-bloco", "data-apr"].forEach(function (at) { var v = x.getAttribute(at); if (v && re.test(v)) x.setAttribute(at, v.replace(re, nova)); });
       });
       if (g === "aprendizado" || GRUPOS[g].layout === "colunas") { var num = it.querySelector("p.ft"); if (num && /^\d+$/.test(num.textContent.trim())) num.textContent = String(i + 1); }
     });
@@ -2148,6 +2238,7 @@
     var feitos = [], faltam = [];
     Object.keys(campos).forEach(function (chave) {
       var c = campos[chave], els = camposDe(chave);
+      if (!els.length && /\.aprendizado$/.test(chave) && criarAprendizado(chave, esc(c.texto).replace(/&lt;br\s*\/?&gt;/gi, "<br>"))) { feitos.push(chave); ED.alterados[chave] = true; return; }
       if (!els.length) { faltam.push(chave); return; }
       els.forEach(function (el) {
         var antes = el.innerHTML;
@@ -2195,6 +2286,8 @@
     if (per) { var periodo = per.textContent.replace(/\s+/g, " ").trim(), mes = periodo.charAt(0) + periodo.slice(1).toLocaleLowerCase("pt-BR"); doc.title = "Creative Strategy PF | Report de " + mes.replace(/(\d{4})$/, "$1"); }
     var fraseFinal = doc.querySelector('[data-campo="frase_final"]');
     if (frase && prev && Object.keys(ED.alterados).some(function (k) { return /^frase/.test(k); })) prev.textContent = (frase.textContent + " " + (fraseFinal ? fraseFinal.textContent : "")).replace(/\s+/g, " ").trim();
+    /* destaques do e-mail-resumo (4.13): num bloco que a página não mostra e que os e-mails não levam */
+    gravarResumoConfig(doc);
     var html = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
     return Motor.renumerarSecoes(html);
   }
@@ -2319,7 +2412,7 @@
     { id: "ler", nome: "Ler o report" },
     { id: "origem", nome: "Reconhecer o report" },
     { id: "limpar", nome: "Tirar o que o e-mail não aceita" },
-    { id: "resumir", nome: "Montar o e-mail-resumo (até 3 indicadores)" },
+    { id: "resumir", nome: "Montar o e-mail-resumo (até 4 destaques)" },
     { id: "imagens", nome: "Colocar as imagens dentro dos e-mails" },
     { id: "completo", nome: "Montar o e-mail completo (.eml)" },
     { id: "resumido", nome: "Montar o e-mail-resumo (.eml)" }
@@ -2375,29 +2468,171 @@
   function nomeDoSrc(src) { try { src = decodeURIComponent(src); } catch (e) {} return src.split(/[?#]/)[0].split(/[\\/]/).pop(); }
   function hostDe(u) { try { return new URL(u).host || u.slice(0, 60); } catch (e) { return u.slice(0, 60); } }
 
-  /* Indicadores candidatos: caixas (até 3). */
-  function atualizarIndicadores(cand, escolha) {
-    var box = $("#indicadores"), chave = cand.map(function (x) { return x.chave + x.valor + x.titulo + x.origem + x.na_frase; }).join("|");
-    if (box.dataset.chave === chave) return;
-    var antes = {}; Array.prototype.forEach.call(box.querySelectorAll("input"), function (c) { antes[c.value] = c.checked; });
-    box.dataset.chave = chave; box.textContent = "";
-    if (!cand.length) { box.innerHTML = '<span class="muted">Este report não tem indicadores marcados.</span>'; return; }
-    cand.forEach(function (x) {
-      var l = document.createElement("label"), c = document.createElement("input"); l.className = "check"; c.type = "checkbox"; c.value = x.chave;
-      c.checked = x.chave in antes ? antes[x.chave] : escolha.indexOf(x.chave) >= 0;
-      /* o nome do projeto (ex.: Alfa), não "Projeto principal"; sem repetir o nome que o título já tem */
-      var de = x.origem && x.origem !== x.titulo && x.titulo.indexOf(x.origem) < 0 ? " (" + x.origem + ")" : "";
-      l.appendChild(c); l.appendChild(document.createTextNode(" " + x.valor + " · " + x.titulo + de));
-      if (x.na_frase) { var av = document.createElement("span"); av.className = "muted"; av.textContent = " · já está na frase do mês"; l.appendChild(av); l.title = "A frase do mês já diz este número: no e-mail ele apareceria duas vezes."; }
-      box.appendChild(l);
+  /* ---------- e-mail-resumo: destaques escolhidos (4.13) ---------- */
+  /* ED.resumo.destaques: null = a sugestão do motor (os números do projeto principal); depois que a pessoa mexe,
+     a lista dela, na ordem dela (até 4). Cada destaque: { origem, titulo?, texto?, imagem?, link?, link_texto?,
+     novo?, valor?, etiqueta?, tom?, revisado? }. Vai gravado no report salvo, num bloco que a página não mostra
+     (<script type="application/json" id="resumo-email">) e que os e-mails não levam. O valor dos números vem
+     sempre da página: muda lá, muda aqui. */
+  var DTQ = { cand: [], sug: [], fora: [], figuras: {}, cache: {}, assinatura: "" };
+  var MAX_DTQ = Motor.RESUMO_REGRAS.destaques;
+  function lerResumoConfig(html) {
+    var m = /<script type="application\/json" id="resumo-email">([\s\S]*?)<\/script>/.exec(html || "");
+    if (!m) return null;
+    try { var o = JSON.parse(m[1]); return o && Array.isArray(o.destaques) ? { destaques: o.destaques.slice(0, MAX_DTQ) } : null; } catch (e) { return null; }
+  }
+  function gravarResumoConfig(doc) {
+    Array.prototype.forEach.call(doc.querySelectorAll("#resumo-email"), function (n) { n.remove(); });
+    if (!ED.resumo || !ED.resumo.destaques || !doc.body) return;
+    var sc = doc.createElement("script"); sc.type = "application/json"; sc.id = "resumo-email";
+    sc.textContent = JSON.stringify({ versao: 1, destaques: ED.resumo.destaques }).replace(/</g, "\\u003c");
+    doc.body.appendChild(sc);
+  }
+  function porOrigem(o) { for (var i = 0; i < DTQ.cand.length; i++) if (DTQ.cand[i].origem === o) return DTQ.cand[i]; return null; }
+  function listaDtq() { return ED.resumo && ED.resumo.destaques ? ED.resumo.destaques : DTQ.sug.map(function (x) { return { origem: x.origem }; }); }
+  /* a primeira mudança transforma a sugestão na lista da pessoa */
+  function minhaLista() { if (!ED.resumo) ED.resumo = { destaques: null }; if (!ED.resumo.destaques) ED.resumo.destaques = listaDtq().map(function (x) { return JSON.parse(JSON.stringify(x)); }); return ED.resumo.destaques; }
+  function mudouDtq(msg, refazer) { if (refazer) desenharDestaques(true); if (ED.doc) marcarSujo(msg); else reconverter(); }
+  var NOMES_FIG = { principal: "Peça do projeto principal", destaque: "Peça do destaque" };
+  function nomeFigura(k) {
+    if (NOMES_FIG[k]) return NOMES_FIG[k];
+    var c = porOrigem(k); return c ? (/^lancamento/.test(k) ? "Card: " : /^transformation/.test(k) ? "Projeto: " : "") + c.titulo : k;
+  }
+  function figurasUteis() { return Object.keys(DTQ.figuras).filter(function (k) { return k !== "logo" && DTQ.figuras[k].src; }); }
+  function rotuloCand(c) { return (c.valor ? c.valor + " · " : "") + (c.aprendizado ? "O que aprendemos · " + c.grupo : c.titulo) + (c.tipo === "texto" && c.texto && !c.aprendizado ? " — " + c.texto.slice(0, 70) + (c.texto.length > 70 ? "…" : "") : c.aprendizado ? " — " + c.texto.slice(0, 70) + (c.texto.length > 70 ? "…" : "") : "") + (c.na_frase ? " · já está na frase do mês" : ""); }
+  function el(tag, at, filhos) {
+    var e = document.createElement(tag);
+    Object.keys(at || {}).forEach(function (k) { if (k === "texto") e.textContent = at[k]; else if (k === "classe") e.className = at[k]; else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), at[k]); else if (at[k] !== null && at[k] !== undefined && at[k] !== false) e.setAttribute(k, at[k] === true ? "" : at[k]); });
+    (filhos || []).forEach(function (f) { if (f) e.appendChild(typeof f === "string" ? document.createTextNode(f) : f); });
+    return e;
+  }
+  function campoTexto(rotulo, valor, dica, aoMudar, area, larga, max) {
+    var i = el(area ? "textarea" : "input", area ? { rows: "2", maxlength: max || 180, placeholder: dica || "" } : { type: "text", maxlength: max || 90, placeholder: dica || "" });
+    i.value = valor || ""; i.addEventListener("input", function () { aoMudar(i.value); });
+    return el("label", { classe: "f" + (larga ? " larga" : "") }, [rotulo, i]);
+  }
+  /* Lista dos escolhidos (cartões editáveis) e do que o report oferece. forcar: refaz mesmo sem mudar a estrutura. */
+  function desenharDestaques(forcar) {
+    var lista = listaDtq(), auto = !(ED.resumo && ED.resumo.destaques);
+    var ass = JSON.stringify([lista.map(function (x) { return [x.origem, !!x.imagem, x.imagem && x.imagem.posicao, x.imagem && x.imagem.inteira, x.imagem && x.imagem.video, x.imagem && x.imagem.recorte, !!x.novo, !!x.revisado]; }), DTQ.cand.map(function (c) { return c.origem + c.valor + c.titulo + c.texto; }), auto, DTQ.fora, figurasUteis()]);
+    if (!forcar && ass === DTQ.assinatura) return;
+    DTQ.assinatura = ass;
+    var box = $("#dtqEscolhidos"), n = lista.length; box.textContent = "";
+    $("#dtqConta").textContent = n + " de " + MAX_DTQ + (auto && n ? " · sugestão" : "");
+    $("#dtqDica").textContent = !DTQ.cand.length ? "Este report não tem itens para destacar." : auto ? "Sugestão: os números do projeto principal. Troque, tire, reordene ou inclua o que quiser (até " + MAX_DTQ + ")." : "Na ordem do e-mail. Com número ímpar, o primeiro ocupa a largura toda.";
+    $("#bDtqNovo").disabled = n >= MAX_DTQ || !DTQ.cand.length && !ED.doc; $("#bDtqSugestao").disabled = auto;
+    lista.forEach(function (cf, i) {
+      var c = cf.novo ? null : porOrigem(cf.origem), fora = !cf.novo && !c, ind = cf.novo ? !!cf.valor : c && c.tipo === "indicador";
+      var largo = Motor.layoutDestaques(n)[i].largo;
+      var topo = el("div", { classe: "topo" }, [el("span", { classe: "num", texto: String(i + 1) }),
+        el("span", { classe: "tag", texto: cf.novo ? "INFORMAÇÃO NOVA" : fora ? "SAIU DO REPORT" : (c.secao + (c.grupo && c.grupo !== c.secao ? " · " + c.grupo : "")).toUpperCase() }),
+        cf.novo ? el("span", { classe: "selo " + (cf.revisado ? "ok" : "novo"), texto: cf.revisado ? "revisada" : "precisa de revisão" }) : null,
+        fora ? el("span", { classe: "selo fora", texto: "não vai no e-mail" }) : null,
+        !cf.novo && c && ((cf.titulo && cf.titulo !== c.titulo) || (cf.texto !== undefined && cf.texto !== null && cf.texto !== c.texto)) ? el("span", { classe: "selo ed", texto: "texto ajustado para o e-mail" }) : null,
+        largo ? el("span", { classe: "selo", texto: "largura toda" }) : null,
+        el("span", { classe: "acoes" }, [
+          el("button", { type: "button", texto: "↑", title: "Subir", "aria-label": "Subir o destaque " + (i + 1), disabled: i === 0, onclick: function () { var l = minhaLista(); l.splice(i - 1, 0, l.splice(i, 1)[0]); mudouDtq("Destaques: nova ordem", true); } }),
+          el("button", { type: "button", texto: "↓", title: "Descer", "aria-label": "Descer o destaque " + (i + 1), disabled: i === n - 1, onclick: function () { var l = minhaLista(); l.splice(i + 1, 0, l.splice(i, 1)[0]); mudouDtq("Destaques: nova ordem", true); } }),
+          el("button", { type: "button", texto: "Tirar", "aria-label": "Tirar o destaque " + (i + 1), onclick: function () { minhaLista().splice(i, 1); mudouDtq("Destaque tirado do e-mail", true); } })])]);
+      var card = el("div", { classe: "dtq" + (cf.novo ? " novo" : "") + (fora ? " fora" : ""), "data-origem": cf.origem }, [topo]);
+      if (fora) { card.appendChild(el("p", { classe: "muted", texto: "Este item não está mais no report (" + cf.origem + "): tire o destaque ou escolha outro." })); box.appendChild(card); return; }
+      function muda(k, v) { var l = minhaLista(), x = l[i]; if (v === null) delete x[k]; else x[k] = v; mudouDtq(); }
+      var grade = el("div", { classe: "grade" });
+      if (cf.novo) {
+        grade.appendChild(campoTexto("Número (opcional)", cf.valor, "ex.: 1.234 ou 12%", function (v) { muda("valor", v.trim()); }, false, false, 14));
+        grade.appendChild(campoTexto("Etiqueta (opcional)", cf.etiqueta, "ex.: ▲ 2x maior", function (v) { muda("etiqueta", v.trim()); }, false, false, 30));
+      } else if (ind) card.appendChild(el("div", { classe: "valor", texto: c.valor + (c.etiqueta ? "  ·  " + c.etiqueta : "") }));
+      grade.appendChild(campoTexto("Título", cf.novo ? cf.titulo : cf.titulo !== undefined && cf.titulo !== null ? cf.titulo : c.titulo, cf.novo ? "O que aconteceu, em poucas palavras" : c.titulo, function (v) { muda("titulo", cf.novo || v.trim() !== c.titulo ? v : null); }, false, true, 70));
+      grade.appendChild(campoTexto("Descrição curta", cf.novo ? cf.texto : cf.texto !== undefined && cf.texto !== null ? cf.texto : c.texto, cf.novo ? "Uma frase: por que isso importa" : "Uma frase (vazio: sem descrição)", function (v) { muda("texto", cf.novo || v !== c.texto ? v : null); }, true, true, 180));
+      grade.appendChild(campoTexto("Link do destaque (opcional)", cf.link, "https://… (o botão principal continua sendo o do report)", function (v) { muda("link", v.trim() || null); }, false, false, 400));
+      grade.appendChild(campoTexto("Texto do link", cf.link_texto, "Saiba mais", function (v) { muda("link_texto", v.trim() || null); }, false, false, 30));
+      card.appendChild(grade);
+      /* imagem: do computador ou do report; posição; capa de vídeo (▶) */
+      var im = cf.imagem, imgBox = el("div", { classe: "img" });
+      if (im) {
+        var mini = el("img", { alt: "Imagem do destaque " + (i + 1) }); mini.src = im.fonte === "report" ? (DTQ.figuras[im.figura] || {}).src || "" : im.orig || "";
+        imgBox.appendChild(mini);
+        imgBox.appendChild(el("label", { classe: "f" }, ["Posição", (function () {
+          var sl = el("select", {}, [el("option", { value: "acima", texto: "Acima do texto" }), el("option", { value: "lado", texto: largo ? "Ao lado do texto" : "Ao lado do texto (só no destaque de largura toda)" })]);
+          sl.value = im.posicao || "acima"; sl.addEventListener("change", function () { minhaLista()[i].imagem.posicao = sl.value; mudouDtq("Imagem do destaque: posição", true); }); return sl; })()]));
+        if (!im.inteira) imgBox.appendChild(el("label", { classe: "f" }, ["Recorte", (function () {
+          var sr = el("select", {}, [el("option", { value: "", texto: "Centro" }), el("option", { value: "topo", texto: "Topo" }), el("option", { value: "base", texto: "Base" })]);
+          sr.value = im.recorte || ""; sr.addEventListener("change", function () { var x = minhaLista()[i].imagem; if (sr.value) x.recorte = sr.value; else delete x.recorte; mudouDtq("Imagem do destaque: recorte " + (sr.value || "no centro"), true); }); return sr; })()]));
+        var inteira = el("input", { type: "checkbox" }); inteira.checked = !!im.inteira;
+        inteira.addEventListener("change", function () { minhaLista()[i].imagem.inteira = inteira.checked; mudouDtq("Imagem do destaque: " + (inteira.checked ? "inteira" : "recortada"), true); });
+        imgBox.appendChild(el("label", { classe: "check" }, [inteira, "Inteira (sem cortar)"]));
+        if (im.fonte !== "report" || !(DTQ.figuras[im.figura] || {}).video) {
+          var vid = el("input", { type: "checkbox" }); vid.checked = !!im.video;
+          vid.addEventListener("change", function () { minhaLista()[i].imagem.video = vid.checked; mudouDtq(vid.checked ? "Capa de vídeo: o ▶ vai desenhado na imagem (o vídeo fica no report)" : "Imagem sem o ▶", true); });
+          imgBox.appendChild(el("label", { classe: "check" }, [vid, "Capa de vídeo (▶)"]));
+        } else imgBox.appendChild(el("span", { classe: "muted", texto: "Capa do vídeo do report, com o ▶ (o vídeo fica no report)." }));
+        imgBox.appendChild(el("button", { type: "button", texto: "Tirar imagem", onclick: function () { delete minhaLista()[i].imagem; mudouDtq("Imagem tirada do destaque", true); } }));
+      }
+      imgBox.appendChild(el("button", { type: "button", texto: im ? "Trocar: do computador" : "+ Imagem do computador", onclick: function () { escolher("#fDtqImg", function (f) { imagemDoComputador(i, f); }); } }));
+      var figs = figurasUteis();
+      if (figs.length) {
+        var sf = el("select", { "aria-label": "Imagem do report para o destaque " + (i + 1) }, [el("option", { value: "", texto: im ? "Trocar: do report…" : "+ Imagem do report…" })].concat(figs.map(function (k) { return el("option", { value: k, texto: nomeFigura(k) + (DTQ.figuras[k].video ? " (vídeo)" : "") }); })));
+        sf.addEventListener("change", function () { if (!sf.value) return; var l = minhaLista(); l[i].imagem = { fonte: "report", figura: sf.value, posicao: (l[i].imagem && l[i].imagem.posicao) || "acima", alt: DTQ.figuras[sf.value].alt || "" }; mudouDtq("Imagem do report no destaque", true); });
+        imgBox.appendChild(sf);
+      }
+      card.appendChild(imgBox);
+      if (cf.novo) {
+        var rv = el("input", { type: "checkbox" }); rv.checked = !!cf.revisado;
+        rv.addEventListener("change", function () { minhaLista()[i].revisado = rv.checked; mudouDtq(rv.checked ? "Informação nova revisada" : "Informação nova: precisa de revisão", true); });
+        card.appendChild(el("label", { classe: "check", style: "margin-top:10px" }, [rv, "Revisei: confere com os resultados (sem isso, o e-mail não sai)"]));
+      }
+      box.appendChild(card);
     });
-    limitar();
+    /* o que o report oferece, por seção */
+    var disp = $("#dtqLista"); disp.textContent = "";
+    var usados = {}; lista.forEach(function (x) { usados[x.origem] = 1; });
+    var secoes = []; DTQ.cand.forEach(function (c) { if (secoes.indexOf(c.secao) < 0) secoes.push(c.secao); });
+    secoes.forEach(function (sec) {
+      /* o nome da campanha junto da seção (quem lê o e-mail conhece a campanha, não o "Projeto principal") */
+      var dono = sec === "Projeto principal" ? porOrigem("principal") : sec === "Destaque" ? porOrigem("destaque") : null;
+      var g = el("div", { classe: "grupo" }, [el("b", { texto: sec + (dono && dono.titulo ? " · " + dono.titulo : "") })]);
+      DTQ.cand.filter(function (c) { return c.secao === sec; }).forEach(function (c) {
+        var ja = !!usados[c.origem];
+        g.appendChild(el("button", { type: "button", "data-origem": c.origem, disabled: ja || n >= MAX_DTQ, title: ja ? "Já está no e-mail" : n >= MAX_DTQ ? "O e-mail já tem " + MAX_DTQ + " destaques" : "Incluir no e-mail", texto: (ja ? "✓ " : "+ ") + rotuloCand(c),
+          onclick: function () { var l = minhaLista(); if (l.length >= MAX_DTQ) return; var nv = { origem: c.origem }; if (c.figura && DTQ.figuras[c.figura] && c.tipo === "texto") nv.imagem = { fonte: "report", figura: c.figura, posicao: "acima", alt: DTQ.figuras[c.figura].alt || "" }; l.push(nv); mudouDtq("Destaque incluído: " + c.titulo, true); } }));
+      });
+      disp.appendChild(g);
+    });
   }
-  function limitar() {
-    var cs = Array.prototype.slice.call(document.querySelectorAll("#indicadores input")), n = cs.filter(function (c) { return c.checked; }).length;
-    cs.forEach(function (c) { c.disabled = !c.checked && n >= Motor.RESUMO_REGRAS.indicadores; });
+  $("#bDtqNovo").addEventListener("click", function () {
+    var l = minhaLista(); if (l.length >= MAX_DTQ) return;
+    var id = 1; while (l.some(function (x) { return x.origem === "novo-" + id; })) id++;
+    l.push({ origem: "novo-" + id, novo: true, titulo: "", texto: "", valor: "", etiqueta: "", revisado: false });
+    mudouDtq("Informação nova: preencha e marque \"Revisei\" para liberar o e-mail", true);
+    var c = $("#dtqEscolhidos").lastElementChild, t = c && c.querySelectorAll("input")[2]; if (t) t.focus();
+  });
+  $("#bDtqSugestao").addEventListener("click", function () { if (ED.resumo) ED.resumo.destaques = null; mudouDtq("Destaques: de volta à sugestão", true); });
+  /* imagem do computador: guardada reduzida (até 1200 px) no report; o recorte do e-mail é feito na hora, no tamanho do espaço */
+  async function imagemDoComputador(i, file) {
+    if (!/^image\//.test(file.type)) { await perguntar("Arquivo não é uma imagem", "<p>Escolha um arquivo <b>.jpg</b> ou <b>.png</b>.</p>", "Entendi"); return; }
+    var im = await carregarArquivo(file), l = minhaLista();
+    if (!l[i]) return;
+    l[i].imagem = { fonte: "arquivo", orig: desenhar(im, 600, 0, /png|webp|gif/.test(file.type), false), alt: (l[i].titulo || (porOrigem(l[i].origem) || {}).titulo || "").slice(0, 120), posicao: (l[i].imagem && l[i].imagem.posicao) || "acima", video: false };
+    mudouDtq("Imagem do computador no destaque " + (i + 1), true);
   }
-  $("#indicadores").addEventListener("change", function () { limitar(); reconverter(); });
+  /* Destaques prontos para o motor: as imagens recortadas no tamanho do espaço (o dobro, para telas nítidas). */
+  async function destaquesProntos() {
+    var lista = ED.resumo && ED.resumo.destaques; if (!lista) return null;
+    var n = Math.min(lista.length, MAX_DTQ), out = [];
+    for (var i = 0; i < n; i++) {
+      var cf = JSON.parse(JSON.stringify(lista[i])), im = cf.imagem; delete cf.imagem;
+      if (im) { try { var pr = await imagemPronta(im, i, n); if (pr) cf.imagem = pr; } catch (e) { log("Imagem do destaque " + (i + 1) + ": " + e.message); } }
+      out.push(cf);
+    }
+    return out;
+  }
+  async function imagemPronta(im, i, n) {
+    var fig = im.fonte === "report" ? DTQ.figuras[im.figura] : null, src = fig ? fig.src : im.orig; if (!src) return null;
+    var tam = Motor.tamanhoImagemDestaque(i, n, im.posicao), w = tam[0], h = im.inteira ? 0 : tam[1], play = !!im.video && !(fig && fig.video);
+    var chave = [src.length, src.slice(0, 64), src.slice(-64), w, h, play, im.recorte || ""].join("|");
+    if (!DTQ.cache[chave]) { var e = await carregar(src); DTQ.cache[chave] = { src: desenhar(e, w, h, false, play, im.recorte), w: w, h: h || Math.round(w * e.naturalHeight / e.naturalWidth) }; }
+    var c = DTQ.cache[chave]; return { src: c.src, w: c.w, h: c.h, alt: im.alt || (fig && fig.alt) || "", posicao: im.posicao || "acima" };
+  }
 
   var adiar = null;
   function reconverter(agora) {
@@ -2417,7 +2652,7 @@
     function parou() { return minha !== execucao; }
     var erros = [], avisos = [];
     resultado = null; resumido = null; previas = {};
-    $("#bEml").disabled = true; $("#bEmlRes").disabled = true; $("#emlInfo").textContent = ""; $("#emlResInfo").textContent = "";
+    $("#bEml").disabled = true; $("#bEmlRes").disabled = true; $("#bPngRes").disabled = true; $("#emlInfo").textContent = ""; $("#emlResInfo").textContent = "";
     urls.forEach(URL.revokeObjectURL); urls = [];
     $("#secStatus").hidden = false; montarEtapas(); progresso(0); relogio(true);
     banner("run", "Preparando o e-mail de " + file.name + "…");
@@ -2429,6 +2664,7 @@
     etapa("origem", "rodando", "Procurando a marca da ferramenta…"); await respira();
     var org = Motor.origemDoHtml(html), titulo = Motor.assuntoDoHtml(html);
     var dr = Motor.dadosDoResumo(html), per = dr.ok ? dr.d.periodo : "";
+    if (dr.ok) DTQ.figuras = dr.d.figuras || {};
     if (org || dr.ok) etapa("origem", "ok", "Report " + (per ? "de " + per : "") + (org ? " · gerado pela versão " + org.versao : "") + ".");
     else etapa("origem", "ok", "Report sem a marca da ferramenta (feito fora dela ou antes da 4.2): o e-mail é montado do mesmo jeito; confira a prévia.");
     var meta = /<meta name="report-completo" content="([^"]*)"/.exec(html);
@@ -2447,26 +2683,32 @@
       else if (lk.info && !/Caminho de arquivo|Endereço relativo/.test($("#linkInfo").textContent)) $("#linkInfo").textContent += " " + lk.info;
       $("#linkInfo").style.color = "";
     }
-    etapa("resumir", "rodando", "Escolhendo os indicadores…"); await respira();
-    var marcados = Array.prototype.filter.call(document.querySelectorAll("#indicadores input"), function (c) { return c.checked; }).map(function (c) { return c.value; });
-    var res = Motor.emailResumo(html, { link: linkOk ? link : "", botao: botao, indicadores: marcados, assunto: titulo }), itens = [];
+    etapa("resumir", "rodando", "Montando os destaques…"); await respira();
+    var prontos = await destaquesProntos(); if (parou()) return;
+    var res = Motor.emailResumo(html, { link: linkOk ? link : "", botao: botao, destaques: prontos, assunto: titulo }), itens = [];
     if (res.erro) { resErro = res.erro; etapa("resumir", "erro", res.erro); erros.push("resumo"); }
     else {
-      atualizarIndicadores(res.candidatos, res.indicadores);
-      res.indicadores.forEach(function (k) { var x = res.candidatos.filter(function (c) { return c.chave === k; })[0]; itens.push(x.valor + " · " + x.titulo + (x.origem && x.titulo.indexOf(x.origem) < 0 ? " (" + x.origem + ")" : "")); });
-      if (!res.indicadores.length) itens.push("Nenhum indicador na página: o e-mail sai só com a frase do mês e a chamada.");
-      var repetidos = res.candidatos.filter(function (x) { return x.na_frase && res.indicadores.indexOf(x.chave) >= 0; });
-      if (repetidos.length) itens.push({ t: "Repete a frase do mês: " + repetidos.map(function (x) { return x.valor + " · " + x.titulo; }).join(" | ") + ". Troque o indicador ou a frase.", aviso: true, ir: irPara("#indicadores"), ciente: "rep|" + repetidos.map(function (x) { return x.chave + x.valor; }).join() });
+      DTQ.cand = res.candidatos; DTQ.sug = res.sugestao; DTQ.fora = res.fora; desenharDestaques();
+      res.destaques.forEach(function (x) { itens.push((x.valor ? x.valor + " · " : "") + (x.aprendizado ? "O que aprendemos" + (x.grupo ? " · " + x.grupo : "") : x.titulo || "O que aprendemos") + (x.novo ? " (informação nova)" : "") + (x.imagem ? " · com imagem" : "") + (x.link ? " · com link" : "")); });
+      if (!res.destaques.length) itens.push("Sem destaques: o e-mail sai só com a frase do mês e a chamada.");
+      res.fora.forEach(function (o) { itens.push({ t: "Um destaque não está mais no report (" + o + "): tire ou troque na etapa 4.", aviso: true, ir: irPara("#dtq") }); });
+      var semRevisao = res.destaques.filter(function (x) { var cf = (ED.resumo.destaques || []).filter(function (y) { return y.origem === x.origem; })[0]; return x.novo && !(cf && cf.revisado); });
+      var vazios = res.destaques.filter(function (x) { return x.novo && !x.titulo; });
+      if (vazios.length) resErro = "Informação nova sem título (etapa 4): escreva o título ou tire o destaque.";
+      else if (semRevisao.length) resErro = "Informação nova para revisar (etapa 4): " + semRevisao.map(function (x) { return x.titulo; }).join(", ") + ". Marque \"Revisei\" para liberar o e-mail.";
+      var repetidos = res.repetidos;
+      if (repetidos.length) itens.push({ t: "Repete a frase do mês: " + repetidos.map(function (x) { return x.valor + " · " + x.titulo; }).join(" | ") + ". Troque o destaque ou a frase.", aviso: true, ir: irPara("#dtq"), ciente: "rep|" + repetidos.map(function (x) { return x.origem + x.valor; }).join() });
       /* cada texto do modelo que falta trocar, com "Ir até lá" (leva ao campo, com o cursor dentro) */
       res.pendencias.slice(0, 6).forEach(function (pd) { var k = pd.indexOf(": "); itens.push({ t: "Ainda é texto do modelo: " + pd.slice(k + 2), aviso: true, ir: irParaCampo(pd.slice(0, k)) }); });
       if (res.pendencias.length > 6) itens.push({ t: "E mais " + (res.pendencias.length - 6) + " texto(s) do modelo no report.", aviso: true });
       if (lk.erro) resErro = "O link do report completo (passo 3) " + lk.erro;
       else if (!link) resErro = "Falta o link do report completo (passo 3).";
+      res.destaques.forEach(function (x) { if (x.link && /^(javascript|data|vbscript):/i.test(x.link)) resErro = "Link de destaque não permitido: " + x.titulo; });
       if (linkOk && lk.tipo === "arquivo") itens.push({ t: "Link: caminho de arquivo. No e-mail recebido, o Outlook bloqueia esse link (e um caminho C:\\… só existe no seu computador). Para quem recebe, cole o link do OneDrive: botão direito no arquivo › Compartilhar › Copiar link.", aviso: true, ir: irPara("#link"), ciente: "arq|" + link });
       if (linkOk && lk.tipo === "relativo") itens.push({ t: "Link: só o nome do arquivo não abre no e-mail. Cole o caminho completo (C:\\…) ou o link de compartilhamento.", aviso: true, ir: irPara("#link"), ciente: "rel|" + link });
       if (!resErro && !res.temLink) resErro = "O botão ficou sem o link: confira o endereço no passo 3.";
       var abR = abertos(itens); if (abR.length) avisos.push("resumo");
-      etapa("resumir", resErro || abR.length ? "aviso" : "ok", resErro ? resErro + " A prévia mostra o aviso no lugar do botão." : res.indicadores.length + " indicador(es) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURIComponent(link.split("/").pop().replace(/%(?![0-9a-f]{2})/gi, "%25")) : hostDe(link)) + " (o único link do e-mail).", itens);
+      etapa("resumir", resErro || abR.length ? "aviso" : "ok", resErro ? resErro + (/link do report/.test(resErro) ? " A prévia mostra o aviso no lugar do botão." : "") : res.destaques.length + " destaque(s) · botão \"" + botao + "\" para " + (lk.tipo === "arquivo" ? "o arquivo " + decodeURIComponent(link.split("/").pop().replace(/%(?![0-9a-f]{2})/gi, "%25")) : hostDe(link)) + " (o único link do e-mail).", itens);
     }
     var completo = { html: limpo.html };
     progresso(32); await respira(); if (parou()) return;
@@ -2525,7 +2767,8 @@
     else {
       previas.resumido = Motor.trocarSrc(res.html, mapaPrev);
       var rr = montar(res.html, base + "-resumo.eml"), nl = (res.html.match(/<a\b[^>]*href=/gi) || []).length;
-      if (nl > 1) rr.notas.push("O e-mail-resumo tem " + nl + " links; o esperado é um.");
+      var nld = res.destaques.filter(function (x) { return x.link; }).length;
+      if (nl > 1 + nld) rr.notas.push("O e-mail-resumo tem " + nl + " links; o esperado é o do botão" + (nld ? " e os " + nld + " dos destaques" : "") + ".");
       if (erros.length) etapa("resumido", "erro", "Não montei: há imagens com problema.");
       else if (resErro) etapa("resumido", "aviso", resErro + " (prévia pronta: " + kb(rr.tam) + ").");
       else {
@@ -2539,7 +2782,7 @@
     if (erros.length) { progresso(100); banner("err", "Não deu para preparar o e-mail. Veja a etapa com ✕."); return; }
     progresso(100, true);
     banner(resumido && !avisos.length ? "ok" : "warn", resumido ? "Pronto: e-mail-resumo." + (avisos.length ? " Há pontos para olhar (!)." : "") : lk.erro ? "Quase: o link do report completo (passo 3) não é permitido. Sem um link, o e-mail-resumo não sai." : "Quase: falta o link do report completo (passo 3) para liberar o e-mail-resumo.");
-    $("#bEml").disabled = !resultado; $("#bEmlRes").disabled = !resumido;
+    $("#bEml").disabled = !resultado; $("#bEmlRes").disabled = !resumido; $("#bPngRes").disabled = !previas.resumido;
     $("#emlInfo").textContent = resultado ? resultado.nome + " · " + kb(resultado.tam) : "";
     $("#emlResInfo").textContent = resumido ? resumido.nome + " · " + kb(resumido.tam) : "Precisa do link do report completo (passo 3): o caminho do arquivo ou o link de compartilhamento.";
   }
@@ -2575,6 +2818,42 @@
   var alturaEdicao = ajustarAltura($("#edFrame")), alturaPrevia = ajustarAltura($("#prev"));
   $("#bEml").addEventListener("click", function () { baixarEml(resultado, "#emlInfo"); });
   $("#bEmlRes").addEventListener("click", function () { baixarEml(resumido, "#emlResInfo"); });
+  /* Imagem (.png) do e-mail-resumo (4.13): a prévia desenhada numa imagem, em dobro (nítida), sem programa externo.
+     Complementa o .eml (não o substitui): o e-mail continua em texto, legível e com o botão clicável. */
+  async function pngDoResumo(html, largura) {
+    var fr = document.createElement("iframe"); fr.setAttribute("aria-hidden", "true"); fr.tabIndex = -1;
+    fr.style.cssText = "position:fixed;left:-10000px;top:0;width:" + largura + "px;height:400px;border:0;visibility:hidden";
+    document.body.appendChild(fr);
+    try {
+      await new Promise(function (ok) { fr.onload = ok; fr.srcdoc = html; });
+      var d = fr.contentDocument;
+      await Promise.all(Array.prototype.map.call(d.images, function (im) { return im.complete ? 0 : new Promise(function (ok) { im.onload = im.onerror = ok; }); }));
+      /* imagens em blob: (mídia separada) viram data: (a imagem do SVG não busca nada de fora) */
+      for (var i = 0; i < d.images.length; i++) {
+        var im = d.images[i];
+        if (/^blob:/.test(im.src)) im.src = await lerComo(await (await fetch(im.src)).blob(), "readAsDataURL");
+      }
+      var H = Math.ceil(d.documentElement.scrollHeight), W = largura, esc2 = 2;
+      var caixa = d.createElement("div"); caixa.setAttribute("style", (d.body.getAttribute("style") || "") + ";width:" + W + "px;");
+      Array.prototype.forEach.call(d.querySelectorAll("style"), function (st) { caixa.appendChild(st.cloneNode(true)); });
+      Array.prototype.forEach.call(d.body.childNodes, function (n) { caixa.appendChild(n.cloneNode(true)); });
+      var xhtml = new XMLSerializer().serializeToString(caixa);
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W * esc2 + '" height="' + H * esc2 + '" viewBox="0 0 ' + W + " " + H + '"><foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' + xhtml + "</foreignObject></svg>";
+      var img = new Image(); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); await img.decode();
+      var c = document.createElement("canvas"); c.width = W * esc2; c.height = H * esc2;
+      var g = c.getContext("2d"); g.fillStyle = "#FBF1EA"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      return await new Promise(function (ok, falha) { c.toBlob(function (b) { b ? ok(b) : falha(new Error("não deu para gerar a imagem")); }, "image/png"); });
+    } finally { fr.remove(); }
+  }
+  $("#bPngRes").addEventListener("click", async function () {
+    if (!previas.resumido) return;
+    $("#pngResInfo").textContent = "Gerando a imagem…";
+    try {
+      var b = await pngDoResumo(previas.resumido, 680), nome = (resumido ? resumido.nome : (ED.nomeSalvo || "report") + "-resumo.eml").replace(/\.eml$/, ".png");
+      baixar(nome, b, "image/png");
+      $("#pngResInfo").textContent = "Baixada: " + nome + " · " + kb(b.size) + ". É uma foto do e-mail: para enviar, use o .eml."; log("Baixada: " + nome + ".");
+    } catch (e) { $("#pngResInfo").textContent = "Não deu para gerar a imagem: " + e.message; }
+  });
   /* a prévia só recarrega quando muda (editar um texto que não entra no resumo não refaz o quadro do resumo) */
   function mostrarPrevia() { var h = previas[qualPrev] || '<p style="font:15px Arial;padding:24px;color:#5F5F5F">A prévia aparece quando o report estiver aberto.</p>'; if ($("#prev").srcdoc !== h) $("#prev").srcdoc = h; }
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button[data-qual]"), function (b) {

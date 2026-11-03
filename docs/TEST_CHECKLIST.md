@@ -14,7 +14,8 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 - [ ] Transformation Hub (status/previsão, logo, links ou PDF), conferido com a área
 - [ ] Links e imagens adicionados (+ Link / + Imagem): cada link abre o lugar certo; cada imagem tem descrição
 - [ ] Depois de adicionar ou tirar itens, imagens ou seções: no computador e no modo Celular, tudo alinhado, sem nada colado nem vazando para o lado
-- [ ] Tópicos novos (ex.: Testes): só os que o mês tem; rótulo, título e itens sem [colchetes]; layout certo; aparecem também no e-mail-resumo
+- [ ] Tópicos novos (ex.: Testes): só os que o mês tem; rótulo, título e itens sem [colchetes]; layout certo; os itens podem ser escolhidos como destaque do e-mail-resumo
+- [ ] "O que aprendemos" de cada campanha: uma ou duas frases, sem [colchetes]; a seção geral oculta se ficou repetida
 - [ ] Aprendizados, foco do próximo mês e agenda
 - [ ] Nenhum texto de exemplo [entre colchetes] nem `X` (o estado avisa depois de salvar)
 - [ ] Imagens trocadas, nítidas, com descrição; links com `https://`
@@ -30,7 +31,7 @@ Copie esta lista a cada mês. Leva uns 10 minutos.
 
 - [ ] Report publicado no ambiente corporativo autorizado; link de compartilhamento colado no emulador
 - [ ] Link testado em janela anônima (Ctrl+Shift+N); uma pessoa de outra equipe também abriu
-- [ ] Até 3 indicadores escolhidos; botão "Acessar report completo"
+- [ ] Até 4 destaques escolhidos, na ordem certa; números iguais aos do report; informação nova conferida com os resultados e marcada "Revisei"; um único botão, "Acessar report completo"
 - [ ] Status sem ✕; prévia conferida em Computador e Celular
 
 **Envio de teste (só para você)**

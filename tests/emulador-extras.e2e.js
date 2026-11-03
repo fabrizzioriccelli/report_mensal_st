@@ -246,10 +246,14 @@ function salvarComo() {
   await p.waitForFunction(function () { return /banner (ok|warn|err)/.test(document.querySelector("#banner").className); }, null, { timeout: 60000 });
   var ban = await p.$eval("#banner", function (e) { return e.className + " · " + e.textContent; });
   confere(!/banner err/.test(ban), "conversão do arquivo salvo sem erro · " + ban.replace(/^banner \w+ · /, "").slice(0, 90));
-  /* e-mail-resumo: os tópicos aparecem (rótulo e itens) e os números do tópico viram indicadores para escolher */
-  var prev = await p.$eval("#prev", function (e) { return e.srcdoc; });
-  confere([">TESTES</p>", ">EVENTOS</p>", ">MÍDIA</p>", ">PESQUISAS</p>"].every(function (x) { return prev.indexOf(x) > 0; }) && /<b>Teste A\/B fictício<\/b>/.test(prev) && />1,2 mi<\/b>&nbsp;·&nbsp;<b>Alcance fictício</.test(prev), "e-mail-resumo: os 4 tópicos, com os itens");
-  confere(!!(await p.$('#indicadores input[value="topicoc-1"]')), "e-mail-resumo: o número do tópico MÍDIA pode ser escolhido como indicador");
+  /* e-mail-resumo (4.13): os tópicos ficam na lista do que o report oferece (cada um com a sua seção); entram no e-mail
+     só quando escolhidos, e o número do tópico pode virar destaque */
+  var grupos = await p.$$eval("#dtqLista .grupo > b", function (l) { return l.map(function (x) { return x.textContent; }); });
+  confere(["Testes", "Eventos", "Mídia", "Pesquisas"].every(function (x) { return grupos.indexOf(x) >= 0; }) && !!(await p.$('#dtqLista button[data-origem^="topico-"]')), "e-mail-resumo: os 4 tópicos na lista de destaques, com os itens · " + grupos.join(" | "));
+  confere(!!(await p.$('#dtqLista button[data-origem="topicoc-1"]')), "e-mail-resumo: o número do tópico MÍDIA pode ser escolhido como destaque");
+  await p.click('#dtqLista button[data-origem="topicoc-1"]');
+  await p.waitForFunction(function () { return />1,2 mi</.test(document.querySelector("#prev").srcdoc) && /Alcance fictício/.test(document.querySelector("#prev").srcdoc); }, null, { timeout: 30000 });
+  confere(true, "o número do tópico escolhido entra no e-mail-resumo (1,2 mi · Alcance fictício)");
   await p.close();
 
   /* 6. Reabrir o salvo: o novo tópico preenchido continua ligado. */

@@ -2,6 +2,19 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 4.13 · 2026-11-03 · "O que aprendemos" em cada campanha e e-mail-resumo com destaques escolhidos
+
+- **"O que aprendemos" dentro de cada campanha:** campo novo `aprendizado` em `[PROJETO PRINCIPAL]`, `[DESTAQUE]` e `[LANCAMENTO n]`. Sai um bloco curto, com o rótulo O QUE APRENDEMOS e uma ou duas frases, no lugar da campanha: abaixo dos números do projeto principal, abaixo dos resultados do destaque (antes da nota) e no fim do card do lançamento. Sem texto, o bloco não aparece. Aviso acima de 180 caracteres (100 no card). A seção geral "O que aprendemos" continua e virou opcional: quando ficar repetida, oculte em Seções do report.
+- **No emulador:** **+ O que aprendemos** na barra dos números, dos resultados e do card cria o bloco com o texto do modelo para digitar por cima; **Tirar aprendizado** tira (o Desfazer devolve). A importação do Copilot cria o bloco que falta, inclusive num report de antes da 4.13.
+- **E-mail-resumo: "Selecionar destaques do e-mail" (passo 4):** a lista do que o report oferece, por seção (números do projeto principal e do destaque, Creative X, campanhas, "O que aprendemos", lançamentos, Transformation Hub, foco, agenda e tópicos). Até 4 destaques. A escolha automática é só uma sugestão (os números do projeto principal que não estão na frase do mês). Dá para incluir, tirar, reordenar (↑ ↓), ajustar o título e a descrição só no e-mail (o report não muda) e voltar para a sugestão.
+- **Informação nova:** **+ Informação nova** entra marcada como "precisa de revisão" e trava o `.eml` até "Revisei: confere com os resultados". Fica identificada no emulador e não entra no report.
+- **Imagem, capa de vídeo e link no destaque:** imagem do computador (guardada reduzida) ou do report, acima ou ao lado do texto (ao lado, no destaque de largura toda), com recorte (centro, topo, base) ou inteira, e o ▶ desenhado na capa (o vídeo fica no report: e-mail não toca vídeo). Link opcional por destaque, como texto ("Saiba mais"), sem competir com o botão principal. Link que roda código não entra.
+- **Layout novo dos destaques:** cartões em dois por linha (com número ímpar, o primeiro ocupa a largura toda), fundo Lisboa, etiqueta com o nome curto da campanha, chamada final num painel Rio. Sem VML; imagens dentro do `.eml`; modo escuro protegido como na 4.12.
+- **Imagem do resumo (.png):** "Baixar imagem do resumo (.png)" no passo 6: uma foto do e-mail-resumo no dobro da largura (1360 px), para prévia ou para usar junto. O `.eml` continua sendo o e-mail.
+- **O report continua sendo a fonte:** valores dos destaques vêm sempre da página (mudar um número no report muda o e-mail). A escolha do e-mail fica gravada no report salvo num bloco de dados à parte (`<script type="application/json" id="resumo-email">`), que não muda o conteúdo da página e não vai para nenhum dos dois e-mails.
+- Modelo em branco, `dados/MODELO.txt`, `dados/CORINGA.txt` e o emulador avulso do kit gerados de novo.
+- Testes: `tests/resumo.e2e.js` (novo), `tests/aprendizado.e2e.js` (novo), motor com o aprendizado e os destaques (77), `tests/escuro.e2e.js` com os destaques escolhidos, `tests/emulador.e2e.js`, `tests/leveza.e2e.js` e `tests/emulador-extras.e2e.js` na tela nova.
+
 ## 4.12.1 · 2026-10-29 · E-mail-resumo: sem quadrados no Outlook clássico (modo escuro) e aviso do link de arquivo
 
 - **Quadrados entre os indicadores:** no Outlook clássico para Windows com o modo escuro ligado, apareciam quadrados entre os indicadores do e-mail-resumo, na altura da linha de detalhe. Os espaços entre as colunas (e entre os tópicos) eram células com um caractere invisível (`&nbsp;`) e letra tamanho 0, e o Outlook pinta esse caractere. Agora são células vazias, com a mesma largura: o modo claro não muda.

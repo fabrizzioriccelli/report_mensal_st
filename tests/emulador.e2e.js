@@ -4,7 +4,7 @@
  *   abrir o modelo em branco → editar texto, número, etiqueta, imagem e link → ocultar
  *   um item → importar conteúdo (Copilot) → salvar → fechar → reabrir o arquivo salvo e
  *   conferir que tudo ficou → aviso de números do mês anterior → rascunho recuperado
- *   depois de fechar a aba sem salvar → e-mail-resumo (até 3 indicadores, um único
+ *   depois de fechar a aba sem salvar → e-mail-resumo (até 4 destaques, um único
  *   botão, aviso sem o link) → .eml (MIME, imagens dentro, X-Unsent).
  *   Requer Node.js + Playwright:  node tests/emulador.e2e.js [pasta-de-saida]
  *   Versão avulsa:  EMULADOR=kit/emulador-report.html node tests/emulador.e2e.js
@@ -250,10 +250,10 @@ function salvarComo() {
   await p.setInputFiles("#arquivo", path.join(SAIDA, salvo.nome));
   f = await quadro(p);
   await esperaConversao(p);
-  var marcados = await p.$$eval("#indicadores input:checked", function (l) { return l.map(function (x) { return x.value; }); });
-  console.log("INDICADORES MARCADOS: " + marcados.join(", "));
-  confere(marcados.join(",") === "numero-1,numero-2,numero-3", "indicadores: os 3 números do projeto principal por padrão");
-  confere(await p.$$eval("#indicadores input:disabled", function (l) { return l.length; }) > 0, "no máximo 3 indicadores (os outros ficam bloqueados)");
+  var marcados = await p.$$eval("#dtqEscolhidos .dtq[data-origem]", function (l) { return l.map(function (x) { return x.getAttribute("data-origem"); }); });
+  console.log("DESTAQUES SUGERIDOS: " + marcados.join(", "));
+  confere(marcados.join(",") === "numero-1,numero-2,numero-3" && /^3 de 4 · sugestão/.test(await p.$eval("#dtqConta", function (e) { return e.textContent; })), "destaques: a sugestão são os 3 números do projeto principal (3 de 4)");
+  confere(await p.$$eval("#dtqLista button[data-origem]:disabled", function (l) { return l.length; }) >= 3, "os já escolhidos ficam marcados na lista do report (✓)");
   confere(await p.$eval("#bEmlRes", function (b) { return b.disabled; }) && /FALTA O LINK DO REPORT COMPLETO/.test(await p.$eval("#prev", function (e) { return e.srcdoc; })), "sem o link: e-mail-resumo bloqueado e a prévia avisa");
   /* qualquer link vale (4.12). Caminho do Windows com espaço e acento (pasta do OneDrive, "Copiar como caminho"): vira
      file:/// no formato que o Outlook grava (espaço %20, acento como está) e o e-mail-resumo é liberado, com uma nota. */
@@ -284,9 +284,9 @@ function salvarComo() {
   var LINK = "https://www.example.com/report-ficticio";
   await p.fill("#link", LINK);
   await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 30000 });
-  await p.uncheck('#indicadores input[value="numero-3"]');
-  await p.check('#indicadores input[value="resultado-1"]');
-  await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled && /resultado-1/.test(Array.prototype.map.call(document.querySelectorAll("#indicadores input:checked"), function (x) { return x.value; }).join()); }, null, { timeout: 30000 });
+  await p.click('#dtqEscolhidos button[aria-label="Tirar o destaque 3"]');
+  await p.click('#dtqLista button[data-origem="resultado-1"]');
+  await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled && Array.prototype.map.call(document.querySelectorAll("#dtqEscolhidos .dtq"), function (x) { return x.getAttribute("data-origem"); }).join() === "numero-1,numero-2,resultado-1"; }, null, { timeout: 30000 });
   await p.waitForTimeout(1500);
   var d = await Promise.all([p.waitForEvent("download"), p.click("#bEmlRes")]);
   var arqRes = path.join(SAIDA, d[0].suggestedFilename());
@@ -299,7 +299,7 @@ function salvarComo() {
   confere(hrefs.length === 1 && hrefs[0] === 'href="' + LINK + '"', "um único link: o botão do report completo (" + hrefs.length + " href)");
   confere(!/<v:roundrect|<w:anchorlock/.test(html) && /<td class="dm-marca-bg" align="center" bgcolor="#EC0000"[^>]*><a class="cta fx dm-txt-branco" href="/.test(html), "botão sem VML (célula vermelha + link de texto): continua clicável depois que o Outlook envia");
   confere(/Acessar report completo/.test(html), "botão: \"Acessar report completo\"");
-  confere(/12,5%/.test(html) && /R\$ 1,20/.test(html) && /Indicador fictício A/.test(html), "indicadores escolhidos estão no resumo");
+  confere(/12,5%/.test(html) && /R\$ 1,20/.test(html) && /Indicador fictício A/.test(html), "destaques escolhidos estão no resumo");
   confere(!/<script|data-campo|contenteditable/.test(html), "resumo estático, sem marcas");
   var cids = (html.match(/src="cid:([^"]+)"/g) || []).map(function (s) { return s.slice(9, -1); });
   var anexos = (eml.match(/Content-ID: <([^>]+)>/g) || []).map(function (s) { return s.slice(13, -1); });

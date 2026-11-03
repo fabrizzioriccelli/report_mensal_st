@@ -81,6 +81,10 @@ previa: Lorem ipsum dolor sit amet: X% de lorem ipsum no mês.
 [PROJETO PRINCIPAL]
 nome: Lorem ipsum dolor
 resumo: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+# aprendizado (opcional, 4.13): "O que aprendemos" logo abaixo dos números.
+#   Uma ou duas frases curtas: o que a campanha ensinou e o que muda daqui pra frente.
+#   Sem dado que sustente, deixe vazio (o bloco não aparece).
+aprendizado: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 imagem: [INSERIR IMAGEM DA PEÇA]
 descricao_imagem: Lorem ipsum dolor sit amet
 enquadramento: centro
@@ -139,6 +143,8 @@ enquadramento: centro
 tipo: peca
 link: [INSERIR LINK]
 nota: Lorem ipsum dolor sit amet. Etiqueta verde = resultado positivo; custo menor também é bom.
+# aprendizado (opcional): "O que aprendemos" abaixo dos resultados do destaque, antes da nota.
+aprendizado: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 # Resultados do projeto em destaque (até 3).
 [RESULTADO 1]
@@ -173,6 +179,8 @@ status: Resultado em XX/XX
 status_cor: ambar
 nome: Lorem ipsum
 texto: Lorem ipsum dolor sit amet, consectetur.
+# aprendizado (opcional): uma frase no fim do card. Só quando já houver resultado.
+aprendizado:
 imagem: [INSERIR IMAGEM DA PEÇA]
 descricao_imagem: Lorem ipsum dolor sit amet
 enquadramento: centro
@@ -309,7 +317,11 @@ link:
 
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: 05 · O QUE APRENDEMOS (até 3)
+#  EDITAR AQUI: 05 · O QUE APRENDEMOS (até 3) · SEÇÃO OPCIONAL
+#  Desde a 4.13, o aprendizado de cada campanha vai no próprio bloco
+#  (campo "aprendizado" em [PROJETO PRINCIPAL], [DESTAQUE] e [LANCAMENTO n]).
+#  Esta seção junta aprendizados gerais: para não repetir, apague os blocos
+#  [APRENDIZADO] abaixo (a seção some e a numeração se ajusta).
 #  Aprendizado = o que os dados mostraram. Se a causa não está provada,
 #  escreva como hipótese ("pode indicar", "sugere").
 # ----------------------------------------------------------------------

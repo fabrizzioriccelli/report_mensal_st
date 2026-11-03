@@ -8,7 +8,7 @@ Você precisa de: **Chrome ou Edge**, o arquivo `emulador-report.html`, as image
 imagens do mês ─┐
 resultados ─────┼─► emulador (Chrome/Edge) ─► report-AAAA-MM.html ─► ambiente autorizado ─► link
 Copilot ────────┘        │                                                                   │
-                         └──────────── e-mail-resumo (.eml) ◄── até 3 indicadores + link ◄───┘
+                         └──────────── e-mail-resumo (.eml) ◄── até 4 destaques + link ◄────┘
                                               │
                                               ▼
                                   Outlook ─► área (botão "Acessar report completo")
@@ -64,6 +64,7 @@ Tamanho recomendado (a ferramenta recorta e reduz): projeto principal 440 × 440
 | Mudar um item de lugar | Passo o mouse no item › **← Antes** / **Depois →** (ou **↑ Subir** / **↓ Descer**) |
 | Mudar a ordem das seções | Passo o mouse na seção › arrasto a alça **⠿ Mover seção** até a linha vermelha do lugar novo (Esc cancela), ou uso **↑** / **↓** / **Posição…**. Também em **Seções do report** (arrastando a linha pela ⠿ ou com ↑ ↓ Posição…). A capa e o encerramento não mudam |
 | Creative X do trimestre | No mês que fecha o trimestre: o bloco trimestral fica abaixo do resultado do mês (até 3 indicadores, leitura curta e a estimativa, sempre marcada como estimativa). Nos outros meses: passo o mouse no bloco › **Tirar trimestral**. Para trazer de volta: **+ Adicionar item › Indicador › Creative X: indicadores do trimestre** |
+| O que aprendemos numa campanha | Passo o mouse nos números do projeto principal, nos resultados do destaque ou no card do lançamento › **+ O que aprendemos** e escrevo uma ou duas frases: o que fizemos, o que vimos e o que fazemos melhor. Pelo Copilot: campo `aprendizado` no bloco da campanha |
 | Tirar um item sem dado | Passo o mouse no item › **Tirar item** (canto de cima, à direita). A grade se ajusta. Nunca deixo o número do mês anterior nem escrevo 0 |
 | Tirar uma seção inteira | **Seções do report** › desmarco a seção. A numeração se ajusta |
 | Voltar atrás | **Desfazer** (imagem, link, cor, item, item novo, ordem); **Ctrl+Z** (texto) |
@@ -131,10 +132,10 @@ O link fica gravado no report ao salvar: no mês seguinte, é só trocar. Teste 
 ## 4. E-mail-resumo e envio
 
 1. **Sem o link**, o botão "Baixar e-mail-resumo" fica bloqueado e a prévia mostra "FALTA O LINK DO REPORT COMPLETO".
-2. **Indicadores:** vêm marcados os números do projeto principal (até 3). Troque se quiser (resultados do destaque ou Creative X). Só aparecem indicadores que estão no report.
-3. **Botão:** "Acessar report completo", o único link do e-mail.
+2. **Selecionar destaques do e-mail:** vem uma sugestão (os números do projeto principal). Troque, tire, reordene (↑ ↓) ou inclua o que quiser do report, até 4: números, campanhas, "O que aprendemos", lançamentos, Creative X, foco. Ajuste título e descrição só para o e-mail, se precisar. Opcional: imagem (do computador ou do report, acima ou ao lado, capa de vídeo com ▶) e um link por destaque. **+ Informação nova** é para o que não está no report: confira com os resultados e marque **Revisei**, senão o `.eml` não sai.
+3. **Botão:** "Acessar report completo", o único botão do e-mail (os links dos destaques saem como texto).
 4. **Status:** ✓ pronto · ! olhar · ✕ problema. **Prévia:** Computador e Celular.
-5. **Baixar e-mail-resumo (.eml):** vai para Downloads (`report-AAAA-MM-resumo.eml`).
+5. **Baixar e-mail-resumo (.eml):** vai para Downloads (`report-AAAA-MM-resumo.eml`). Se quiser uma foto do e-mail (prévia, apresentação), **Baixar imagem do resumo (.png)**.
 6. **Outlook:** dois cliques no `.eml`. O Outlook clássico abre uma mensagem nova com assunto e imagens. Abriu como mensagem recebida (novo Outlook)? **Encaminhar** e apague o cabeçalho do topo.
 7. Envie primeiro **só para você**: confira no computador e no celular e clique no botão.
 8. Tudo certo: abra o `.eml` de novo, coloque os destinatários autorizados e envie.
@@ -176,6 +177,6 @@ O link fica gravado no report ao salvar: no mês seguinte, é só trocar. Teste 
 
 **Publicar e enviar**
 - [ ] Report publicado no ambiente autorizado; link testado em janela anônima
-- [ ] Link colado no emulador; até 3 indicadores; status verde; prévia conferida
+- [ ] Link colado no emulador; até 4 destaques conferidos (informação nova revisada); status verde; prévia conferida
 - [ ] `.eml` aberto no Outlook, enviado primeiro para você, botão testado
 - [ ] Enviado aos destinatários autorizados

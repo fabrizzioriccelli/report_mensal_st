@@ -116,18 +116,23 @@ function kb(n) { return Math.round(n / 1024) + " KB"; }
   var vid = await midiaDe(p, 'img[data-img="principal"]', "data-video"); vid = { tipo: vid.tipo, n: vid.tam };
   confere(/video\/webm/.test(vid.tipo) && vid.n < tamVid * 0.6, "vídeo otimizado: " + kb(tamVid) + " → " + kb(vid.n) + " · " + await p.$eval("#estado", function (e) { return e.textContent.slice(0, 90); }));
 
-  /* 5. Indicadores do resumo: o nome do projeto, e aviso de repetição com a frase */
+  /* 5. Destaques do resumo (4.13): a lista do report mostra o nome da campanha, e aviso de repetição com a frase */
   await p.fill("#link", "https://www.example.com/report-ficticio");
-  await p.waitForFunction(function () { return document.querySelectorAll("#indicadores input").length > 0; }, null, { timeout: 30000 });
-  var rot = await p.$$eval("#indicadores label", function (l) { return l.map(function (x) { return x.textContent; }); });
-  confere(rot.some(function (x) { return /\(Campanha Exemplo A\)/.test(x); }) && !rot.some(function (x) { return /Projeto principal|Destaque do mês/.test(x); }), "indicadores com o nome do projeto, não \"Projeto principal\" · " + rot[0]);
+  await p.waitForFunction(function () { return document.querySelectorAll("#dtqEscolhidos .dtq").length > 0 && document.querySelectorAll("#dtqLista button").length > 0; }, null, { timeout: 30000 });
+  var cab = await p.$$eval("#dtqLista .grupo > b", function (l) { return l.map(function (x) { return x.textContent; }); });
+  var tags = await p.$$eval("#dtqEscolhidos .dtq .tag", function (l) { return l.map(function (x) { return x.textContent; }); });
+  confere(cab.some(function (x) { return /Campanha Exemplo A/.test(x); }) && tags.some(function (x) { return /CAMPANHA EXEMPLO A/.test(x); }), "destaques com o nome da campanha (na lista e no cartão) · " + cab[0] + " · " + tags[0]);
   await p.mouse.move(2, 2); await p.waitForTimeout(900);
   await f.locator('[data-campo="frase"][data-ed-campo]').first().click({ position: { x: 4, y: 6 } }); await p.waitForTimeout(150);
   await p.keyboard.press("Control+A"); await p.keyboard.type("12,5% no indicador A"); await p.keyboard.press("Enter");
-  await p.waitForFunction(function () { return /já está na frase/.test(document.querySelector("#indicadores").textContent); }, null, { timeout: 30000 });
-  confere(true, "frase com o número: o indicador mostra \"já está na frase do mês\"");
+  await p.waitForFunction(function () { return /já está na frase/.test(document.querySelector("#dtq").textContent); }, null, { timeout: 30000 });
+  confere(true, "frase com o número: o item mostra \"já está na frase do mês\"");
+  var sug = await p.$$eval("#dtqEscolhidos .dtq[data-origem]", function (l) { return l.map(function (x) { return x.getAttribute("data-origem"); }); });
+  confere(sug.indexOf("numero-1") < 0 && sug.length > 0, "a sugestão deixa de fora o número que já está na frase · " + sug.join(","));
+  /* escolhido de propósito, o número repetido continua possível, com aviso */
+  await p.click('#dtqLista button[data-origem="numero-1"]');
   await p.waitForFunction(function () { return /Repete a frase do mês/.test(document.querySelector("#etapas") ? document.querySelector("#etapas").textContent : document.body.textContent); }, null, { timeout: 30000 });
-  confere(true, "e o status avisa a repetição enquanto ele estiver marcado");
+  confere(true, "e o status avisa a repetição enquanto ele estiver escolhido");
 
   /* 6. Prévia do e-mail no celular: inteira, sem rolagem dentro */
   await p.click('button[data-w="390px"]'); await p.waitForTimeout(800);

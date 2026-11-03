@@ -18,14 +18,18 @@ var falhas = 0;
 function confere(ok, msg) { console.log((ok ? "  ok   " : "  FALHA ") + msg); if (!ok) falhas++; }
 function ler(p) { return fs.readFileSync(path.join(RAIZ, p), "utf8"); }
 
-function resumo() {
-  var r = Motor.montar({ dados: ler("dados/EXEMPLO-treinamento.txt"), arquivoDados: "exemplo.txt", marca: ler("config/marca.txt"), template: ler("template/report.html"), existe: function (p) { return fs.existsSync(path.join(RAIZ, p)); } });
+/* variante 4.13: destaques escolhidos, com o "O que aprendemos" (rótulo rosa), link do destaque e um de largura toda */
+var DESTAQUES = [{ origem: "principal.aprendizado" }, { origem: "numero-1" }, { origem: "numero-2", link: "https://www.example.com/peca-ficticia" }];
+function resumo(destaques) {
+  var dados = ler("dados/EXEMPLO-treinamento.txt");
+  if (destaques) dados = dados.replace(/(\[PROJETO PRINCIPAL\]\r?\n)/, "$1aprendizado: Frase fictícia de aprendizado, só para o teste.\n");
+  var r = Motor.montar({ dados: dados, arquivoDados: "exemplo.txt", marca: ler("config/marca.txt"), template: ler("template/report.html"), existe: function (p) { return fs.existsSync(path.join(RAIZ, p)); } });
   var h = r.html;
   r.imagens.forEach(function (i) {
     var tipo = /\.png$/i.test(i.caminho) ? "image/png" : "image/jpeg";
     h = h.split(i.token).join("data:" + tipo + ";base64," + fs.readFileSync(path.join(RAIZ, i.caminho)).toString("base64"));
   });
-  return Motor.emailResumo(h, { link: "https://www.example.com/report-ficticio", botao: "Acessar report completo" }).html;
+  return Motor.emailResumo(h, { link: "https://www.example.com/report-ficticio", botao: "Acessar report completo", destaques: destaques }).html;
 }
 
 /* O que o Outlook.com faz no modo escuro (aproximação): fundo claro fica escuro, fundo colorido fica mais claro,
@@ -95,6 +99,8 @@ function simularOutlookCom() {
         fundo: cs("body", "backgroundColor"), botao: cs("table.btn td", "backgroundColor"), textoBotao: cs("table.btn a", "color"),
         valor: cs("p.kpiv", "color"), titulo: cs("td.kpi p.fx", "color"), chamada: cs("td.ctat p.ft", "color"), assinatura: cs("tr:last-child > td.px.dm-marca-bg p.ft", "color"),
         selo: cs("table.selo td", "backgroundColor"), etiqueta: cs("td.dm-chip-verde, td.dm-chip-ambar", "color"),
+        cartaoDtq: cs("td.dtq", "backgroundColor"), painelCta: cs("table.dm-rio", "backgroundColor"), chamadaCta: cs("table.dm-rio p.ft", "color"),
+        grupoApr: cs("td.dtq p.dm-txt-rosa", "color"), linkDtq: cs("td.dtq a.dm-txt-marca", "color"),
         recoloridos: document.querySelectorAll("[data-ogsc], [data-ogsb], [data-ogab]").length
       };
     });
@@ -110,9 +116,27 @@ function simularOutlookCom() {
   var chaves = Object.keys(claro).filter(function (k) { return k !== "recoloridos"; }), diferentes = chaves.filter(function (k) { return com[k] !== claro[k]; });
   confere(com.recoloridos > 20 && !diferentes.length, "com a proteção, todas as cores voltam às aprovadas (" + chaves.join(", ") + ")" + (diferentes.length ? " · diferentes: " + diferentes.join(", ") : ""));
 
+  /* 2b. destaques escolhidos (4.13): cartão Lisboa, painel Rio da chamada, rótulo rosa do aprendizado e link do destaque */
+  var htmlD = resumo(DESTAQUES), arqD = path.join(SAIDA, "escuro-resumo-destaques.html"); fs.writeFileSync(arqD, htmlD);
+  var claroD = await cores(arqD, false, "escuro-destaques-claro-800.png"), comD = await cores(arqD, true, "escuro-destaques-outlookcom-800.png");
+  console.log("  destaques claro: " + JSON.stringify(claroD));
+  confere(claroD.cartaoDtq === "rgb(251, 241, 234)" && claroD.painelCta === "rgb(245, 222, 207)" && claroD.grupoApr === "rgb(166, 17, 47)" && claroD.linkDtq === "rgb(236, 0, 0)", "destaques no claro: cartão Lisboa, painel Rio, \"O QUE APRENDEMOS\" rosa e link vermelho");
+  var difD = Object.keys(claroD).filter(function (k) { return k !== "recoloridos" && comD[k] !== claroD[k]; });
+  confere(comD.recoloridos > 20 && !difD.length, "destaques no Outlook.com escuro (simulação): com a proteção, todas as cores voltam" + (difD.length ? " · diferentes: " + difD.join(", ") : ""));
+  for (var wd of [800, 390]) {
+    var fd = {};
+    for (var esd of ["light", "dark"]) { var pd = await browser.newPage({ viewport: { width: wd, height: 900 }, colorScheme: esd }); await pd.goto("file://" + arqD); await pd.waitForTimeout(300); fd[esd] = await pd.screenshot({ fullPage: true }); await pd.close(); }
+    confere(Buffer.compare(fd.light, fd.dark) === 0, wd + " px: destaques no modo escuro do sistema iguais ao claro (pixel a pixel)");
+  }
+
   /* 3. o resumo continua dentro da tela no celular, nos dois modos */
   for (var esq of ["light", "dark"]) {
     var pc = await browser.newPage({ viewport: { width: 320, height: 800 }, colorScheme: esq });
+    await pc.goto("file://" + arq); await pc.waitForTimeout(200);
+    var largD = await pc.evaluate(function () { return document.documentElement.scrollWidth; }), urlD = "file://" + arqD;
+    await pc.goto(urlD); await pc.waitForTimeout(200);
+    largD = await pc.evaluate(function () { return document.documentElement.scrollWidth; });
+    confere(largD <= 320, "320 px (" + esq + ") com destaques escolhidos: sem rolagem para o lado (" + largD + " px)");
     await pc.goto("file://" + arq); await pc.waitForTimeout(200);
     var larg = await pc.evaluate(function () { return document.documentElement.scrollWidth; });
     confere(larg <= 320, "320 px (" + esq + "): sem rolagem para o lado (" + larg + " px)");

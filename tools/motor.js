@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "4.12.1 (2026-10-29)";
+  var VERSAO = "4.13 (2026-11-03)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -83,12 +83,12 @@
   var ESQUEMA_DADOS = [
     { bloco: "EDICAO", obrigatorio: true, campos: { mes: 1, ano: 1, proximo_mes: 1, pasta_imagens: 1, contato: 0, link_report_completo: 0 } },
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
-    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0 }, PECA) },
+    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ nome: 1, resumo: 0, aprendizado: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
     { bloco: "LANCAMOS", campos: { titulo: 0 } },
-    { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0 }, PECA) },
+    { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0, aprendizado: 0 }, PECA) },
     { bloco: "RESULTADO", max: 3, campos: NUM },
-    { bloco: "LANCAMENTO", max: 6, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0 }, PECA) },
+    { bloco: "LANCAMENTO", max: 6, campos: junta({ status: 0, status_cor: 0, nome: 1, texto: 0, aprendizado: 0 }, PECA) },
     { bloco: "CREATIVE X", campos: { subtitulo: 0, rotulo: 0, anterior: 0, atual: 1, variacao: 0, periodo: 0, referencia: 0, significado: 0, nota: 0 } },
     /* Creative X trimestral (opcional, no mês que fecha o trimestre): entra na mesma seção, abaixo do resultado do mês. */
     { bloco: "CREATIVE X TRIMESTRE", campos: { rotulo: 0, titulo: 0, texto: 0, estimativa: 0 } },
@@ -311,6 +311,18 @@
   Seguro.prototype.toString = function () { return this.s; };
   function seguro(s) { return new Seguro(s); }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  /* "O que aprendemos" dentro da campanha (4.13): rótulo na cor do grupo Aprendizado, filete fino e uma ou duas frases.
+     O mesmo HTML sai do motor (template) e do emulador (quando a pessoa cria o aprendizado num report de antes).
+     variante: "capa" (faixa dos números do projeto principal), "destaque" (texto do destaque) ou "card" (lançamento). */
+  function htmlAprendizado(textoHtml, campo, variante, f) {
+    var card = variante === "card", c = f.cor || {};
+    var filete = variante === "capa" ? (c.abertura_linha || CR.mexico) : (c.linha || CR.linha);
+    return '<table role="presentation" class="apr" data-apr="' + campo + '" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:' + (card ? 12 : variante === "capa" ? 20 : 16) + 'px;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid ' + filete + ';padding-top:' + (card ? 10 : 12) + 'px;">' +
+      '<p class="fx" style="margin:0;font-family:' + f.fonte + ';font-size:' + (card ? 9 : 10) + 'px;line-height:14px;font-weight:bold;color:' + (c.grupo_aprendizado || CR.rosa) + ';letter-spacing:1.5px;">O QUE APRENDEMOS</p>' +
+      '<p class="fx tm" data-campo="' + campo + '" style="margin:' + (card ? 3 : 4) + 'px 0 0 0;font-family:' + f.fonte + ';font-size:' + (card ? 12 : 13) + 'px;line-height:' + (card ? 17 : 19) + 'px;color:' + (c.texto || CR.texto) + ';">' + textoHtml + '</p>' +
+      '</td></tr></table></td></tr></table>';
+  }
   /* Texto do usuário → HTML. Só <br> é aceito como marcação. */
   function textoSeguro(s) { return seguro(esc(s || "").replace(/&lt;br\s*\/?&gt;/gi, "<br>")); }
   function semBr(s) { return String(s || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim(); }
@@ -593,6 +605,13 @@
       var s = semBr(v[campo]);
       if (s.length > max && !ehPendencia(s)) problema(prob, "aviso", arqD, v._linhas[campo], "[" + nomeBloco + "] " + campo + " com " + s.length + " caracteres (recomendado até " + max + "). Pode quebrar em mais linhas.");
     }
+    /* "O que aprendemos" da campanha: só sai com texto (nada de bloco vazio); uma ou duas frases curtas. */
+    function aprendizado(v, nomeBloco, campo, variante) {
+      if (!v || !v.aprendizado) return null;
+      curto(v, "aprendizado", variante === "card" ? 100 : 180, nomeBloco);
+      return seguro(htmlAprendizado(texto(v.aprendizado).s, campo, variante, { fonte: fonte.texto.s,
+        cor: { abertura_linha: cor.abertura_linha.s, linha: cor.linha.s, grupo_aprendizado: cor.grupo_aprendizado.s, texto: cor.texto.s } }));
+    }
     /* Formiguinha (config/marca.txt, bloco [FORMIGUINHA]): o arquivo original, no encerramento (rodapé). */
     var FM = M.simples.FORMIGUINHA || {}, camFormiga = (FM.arquivo || "").replace(/\\/g, "/").replace(/^\.?\/+/, "");
     if (camFormiga && !existe(camFormiga)) { problema(prob, "erro", arqM, FM._linhas.arquivo, "Formiguinha não encontrada: " + camFormiga + ". Confira o nome do arquivo em config/marca.txt."); camFormiga = ""; }
@@ -633,7 +652,7 @@
     var sobra = nums.length && nums.length < 3 ? LARGURA - nums.length * COL - (nums.length - 1) * ESP : 0;
     var abertura = {
       n: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
-      nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp,
+      nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp, aprendizado: aprendizado(P, "PROJETO PRINCIPAL", "principal.aprendizado", "capa"),
       numeros: nums.map(function (v, i) {
         curto(v, "valor", 11, "NUMERO " + (i + 1));
         return {
@@ -661,6 +680,7 @@
         n: proxSecao(), titulo: texto((D.simples.LANCAMOS || {}).titulo || ""), tem_compactos: lanc.length > 0, colunas_compactos: Math.min(lanc.length, 3) * 2 - 1,
         destaque: DS ? {
           categoria: seguro(marcarPendencias(categoria(DS.categoria).s)), titulo: texto(DS.titulo), texto_cta: comCta(DS.texto, dsp), peca: dsp, nota: texto(DS.nota), tem_resultados: res.length > 0,
+          aprendizado: aprendizado(DS, "DESTAQUE", "destaque.aprendizado", "destaque"),
           largura_texto: textoDestaque, colunas: res.length * 3 - 2,
           resultados: res.map(function (v, i) {
             /* No celular os resultados ficam em terços (~110 px): número longo (ex.: "R$ 1.234,56") invade a coluna ao lado. */
@@ -675,7 +695,7 @@
         linhas_compactos: (function () {
           var itens = lanc.map(function (v, i) {
             var nb = "LANCAMENTO " + (i + 1), p = peca(v, nb, COL, 72, 20, { dica: "700 x 274 px", fluida: true }), ult = i === lanc.length - 1;
-            return { idx: i + 1, status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), peca: p, largura: lanc.length > 3 ? COL : lc[i], classe: (ult ? "col" : "col gap") + (i >= 3 ? " pt0" : ""), vazio: false, estilo: i >= 3 ? "padding-top:28px;" : "" };
+            return { idx: i + 1, status: status(v, nb), nome: texto(v.nome), texto_cta: comCta(v.texto, p), aprendizado: aprendizado(v, nb, "lancamento-" + (i + 1) + ".aprendizado", "card"), peca: p, largura: lanc.length > 3 ? COL : lc[i], classe: (ult ? "col" : "col gap") + (i >= 3 ? " pt0" : ""), vazio: false, estilo: i >= 3 ? "padding-top:28px;" : "" };
           }), linhas = [];
           for (var k = 0; k < itens.length; k += 3) {
             var linha = itens.slice(k, k + 3);
@@ -959,15 +979,18 @@
     o.push(t(S.ABERTURA.frase + " " + S.ABERTURA.frase_final), "");
     o.push("PROJETO PRINCIPAL: " + t(S["PROJETO PRINCIPAL"].nome), t(S["PROJETO PRINCIPAL"].resumo));
     (L.NUMERO || []).forEach(function (v) { o.push(num(v)); });
+    function apr(v) { if (v && v.aprendizado) o.push("O que aprendemos: " + t(v.aprendizado)); }
+    apr(S["PROJETO PRINCIPAL"]);
     var l = lk(S["PROJETO PRINCIPAL"]); if (l) o.push(l);
     if (S.DESTAQUE || (L.LANCAMENTO || []).length) {
       o.push("", "O QUE LANÇAMOS" + (S.LANCAMOS && S.LANCAMOS.titulo ? ": " + t(S.LANCAMOS.titulo) : ""));
       if (S.DESTAQUE) {
         o.push("", t(S.DESTAQUE.titulo) + (S.DESTAQUE.categoria ? " (" + t(S.DESTAQUE.categoria) + ")" : ""), t(S.DESTAQUE.texto));
         (L.RESULTADO || []).forEach(function (v) { o.push(num(v)); });
+        apr(S.DESTAQUE);
         l = lk(S.DESTAQUE); if (l) o.push(l);
       }
-      (L.LANCAMENTO || []).forEach(function (v) { o.push("", t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto)); l = lk(v); if (l) o.push(l); });
+      (L.LANCAMENTO || []).forEach(function (v) { o.push("", t(v.nome) + (v.status ? " · " + t(v.status) : ""), t(v.texto)); apr(v); l = lk(v); if (l) o.push(l); });
     }
     if (S["CREATIVE X"]) {
       var c = S["CREATIVE X"], ct = S["CREATIVE X TRIMESTRE"], ci = L["CREATIVE X TRIMESTRE"] || [];
@@ -1502,7 +1525,7 @@
    * No emulador, dá para trocar por outros indicadores da página (resultados do destaque, Creative X).
    * Indicador vazio não aparece; nada é inventado nem completado com zero.
    */
-  var RESUMO_REGRAS = { indicadores: 3, itens_topico: 4 };
+  var RESUMO_REGRAS = { indicadores: 3, destaques: 4, itens_topico: 4 };
   /* Paleta do Brand Guide (a mesma de config/marca.txt). */
   var CR = {
     marca: "#EC0000", branco: "#FFFFFF", lisboa: "#FBF1EA", rio: "#F5DECF", mexico: "#F0B998", texto: "#000000", apoio: "#767676", linha: "#E2E2E2",
@@ -1585,7 +1608,109 @@
     });
     if (d.cx) ind.push({ chave: "cx", valor: d.cx.atual, titulo: "Creative X" + (d.cx.subtitulo ? " · " + d.cx.subtitulo.split(" · ")[0] : ""), detalhe: (d.cx.anterior ? "Antes: " + d.cx.anterior : "") + (d.cx.periodo ? (d.cx.anterior ? " · " : "") + d.cx.periodo : ""), variacao: d.cx.variacao, tom: d.cx.tom, origem: "Creative X", grupo: "Creative X" });
     d.indicadores = ind;
+    d.campos = c; d.tons = tom;
+    /* imagens da página (data-img): a peça, o card, o projeto… A de vídeo já tem o ▶ desenhado (é a capa estática). */
+    d.figuras = {};
+    html.replace(/<img\b[^>]*\sdata-img="([^"]+)"[^>]*>/g, function (tag, k) {
+      if (!d.figuras[k]) d.figuras[k] = { src: atributo(tag, "src"), alt: atributo(tag, "alt"), video: / data-video="/.test(tag), w: +atributo(tag, "width") || 0 };
+      return tag;
+    });
     return { ok: true, d: d, pendencias: pend };
+  }
+
+  /* =================================================================== */
+  /* Destaques do e-mail-resumo (4.13): o que o report oferece, a sugestão, e a escolha da pessoa (até 4)        */
+  /* =================================================================== */
+  /*
+   * Cada candidato: { origem, secao, tipo: "indicador" | "texto", valor, titulo, texto, etiqueta, tom, grupo, figura }
+   *   origem = a chave na página (numero-1, resultado-2, cx, cxt-1, principal, destaque, lancamento-3,
+   *   principal.aprendizado, aprendizado-1, transformation-2, foco, agenda-1, topico-1…). O valor sempre vem da página:
+   *   mudar um número no report muda o e-mail. figura = a chave da imagem da página que combina com o item (data-img).
+   */
+  function candidatosResumo(d) {
+    var c = d.campos || {}, tom = d.tons || {}, fig = d.figuras || {}, out = [];
+    function v(k) { return c[k] || ""; }
+    function semBola(t) { return String(t || "").replace(/^[\u25cf\u25cb]\s*/, ""); }
+    function add(x) { if (x.titulo || x.valor || x.texto) out.push(x); }
+    /* na etiqueta do cartão, o nome curto da campanha: "Campanha Beta: frase do título" vira "Campanha Beta" */
+    function nomeCurto(t) { var m = /^([^:]{2,32}):\s/.exec(String(t || "")); return m ? m[1].trim() : t; }
+    var nomeP = v("principal.nome") || "Projeto principal", nomeD = v("destaque.titulo");
+    d.indicadores.forEach(function (n) {
+      var sec = n.grupo === "Destaque do mês" ? "Destaque" : n.grupo === "Projeto principal" ? "Projeto principal" : n.grupo;
+      add({ origem: n.chave, secao: sec, tipo: "indicador", valor: n.valor, titulo: n.titulo, texto: n.detalhe, etiqueta: n.variacao, tom: n.tom, grupo: n.grupo === "Destaque do mês" ? nomeCurto(n.origem) : n.origem,
+        figura: n.grupo === "Projeto principal" ? "principal" : n.grupo === "Destaque do mês" ? "destaque" : "" });
+    });
+    for (var i = 1; i <= 3; i++) if (v("cxt-" + i + ".valor")) add({ origem: "cxt-" + i, secao: "Creative X", tipo: "indicador", valor: v("cxt-" + i + ".valor"), titulo: v("cxt-" + i + ".titulo"), texto: v("cxt-" + i + ".detalhe"), etiqueta: v("cxt-" + i + ".variacao"), tom: tom["cxt-" + i + ".variacao"] || "", grupo: "Creative X trimestral", figura: "" });
+    if (c["principal.nome"]) add({ origem: "principal", secao: "Projeto principal", tipo: "texto", titulo: nomeP, texto: v("principal.resumo"), grupo: "Projeto principal", figura: fig.principal ? "principal" : "" });
+    if (v("principal.aprendizado")) add({ origem: "principal.aprendizado", secao: "Projeto principal", tipo: "texto", titulo: "O que aprendemos", texto: v("principal.aprendizado"), grupo: nomeP, aprendizado: true, figura: "" });
+    if (nomeD) add({ origem: "destaque", secao: "Destaque", tipo: "texto", titulo: nomeD, texto: v("destaque.texto"), grupo: v("destaque.categoria") || "Destaque do mês", figura: fig.destaque ? "destaque" : "" });
+    if (v("destaque.aprendizado")) add({ origem: "destaque.aprendizado", secao: "Destaque", tipo: "texto", titulo: "O que aprendemos", texto: v("destaque.aprendizado"), grupo: nomeCurto(nomeD) || "Destaque do mês", aprendizado: true, figura: "" });
+    for (i = 1; i <= 6; i++) {
+      var lk = "lancamento-" + i; if (!v(lk + ".nome")) continue;
+      add({ origem: lk, secao: "Lançamentos", tipo: "texto", titulo: v(lk + ".nome"), texto: v(lk + ".texto"), etiqueta: semBola(v(lk + ".status")), tom: tom[lk + ".status"] || "", grupo: "Também neste mês", figura: fig[lk] ? lk : "" });
+      if (v(lk + ".aprendizado")) add({ origem: lk + ".aprendizado", secao: "Lançamentos", tipo: "texto", titulo: "O que aprendemos", texto: v(lk + ".aprendizado"), grupo: v(lk + ".nome"), aprendizado: true, figura: "" });
+    }
+    for (i = 1; i <= 3; i++) {
+      var tk = "transformation-" + i; if (!v(tk + ".nome")) continue;
+      add({ origem: tk, secao: "Transformation Hub", tipo: "texto", titulo: v(tk + ".nome"), texto: v(tk + ".texto"), etiqueta: semBola(v(tk + ".status")), tom: tom[tk + ".status"] || "", grupo: "Transformation Hub", figura: fig[tk] ? tk : "" });
+    }
+    for (i = 1; i <= 3; i++) if (v("aprendizado-" + i + ".titulo")) add({ origem: "aprendizado-" + i, secao: "O que aprendemos", tipo: "texto", titulo: v("aprendizado-" + i + ".titulo"), texto: v("aprendizado-" + i + ".texto"), grupo: "O que aprendemos", aprendizado: true, figura: "" });
+    if (v("foco.prioridade")) add({ origem: "foco", secao: "Foco", tipo: "texto", titulo: v("foco.prioridade"), texto: v("foco.texto"), grupo: "Foco" + (v("foco.mes") ? " de " + v("foco.mes").charAt(0) + v("foco.mes").slice(1).toLocaleLowerCase("pt-BR") : ""), figura: "" });
+    for (i = 1; i <= 6; i++) if (v("agenda-" + i + ".titulo")) add({ origem: "agenda-" + i, secao: "Também vem aí", tipo: "texto", titulo: v("agenda-" + i + ".titulo"), texto: v("agenda-" + i + ".detalhe"), etiqueta: v("agenda-" + i + ".data"), tom: "verde", grupo: "Também vem aí", figura: "" });
+    d.topicos.forEach(function (tp) {
+      var gr = tp.rotulo.charAt(0) + tp.rotulo.slice(1).toLocaleLowerCase("pt-BR");
+      tp.itens.forEach(function (n) { if (!n.valor) add({ origem: n.chave, secao: gr, tipo: "texto", titulo: n.nome || n.texto, texto: n.nome ? n.texto : "", etiqueta: semBola(n.status), tom: n.tom_status || "", grupo: tp.titulo || gr, figura: fig[n.chave] ? n.chave : "" }); });
+    });
+    return out;
+  }
+  /* Sugestão (a pessoa decide no fim): os números do projeto principal que a frase do mês ainda não diz, até 3, como
+     antes da 4.13; sem eles, os primeiros indicadores da página. */
+  function sugerirDestaques(cand, fraseMes) {
+    var ind = cand.filter(function (x) { return x.tipo === "indicador"; });
+    ind.forEach(function (x) { x.na_frase = repete(fraseMes, x); });
+    var livres = ind.filter(function (x) { return !x.na_frase; });
+    var s = livres.filter(function (x) { return x.secao === "Projeto principal"; }).slice(0, RESUMO_REGRAS.indicadores);
+    if (!s.length) s = (livres.length ? livres : ind).slice(0, RESUMO_REGRAS.indicadores);
+    return s.map(function (x) { return { origem: x.origem }; });
+  }
+  /* Grade: em pares (290 + 20 + 290); com número ímpar, o primeiro ocupa a largura toda. */
+  var DESTAQUE_IMG = { metade: [290, 163], larga: [600, 270], lado: [240, 240] };
+  function layoutDestaques(n) {
+    var r = [];
+    for (var i = 0; i < n; i++) r.push({ largo: n % 2 === 1 && i === 0, w: n % 2 === 1 && i === 0 ? LARGURA : 290 });
+    return r;
+  }
+  /* O tamanho da imagem de cada destaque (o emulador recorta nesse tamanho, em dobro para telas nítidas):
+     posicao "lado" só no destaque largo; nos outros, a imagem vai em cima. */
+  function tamanhoImagemDestaque(i, n, posicao) {
+    var l = layoutDestaques(n)[i] || { largo: false };
+    return l.largo ? (posicao === "lado" ? DESTAQUE_IMG.lado : DESTAQUE_IMG.larga) : DESTAQUE_IMG.metade;
+  }
+  /*
+   * resolverDestaques(config, cand) → { lista, fora }
+   *   config: [{ origem, titulo?, texto?, semEtiqueta?, imagem?: { src, w, h, alt, posicao, video }, link?, link_texto?,
+   *              novo?: true, valor?, etiqueta?, tom? }] (até 4). Título e descrição: o texto da pessoa (se houver) ou o da
+   *   página. Informação nova (novo): tudo vem da configuração. Item que saiu da página fica de fora (aviso).
+   */
+  function resolverDestaques(config, cand) {
+    var por = {}, lista = [], fora = [];
+    cand.forEach(function (x) { por[x.origem] = x; });
+    (config || []).slice(0, RESUMO_REGRAS.destaques).forEach(function (cf) {
+      if (!cf) return;
+      var base = cf.novo ? { origem: cf.origem || "novo", secao: "Informação nova", tipo: cf.valor ? "indicador" : "texto", valor: cf.valor || "", titulo: "", texto: "", etiqueta: cf.etiqueta || "", tom: cf.tom || "verde", grupo: cf.grupo || "" } : por[cf.origem];
+      if (!base) { fora.push(cf.origem); return; }
+      var t = function (x, y) { return x !== undefined && x !== null && String(x).trim() !== "" ? String(x).trim() : y; };
+      var lk = cf.link ? normalizarLink(cf.link) : null;
+      lista.push({
+        origem: base.origem, secao: base.secao, tipo: cf.novo ? (cf.valor ? "indicador" : "texto") : base.tipo, novo: !!cf.novo,
+        valor: cf.novo ? (cf.valor || "") : base.valor || "", titulo: t(cf.titulo, base.titulo), texto: cf.texto !== undefined && cf.texto !== null ? String(cf.texto).trim() : base.texto || "",
+        etiqueta: cf.semEtiqueta ? "" : cf.novo ? (cf.etiqueta || "") : base.etiqueta || "", tom: cf.novo ? (cf.tom || "verde") : base.tom || "",
+        grupo: t(cf.grupo, base.grupo || ""), aprendizado: !!base.aprendizado,
+        imagem: cf.imagem && cf.imagem.src ? cf.imagem : null, link: lk && !lk.erro ? lk.url : "", link_texto: t(cf.link_texto, "Saiba mais"),
+        editado: !cf.novo && ((t(cf.titulo, "") && t(cf.titulo, "") !== base.titulo) || (cf.texto !== undefined && cf.texto !== null && String(cf.texto).trim() !== (base.texto || "")))
+      });
+    });
+    return { lista: lista, fora: fora };
   }
 
   /* Etiqueta (▲ +12%), com o tom verde ou âmbar que veio da página. Célula de tabela com fundo: o Outlook para
@@ -1637,8 +1762,10 @@
     '    .px{padding-left:20px !important;padding-right:20px !important;}',
     '    .col{display:block !important;width:100% !important;box-sizing:border-box !important;padding-left:0 !important;padding-right:0 !important;}',
     '    .hide-m{display:none !important;}',
-    '    .kpi{display:block !important;width:100% !important;box-sizing:border-box !important;padding:10px 0 12px 0 !important;}',
+    '    .kpi{display:block !important;width:100% !important;box-sizing:border-box !important;}',
     '    .kpiv{font-size:26px !important;line-height:30px !important;}',
+    '    .dtq2{border-top:14px solid #FFFFFF !important;}',
+    '    .dimg{width:100% !important;max-width:100% !important;height:auto !important;}',
     '    .ctat{display:block !important;width:100% !important;box-sizing:border-box !important;padding:18px 20px 0 20px !important;}',
     '    .ctab{display:block !important;width:100% !important;box-sizing:border-box !important;padding:14px 20px 20px 20px !important;text-align:left !important;}',
     '    .btn{width:100% !important;max-width:100% !important;}',
@@ -1674,42 +1801,39 @@
     '    </td></tr></table>',
     '  </td></tr>',
     '',
-    '  {{#tem_indicadores}}',
-    '  <!-- PRINCIPAIS RESULTADOS: dois ou três indicadores -->',
-    '  <tr><td class="px" style="padding:26px 40px 0 40px;">',
-    '    <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">PRINCIPAIS RESULTADOS</p>',
-    '    {{#origem_unica}}<p class="fx dm-txt-texto" style="margin:4px 0 0 0;font-family:{{fx}};font-size:13px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};"><b>{{origem_unica}}</b></p>{{/origem_unica}}',
-    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>',
-    '      {{#indicadores}}{{^primeiro}}<td class="hide-m" width="24" style="width:24px;"></td>{{/primeiro}}',
-    '      <td class="kpi dm-borda-{{dm_valor}}" width="{{largura}}" valign="top" style="width:{{largura}}px;border-top:2px solid {{cor_valor}};padding-top:12px;">',
-    '        <p class="ft kpiv dm-txt-{{dm_valor}}" style="margin:0;font-family:{{ft}};font-size:30px;line-height:34px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>',
-    '        <p class="fx dm-txt-texto" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>',
-    '        {{#detalhe}}<p class="fx dm-txt-apoio" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;mso-line-height-rule:exactly;color:{{cor.apoio}};">{{detalhe}}</p>{{/detalhe}}',
-    '        {{#origem}}<p class="fx dm-txt-apoio" style="margin:2px 0 0 0;font-family:{{fx}};font-size:11px;line-height:15px;mso-line-height-rule:exactly;color:{{cor.apoio}};">{{origem}}</p>{{/origem}}',
-    '        {{#variacao}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:8px;">{{variacao}}</td></tr></table>{{/variacao}}',
-    '      </td>{{/indicadores}}',
-    '    </tr></table>',
-    '  </td></tr>',
-    '  {{/tem_indicadores}}',
-    '',
-    '  {{#tem_topicos}}',
-    '  <!-- NOVOS TÓPICOS (ex.: Testes): rótulo, título e os itens de cada um, sem link (o link do e-mail é o botão) -->',
-    '  <tr><td class="px" style="padding:26px 40px 0 40px;">',
-    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">',
-    '      {{#topicos}}{{^primeiro}}<tr><td height="18" style="height:18px;"></td></tr>{{/primeiro}}',
-    '      <tr><td class="dm-borda-texto" style="border-top:1px solid {{cor.texto}};padding-top:12px;">',
-    '        <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">{{rotulo}}</p>',
-    '        {{#titulo}}<p class="ft dm-txt-texto" style="margin:4px 0 0 0;font-family:{{ft}};font-size:17px;line-height:22px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>{{/titulo}}',
-    '        {{#itens}}<p class="fx dm-txt-texto" style="margin:6px 0 0 0;font-family:{{fx}};font-size:13px;line-height:19px;mso-line-height-rule:exactly;color:{{cor.texto}};"><span class="dm-txt-marca" style="color:{{cor.marca}};font-weight:bold;">&#9679;</span>&nbsp; {{#valor}}<b class="dm-txt-marca" style="color:{{cor.marca}};">{{valor}}</b>&nbsp;·&nbsp;{{/valor}}<b>{{nome}}</b>{{#status}}<span class="dm-txt-apoio" style="color:{{cor.apoio}};">&nbsp;·&nbsp;{{status}}</span>{{/status}}</p>{{/itens}}',
-    '        {{#mais}}<p class="fx dm-txt-apoio" style="margin:6px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.apoio}};">E mais {{mais}} no report completo.</p>{{/mais}}',
-    '      </td></tr>{{/topicos}}',
+    '  {{#tem_destaques}}',
+    '  <!-- DESTAQUES DO MÊS: até 4, escolhidos no emulador (indicador, campanha, aprendizado, informação nova), com imagem opcional.',
+    '       Em pares (290 + 20 + 290); com número ímpar, o primeiro ocupa a largura toda. No celular, um embaixo do outro. -->',
+    '  <tr><td class="px" style="padding:26px 40px 20px 40px;">',
+    '    <p class="fx dm-txt-turquesa" style="margin:0;font-family:{{fx}};font-size:10px;line-height:14px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.turquesa}};letter-spacing:2px;">DESTAQUES DO MÊS</p>',
+    '    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;">',
+    '      {{#linhas}}{{^primeira}}<tr><td colspan="3" height="20" style="height:20px;"></td></tr>{{/primeira}}<tr>',
+    '        {{#cards}}{{^primeiro}}<td class="hide-m" width="20" style="width:20px;"></td>{{/primeiro}}',
+    '        <!-- o fundo fica na célula: os dois cartões da linha têm a mesma altura (também no Outlook) -->',
+    '        <td class="col kpi dtq dm-lisboa{{^primeiro}} dtq2{{/primeiro}}"{{#largo}} colspan="3"{{/largo}} width="{{w}}" valign="top" bgcolor="{{cor.lisboa}}" style="width:{{w}}px;background:{{cor.lisboa}};">',
+    '          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">',
+    '            {{#img_topo}}<tr><td colspan="2" style="font-size:0;line-height:0;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" class="dimg" style="display:block;border:0;width:{{w}}px;max-width:100%;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.apoio}};"></td></tr>{{/img_topo}}',
+    '            <tr>',
+    '              {{#img_lado}}<td class="col" width="{{w}}" valign="top" style="width:{{w}}px;font-size:0;line-height:0;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" class="dimg" style="display:block;border:0;width:{{w}}px;max-width:100%;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.apoio}};"></td>{{/img_lado}}',
+    '              <td class="col" valign="top" style="padding:16px 18px 18px 18px;">',
+    '                {{#grupo}}<p class="fx dm-txt-{{dm_grupo}}" style="margin:0 0 6px 0;font-family:{{fx}};font-size:9px;line-height:13px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_grupo}};letter-spacing:1.5px;">{{grupo}}</p>{{/grupo}}',
+    '                {{#valor}}<p class="ft kpiv dm-txt-{{dm_valor}}" style="margin:0;font-family:{{ft}};font-size:30px;line-height:34px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;">{{valor}}</p>{{/valor}}',
+    '                {{#titulo}}<p class="ft dm-txt-{{dm_titulo}}" style="margin:{{#valor}}4px{{/valor}}{{^valor}}0{{/valor}} 0 0 0;font-family:{{ft}};font-size:16px;line-height:21px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor_titulo}};">{{titulo}}</p>{{/titulo}}',
+    '                {{#texto}}<p class="fx dm-txt-{{dm_texto}}" style="margin:4px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor_texto}};">{{texto}}</p>{{/texto}}',
+    '                {{#etiqueta}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-top:8px;">{{etiqueta}}</td></tr></table>{{/etiqueta}}',
+    '                {{#link}}<p class="fx" style="margin:10px 0 0 0;font-family:{{fx}};font-size:12px;line-height:16px;mso-line-height-rule:exactly;font-weight:bold;"><a class="fx dm-txt-marca" href="{{link}}" target="_blank" style="color:{{cor.marca}};font-family:{{fx}};text-decoration:none;">{{link_texto}}&nbsp;&#8594;</a></p>{{/link}}',
+    '              </td>',
+    '            </tr>',
+    '          </table>',
+    '        </td>{{/cards}}',
+    '      </tr>{{/linhas}}',
     '    </table>',
     '  </td></tr>',
-    '  {{/tem_topicos}}',
+    '  {{/tem_destaques}}',
     '',
     '  <!-- CHAMADA PRINCIPAL: o único link do e-mail -->',
-    '  <tr><td class="px" style="padding:26px 40px 28px 40px;">',
-    '    <table role="presentation" class="dm-lisboa" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.lisboa}}" style="background:{{cor.lisboa}};"><tr>',
+    '  <tr><td class="px" style="padding:{{#tem_destaques}}6px{{/tem_destaques}}{{^tem_destaques}}26px{{/tem_destaques}} 40px 28px 40px;">',
+    '    <table role="presentation" class="dm-rio" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.rio}}" style="background:{{cor.rio}};"><tr>',
     '      <td class="ctat" valign="middle" style="padding:20px 0 20px 26px;">',
     '        <p class="ft dm-txt-marca" style="margin:0;font-family:{{ft}};font-size:19px;line-height:24px;mso-line-height-rule:exactly;font-weight:bold;color:{{cor.marca}};">{{cta_titulo}}</p>',
     '        <p class="fx dm-txt-texto" style="margin:4px 0 0 0;font-family:{{fx}};font-size:12px;line-height:18px;mso-line-height-rule:exactly;color:{{cor.texto}};">{{cta_texto}}</p>',
@@ -1742,8 +1866,8 @@
      (que marcam o que recoloriram com data-ogsc / data-ogsb). O "light only" do cabeçalho já pede ao Apple Mail para
      não inverter. O Outlook clássico para Windows não aceita nenhum desses recursos: lá vale o botão do próprio
      Outlook para trocar o fundo da mensagem (docs/EMULADOR.md). */
-  var DM_FUNDOS = { "dm-lisboa": CR.lisboa, "dm-branco-bg": CR.branco, "dm-marca-bg": CR.marca, "dm-chip-verde": CR.positivo_fundo, "dm-chip-ambar": CR.atencao_fundo };
-  var DM_TEXTOS = { "dm-txt-branco": CR.branco, "dm-txt-marca": CR.marca, "dm-txt-texto": CR.texto, "dm-txt-apoio": CR.apoio, "dm-txt-turquesa": CR.turquesa, "dm-chip-verde": CR.positivo, "dm-chip-ambar": CR.atencao };
+  var DM_FUNDOS = { "dm-lisboa": CR.lisboa, "dm-rio": CR.rio, "dm-branco-bg": CR.branco, "dm-marca-bg": CR.marca, "dm-chip-verde": CR.positivo_fundo, "dm-chip-ambar": CR.atencao_fundo };
+  var DM_TEXTOS = { "dm-txt-branco": CR.branco, "dm-txt-marca": CR.marca, "dm-txt-texto": CR.texto, "dm-txt-apoio": CR.apoio, "dm-txt-turquesa": CR.turquesa, "dm-txt-rosa": CR.rosa, "dm-chip-verde": CR.positivo, "dm-chip-ambar": CR.atencao };
   var DM_BORDAS = { "dm-borda-marca": CR.marca, "dm-borda-texto": CR.texto };
   var CSS_ESCURO = (function () {
     function regras(mapa, prop, sel) {
@@ -1783,18 +1907,12 @@
     var d = lido.d, ft = fonteDaClasse(html, "ft", "Arial, Helvetica, sans-serif"), fx = fonteDaClasse(html, "fx", "Arial, Helvetica, sans-serif");
     var fti = (/class="ft h1"[^>]*?font-family:([^;"]+)/.exec(html) || [])[1] || ft;
     var mso = (/<!--\[if mso\]>\s*<noscript>[\s\S]*?<!\[endif\]-->/.exec(html) || [""])[0];
-    var cand = d.indicadores, porChave = {};
-    cand.forEach(function (x) { porChave[x.chave] = x; });
-    /* Sem repetição: um indicador que a frase do mês já diz (valor e o que ele mede) não vem marcado sozinho. */
-    var fraseMes = [d.frase, d.frase_final].join(" ");
-    cand.forEach(function (x) { x.na_frase = repete(fraseMes, x); });
-    var livres = cand.filter(function (x) { return !x.na_frase; });
-    var escolha = (op.indicadores && op.indicadores.length ? op.indicadores : livres.filter(function (x) { return x.grupo === "Projeto principal"; }).map(function (x) { return x.chave; }))
-      .filter(function (k) { return porChave[k]; }).slice(0, RESUMO_REGRAS.indicadores);
-    if (!escolha.length) escolha = (livres.length ? livres : cand).slice(0, RESUMO_REGRAS.indicadores).map(function (x) { return x.chave; });
-    var sel = escolha.map(function (k) { return porChave[k]; }), n = sel.length, larg = n ? colunas(LARGURA, n) : [];
-    var grupos = sel.map(function (x) { return x.grupo + "|" + x.origem; }).filter(function (g, i, a) { return a.indexOf(g) === i; });
-    var unica = grupos.length === 1 ? sel[0] : null;
+    var cand = candidatosResumo(d), fraseMes = [d.frase, d.frase_final].join(" ");
+    /* a escolha da pessoa (destaques); sem ela, os indicadores pedidos (como antes da 4.13); sem nada, a sugestão */
+    var sugestao = sugerirDestaques(cand, fraseMes);
+    var config = op.destaques && op.destaques.length ? op.destaques : op.indicadores && op.indicadores.length ? op.indicadores.map(function (k) { return { origem: k }; }) : sugestao;
+    var rd = resolverDestaques(config, cand), sel = rd.lista, n = sel.length, lay = layoutDestaques(n);
+    sel.forEach(function (x) { x.na_frase = x.tipo === "indicador" && repete(fraseMes, x); });
     var periodo = d.periodo, mesTxt = periodo ? periodo.charAt(0) + periodo.slice(1).toLocaleLowerCase("pt-BR") : "";
     var nomesTop = d.topicos.map(function (t) { return t.rotulo.toLocaleLowerCase("pt-BR"); });
     var partes = [d.tem.campanhas ? "as campanhas" : "", d.tem.aprendizados ? "os aprendizados" : "", d.tem.transformation ? "o Transformation Hub" : ""].concat(nomesTop, [d.tem.proximos ? "os próximos passos" : ""]).filter(Boolean);
@@ -1810,30 +1928,41 @@
       previa: "Resumo" + (mesTxt ? " de " + mesTxt : "") + ": " + [d.frase, d.frase_final].filter(Boolean).join(" "),
       intro: "Os destaques" + (mesTxt ? " de " + mesTxt : " do mês") + " em poucos segundos. O report completo traz todos os detalhes.",
       logo: d.logo && d.logo.src ? { src: d.logo.src, w: Math.min(d.logo.w || 32, 40) } : null,
-      tem_indicadores: n > 0,
-      /* o nome do projeto (não "Projeto principal"), e só uma vez: se a frase do mês já diz o nome, a linha sai */
-      origem_unica: unica && !contemTexto(fraseMes, unica.origem) ? unica.origem : "",
-      indicadores: sel.map(function (x, i) {
-        /* o detalhe que só repete o valor e o título (ex.: "28 contas abertas" embaixo de 28 · Contas abertas) sai;
-           o nome do projeto embaixo do indicador também, se o título ou a frase já o dizem */
-        var detalhe = x.detalhe && !repete(x.detalhe, x) && !contemTexto(x.titulo, x.detalhe) ? x.detalhe : "";
-        var origem = unica || contemTexto(x.titulo + " " + detalhe + " " + fraseMes, x.origem) ? "" : x.origem;
-        return { valor: x.valor, titulo: x.titulo, detalhe: detalhe, origem: origem, variacao: etiquetaResumo(x.variacao, x.tom, fx), primeiro: i === 0, largura: larg[i], cor_valor: i === 0 ? CR.marca : CR.texto, dm_valor: i === 0 ? "marca" : "texto" };
-      }),
-      tem_topicos: d.topicos.length > 0,
-      topicos: d.topicos.map(function (t, i) {
-        var mostra = t.itens.slice(0, RESUMO_REGRAS.itens_topico), resto = t.itens.length - mostra.length;
-        return {
-          primeiro: i === 0, rotulo: maiusculas(t.rotulo), titulo: t.titulo, mais: resto > 0 ? resto + (resto > 1 ? " itens" : " item") : "",
-          itens: mostra.map(function (x) { return { valor: x.valor, nome: x.nome || x.texto, status: (x.status || "").replace(/^[\u25cf\u25cb]\s*/, "") }; })
-        };
-      }),
+      tem_destaques: n > 0,
+      linhas: (function () {
+        var cards = sel.map(function (x, i) {
+          var l = lay[i], ind = x.tipo === "indicador", im = x.imagem, lado = !!(im && l.largo && im.posicao === "lado");
+          /* o detalhe que só repete o valor e o título (ex.: "28 contas abertas" embaixo de 28 · Contas abertas) sai;
+             o nome do projeto no alto do cartão também, se o título ou a frase do mês já o dizem */
+          var texto = ind && x.texto && !x.novo && (repete(x.texto, x) || contemTexto(x.titulo, x.texto)) ? "" : x.texto;
+          var grupo = x.grupo && !contemTexto(x.titulo + " " + texto + " " + (ind ? fraseMes : ""), x.grupo) ? maiusculas(x.grupo) : "";
+          if (x.aprendizado) grupo = "O QUE APRENDEMOS" + (x.titulo !== "O que aprendemos" || !x.grupo ? "" : " · " + maiusculas(x.grupo));
+          var img = im ? { src: im.src, w: lado ? DESTAQUE_IMG.lado[0] : l.w, h: im.h ? Math.round(im.h * (lado ? DESTAQUE_IMG.lado[0] : l.w) / (im.w || l.w)) : "", alt: im.alt || x.titulo } : null;
+          return {
+            primeiro: false, w: l.w, largo: l.largo, valor: ind ? x.valor : "", titulo: x.aprendizado && x.titulo === "O que aprendemos" ? "" : x.titulo, texto: texto,
+            grupo: grupo, dm_grupo: x.aprendizado ? "rosa" : "turquesa", cor_grupo: x.aprendizado ? CR.rosa : CR.turquesa,
+            dm_valor: i === 0 ? "marca" : "texto", cor_valor: i === 0 ? CR.marca : CR.texto,
+            dm_titulo: ind ? "texto" : "marca", cor_titulo: ind ? CR.texto : CR.marca, mt_titulo: ind ? 6 : x.aprendizado ? 6 : 6,
+            dm_texto: ind ? "apoio" : "texto", cor_texto: ind ? CR.apoio : CR.texto,
+            etiqueta: etiquetaResumo(x.etiqueta, x.tom, fx), link: x.link, link_texto: x.link_texto,
+            img_topo: img && !lado ? img : null, img_lado: img && lado ? img : null
+          };
+        }), linhas = [], k = 0;
+        while (k < cards.length) {
+          var lin = cards[k].largo ? [cards[k]] : cards.slice(k, k + 2);
+          lin.forEach(function (c2, j) { c2.primeiro = j === 0; });
+          linhas.push({ cards: lin, primeira: !linhas.length }); k += lin.length;
+        }
+        return linhas;
+      })(),
       cta_titulo: op.titulo || "Acesse o report completo.",
       cta_texto: op.chamada || ((lista ? lista.charAt(0).toUpperCase() + lista.slice(1) : "Todas as seções") + ", com as peças" + (temVideo ? " e os vídeos" : "") + "."),
       botao_html: seguro(botao), css_escuro: seguro(CSS_ESCURO), botao_w: link ? larguraBotao(txtBotao) : 260, contato: ""
     };
     var out = aplicar(RESUMO_TPL, m).replace(/\n[ \t]*\n(\s*\n)+/g, "\n\n");
-    return { html: out, indicadores: escolha, candidatos: cand, pendencias: lido.pendencias, temVideo: temVideo, temLink: !!link, dados: d };
+    var escolha = sel.filter(function (x) { return x.tipo === "indicador" && !x.novo; }).map(function (x) { return x.origem; });
+    return { html: out, destaques: sel, fora: rd.fora, sugestao: sugestao, candidatos: cand, indicadores: escolha, repetidos: sel.filter(function (x) { return x.na_frase; }),
+      pendencias: lido.pendencias, temVideo: temVideo, temLink: !!link, dados: d };
   }
 
 
@@ -1848,9 +1977,9 @@
    */
   var IMPORTA = {
     "ABERTURA": { frase: "frase", frase_final: "frase_final" },
-    "PROJETO PRINCIPAL": { nome: "principal.nome", resumo: "principal.resumo" },
+    "PROJETO PRINCIPAL": { nome: "principal.nome", resumo: "principal.resumo", aprendizado: "principal.aprendizado" },
     "LANCAMOS": { titulo: "lancamos.titulo" },
-    "DESTAQUE": { categoria: "destaque.categoria", titulo: "destaque.titulo", texto: "destaque.texto", nota: "destaque.nota" },
+    "DESTAQUE": { categoria: "destaque.categoria", titulo: "destaque.titulo", texto: "destaque.texto", nota: "destaque.nota", aprendizado: "destaque.aprendizado" },
     "CREATIVE X": { subtitulo: "cx.subtitulo", rotulo: "cx.rotulo", anterior: "cx.anterior", atual: "cx.atual", variacao: "cx.variacao", periodo: "cx.periodo", referencia: "cx.referencia", significado: "cx.significado", nota: "cx.nota" },
     "CREATIVE X TRIMESTRE": { rotulo: "cxt.rotulo", titulo: "cxt.titulo", texto: "cxt.texto", estimativa: "cxt.estimativa" },
     "TRANSFORMATION": { titulo: "transformation.titulo" },
@@ -1859,7 +1988,7 @@
   var IMPORTA_LISTA = {
     "NUMERO": ["numero", ["valor", "titulo", "detalhe", "variacao"]], "RESULTADO": ["resultado", ["valor", "titulo", "detalhe", "variacao"]],
     "CREATIVE X TRIMESTRE": ["cxt", ["valor", "titulo", "detalhe", "variacao"]],
-    "LANCAMENTO": ["lancamento", ["status", "nome", "texto"]],
+    "LANCAMENTO": ["lancamento", ["status", "nome", "texto", "aprendizado"]],
     "TRANSFORMATION": ["transformation", ["status", "nome", "texto", "resultado"]], "APRENDIZADO": ["aprendizado", ["titulo", "texto", "levamos"]], "AGENDA": ["agenda", ["data", "titulo", "detalhe"]]
   };
   TOPICOS.forEach(function (t) {
@@ -1913,7 +2042,7 @@
     limparHtmlEditado: limparHtmlEditado, imagensDoHtml: imagensDoHtml, origemImagem: origemImagem, deBase64: deBase64,
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
-    RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, CSS_CELULAR: CSS_CELULAR, xDeExemplo: xDeExemplo, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, linkDoReport: linkDoReport, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, elementosComCampo: elementosComCampo,
+    RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, CSS_CELULAR: CSS_CELULAR, xDeExemplo: xDeExemplo, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, linkDoReport: linkDoReport, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, htmlAprendizado: htmlAprendizado, candidatosResumo: candidatosResumo, sugerirDestaques: sugerirDestaques, resolverDestaques: resolverDestaques, layoutDestaques: layoutDestaques, tamanhoImagemDestaque: tamanhoImagemDestaque, DESTAQUE_IMG: DESTAQUE_IMG, elementosComCampo: elementosComCampo,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

@@ -26,6 +26,7 @@ previa: [Texto da caixa de entrada, até 110 caracteres]
 [PROJETO PRINCIPAL]
 nome: [Nome do projeto principal]
 resumo: [Resumo do resultado mais importante do mês, em uma ou duas frases.]
+aprendizado: [O que a campanha ensinou, em uma ou duas frases]
 imagem: coringa-principal.png
 descricao_imagem: [Descrição da imagem]
 enquadramento: centro
@@ -57,6 +58,7 @@ titulo: [Título da seção O que lançamos.]
 categoria: [Categoria · Canal]
 titulo: [Título do projeto em destaque]
 texto: [Texto do projeto em destaque: o que foi feito e por quê.]
+aprendizado: [O que a campanha ensinou, em uma ou duas frases]
 imagem: coringa-destaque.png
 descricao_imagem: [Descrição da imagem]
 enquadramento: centro
