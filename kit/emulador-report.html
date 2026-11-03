@@ -2762,6 +2762,12 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
     var top = r.top + w.scrollY + (onde === "acima" ? -barra.offsetHeight - 7 : onde === "direita" ? 4 : onde === "abaixo" ? r.height + 4 : 8);
     var left = onde === "direita" ? r.right + w.scrollX - barra.offsetWidth - 4 : r.left + w.scrollX + 8;
     left = Math.max(4, Math.min(left, w.scrollX + d.documentElement.clientWidth - barra.offsetWidth - 4));
+    /* O quadro cresce com o report e quem rola é a página do emulador, cuja barra de ferramentas fica presa no alto da
+       janela: num item alto, com o começo já acima, a barra dele ia para baixo dessa barra (sem dar para clicar).
+       Ela fica na parte do quadro que se vê, logo abaixo da barra do emulador (e dentro do item). */
+    var fr = $("#edFrame").getBoundingClientRect(), fx = document.querySelector(".ferramentas");
+    var visivel = w.scrollY + Math.max(0, (fx ? fx.getBoundingClientRect().bottom : 0) - fr.top) + 4;
+    if (top < visivel) top = Math.min(visivel, r.bottom + w.scrollY - barra.offsetHeight - 4);
     barra.style.top = Math.max(w.scrollY + 4, top) + "px"; barra.style.left = left + "px";
   }
   function barraEtiqueta(campo, chip) {
