@@ -100,7 +100,7 @@
   /* destaques do e-mail-resumo (4.13) */
   .dtqCab{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.dtqCab label{font-size:14px;font-weight:600}
   .dtqs{display:grid;gap:10px;margin-top:8px}
-  .dtq{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;background:#FCFAF8;min-width:0}
+  .dtq{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;background:#FCFAF8;min-width:0;overflow-wrap:anywhere}
   .dtq.novo{border-color:#F0B998;background:#FFF8F2}.dtq.fora{border-color:#E8B4B4;background:#FFF5F5}
   .dtq .topo{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
   .dtq .num{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;font-weight:700;flex:none}
@@ -118,8 +118,10 @@
   .dtq .img{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule)}
   .dtq .img img{width:96px;height:auto;border-radius:6px;border:1px solid var(--rule);display:block}
   .dtq .img .check{font-size:13px}
+  /* a lista de imagens do report tem o nome de cada peça: a caixa não passa da largura do cartão (a lista aberta mostra o nome inteiro) */
+  .dtq .img select{max-width:100%;min-width:0;text-overflow:ellipsis}
   .dtqLista .grupo{margin-top:10px}.dtqLista .grupo>b{display:block;font-size:13px;color:var(--gray);margin-bottom:2px}
-  .dtqLista button{padding:4px 10px;font-size:13px;margin:4px 6px 0 0;text-align:left;max-width:100%;white-space:normal}
+  .dtqLista button{padding:4px 10px;font-size:13px;margin:4px 6px 0 0;text-align:left;max-width:100%;white-space:normal;overflow-wrap:anywhere}
   .passos{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--gray)}
   .inicio{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:12px}
   .cartao{border:1px solid #CFC9C4;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff}
@@ -4556,7 +4558,7 @@ window.CORINGA_HTML = "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\" xmlns=\"h
     var c = porOrigem(k); return c ? (/^lancamento/.test(k) ? "Card: " : /^transformation/.test(k) ? "Projeto: " : "") + c.titulo : k;
   }
   function figurasUteis() { return Object.keys(DTQ.figuras).filter(function (k) { return k !== "logo" && DTQ.figuras[k].src; }); }
-  function rotuloCand(c) { return (c.valor ? c.valor + " · " : "") + (c.aprendizado ? "O que aprendemos · " + c.grupo : c.titulo) + (c.tipo === "texto" && c.texto && !c.aprendizado ? " — " + c.texto.slice(0, 70) + (c.texto.length > 70 ? "…" : "") : c.aprendizado ? " — " + c.texto.slice(0, 70) + (c.texto.length > 70 ? "…" : "") : "") + (c.na_frase ? " · já está na frase do mês" : ""); }
+  function rotuloCand(c) { return (c.valor ? c.valor + " · " : "") + (c.aprendizado ? (c.titulo && c.titulo !== "O que aprendemos" ? c.titulo : "O que aprendemos · " + c.grupo) : c.titulo) + (c.tipo === "texto" && c.texto && !c.aprendizado ? " — " + c.texto.slice(0, 70) + (c.texto.length > 70 ? "…" : "") : c.aprendizado ? " — " + c.texto.slice(0, 70) + (c.texto.length > 70 ? "…" : "") : "") + (c.na_frase ? " · já está na frase do mês" : ""); }
   function el(tag, at, filhos) {
     var e = document.createElement(tag);
     Object.keys(at || {}).forEach(function (k) { if (k === "texto") e.textContent = at[k]; else if (k === "classe") e.className = at[k]; else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), at[k]); else if (at[k] !== null && at[k] !== undefined && at[k] !== false) e.setAttribute(k, at[k] === true ? "" : at[k]); });
