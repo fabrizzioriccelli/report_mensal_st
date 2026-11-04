@@ -1327,6 +1327,10 @@
     html = html.replace(/<link rel="(?:icon|apple-touch-icon)"[^>]*>\n?/g, "");
     tira(/ (?:tabindex="0"|role="button"|aria-label="(?:Ampliar|Assistir): [^"]*"|title="Clique para (?:ampliar|assistir)")/g, "atributo do clique");
     tira(/ (?:contenteditable|spellcheck)(?:="[^"]*")?(?=[\s>\/])/gi, "atributo de edição");
+    /* cor em rgb() (estilo regravado por um navegador): vira #RRGGBB, o único formato que o Outlook para Windows entende */
+    var nr = 0;
+    html = html.replace(/rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/g, function (m, r, g, b) { nr++; return "#" + [r, g, b].map(function (x) { return ("0" + Math.min(255, +x).toString(16)).slice(-2).toUpperCase(); }).join(""); });
+    if (nr) saiu.push({ item: "cor em rgb() trocada pelo código #RRGGBB", n: nr });
     return { html: html, saiu: saiu };
   }
 
@@ -1936,14 +1940,18 @@
     pf: { area: PERFIS.pf.area, area_linha: PERFIS.pf.area_linha, pagina: CR.lisboa, dm_pagina: "dm-lisboa", cab: CR.marca, dm_cab: "dm-marca-bg", cab_txt: "#FFFFFF", dm_cab_txt: "dm-txt-branco", cab_filete: "#FFFFFF",
       rot: CR.turquesa, dm_rot: "dm-txt-turquesa", card: CR.lisboa, dm_card: "dm-lisboa", grupo: CR.turquesa, dm_grupo: "turquesa", grupo_apr: CR.rosa, dm_grupo_apr: "rosa",
       valor1: CR.marca, dm_valor1: "marca", titulo_txt: CR.marca, dm_titulo_txt: "marca", cta: CR.rio, dm_cta: "dm-rio", cta_borda: "", cta_tit: CR.marca, dm_cta_tit: "dm-txt-marca",
-      ass: CR.marca, dm_ass: "dm-marca-bg", ass_txt: "#FFFFFF", dm_ass_txt: "dm-txt-branco", ass_borda: "" },
+      ass: CR.marca, dm_ass: "dm-marca-bg", ass_txt: "#FFFFFF", dm_ass_txt: "dm-txt-branco", ass_borda: "", apoio: CR.apoio, dm_apoio: "apoio" },
     pj: { area: PERFIS.pj.area, area_linha: PERFIS.pj.area_linha, pagina: CR.rio, dm_pagina: "dm-rio", cab: CR.rio, dm_cab: "dm-rio", cab_txt: CR.texto, dm_cab_txt: "dm-txt-texto", cab_filete: CR.texto,
       rot: CR.boston, dm_rot: "dm-txt-boston", card: CR.rio, dm_card: "dm-rio", grupo: CR.boston, dm_grupo: "boston", grupo_apr: CR.boston, dm_grupo_apr: "boston",
       valor1: CR.texto, dm_valor1: "texto", titulo_txt: CR.texto, dm_titulo_txt: "texto", cta: CR.branco, dm_cta: "dm-branco-bg", cta_borda: "border:1px solid " + CR.rio + ";", cta_tit: CR.texto, dm_cta_tit: "dm-txt-texto",
-      ass: CR.branco, dm_ass: "dm-branco-bg", ass_txt: CR.texto, dm_ass_txt: "dm-txt-texto", ass_borda: "border-top:1px solid " + CR.rio + ";" }
+      ass: CR.branco, dm_ass: "dm-branco-bg", ass_txt: CR.texto, dm_ass_txt: "dm-txt-texto", ass_borda: "border-top:1px solid " + CR.rio + ";", apoio: CR.texto, dm_apoio: "texto" }
   };
   var CSS_ESCURO_PJ = (function () {
-    var f = junta(DM_FUNDOS), t = junta(DM_TEXTOS, { "dm-txt-boston": CR.boston });
+    /* só as classes que o tema PJ usa (sem Lisboa, turquesa, rosa: não são do Empresas) */
+    var f = {}, t = {};
+    ["dm-rio", "dm-branco-bg", "dm-marca-bg", "dm-chip-verde", "dm-chip-ambar"].forEach(function (k) { f[k] = DM_FUNDOS[k]; });
+    ["dm-txt-branco", "dm-txt-marca", "dm-txt-texto", "dm-chip-verde", "dm-chip-ambar"].forEach(function (k) { t[k] = DM_TEXTOS[k]; });
+    t["dm-txt-boston"] = CR.boston;
     function regras(mapa, prop, sel) {
       return Object.keys(mapa).map(function (c) {
         var v = mapa[c], d = prop === "bg" ? "background:" + v + " !important;background-color:" + v + " !important;" : prop === "cor" ? "color:" + v + " !important;" : "border-color:" + v + " !important;";
@@ -2019,7 +2027,7 @@
             grupo: grupo, dm_grupo: x.aprendizado ? T.dm_grupo_apr : T.dm_grupo, cor_grupo: x.aprendizado ? T.grupo_apr : T.grupo, campanha: !x.aprendizado,
             dm_valor: i === 0 ? T.dm_valor1 : "texto", cor_valor: i === 0 ? T.valor1 : CR.texto,
             dm_titulo: ind ? "texto" : T.dm_titulo_txt, cor_titulo: ind ? CR.texto : T.titulo_txt, mt_titulo: ind ? 6 : x.aprendizado ? 6 : 6,
-            dm_texto: ind ? "apoio" : "texto", cor_texto: ind ? CR.apoio : CR.texto,
+            dm_texto: ind ? T.dm_apoio : "texto", cor_texto: ind ? T.apoio : CR.texto,
             etiqueta: etiquetaResumo(x.etiqueta, x.tom, fx), link: x.link, link_texto: x.link_texto,
             img_topo: img && !lado ? img : null, img_lado: img && lado ? img : null
           };

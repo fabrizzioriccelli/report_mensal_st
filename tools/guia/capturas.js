@@ -41,7 +41,14 @@ async function capturar(browser, s, S) {
     return p.evaluate(function (x) { var e = Array.prototype.find.call(document.querySelectorAll(x), function (y) { var r = y.getBoundingClientRect(); return r.width > 0 && r.height > 0; }); if (!e) return null; var r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }, sel);
   }
   /* foto de uma área (clip em px da tela) e as caixas dos destaques, relativas à foto */
-  async function foto(nome, clip, destaques, legenda) {
+  async function foto(nome, clip, destaques, legenda, op) {
+    /* recorte em volta do report (no quadro de edição): o report tem 680 px no meio do quadro; o resto é vazio */
+    if (op && op.report) {
+      var cont = await caixa("q:table.container"), xs = [cont.x, cont.x + cont.w];
+      for (var dd of destaques || []) { var bb = await caixa(dd); if (bb) { xs.push(bb.x); xs.push(bb.x + bb.w); } }
+      var xa = Math.max(0, Math.min.apply(null, xs) - 28), xb = Math.min(1280, Math.max.apply(null, xs) + 28);
+      clip = { x: xa, y: clip.y, w: xb - xa, h: clip.h };
+    }
     clip = { x: Math.max(0, Math.round(clip.x)), y: Math.max(0, Math.round(clip.y)), width: Math.round(clip.w), height: Math.round(clip.h) };
     var cx = [];
     for (var d of destaques || []) { var b = await caixa(d); if (b) cx.push({ sel: d, x: (b.x - clip.x) / clip.width, y: (b.y - clip.y) / clip.height, w: b.w / clip.width, h: b.h / clip.height }); else { cx.push(null); console.log("  (sem caixa) " + nome + " " + d); } }
@@ -87,29 +94,29 @@ async function capturar(browser, s, S) {
   await f.click('[data-campo="frase"][data-ed-campo]');
   await p.waitForTimeout(300);
   var bq = await caixa("q:" + '[data-campo="frase"]');
-  await foto("texto", { x: 0, y: Math.max(0, bq.y - 170), w: 1280, h: 420 }, ["q:[data-campo=\"frase\"]"], "Editar um texto");
+  await foto("texto", { x: 0, y: Math.max(0, bq.y - 170), w: 1280, h: 420 }, ["q:[data-campo=\"frase\"]"], "Editar um texto", { report: true });
   await p.keyboard.press("Escape");
   /* 4. Indicador e etiqueta */
   await noTopoDoQuadro('[data-campo="numero-2.variacao"]');
   await f.locator('[data-campo="numero-2.variacao"]').locator("visible=true").first().click();
   await p.waitForTimeout(400);
   var bv = await caixa("q:[data-campo=\"numero-2.valor\"]");
-  await foto("indicador", { x: 0, y: Math.max(0, bv.y - 150), w: 1280, h: 400 }, ["q:[data-campo=\"numero-2.valor\"]", "q:[data-campo=\"numero-2.variacao\"]", "q:#ed-barra"], "Editar um indicador");
+  await foto("indicador", { x: 0, y: Math.max(0, bv.y - 150), w: 1280, h: 400 }, ["q:[data-campo=\"numero-2.valor\"]", "q:[data-campo=\"numero-2.variacao\"]", "q:#ed-barra"], "Editar um indicador", { report: true });
   /* 5. Item: barra do item e + Adicionar */
   await noTopoDoQuadro('[data-item="' + S.item + '"]');
   await passar('[data-item="' + S.item + '"] [data-campo$=".nome"]');
   var bi = await caixa("q:[data-item=\"" + S.item + "\"]");
-  await foto("item", { x: 0, y: Math.max(0, bi.y - 120), w: 1280, h: 460 }, ["q:[data-item=\"" + S.item + "\"]", "q:#ed-barra", "q:.ed-mais button[data-grupo=\"lancamento\"]"], "Barra do item");
+  await foto("item", { x: 0, y: Math.max(0, bi.y - 120), w: 1280, h: 460 }, ["q:[data-item=\"" + S.item + "\"]", "q:#ed-barra", "q:.ed-mais button[data-grupo=\"lancamento\"]"], "Barra do item", { report: true });
   /* 6. Imagem: Trocar imagem */
   await noTopoDoQuadro('img[data-img="principal"]');
   await passar('img[data-img="principal"]');
   var bim = await caixa("q:img[data-img=\"principal\"]");
-  await foto("imagem", { x: 0, y: Math.max(0, bim.y - 110), w: 1280, h: Math.min(520, bim.h + 220) }, ["q:img[data-img=\"principal\"]", "q:#ed-barra"], "Trocar imagem");
+  await foto("imagem", { x: 0, y: Math.max(0, bim.y - 110), w: 1280, h: Math.min(520, bim.h + 220) }, ["q:img[data-img=\"principal\"]", "q:#ed-barra"], "Trocar imagem", { report: true });
   /* 7. Vídeo */
   await noTopoDoQuadro(S.video);
   await passar(S.video);
   var bvd = await caixa("q:" + S.video);
-  await foto("video", { x: 0, y: Math.max(0, bvd.y - 110), w: 1280, h: Math.min(480, bvd.h + 240) }, ["q:" + S.video, "q:#ed-barra"], "Vídeo");
+  await foto("video", { x: 0, y: Math.max(0, bvd.y - 110), w: 1280, h: Math.min(480, bvd.h + 240) }, ["q:" + S.video, "q:#ed-barra"], "Vídeo", { report: true });
   await p.mouse.move(2, 2);
   /* 8. + Adicionar item (assistente) */
   await p.evaluate(function (y) { window.scrollTo(0, y - 8); }, (await p.evaluate(function () { return document.querySelector("#secEditar").getBoundingClientRect().top + window.scrollY; })));
@@ -134,7 +141,7 @@ async function capturar(browser, s, S) {
   await p.waitForTimeout(250);
   var ps = await noQuadro(function (d, i) { var q = document.querySelector("#edFrame").getBoundingClientRect(), w = d.createTreeWalker(d.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:" + i) { var e = n.nextSibling; while (e.nodeType !== 1) e = e.nextSibling; var b = e.getBoundingClientRect(); return { x: q.left + b.left + 120, y: q.top + b.top + 18 }; } }, idSec);
   await p.mouse.move(ps.x, ps.y + 30); await p.mouse.move(ps.x, ps.y); await p.waitForTimeout(400);
-  await foto("alca", { x: 0, y: Math.max(0, ps.y - 160), w: 1280, h: 380 }, ["q:#ed-secao"], "Mover ou tirar uma seção");
+  await foto("alca", { x: 0, y: Math.max(0, ps.y - 160), w: 1280, h: 380 }, ["q:#ed-secao"], "Mover ou tirar uma seção", { report: true });
   await p.mouse.move(2, 2);
   /* 12. Importar conteúdo (Copilot) */
   await p.click("#bImportar"); await p.fill("#txtImportar", IMPORTAR); await p.waitForTimeout(200);
@@ -150,19 +157,24 @@ async function capturar(browser, s, S) {
   /* 14. Salvar */
   await p.click("#bSalvar"); await p.waitForFunction(function () { return window.__salvos.length >= 1; }, null, { timeout: 15000 }); await p.waitForTimeout(300);
   await p.evaluate(function () { window.scrollTo(0, document.querySelector("#secEditar").getBoundingClientRect().top + window.scrollY - 8); }); await p.waitForTimeout(200);
-  await foto("salvar", { x: 0, y: 0, w: 1280, h: 300 }, ["#bSalvar", "#estado"], "Salvar o report");
+  await foto("salvar", { x: 0, y: 0, w: 1280, h: 430 }, ["#bSalvar", "#estado"], "Salvar o report");
   /* 15. Link do report completo */
   await p.fill("#link", "https://www.example.com/report-ficticio-" + s + ".html");
   await p.waitForFunction(function () { return !document.querySelector("#bEmlRes").disabled; }, null, { timeout: 40000 }); await p.waitForTimeout(400);
   var cl = await vista("#secLink", 12, 300);
   await foto("link", cl, ["#link", "#linkInfo"], "Link do report completo");
   /* 16. E-mail-resumo: destaques */
-  var cr = await vista("#secResumo", 12, 780);
-  await foto("resumo", cr, ["#dtqEscolhidos", "#dtqLista", "#bDtqNovo", "#botao"], "Destaques do e-mail-resumo");
+  var cr = await vista("#secResumo", 12, 560);
+  await foto("resumo", cr, ["#dtqEscolhidos"], "Destaques do e-mail-resumo");
+  var crl = await vista("#bDtqNovo", 16, 700); crl.h = Math.min(320, 800 - crl.y);
+  await foto("resumo-lista", crl, ["#bDtqNovo", "#dtqLista"], "Informação nova e lista do report");
+  var crb = await vista(".campo:has(#botao)", 14, 150);
+  await foto("resumo-botao", crb, ["#botao"], "Texto do botão do e-mail-resumo");
   /* 17. Status e baixar */
-  var cb = await p.evaluate(function () { var a = document.querySelector("#secStatus").getBoundingClientRect(), b = document.querySelector("#secBaixar").getBoundingClientRect(); return { y: a.top + window.scrollY, h: b.bottom - a.top }; });
-  await p.evaluate(function (y) { window.scrollTo(0, y - 16); }, cb.y); await p.waitForTimeout(250);
-  await foto("baixar", { x: 0, y: 4, w: 1280, h: Math.min(780, cb.h + 24) }, ["#secStatus", "#bEmlRes", "#bPngRes", "#bEml"], "Status e downloads");
+  var cst = await vista("#secStatus", 12, 560);
+  await foto("status", cst, ["#secStatus"], "Status");
+  var cbx = await vista("#secBaixar", 12, 420);
+  await foto("baixar", cbx, ["#bEmlRes", "#bPngRes", "#bEml"], "Downloads");
   /* 18. Prévia do e-mail (computador e celular) */
   var cp = await vista("#secPrev", 12, 780);
   await foto("previa", cp, ["#secPrev .tabs, #secPrev [role=group]", "#prev"], "Prévia do e-mail-resumo");

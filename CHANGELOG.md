@@ -12,6 +12,9 @@ A versão atual aparece na página `gerar-report.html`, no topo de `report_backu
 - **Dados do PJ:** `dados/CORINGA-PJ.txt` (modelo em branco) e `dados/EXEMPLO-PJ-treinamento.txt` (treino, 100% fictício, Janeiro 2099) → `kit/report-coringa-pj.html` e `kit/report-exemplo-pj.html`. Campo novo, opcional, `segmento: PJ` em `[EDICAO]`: `gerar-report.html` usa o template e a marca do PJ.
 - **O PF não muda:** o motor, o template, a marca e o kit do PF geram exatamente o mesmo resultado de antes (comparado byte a byte: HTML, texto puro, e-mail-resumo, página interativa e e-mail resumido); muda só o número da versão.
 - **Guia operacional unificado PF + PJ** (`kit/guia-operacional.pptx` e `.pdf`), no sistema visual da referência Santander ("Boas práticas nas redes sociais"): navegação em pílulas no alto de cada página, índice com cartões clicáveis, aberturas de seção em Vermelho Santander, 14 seções, telas reais dos dois emuladores (dados fictícios) com marcações, e o que muda no PJ marcado. Gerado por `tools/guia/capturas.js` e `tools/guia/gerar-guia.js`.
+- **Correções que valem para os dois emuladores** (achadas nos testes do PJ):
+  - trocar a cor de uma etiqueta (verde, âmbar) grava a cor no código `#RRGGBB`. Antes, o navegador podia gravar `rgb(…)`, que alguns programas de e-mail não leem bem. Num report de antes que tenha `rgb(…)`, a cor é convertida para `#RRGGBB` ao gerar os e-mails;
+  - ao passar para o modo Celular, a barra do item que estava aberta some. Antes, ela ficava na largura do computador e fazia a página rolar para o lado.
 - Testes: `tests/pj.e2e.js` (novo, ponta a ponta do PJ, incluindo a recusa do outro segmento e o rascunho separado). A suíte do PF, inteira, no repositório e no kit.
 
 ## 4.13 · 2026-11-03 · "O que aprendemos" em cada campanha e e-mail-resumo com destaques escolhidos

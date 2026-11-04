@@ -43,12 +43,12 @@ function pagina(tipo, sec, fn) { PAGINAS.push({ tipo: tipo, sec: sec, fn: fn });
 /* ---------- primitivas ---------- */
 function texto(sl, t, o) {
   var runs = Array.isArray(t) ? t : [{ text: t, options: {} }];
-  runs = runs.map(function (r) { return typeof r === "string" ? { text: r, options: {} } : r; });
+  runs = runs.map(function (r) { r = typeof r === "string" ? { text: r, options: {} } : r; if (o.link && !r.options.hyperlink) r.options.hyperlink = JSON.parse(JSON.stringify(o.link)); return r; });
   sl.addText(runs, {
     x: I(o.x), y: I(o.y), w: I(o.w), h: I(o.h || o.s * 1.6), margin: 0, isTextBox: true,
     fontFace: o.f === "fx" ? FX : FT, fontSize: o.s, bold: o.b !== undefined ? o.b : o.f !== "fx", color: o.c || C.pt,
     align: o.al || "left", valign: o.va || "top", lineSpacingMultiple: o.ls || (o.f === "fx" ? 1.18 : 1.02), paraSpaceAfter: o.pa || 0, charSpacing: o.cs || 0,
-    hyperlink: o.link, fit: "none"
+    fit: "none"
   });
 }
 function caixa(sl, x, y, w, h, o) {
@@ -59,8 +59,8 @@ function caixa(sl, x, y, w, h, o) {
   });
 }
 function pilula(sl, t, x, y, w, h, o) {
-  caixa(sl, x, y, w, h, { r: h / 2, fill: o.fill, line: o.line, lw: o.lw || 1, link: o.link });
-  texto(sl, [{ text: t, options: { hyperlink: o.link } }], { x: x, y: y, w: w, h: h, s: o.s || 12.8, c: o.c, al: "center", va: "middle", f: o.f });
+  caixa(sl, x, y, w, h, { r: h / 2, fill: o.fill, line: o.line, lw: o.lw || 1, link: o.link ? JSON.parse(JSON.stringify(o.link)) : undefined });
+  texto(sl, [{ text: t, options: { hyperlink: o.link ? JSON.parse(JSON.stringify(o.link)) : undefined } }], { x: x, y: y, w: w, h: h, s: o.s || 12.8, c: o.c, al: "center", va: "middle", f: o.f });
 }
 function circulo(sl, t, x, y, d, fill, cor, s) {
   sl.addShape(pres.shapes.OVAL, { x: I(x), y: I(y), w: I(d), h: I(d), fill: { color: fill }, line: { type: "none" } });
@@ -105,7 +105,8 @@ function tags(sl, segs, x, y) {
 function titulo(sl, t, sub, segs) {
   texto(sl, t, { x: 65, y: 88, w: 1100, h: 56, s: 42, c: C.vm });
   if (segs) tags(sl, segs, 1377 - segs.length * 52 + 6, 102);
-  if (sub) texto(sl, sub, { x: 65, y: 150, w: 1310, h: 34, s: 23, c: C.pt });
+  /* subtítulo longo (ex.: objetivo de um prompt): menor, em até duas linhas, sem encostar no conteúdo */
+  if (sub) texto(sl, sub, sub.length > 105 ? { x: 65, y: 146, w: 1310, h: 44, s: 16, c: C.pt } : { x: 65, y: 150, w: 1310, h: 34, s: 23, c: C.pt });
 }
 
 /* ---------- blocos de conteúdo ---------- */
@@ -154,12 +155,14 @@ function captura(sl, nome, x, y, w, h, marcas, o) {
   sl.addShape(pres.shapes.RECTANGLE, { x: I(ix), y: I(iy), w: I(iw), h: I(ih), fill: { type: "none" }, line: { color: C.linha, width: 0.75 } });
   (marcas || []).forEach(function (mk) {
     var c = m.caixas[mk.i]; if (!c) throw new Error("marca sem caixa: " + nome + " #" + mk.i);
-    var bx = ix + c.x * iw - 3, by = iy + c.y * ih - 3, bw2 = c.w * iw + 6, bh2 = c.h * ih + 6;
-    bx = Math.max(ix, bx); by = Math.max(iy, by); bw2 = Math.min(ix + iw - bx, bw2); bh2 = Math.min(iy + ih - by, bh2);
+    /* a marcação fica dentro da imagem: o que passa da borda é cortado (e o que está fora não é marcado) */
+    var x0 = Math.max(0, c.x), y0 = Math.max(0, c.y), x1 = Math.min(1, c.x + c.w), y1 = Math.min(1, c.y + c.h);
+    if (x1 - x0 < 0.01 || y1 - y0 < 0.01) throw new Error("marca fora da captura: " + nome + " #" + mk.i);
+    var bx = Math.max(ix, ix + x0 * iw - 3), by = Math.max(iy, iy + y0 * ih - 3), bw2 = Math.min(ix + iw, ix + x1 * iw + 3) - bx, bh2 = Math.min(iy + ih, iy + y1 * ih + 3) - by;
     caixa(sl, bx, by, bw2, bh2, { r: 6, line: C.vm, lw: 2.25 });
     if (mk.n) circulo(sl, String(mk.n), Math.max(ix - 6, bx - 13), Math.max(iy - 6, by - 13), 26, C.vm, C.br, 13);
   });
-  texto(sl, "CAPTURA REAL · DADOS FICTÍCIOS DE TREINAMENTO", { x: x + 14, y: y + h + 6, w: w - 28, h: 16, s: 9.5, c: C.cinza, cs: 1.2, al: "right" });
+  texto(sl, w < 460 ? "CAPTURA REAL · FICTÍCIO" : "CAPTURA REAL · DADOS FICTÍCIOS DE TREINAMENTO", { x: x + 14, y: y + h + 5, w: w - 28, h: 14, s: 9, c: C.cinza, cs: 1.2, al: "right" });
 }
 /* esquema de pastas ou passos (não é captura de tela) */
 function esquema(sl, x, y, w, h, linhas, rot) {

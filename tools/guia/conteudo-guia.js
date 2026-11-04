@@ -46,7 +46,7 @@ module.exports = function (G) {
       var col = i % 2, lin = Math.floor(i / 2), x = cols[col], y = 65 + lin * (hh + gap), w = 417, alvo = G.INICIO[s[1]];
       cx(sl, x, y, w, hh, { fill: C.lisboa, r: 18, link: { slide: alvo, tooltip: s[0] } });
       T(sl, [{ text: (i < 9 ? "0" : "") + (i + 1), options: { hyperlink: { slide: alvo } } }], { x: x + 22, y: y + 22, w: 60, h: 44, s: 34, c: C.vm });
-      T(sl, [{ text: s[0], options: { hyperlink: { slide: alvo } } }], { x: x + 92, y: y + 18, w: 250, h: 28, s: 19, c: C.pt });
+      T(sl, [{ text: s[0], options: { hyperlink: { slide: alvo } } }], { x: x + 92, y: y + 20, w: 262, h: 24, s: 17, c: C.pt });
       T(sl, "p. " + String(alvo).padStart(2, "0"), { x: x + 92, y: y + 50, w: 120, h: 20, s: 13.5, f: "fx", b: false, c: C.cinza });
       G.seta(sl, x + w - 58, y + 22, 40, C.vm, C.br, { slide: alvo, tooltip: s[0] });
     });
@@ -73,8 +73,8 @@ module.exports = function (G) {
       ["report-AAAA-MM.html", "O report do mês, salvo por você (PF ou PJ)", "Guardar na pasta do mês; abrir no emulador para editar de novo"],
       ["report-AAAA-MM-resumo.eml", "O e-mail-resumo, pronto para o Outlook", "Dois cliques: abre uma mensagem nova no Outlook"],
       ["guia-operacional.pdf", "Este guia (.pptx editável ao lado)", "Consultar no passo a passo"]
-    ], [330, 560, 422], { rowH: 52, s: 14 });
-    G.atencao(sl, 65, 655, 1312, 80, "O report salvo (.html) já leva as imagens e os vídeos dentro. Não é preciso mandar a pasta de imagens junto. Clique no nome de um emulador acima para abrir (o arquivo precisa estar na mesma pasta deste guia).");
+    ], [330, 560, 422], { rowH: 44, s: 13.5 });
+    G.atencao(sl, 65, 645, 1312, 90, "O report salvo (.html) já leva as imagens e os vídeos dentro. Não é preciso mandar a pasta de imagens junto. Clique no nome de um emulador acima para abrir (o arquivo precisa estar na mesma pasta deste guia).");
   });
   G.conteudo("conhecendo", function (sl) {
     G.titulo(sl, "O mês em 8 passos", "Tempo médio, com os dados aprovados: de 30 a 45 minutos", ["PF", "PJ"]);
@@ -340,7 +340,9 @@ module.exports = function (G) {
       ["Texto do botão (4):", "\"Acessar report completo\" (padrão)."]
     ], { s: 14.5 });
     G.atencao(sl, 65, 655, 560, 80, "O valor dos destaques vem sempre da página: mudou o número no report, muda no e-mail.");
-    G.captura(sl, "pj-resumo", 645, 205, 732, 530, [{ i: 0, n: 1 }, { i: 1, n: 2 }, { i: 2, n: 3 }, { i: 3, n: 4 }], { rot: "DESTAQUES DO E-MAIL", seg: "PJ" });
+    G.captura(sl, "pj-resumo", 645, 205, 732, 188, [{ i: 0, n: 1 }], { rot: "DESTAQUES ESCOLHIDOS", seg: "PJ" });
+    G.captura(sl, "pj-resumo-lista", 645, 413, 732, 188, [{ i: 1, n: 2 }, { i: 0, n: 3 }], { rot: "LISTA DO REPORT", seg: "PJ" });
+    G.captura(sl, "pj-resumo-botao", 645, 621, 732, 114, [{ i: 0, n: 4 }], { rot: "TEXTO DO BOTÃO", seg: "PJ" });
   });
   G.conteudo("resumo", function (sl) {
     G.titulo(sl, "Prévia do e-mail-resumo", "Como chega na caixa de entrada, no computador e no celular", ["PF", "PJ"]);
@@ -366,11 +368,11 @@ module.exports = function (G) {
     G.titulo(sl, "Colar o link do report completo", "Passo 3 do emulador", ["PF", "PJ"]);
     G.passos(sl, 65, 205, 560, 430, [
       ["Copie o link do report salvo:", "no OneDrive, botão direito no arquivo › Compartilhar › Copiar link."],
-      ["Cole no campo do passo 3 (1)", "com Ctrl+V."], ["Leia a nota embaixo do campo (2):", "ela diz que tipo de link é e se há algum cuidado."],
+      ["Cole no campo do passo 3 (1)", "com Ctrl+V."], ["Leia a nota embaixo do campo:", "quando há um cuidado (link de arquivo, endereço sem https://), ela avisa."],
       ["Caminho do computador (C:\\…)?", "É aceito, mas no e-mail recebido o Outlook para Windows bloqueia link para arquivo. Para enviar, use o link copiado do OneDrive."]
     ], { s: 14.5 });
     G.confirmar(sl, 65, 655, 560, 80, "O botão Baixar e-mail-resumo (.eml) fica liberado no passo 6.");
-    G.captura(sl, "pj-link", 645, 205, 732, 300, [{ i: 0, n: 1 }, { i: 1, n: 2 }], { rot: "LINK DO REPORT", seg: "PJ" });
+    G.captura(sl, "pj-link", 645, 205, 732, 300, [{ i: 0, n: 1 }], { rot: "LINK DO REPORT", seg: "PJ" });
     G.atencao(sl, 645, 530, 732, 205, "Use o link que a área usa para compartilhar o report. Nunca use um link pessoal nem público. O emulador recusa link que executa código (javascript:).");
   });
 
@@ -383,7 +385,8 @@ module.exports = function (G) {
       ["Opcional:", "Baixar imagem do resumo (.png) (3) e Baixar e-mail completo (.eml) (4), com o report inteiro."], ["Ache o arquivo:", "Ctrl+J › Mostrar na pasta."]
     ], { s: 14.5 });
     G.confirmar(sl, 65, 655, 560, 80, "Em Downloads aparece report-AAAA-MM-resumo.eml.");
-    G.captura(sl, "pj-baixar", 645, 205, 732, 530, [{ i: 0, n: 1 }, { i: 1, n: 2 }, { i: 2, n: 3 }, { i: 3, n: 4 }], { rot: "STATUS E DOWNLOADS", seg: "PJ" });
+    G.captura(sl, "pj-status", 645, 205, 732, 300, [{ i: 0, n: 1 }], { rot: "STATUS", seg: "PJ" });
+    G.captura(sl, "pj-baixar", 645, 525, 732, 210, [{ i: 0, n: 2 }, { i: 1, n: 3 }, { i: 2, n: 4 }], { rot: "DOWNLOADS", seg: "PJ" });
   });
   G.conteudo("eml", function (sl) {
     G.titulo(sl, "Abrir no Outlook e enviar", "Sempre um teste antes", ["PF", "PJ"]);

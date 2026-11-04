@@ -801,10 +801,18 @@
     mostrarBarra(campo, [["Cor: verde", function () { tom(chip, "verde"); }, "verde"], ["Cor: âmbar", function () { tom(chip, "ambar"); }, "ambar"]], "acima");
   }
   var TONS = { verde: ["#A3E0CE", "#21634F"], ambar: ["#FFE1B9", "#945400"] };
+  /* Cor da etiqueta direto no texto do estilo, em #RRGGBB: pelo .style, o navegador regrava o estilo inteiro em rgb(), que o
+     Outlook para Windows não entende (5.0). */
+  function corDoChip(chip, t) {
+    var st = chip.getAttribute("style") || "";
+    st = /background:/i.test(st) ? st.replace(/background:\s*[^;]+/i, "background:" + TONS[t][0]) : "background:" + TONS[t][0] + ";" + st;
+    st = /(^|;)\s*color:/i.test(st) ? st.replace(/(^|;)(\s*)color:\s*[^;]+/i, "$1$2color:" + TONS[t][1]) : st.replace(/;?$/, ";color:" + TONS[t][1] + ";");
+    chip.setAttribute("style", st);
+  }
   function tom(chip, t) {
-    var antes = [chip.getAttribute("data-tom"), chip.style.background, chip.style.color];
-    chip.setAttribute("data-tom", t); chip.style.background = TONS[t][0]; chip.style.color = TONS[t][1];
-    pilha(function () { chip.setAttribute("data-tom", antes[0]); chip.style.background = antes[1]; chip.style.color = antes[2]; });
+    var antes = [chip.getAttribute("data-tom"), chip.getAttribute("style")];
+    chip.setAttribute("data-tom", t); corDoChip(chip, t);
+    pilha(function () { chip.setAttribute("data-tom", antes[0]); if (antes[1] === null) chip.removeAttribute("style"); else chip.setAttribute("style", antes[1]); });
     var c = chip.closest("[data-campo]"); if (c) { c.setAttribute("data-ed-alterado", ""); ED.alterados[c.getAttribute("data-campo")] = true; }
     marcarSujo();
   }
@@ -2366,7 +2374,7 @@
         var antes = el.innerHTML;
         if (c.tipo === "etiqueta") {
           var chip = el.matches("[data-tom]") ? el : el.querySelector("[data-tom]");
-          if (chip) { chip.textContent = c.texto; chip.setAttribute("data-tom", c.tom); chip.style.background = TONS[c.tom][0]; chip.style.color = TONS[c.tom][1]; }
+          if (chip) { chip.textContent = c.texto; chip.setAttribute("data-tom", c.tom); corDoChip(chip, c.tom); }
           else el.textContent = c.texto;
         } else {
           var cta = el.querySelector("a.cta"), html = esc(c.texto).replace(/&lt;br\s*\/?&gt;/gi, "<br>");
@@ -2530,6 +2538,8 @@
   function modoCelular(cel) {
     Array.prototype.forEach.call(document.querySelectorAll("[data-ew], .tabs button[data-w]"), function (x) { x.setAttribute("aria-pressed", String(/390/.test(x.dataset.ew || x.dataset.w || "") === cel)); });
     var ed = ED.doc && ED.doc.getElementById("ed-secao"); if (ed) ed.hidden = true;
+    /* a barra do item fica na posição da largura de antes: fecha (no celular, ela empurrava a página para o lado) */
+    var eb = ED.doc && ED.doc.getElementById("ed-barra"); if (eb) eb.hidden = true;
     $("#edFrame").style.width = cel ? "390px" : "100%"; $("#prev").style.width = cel ? "390px" : "100%";
     setTimeout(function () { if (typeof alturaEdicao === "function") alturaEdicao(); if (typeof alturaPrevia === "function") alturaPrevia(); }, 60);
   }
