@@ -12,6 +12,7 @@ Referência: **Brand Guide Santander Brasil (maio/2026)**, seções 3.1 Logotipo
 | `svg/logo-santander-original.svg` | Arquivo vetorial original (chama + nome), recebido da área | Origem do traçado da chama |
 | `svg/santander-pf.svg` | **Santander + PF**: a chama (mesmo traçado) com o selo "PF" | Ícone da aba do emulador, do `gerar-report.html` e do report; símbolo no cabeçalho do emulador (numa placa branca) |
 | `santander-pf-16.png`, `santander-pf-32.png`, `santander-pf-180.png` | O mesmo Santander + PF em PNG (fundo transparente; o de 180 px, ícone de celular, com fundo branco) | Ícone da aba (Chrome/Edge escolhem o tamanho), embutidos nas páginas |
+| `svg/santander-pj.svg` e `santander-pj-16/32/180.png` | **Santander + PJ** (5.0): a mesma chama do PF (mesmo traçado, mesmo tamanho e posição), o selo "PJ" no lugar do "PF" e o contorno do selo em **Rio** (#F5DECF), a cor de destaque do Santander Empresas. PNG gerados do SVG pelo mesmo processo dos do PF (que reproduz os PNG do PF pixel a pixel) | Ícone da aba do Emulador Report PJ e de todo report PJ salvo; símbolo no cabeçalho do emulador PJ |
 
 - A chama é o **mesmo traçado** do arquivo original, sem redesenho: só o nome escrito foi retirado e a cor ajustada para o Vermelho Santander (#EC0000) e para o branco.
 - **Símbolo** em vez do logotipo completo: o guia permite o símbolo como assinatura em **ambientes proprietários** do banco, como canais internos (p. 29). O report é interno.

@@ -396,7 +396,7 @@
     if (DB) return Promise.resolve(DB);
     return new Promise(function (ok) {
       try {
-        var r = indexedDB.open("emulador-report", 1);
+        var r = indexedDB.open(PJ ? "emulador-report-pj" : "emulador-report", 1);
         r.onupgradeneeded = function () { r.result.createObjectStore("rascunho"); };
         r.onsuccess = function () { DB = r.result; ok(DB); }; r.onerror = function () { ok(null); };
       } catch (e) { ok(null); }
@@ -439,6 +439,22 @@
   /* EDITOR: o report aberto num quadro, editável no lugar                */
   /* =================================================================== */
   var ED = { doc: null, nome: "", origem: "", periodoInicial: "", sujo: false, desfazer: [], ocultas: {}, nomeSalvo: "", alterados: {}, abertura: 0 };
+  /* Segmento deste emulador (5.0): PF (padrão) ou PJ (kit/emulador-report-pj.html, montado com "node tools/montar-avulso.js pj").
+     O código é o mesmo; mudam os nomes, as cores da grade, o ícone e o modelo em branco. Um report do outro segmento não abre. */
+  var SEG = window.SEGMENTO === "pj" ? "pj" : "pf", PERFIL = Motor.perfil(SEG), PJ = SEG === "pj";
+  var UI = PJ ? {
+    sec: { visao: "Visão geral", resultados: "Principais resultados", lancamos: "Campanhas", cx: "Indicadores", transformation: "Análises", aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda (próximas datas)" },
+    grupos: { numero: "Principais resultados", resultado: "Resultados da campanha em destaque (Campanhas)", cxt: "Indicadores do trimestre", lancamento: "Outras campanhas do mês (Campanhas)", transformation: "Análises", aprendizado: "Aprendizados", agenda: "Agenda (próximas datas)" },
+    principal: "Visão geral · campanha", destaque: "Campanhas · destaque", foco: "Próximas iniciativas", compactos: "Outras campanhas", figPrincipal: "Peça da visão geral", figDestaque: "Peça da campanha em destaque",
+    numeroDe: "Resultado principal ", resultadoDe: " da campanha em destaque", cx: "Indicadores", sugestao: "os principais resultados", destaqueSec: PERFIL.nomes.destaque,
+    cor: { numero1: "#000000", texto: "#000000", linha: "#F5DECF", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#CC0000", apr: { abertura_linha: "#FFFFFF", linha: "#F5DECF", grupo_aprendizado: "#CC0000", texto: "#000000" } }
+  } : {
+    sec: { lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" },
+    grupos: { numero: "Números da capa", resultado: "Resultados do destaque (O que lançamos)", cxt: "Creative X: indicadores do trimestre", lancamento: "Também neste mês (O que lançamos)", transformation: "Transformation Hub", aprendizado: "O que aprendemos", agenda: "Também vem aí (agenda)" },
+    principal: "Capa · campanha", destaque: "O que lançamos · destaque", foco: "Foco do próximo mês", compactos: "Também neste mês", figPrincipal: "Peça da capa", figDestaque: "Peça do destaque",
+    numeroDe: "Número ", resultadoDe: " do destaque", cx: "Creative X", sugestao: "os números da capa", destaqueSec: "Destaque",
+    cor: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#E2E2E2", transf: "#F5DECF", topico: "#127277", apr: null }
+  };
   var EDITOR_CSS =
     "[data-ed-campo]{outline:1px dashed rgba(236,0,0,.45);outline-offset:2px;border-radius:3px;cursor:text;transition:background-color .15s}" +
     "[data-ed-campo]:hover{outline:2px dashed #EC0000;background-color:rgba(255,225,185,.35)}" +
@@ -1339,7 +1355,7 @@
   function criarAprendizado(chave, textoHtml, mostrar) {
     var a = alvoAprendizado(chave); if (!a) return null;
     var modelo = '<span style="background:#FFE1B9;color:#945400;border-radius:3px;">[O que a campanha ensinou, em uma ou duas frases]</span>';
-    var tmp = ED.doc.createElement("div"); tmp.innerHTML = Motor.htmlAprendizado(textoHtml || modelo, chave, a.variante, { fonte: fonteTextoDaPagina() });
+    var tmp = ED.doc.createElement("div"); tmp.innerHTML = Motor.htmlAprendizado(textoHtml || modelo, chave, a.variante, UI.cor.apr ? { fonte: fonteTextoDaPagina(), cor: UI.cor.apr } : { fonte: fonteTextoDaPagina() });
     var bloco = tmp.firstElementChild; a.pai.insertBefore(bloco, a.antes);
     editavel(bloco);
     pilha(function () { bloco.remove(); });
@@ -1514,7 +1530,7 @@
 
   /* ---------- itens: adicionar e ocultar, com a grade refeita como o motor faz ---------- */
   /* Cores da grade (as mesmas de config/marca.txt): 1º número da capa em vermelho; filete e separadores. */
-  var COR = { marca: "#EC0000", texto: "#000000", linha: "#E2E2E2", transf_linha: "#F5DECF" };
+  var COR = { marca: UI.cor.numero1, texto: UI.cor.texto, linha: UI.cor.linha, linhaBloco: UI.cor.linhaBloco, transf_linha: UI.cor.transf };
   var GRUPOS = {
     numero: { max: 4, nome: "indicador" }, resultado: { max: 3, nome: "resultado" }, lancamento: { max: 6, nome: "lançamento" },
     cxt: { max: 3, nome: "indicador trimestral", semMidia: true },
@@ -1523,7 +1539,7 @@
   };
   /* Novos tópicos (até 4): o id da seção é o grupo dos itens (topico-1, topicob-1…), e o layout vem da página
      (tabela data-layout; sem ela, página da 4.6: lista). O máximo de itens é o do layout (Motor.LAYOUTS_TOPICO). */
-  var IDS_TOPICO = Motor.TOPICOS.map(function (t) { return t[1]; }), LAYOUTS = Motor.LAYOUTS_TOPICO, COR_TOPICO = "#127277";
+  var IDS_TOPICO = Motor.TOPICOS.map(function (t) { return t[1]; }), LAYOUTS = Motor.LAYOUTS_TOPICO, COR_TOPICO = UI.cor.topico;
   function layoutDaSecao(doc, id) {
     var rot = doc.querySelector('[data-campo="' + id + '.rotulo"]'), td = rot && rot.closest("td.px"), t = td && td.querySelector("table[data-layout]");
     return t ? t.getAttribute("data-layout") : "lista";
@@ -1567,7 +1583,7 @@
   }
   function celula(attrs) { var x = ED.doc.createElement("td"); Object.keys(attrs).forEach(function (k) { x.setAttribute(k, attrs[k]); }); x.innerHTML = "&nbsp;"; return x; }
   function espaco(w, extra) { return celula({ "class": "hide-m", width: String(w), style: "width:" + w + "px;font-size:0;line-height:0;" + (extra || "") }); }
-  function separador() { var f = ED.doc.createDocumentFragment(); f.appendChild(espaco(12)); f.appendChild(espaco(11, "border-left:1px solid " + COR.linha + ";")); return f; }
+  function separador(cor) { var f = ED.doc.createDocumentFragment(); f.appendChild(espaco(12)); f.appendChild(espaco(11, "border-left:1px solid " + (cor || COR.linha) + ";")); return f; }
   function divide(total, n) { var base = Math.floor((total - 24 * (n - 1)) / n), resto = total - 24 * (n - 1) - base * n, r2 = []; for (var i = 0; i < n; i++) r2.push(base + (i < resto ? 1 : 0)); return r2; }
   function trocaCor(estilo, cor) { return (estilo || "").replace(/(^|;)\s*color:\s*#[0-9a-f]{3,6}/i, "$1color:" + cor); }
   function trocaFilete(estilo, cor) { return (estilo || "").replace(/border-top:\s*(\d+px)\s+solid\s+#[0-9a-f]{3,6}/i, "border-top:$1 solid " + cor); }
@@ -1606,7 +1622,7 @@
       Array.prototype.slice.call(row.children).forEach(function (c) { if (it.indexOf(c) < 0) c.remove(); });
       var larg = g === "numero" ? (n <= 3 ? it.map(function () { return 184; }) : divide(600, n)) : divide(G.total, Math.max(n, 1));
       it.forEach(function (x, i) {
-        if (i) row.insertBefore(g === "numero" ? espaco(24) : separador(), x);
+        if (i) row.insertBefore(g === "numero" ? espaco(24) : separador(g === "cxt" ? COR.linhaBloco : ""), x);
         x.setAttribute("width", String(larg[i]));
         if (g === "numero") {
           x.setAttribute("class", n === 3 ? "third" : "half"); x.setAttribute("style", "width:" + larg[i] + "px;");
@@ -1909,7 +1925,7 @@
     });
   }
 
-  var NOMES_SEC = { lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" };
+  var NOMES_SEC = UI.sec;
   function marcaSecao(doc, id) { var w = doc.createTreeWalker(doc.body, NodeFilter.SHOW_COMMENT), n; while ((n = w.nextNode())) if (n.nodeValue.trim() === "secao:" + id) return n; return null; }
   function nosDaSecao(id) {
     var w = ED.doc.createTreeWalker(ED.doc.body, NodeFilter.SHOW_COMMENT), n, ini = null, prox = null;
@@ -2052,7 +2068,7 @@
      com a grade refeita, como o "+ Adicionar" de cada grupo. Passos: tipo › onde (grupo e posição) › conteúdo ›
      prévia na própria página (o item novo fica destacado) › confirmar. Depois ele se edita, se move e se tira como
      qualquer outro. Cancelar ou "Voltar e ajustar" desfazem a prévia inteira de uma vez. */
-  var NOMES_GRUPO = { numero: "Números da capa", resultado: "Resultados do destaque (O que lançamos)", cxt: "Creative X: indicadores do trimestre", lancamento: "Também neste mês (O que lançamos)", transformation: "Transformation Hub", aprendizado: "O que aprendemos", agenda: "Também vem aí (agenda)" };
+  var NOMES_GRUPO = UI.grupos;
   var BLOCO_DO_GRUPO = { numero: "NUMERO", resultado: "RESULTADO", cxt: "CREATIVE X TRIMESTRE", lancamento: "LANCAMENTO", transformation: "TRANSFORMATION", aprendizado: "APRENDIZADO", agenda: "AGENDA" };
   Motor.TOPICOS.forEach(function (t) { BLOCO_DO_GRUPO[t[1]] = t[0]; });
   /* Campos que cada grupo recebe (os mesmos da importação do Copilot); ficam só os que o modelo do item tem. */
@@ -2085,7 +2101,7 @@
     });
     return gs.map(function (g) {
       var it = GRUPOS[g] ? itensDo(g) : [], nome = nomeGrupo(g);
-      if (g === "cxt" && !it.length) return ED.doc.querySelector('[data-campo="cx.atual"]') && temModeloTrimestre() ? { g: g, nome: nome + " (o bloco trimestral entra junto)", ok: true, novoBloco: true } : { g: g, nome: nome, ok: false, motivo: "este report não tem a seção Creative X" };
+      if (g === "cxt" && !it.length) return ED.doc.querySelector('[data-campo="cx.atual"]') && temModeloTrimestre() ? { g: g, nome: nome + " (o bloco trimestral entra junto)", ok: true, novoBloco: true } : { g: g, nome: nome, ok: false, motivo: "este report não tem a seção " + UI.cx };
       if (!it.length || !ED.grupos[g]) return { g: g, nome: nome, ok: false, motivo: "não está neste report" };
       if (secaoOculta(it[0])) return { g: g, nome: nome, ok: false, motivo: "a seção está oculta (Seções do report)" };
       if (it.length >= GRUPOS[g].max) return { g: g, nome: nome, ok: false, motivo: "já tem o máximo de " + GRUPOS[g].max };
@@ -2095,7 +2111,7 @@
   /* Itens que recebem imagem ou link a mais: destaque, projeto principal, foco e os itens com texto (não os números). */
   function alvosDeConteudo() {
     var r = [];
-    [["principal", "Capa · campanha"], ["destaque", "O que lançamos · destaque"], ["foco", "Foco do próximo mês"]].forEach(function (b) {
+    [["principal", UI.principal], ["destaque", UI.destaque], ["foco", UI.foco]].forEach(function (b) {
       var el = ED.doc.querySelector('[data-ed-bloco="' + b[0] + '"]'); if (el && !secaoOculta(el)) r.push({ el: el, nome: b[1] + (b[0] === "foco" ? "" : ": " + rotuloItem(el)) });
     });
     Array.prototype.forEach.call(ED.doc.querySelectorAll("[data-item]"), function (el) {
@@ -2105,10 +2121,10 @@
     return r;
   }
   function alvosDeVideo() {
-    var nomes = { principal: "Capa · campanha", destaque: "O que lançamos · destaque" };
+    var nomes = { principal: UI.principal, destaque: UI.destaque };
     return Array.prototype.filter.call(ED.doc.querySelectorAll("img[data-img]"), function (i) { return /^(principal|destaque|lancamento-\d+)$/.test(i.getAttribute("data-img")) && !secaoOculta(i); }).map(function (i) {
       var k = i.getAttribute("data-img"), it = i.closest("[data-item]");
-      return { img: i, nome: (nomes[k] || "Também neste mês: " + (it ? rotuloItem(it) : k)) + (i.hasAttribute("data-video") ? " (trocar o vídeo)" : "") };
+      return { img: i, nome: (nomes[k] || UI.compactos + ": " + (it ? rotuloItem(it) : k)) + (i.hasAttribute("data-video") ? " (trocar o vídeo)" : "") };
     });
   }
   function disponivel(tipo) {
@@ -2374,9 +2390,9 @@
     Array.prototype.forEach.call(doc.querySelectorAll("[data-editor], #ed-css"), function (n) { n.remove(); });
     Array.prototype.forEach.call(doc.querySelectorAll("[data-ed-oculta]"), function (n) { n.remove(); });
     Array.prototype.forEach.call(doc.querySelectorAll(".ed-novo, .ed-movida, .ed-arrastando, .ed-movendo"), function (n) { n.classList.remove("ed-novo", "ed-movida", "ed-arrastando", "ed-movendo"); if (!n.className) n.removeAttribute("class"); });
-    /* ícone da aba: sempre o Santander + PF atual (report antigo, sem ícone ou com a chama da 4.8, é atualizado ao salvar) */
+    /* ícone da aba: sempre o Santander + PF (ou + PJ, no Emulador Report PJ) atual (report antigo, sem ícone ou com a chama da 4.8, é atualizado ao salvar) */
     Array.prototype.forEach.call(doc.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"], link[rel="shortcut icon"]'), function (l) { l.remove(); });
-    if (doc.head) { var t = doc.createElement("template"); t.innerHTML = Motor.ICONE_TAG; var tt = doc.head.querySelector("title"), ref = tt ? tt.nextSibling : null; Array.prototype.slice.call(t.content.children).forEach(function (l) { doc.head.insertBefore(l, ref); }); }
+    if (doc.head) { var t = doc.createElement("template"); t.innerHTML = PERFIL.icone; var tt = doc.head.querySelector("title"), ref = tt ? tt.nextSibling : null; Array.prototype.slice.call(t.content.children).forEach(function (l) { doc.head.insertBefore(l, ref); }); }
     Array.prototype.forEach.call(doc.querySelectorAll("[contenteditable], [data-ed-campo], [data-ed-alterado], [spellcheck], [data-ed-bloco]"), function (n) {
       n.removeAttribute("contenteditable"); n.removeAttribute("data-ed-campo"); n.removeAttribute("data-ed-alterado"); n.removeAttribute("spellcheck"); n.removeAttribute("data-ed-bloco");
     });
@@ -2389,7 +2405,7 @@
     } else if (mt && (lkS.erro || $("#link").dataset.mexeu === "1")) mt.remove();
     /* título (assunto) e texto da caixa de entrada acompanham o período e a frase */
     var per = doc.querySelector('[data-campo="periodo"]'), frase = doc.querySelector('[data-campo="frase"]'), prev = doc.querySelector('[data-campo="previa"]');
-    if (per) { var periodo = per.textContent.replace(/\s+/g, " ").trim(), mes = periodo.charAt(0) + periodo.slice(1).toLocaleLowerCase("pt-BR"); doc.title = "Creative Strategy PF | Report de " + mes.replace(/(\d{4})$/, "$1"); }
+    if (per) { var periodo = per.textContent.replace(/\s+/g, " ").trim(), mes = periodo.charAt(0) + periodo.slice(1).toLocaleLowerCase("pt-BR"); doc.title = PERFIL.area + " | Report de " + mes.replace(/(\d{4})$/, "$1"); }
     var fraseFinal = doc.querySelector('[data-campo="frase_final"]');
     if (frase && prev && Object.keys(ED.alterados).some(function (k) { return /^frase/.test(k); })) prev.textContent = (frase.textContent + " " + (fraseFinal ? fraseFinal.textContent : "")).replace(/\s+/g, " ").trim();
     /* destaques do e-mail-resumo (4.13): num bloco que a página não mostra e que os e-mails não levam */
@@ -2403,8 +2419,8 @@
   /* Nome do campo para gente (no lugar da chave técnica). */
   function rotuloNumero(k) {
     var m = /^(numero|resultado)-(\d+)\.(\w+)$/.exec(k), parte = { valor: "valor", detalhe: "base de comparação", variacao: "variação", anterior: "anterior", atual: "atual" };
-    if (m) return (m[1] === "numero" ? "Número " + m[2] + " da capa" : "Resultado " + m[2] + " do destaque") + " (" + parte[m[3]] + ")";
-    m = /^cx\.(\w+)$/.exec(k); if (m) return "Creative X (" + (parte[m[1]] || m[1]) + ")";
+    if (m) return (m[1] === "numero" ? UI.numeroDe + m[2] + (PJ ? "" : " da capa") : "Resultado " + m[2] + UI.resultadoDe) + " (" + parte[m[3]] + ")";
+    m = /^cx\.(\w+)$/.exec(k); if (m) return UI.cx + " (" + (parte[m[1]] || m[1]) + ")";
     return k;
   }
   async function conferirAntesDeSalvar() {
@@ -2476,6 +2492,14 @@
       return;
     }
     if (!/<html[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) { await perguntar("Arquivo não reconhecido", "<p>" + nome + " não parece um report (.html).</p>", "Entendi"); return; }
+    /* PF e PJ não se misturam: cada emulador abre só os reports do seu segmento (o report aberto continua como estava). */
+    var segArq = Motor.segmentoDoHtml(html);
+    if (segArq !== SEG) {
+      var outro = Motor.perfil(segArq);
+      await perguntar("Este é um report " + outro.sigla, "<p><b>" + nome + "</b> é um report <b>" + outro.sigla + "</b> (" + esc(outro.area) + "). Este é o <b>" + esc(PERFIL.emulador) + "</b>.</p><p>Abra o arquivo no <b>" + esc(outro.emulador) + "</b> (" + (segArq === "pj" ? "kit/emulador-report-pj.html" : "kit/emulador-report.html") + "). Nada foi alterado.</p>", "Entendi");
+      log("Não aberto: " + file.name + " é um report " + outro.sigla + ".");
+      return;
+    }
     if (sep) {
       soltarMidia(); GUARDADAS = {};
       var urls = sep.midias.map(function (b) { return guardarMidia(b); });
@@ -2599,7 +2623,7 @@
   /* a primeira mudança transforma a sugestão na lista da pessoa */
   function minhaLista() { if (!ED.resumo) ED.resumo = { destaques: null }; if (!ED.resumo.destaques) ED.resumo.destaques = listaDtq().map(function (x) { return JSON.parse(JSON.stringify(x)); }); return ED.resumo.destaques; }
   function mudouDtq(msg, refazer) { if (refazer) desenharDestaques(true); if (ED.doc) marcarSujo(msg); else reconverter(); }
-  var NOMES_FIG = { principal: "Peça da capa", destaque: "Peça do destaque" };
+  var NOMES_FIG = { principal: UI.figPrincipal, destaque: UI.figDestaque };
   function nomeFigura(k) {
     if (NOMES_FIG[k]) return NOMES_FIG[k];
     var c = porOrigem(k); return c ? (/^lancamento/.test(k) ? "Card: " : /^transformation/.test(k) ? "Projeto: " : "") + c.titulo : k;
@@ -2625,7 +2649,7 @@
     DTQ.assinatura = ass;
     var box = $("#dtqEscolhidos"), n = lista.length; box.textContent = "";
     $("#dtqConta").textContent = n + " de " + MAX_DTQ + (auto && n ? " · sugestão" : "");
-    $("#dtqDica").textContent = !DTQ.cand.length ? "Este report não tem itens para destacar." : auto ? "Sugestão: os números da capa. Troque, tire, reordene ou inclua o que quiser (até " + MAX_DTQ + ")." : "Na ordem do e-mail. Com número ímpar, o primeiro ocupa a largura toda.";
+    $("#dtqDica").textContent = !DTQ.cand.length ? "Este report não tem itens para destacar." : auto ? "Sugestão: " + UI.sugestao + ". Troque, tire, reordene ou inclua o que quiser (até " + MAX_DTQ + ")." : "Na ordem do e-mail. Com número ímpar, o primeiro ocupa a largura toda.";
     $("#bDtqNovo").disabled = n >= MAX_DTQ || !DTQ.cand.length && !ED.doc; $("#bDtqSugestao").disabled = auto;
     lista.forEach(function (cf, i) {
       var c = cf.novo ? null : porOrigem(cf.origem), fora = !cf.novo && !c, ind = cf.novo ? !!cf.valor : c && c.tipo === "indicador";
@@ -2695,7 +2719,7 @@
     var secoes = []; DTQ.cand.forEach(function (c) { if (secoes.indexOf(c.secao) < 0) secoes.push(c.secao); });
     secoes.forEach(function (sec) {
       /* o nome da campanha junto da seção (ex.: "Campanha · Campanha Exemplo A") */
-      var dono = DTQ.cand.some(function (c) { return c.secao === sec && c.capa; }) ? porOrigem("principal") : sec === "Destaque" ? porOrigem("destaque") : null;
+      var dono = DTQ.cand.some(function (c) { return c.secao === sec && c.capa; }) ? porOrigem("principal") : sec === UI.destaqueSec ? porOrigem("destaque") : null;
       var g = el("div", { classe: "grupo" }, [el("b", { texto: sec + (dono && dono.titulo ? " · " + dono.titulo : "") })]);
       DTQ.cand.filter(function (c) { return c.secao === sec; }).forEach(function (c) {
         var ja = !!usados[c.origem];

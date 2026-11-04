@@ -1,0 +1,412 @@
+# ======================================================================
+#  CORINGA PJ · MODELO EM BRANCO DO EMULADOR REPORT PJ (SANTANDER EMPRESAS)
+# ======================================================================
+#  Gera o "modelo em branco" que o Emulador Report PJ abre em "Começar do
+#  modelo em branco" (kit/report-coringa-pj.html e tools/coringa-pj.js).
+#  Não tem dado real: textos entre [colchetes], números em X e imagens
+#  neutras (assets/coringa-pj/, fundo Rio). Traz o máximo de cada seção;
+#  no emulador, o que não for usado no mês é ocultado ("Ocultar item").
+#  Mesmos blocos do coringa PF: o motor e o emulador são os mesmos.
+#  Seções do PJ: Abertura ([ABERTURA]) · Visão geral ([PROJETO PRINCIPAL])
+#  · Principais resultados ([NUMERO n]) · Campanhas ([LANCAMOS],
+#  [DESTAQUE], [RESULTADO n], [LANCAMENTO n]) · Indicadores ([CREATIVE X])
+#  · Análises ([TRANSFORMATION]) · Aprendizados ([APRENDIZADO n]) ·
+#  Próximas iniciativas ([FOCO], [AGENDA n]) · Encerramento ([EDICAO]).
+#  Quem mantém a ferramenta: node tools/atualizar-coringa.js pj
+# ======================================================================
+
+[EDICAO]
+mes: [Mês]
+ano: [Ano]
+proximo_mes: [Próximo mês]
+pasta_imagens: assets/coringa-pj
+contato: [E-mail de contato da área]
+link_report_completo:
+segmento: PJ
+
+[ABERTURA]
+frase: [Frase do mês, primeira parte]
+frase_final: [segunda parte, mais leve.]
+previa: [Texto da caixa de entrada, até 110 caracteres]
+
+[PROJETO PRINCIPAL]
+nome: [Nome da campanha do mês]
+resumo: [Visão geral do mês: o que a campanha fez e o resultado mais importante, em uma ou duas frases.]
+aprendizado: [O que a campanha ensinou, em uma ou duas frases]
+imagem: coringa-pj-principal.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[NUMERO 1]
+valor: X%
+titulo: [Indicador 1]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[NUMERO 2]
+valor: X%
+titulo: [Indicador 2]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[NUMERO 3]
+valor: X%
+titulo: [Indicador 3]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[LANCAMOS]
+titulo: [Título da seção Campanhas.]
+
+[DESTAQUE]
+categoria: [Categoria · Canal]
+titulo: [Título da campanha em destaque]
+texto: [Texto da campanha em destaque: o que foi feito, para qual público de empresas e por quê.]
+aprendizado: [O que a campanha ensinou, em uma ou duas frases]
+imagem: coringa-pj-destaque.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+nota: [Nota sobre os resultados (opcional).]
+
+[RESULTADO 1]
+valor: X%
+titulo: [Resultado 1]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[RESULTADO 2]
+valor: X%
+titulo: [Resultado 2]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[RESULTADO 3]
+valor: X%
+titulo: [Resultado 3]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[LANCAMENTO 1]
+status: [Status]
+status_cor: ambar
+nome: [Nome da campanha 1]
+texto: [Texto curto da campanha.]
+imagem: coringa-pj-campanha.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 2]
+status: [Status]
+status_cor: ambar
+nome: [Nome da campanha 2]
+texto: [Texto curto da campanha.]
+imagem: coringa-pj-campanha.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 3]
+status: [Status]
+status_cor: ambar
+nome: [Nome da campanha 3]
+texto: [Texto curto da campanha.]
+imagem: coringa-pj-campanha.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 4]
+status: [Status]
+status_cor: ambar
+nome: [Nome da campanha 4]
+texto: [Texto curto da campanha.]
+imagem: coringa-pj-campanha.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 5]
+status: [Status]
+status_cor: ambar
+nome: [Nome da campanha 5]
+texto: [Texto curto da campanha.]
+imagem: coringa-pj-campanha.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 6]
+status: [Status]
+status_cor: ambar
+nome: [Nome da campanha 6]
+texto: [Texto curto da campanha.]
+imagem: coringa-pj-campanha.png
+descricao_imagem: [Descrição da imagem]
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[CREATIVE X]
+subtitulo: [Indicador do mês · período]
+anterior: X%
+atual: X%
+variacao: +X p.p.
+periodo: [Mês anterior vs. mês atual]
+referencia: [Referência: X%]
+significado: [O que o indicador significa neste mês.]
+nota: [*Siglas e fonte, em uma ou duas linhas.]
+
+[CREATIVE X TRIMESTRE]
+rotulo: [Trimestral · trimestre · mercado]
+titulo: [Título do resultado do trimestre]
+texto: [O que alcançamos, como evoluímos e o principal aprendizado.]
+estimativa: [Oportunidade estimada (modelo), separada do resultado.]
+
+[CREATIVE X TRIMESTRE 1]
+valor: X%
+titulo: [Indicador 1]
+detalhe: [Base de comparação]
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 2]
+valor: X%
+titulo: [Indicador 2]
+detalhe: [Base de comparação]
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 3]
+valor: X
+titulo: [Indicador 3]
+detalhe: [Base de comparação]
+variacao: +X%
+
+[TRANSFORMATION]
+titulo: [Título da seção Análises.]
+
+[TRANSFORMATION 1]
+status: [Status ou etapa da análise]
+status_cor: ambar
+nome: [Nome da análise 1]
+texto: [O que a análise mostrou e em que etapa está.]
+citacao:
+resultado: [Resultado ou próximo passo.]
+icones:
+logo: coringa-pj-logo.png
+descricao_logo: [Descrição do logo]
+links: [Texto do link] | [INSERIR LINK]
+imagem:
+descricao_imagem:
+prints: coringa-pj-print.png
+descricao_prints: [Descrição do print]
+tipo: projeto
+link:
+
+[TRANSFORMATION 2]
+status: [Status ou etapa da análise]
+status_cor: ambar
+nome: [Nome da análise 2]
+texto: [O que a análise mostrou e em que etapa está.]
+citacao:
+resultado: [Resultado ou próximo passo.]
+icones:
+logo: coringa-pj-logo.png
+descricao_logo: [Descrição do logo]
+links: [Texto do link] | [INSERIR LINK]
+imagem:
+descricao_imagem:
+prints: coringa-pj-print.png
+descricao_prints: [Descrição do print]
+tipo: projeto
+link:
+
+[TRANSFORMATION 3]
+status: [Status ou etapa da análise]
+status_cor: ambar
+nome: [Nome da análise 3]
+texto: [O que a análise mostrou e em que etapa está.]
+citacao:
+resultado: [Resultado ou próximo passo.]
+icones:
+logo: coringa-pj-logo.png
+descricao_logo: [Descrição do logo]
+links: [Texto do link] | [INSERIR LINK]
+imagem:
+descricao_imagem:
+prints: coringa-pj-print.png
+descricao_prints: [Descrição do print]
+tipo: projeto
+link:
+
+[APRENDIZADO 1]
+titulo: [Aprendizado 1]
+texto: [O que os dados mostraram.]
+levamos: [o que levamos para os próximos meses.]
+
+[APRENDIZADO 2]
+titulo: [Aprendizado 2]
+texto: [O que os dados mostraram.]
+levamos: [o que levamos para os próximos meses.]
+
+[APRENDIZADO 3]
+titulo: [Aprendizado 3]
+texto: [O que os dados mostraram.]
+levamos: [o que levamos para os próximos meses.]
+
+# Novos tópicos (ex.: Testes): um de cada layout (lista, colunas,
+# cartoes, numeros). No emulador, eles não aparecem ao abrir: são a
+# fonte do botão "+ Novo tópico" (Seções do report), que pergunta o nome
+# e o layout e põe o tópico antes do Próximas iniciativas.
+# Lista sem imagem no modelo: cada item ganha imagens pelo "+ Imagem".
+[TOPICO]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+layout: lista
+
+[TOPICO 1]
+status: [Status do item]
+status_cor: ambar
+nome: [Nome do item 1]
+texto: [O que é, o que foi feito e o resultado.]
+links: [Texto do link] | [INSERIR LINK]
+imagens:
+descricao_imagens:
+
+[TOPICO 2]
+status: [Status do item]
+status_cor: ambar
+nome: [Nome do item 2]
+texto: [O que é, o que foi feito e o resultado.]
+links: [Texto do link] | [INSERIR LINK]
+imagens:
+descricao_imagens:
+
+[TOPICO 3]
+status: [Status do item]
+status_cor: ambar
+nome: [Nome do item 3]
+texto: [O que é, o que foi feito e o resultado.]
+links: [Texto do link] | [INSERIR LINK]
+imagens:
+descricao_imagens:
+
+[TOPICO B]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+layout: colunas
+
+[TOPICO B 1]
+nome: [Nome do item 1]
+texto: [O que é e o que aprendemos.]
+links: [Texto do link] | [INSERIR LINK]
+
+[TOPICO B 2]
+nome: [Nome do item 2]
+texto: [O que é e o que aprendemos.]
+links: [Texto do link] | [INSERIR LINK]
+
+[TOPICO B 3]
+nome: [Nome do item 3]
+texto: [O que é e o que aprendemos.]
+links: [Texto do link] | [INSERIR LINK]
+
+[TOPICO C]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+layout: cartoes
+
+[TOPICO C 1]
+status: [Status]
+status_cor: ambar
+nome: [Nome do item 1]
+texto: [Texto curto do item.]
+links: [Texto do link] | [INSERIR LINK]
+imagens: coringa-pj-campanha.png
+descricao_imagens: [Descrição da imagem]
+
+[TOPICO C 2]
+status: [Status]
+status_cor: ambar
+nome: [Nome do item 2]
+texto: [Texto curto do item.]
+links: [Texto do link] | [INSERIR LINK]
+imagens: coringa-pj-campanha.png
+descricao_imagens: [Descrição da imagem]
+
+[TOPICO C 3]
+status: [Status]
+status_cor: ambar
+nome: [Nome do item 3]
+texto: [Texto curto do item.]
+links: [Texto do link] | [INSERIR LINK]
+imagens: coringa-pj-campanha.png
+descricao_imagens: [Descrição da imagem]
+
+[TOPICO D]
+rotulo: [Nome do tópico]
+titulo: [Título do novo tópico.]
+texto: [Uma frase de abertura do tópico.]
+layout: numeros
+
+[TOPICO D 1]
+valor: [X]
+nome: [O que o número mede]
+texto: [Período ou comparação]
+
+[TOPICO D 2]
+valor: [X]
+nome: [O que o número mede]
+texto: [Período ou comparação]
+
+[TOPICO D 3]
+valor: [X]
+nome: [O que o número mede]
+texto: [Período ou comparação]
+
+[FOCO]
+prioridade: [Próxima iniciativa prioritária.]
+texto: [O que vem no próximo mês e por quê.]
+selo: coringa-pj-selo.png
+descricao_selo: [Descrição do selo]
+
+[AGENDA 1]
+data: [Data]
+titulo: [Item da agenda 1]
+detalhe: [Detalhe]
+
+[AGENDA 2]
+data: [Data]
+titulo: [Item da agenda 2]
+detalhe: [Detalhe]
+
+[AGENDA 3]
+data: [Data]
+titulo: [Item da agenda 3]
+detalhe: [Detalhe]
+
+[AGENDA 4]
+data: [Data]
+titulo: [Item da agenda 4]
+detalhe: [Detalhe]
+
+[AGENDA 5]
+data: [Data]
+titulo: [Item da agenda 5]
+detalhe: [Detalhe]
+
+[AGENDA 6]
+data: [Data]
+titulo: [Item da agenda 6]
+detalhe: [Detalhe]

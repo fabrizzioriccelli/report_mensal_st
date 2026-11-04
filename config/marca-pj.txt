@@ -1,0 +1,144 @@
+# ======================================================================
+#  CONFIGURAÇÃO DE MARCA · REPORT MENSAL PJ (SANTANDER EMPRESAS)
+# ======================================================================
+#  O mesmo formato de config/marca.txt (o do PF), com as escolhas do
+#  Brand Guide Santander Brasil (maio/2026), capítulo 6 · Santander
+#  Empresas. Vale para o template/report-pj.html. O PF continua usando
+#  config/marca.txt, sem nenhuma mudança.
+#
+#  Como editar: cada linha é "campo: valor". Troque só o que vem depois
+#  dos ":". Linhas que começam com # são explicações.
+# ======================================================================
+
+
+# ======================================================================
+#  FONTES (Brand Guide 6.2 · Tipografia do Santander Empresas)
+# ======================================================================
+#    Santander Condensed  títulos e mensagens de impacto (voz do banco):
+#                         frase do mês e títulos das seções  -> impacto
+#    Santander Headline   títulos de peso médio, ambientes digitais e
+#                         aplicações pequenas: números, nomes  -> titulos
+#    Santander Micro Text textos de apoio, balões e botão      -> texto
+#  Cada campo é uma LISTA: o aparelho usa a 1ª fonte que encontrar
+#  (arquivo .otf em assets/fonts/ ou fonte instalada). Arial é só a
+#  alternativa do sistema, NÃO é a fonte oficial.
+#  Outlook para Windows: uma fonte só (VALIDAR COM TI, como no PF).
+# ======================================================================
+[FONTES]
+titulos: 'Santander Headline', Arial, Helvetica, sans-serif
+texto: 'Santander Micro Text', Arial, Helvetica, sans-serif
+impacto: 'Santander Condensed', 'Santander Headline', Arial, Helvetica, sans-serif
+titulos_outlook_windows: Arial
+texto_outlook_windows: Arial
+
+
+# ======================================================================
+#  CHAMA DO SANTANDER (só o símbolo)
+# ======================================================================
+#  No Empresas os fundos são Rio e Branco, então a chama vai na versão
+#  POSITIVA, em Vermelho Santander (Brand Guide 6.2 · Logotipo: "o
+#  logotipo e o símbolo devem ser apresentados preferencialmente em sua
+#  versão positiva"; "a cor do logotipo não pode ser alterada").
+#  É o mesmo arquivo oficial do PF (assets/marca/), sem redesenho.
+#  O logotipo completo "Santander Empresas" fica no Portal da Marca: não
+#  foi recriado aqui.
+# ======================================================================
+[LOGO]
+arquivo: assets/marca/chama-santander.png
+largura: 32
+descricao: Santander
+
+
+# ======================================================================
+#  CORES · Brand Guide 6.2 · Cores (paleta do Santander Empresas)
+# ======================================================================
+#  Paleta: Rio #F5DECF (fundo, balão), Branco #FFFFFF (fundo, balão),
+#  Vermelho Santander #EC0000 (Botão de Início, texto do balão, logotipo),
+#  Boston #CC0000 (texto do balão sobre Rio) e Preto #000000 (títulos e
+#  textos de apoio). "Destaque para o tom Rio, garantindo maior
+#  distintividade."
+#  Regras aplicadas no report PJ:
+#   - FUNDO só Rio ou Branco (nenhum fundo vermelho). A página é Branca
+#     e os blocos (abertura, resultados, indicadores, próximas
+#     iniciativas, encerramento) são retângulos Rio arredondados.
+#   - Títulos e textos em Preto; vermelho só na chama, nos links e no
+#     botão; balões: Branco com texto Vermelho (sobre Rio) ou Rio com
+#     texto Boston (sobre Branco). Nenhuma outra combinação.
+#   - Etiquetas de variação (verde/âmbar): só nos dados, como no PF
+#     (paleta de apoio institucional, uso pontual em indicadores).
+[CORES]
+marca: #EC0000
+titulo: #000000
+texto: #000000
+texto_corpo: #000000
+texto_apoio: #000000
+positivo: #21634F
+positivo_fundo: #A3E0CE
+atencao: #945400
+atencao_fundo: #FFE1B9
+fundo_pagina: #FFFFFF
+fundo_email: #FFFFFF
+
+
+# ======================================================================
+#  CORES DE APOIO (elementos do report PJ)
+# ======================================================================
+[CORES DE APOIO]
+# Número da seção (balão sobre Branco): fundo Rio, texto Boston.
+grupo_resultados: #CC0000
+grupo_resultados_fundo: #F5DECF
+grupo_evolucao: #CC0000
+grupo_evolucao_fundo: #F5DECF
+grupo_aprendizado: #CC0000
+grupo_aprendizado_fundo: #F5DECF
+# Balão sobre Rio (período na abertura, número da seção nos blocos Rio):
+# fundo Branco, texto Vermelho Santander. Filetes sobre Rio: branco.
+capa_selo: #FFFFFF
+capa_filete: #FFFFFF
+# Segunda parte da frase do mês: Preto, mais leve (peso normal).
+capa_destaque: #000000
+# Blocos Rio (abertura, resultados, indicadores, análises, próximas
+# iniciativas e encerramento) e filetes sobre eles.
+abertura_fundo: #F5DECF
+abertura_linha: #FFFFFF
+# Divisórias finas sobre Branco (Rio).
+linha: #F5DECF
+# Indicadores: barra (Boston) e valor anterior (Preto).
+creative_x: #CC0000
+creative_x_anterior: #000000
+# Análises: textos, títulos, bloco Rio com cartão branco e divisórias.
+transformation: #000000
+transformation_titulo: #000000
+transformation_fundo: #F5DECF
+transformation_linha: #F5DECF
+transformation_placeholder_fundo: #FFFFFF
+transformation_placeholder_borda: #CC0000
+# Textos sobre Rio: Preto.
+foco_rotulo: #000000
+foco_texto: #000000
+# Encerramento: bloco Rio, assinatura com a chama vermelha.
+rodape_claro: #FFFFFF
+rodape_fundo: #F5DECF
+# Espaço de imagem ainda não escolhida (só no rascunho).
+placeholder_fundo: #F5DECF
+placeholder_borda: #CC0000
+
+
+# ======================================================================
+#  IMAGENS e LINKS: as mesmas regras do PF (config/marca.txt).
+# ======================================================================
+[IMAGENS]
+modo: embutidas
+endereco_base:
+qualidade_jpg: 82
+
+[LINKS]
+dominios_permitidos:
+
+
+# ======================================================================
+#  FORMIGUINHA: não usada no PJ (é personagem do Creative Strategy PF).
+# ======================================================================
+[FORMIGUINHA]
+arquivo:
+descricao:

@@ -12,6 +12,8 @@ O emulador é o centro da operação mensal. Um arquivo só (`kit/emulador-repor
 | **6 · Baixar** | O e-mail-resumo (`.eml`), a imagem do resumo (`.png`, 4.13) e, opcional, o e-mail completo |
 | **Prévia** | O e-mail como vai no `.eml`, no computador e no celular |
 
+**PF e PJ (5.0):** são dois arquivos, `kit/emulador-report.html` (Emulador Report PF) e `kit/emulador-report-pj.html` (Emulador Report PJ, Santander Empresas), com o mesmo código e as mesmas funções. Cada um abre só os reports do seu segmento (o outro é recusado com um aviso, sem mexer no que está aberto) e guarda o seu rascunho à parte. Identidade e seções do PJ: [REPORT_PJ.md](REPORT_PJ.md).
+
 Nada é enviado para a internet: a página só lê e grava os arquivos que você escolhe. Passo a passo para o time: [COMO_ATUALIZAR_O_MES.md](COMO_ATUALIZAR_O_MES.md) e o guia ilustrado, [kit/guia-operacional.pdf](../kit/guia-operacional.pdf).
 
 ## Edição

@@ -1,6 +1,6 @@
 # Como atualizar o report todo mês
 
-Passo a passo para o time, no **emulador** (`kit/emulador-report.html`). É o mesmo conteúdo do guia ilustrado, [kit/guia-operacional.pdf](../kit/guia-operacional.pdf), em texto. Depois dos dados aprovados, leva de 30 a 45 minutos.
+Passo a passo para o time, no **emulador** (`kit/emulador-report.html` no PF; `kit/emulador-report-pj.html` no PJ, com os mesmos passos e os nomes de seção do PJ, veja [REPORT_PJ.md](REPORT_PJ.md)). É o mesmo conteúdo do guia ilustrado, [kit/guia-operacional.pdf](../kit/guia-operacional.pdf), em texto. Depois dos dados aprovados, leva de 30 a 45 minutos.
 
 Você precisa de: **Chrome ou Edge**, o arquivo `emulador-report.html`, as imagens do mês, os resultados aprovados pela área, acesso ao ambiente corporativo autorizado (para publicar o report) e o **Outlook**. Não precisa instalar nada.
 

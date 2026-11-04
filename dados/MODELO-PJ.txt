@@ -1,0 +1,427 @@
+# ======================================================================
+#  REPORT MENSAL PJ (SANTANDER EMPRESAS) · MODELO EM BRANCO
+# ======================================================================
+#  ESTE É O ÚNICO ARQUIVO QUE VOCÊ EDITA TODO MÊS.
+#
+#  Para começar um mês novo:
+#    1. Copie este arquivo e renomeie a cópia para dados/AAAA-MM-pj.txt
+#       (ex.: dados/2026-10-pj.txt). Ou copie o arquivo PJ do mês anterior.
+#       A linha "segmento: PJ" ([EDICAO]) faz a ferramenta usar o template
+#       e a marca do PJ (template/report-pj.html, config/marca-pj.txt).
+#    2. Troque o conteúdo de exemplo pelo conteúdo do mês:
+#         Lorem ipsum…  -> textos       X, X%, R$ X  -> números
+#         [INSERIR …]   -> imagens e links
+#    3. Abra gerar-report.html. Passo a passo: docs/COMO_ATUALIZAR_O_MES.md
+#
+#  Regras:
+#   1. Cada linha é "campo: valor". Troque só o que vem depois dos ":".
+#   2. Linhas que começam com # são instruções. Não vão para o e-mail.
+#   3. Os [BLOCOS] sozinhos numa linha organizam o arquivo. Não renomeie.
+#      Para tirar um item (um lançamento, um número), apague o bloco
+#      inteiro. Para recolocar, copie um bloco igual e troque o número.
+#      Para tirar uma seção inteira, apague todos os blocos dela.
+#   4. Campo vazio = aquele elemento não aparece.
+#      Ex.: "link:" vazio = a peça aparece, mas sem "Ver peça".
+#   5. AINDA NÃO PREENCHIDO = Lorem Ipsum, X (X%, R$ X, XX/XX), "Mês",
+#      "AAAA" ou [texto entre colchetes]. A ferramenta lista cada um, com
+#      a linha, e só libera a versão final quando não sobrar nenhum.
+#   6. Quebra de linha forçada num título: escreva <br>.
+#   7. Não invente número para "completar" o layout: deixe o X até ter
+#      o dado real.
+#
+#  Imagens: coloque o arquivo na pasta indicada em "pasta_imagens" e
+#  escreva só o nome (ex.: imagem: campanha-x.jpg). Pode ser a imagem
+#  original, em alta: a ferramenta recorta e reduz sozinha.
+#  Foto do banco de imagens aprovado: escreva o caminho completo
+#  (ex.: imagem: assets/fotos/foto-grupo-conversa-corredor-2368480077.jpg).
+#  Lista das fotos e onde cada uma funciona: assets/fotos/README.md
+#
+#  Tipos de link (campo "tipo"), cada um com o seu texto fixo:
+#    peca     -> "Ver peça →"          imagem ou peça em tamanho grande
+#    video    -> "▶ Assistir"          vídeo (Stream / SharePoint)
+#    projeto  -> "Ver projeto →"       página, documento, apresentação
+#    demo     -> "Ver demonstração →"  protótipo ou demonstração
+#  Que link colar: docs/LINKS_SHAREPOINT_STREAM.md
+# ======================================================================
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: PERÍODO
+# ----------------------------------------------------------------------
+[EDICAO]
+mes: Mês
+ano: AAAA
+proximo_mes: Próximo mês
+pasta_imagens: assets/AAAA-MM
+contato: lorem.ipsum@empresa.com
+# link_report_completo: link de compartilhamento da versão interativa no
+# SharePoint (destino do botão "Ver report completo" do e-mail-resumo).
+# Vazio = o conversor pede na hora. Nunca um caminho do computador (C:\…).
+link_report_completo:
+segmento: PJ
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: ABERTURA · O MÊS EM UMA FRASE
+#  frase + frase_final formam uma frase de até ~8 palavras.
+#  frase_final aparece mais leve, na linha de baixo (o guia não tem itálico).
+#  previa: o texto cinza que aparece ao lado do assunto na caixa de
+#  entrada (até ~110 caracteres).
+# ----------------------------------------------------------------------
+[ABERTURA]
+frase: Lorem ipsum dolor
+frase_final: sit amet elit.
+previa: Lorem ipsum dolor sit amet: X% de lorem ipsum no mês.
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: VISÃO GERAL · A CAMPANHA DO MÊS
+#  O resultado mais importante do mês. Aparece só na capa, com a peça
+#  (retângulo VERTICAL, 184 x 230 px; envie com 368 x 460 px ou mais) e
+#  até 4 números em PRINCIPAIS RESULTADOS.
+#  Clique na peça: com link, abre o link (e-mail e navegador); sem link,
+#  na página do navegador a peça abre maior; no e-mail, não clica.
+# ----------------------------------------------------------------------
+[PROJETO PRINCIPAL]
+# rotulo: o nome acima da campanha, na capa (padrão: CAMPANHA). Ex.: Campanha do mês, Porta de entrada.
+rotulo:
+nome: Lorem ipsum dolor
+resumo: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+# aprendizado (opcional, 4.13): "O que aprendemos" logo abaixo dos números.
+#   Uma ou duas frases curtas: o que a campanha ensinou e o que muda daqui pra frente.
+#   Sem dado que sustente, deixe vazio (o bloco não aparece).
+aprendizado: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+imagem: [INSERIR IMAGEM DA PEÇA]
+descricao_imagem: Lorem ipsum dolor sit amet
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+# EDITAR AQUI: PRINCIPAIS RESULTADOS (números da campanha do mês)
+# Recomendado: 3 números, um em cada coluna da grade (alinhados com as
+# seções de baixo). Cabe um 4º ([NUMERO 4]): aí são 4 colunas iguais.
+# O 1º é o principal: use o resultado mais relevante (no PJ, todos em Preto).
+#  valor: o número (até ~10 caracteres). Formatos: X,X%  ·  R$ X mi  ·  Xx  ·  X p.p.
+#  titulo: o que é (negrito)        detalhe: base de comparação
+#  variacao: etiqueta opcional. Começa com "-" → seta para baixo
+#  (ex.: "-Menos da metade" para um custo que caiu: seta para baixo, em verde).
+#  variacao_cor: verde (resultado positivo, padrão) ou ambar (atenção).
+#  Atenção: % é variação relativa (+12%); p.p. é diferença entre duas
+#  porcentagens (de 40% para 52% = +12 p.p.). Não troque um pelo outro.
+[NUMERO 1]
+valor: X%
+titulo: Lorem ipsum
+detalhe: era X%
+variacao: +X%
+
+[NUMERO 2]
+valor: R$ X
+titulo: Lorem ipsum
+detalhe: era R$ X
+variacao: +X%
+
+[NUMERO 3]
+valor: X
+titulo: Lorem ipsum
+detalhe: era X
+variacao: +X%
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: CAMPANHAS
+#  1 campanha em destaque (com resultados) + até 6 outras campanhas.
+# ----------------------------------------------------------------------
+[LANCAMOS]
+titulo: Lorem ipsum dolor sit amet.
+
+# Projeto em destaque. No computador, a imagem é recortada na vertical
+# (184 x 300 px). No celular, a mesma imagem aparece na horizontal, na
+# largura da tela, acima do texto.
+# enquadramento: qual parte da imagem fica no recorte:
+#   centro, topo, baixo, esquerda ou direita.
+[DESTAQUE]
+categoria: Lorem · Ipsum dolor
+titulo: Lorem ipsum dolor sit amet?
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
+imagem: [INSERIR IMAGEM DA PEÇA]
+descricao_imagem: Lorem ipsum dolor sit amet
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+nota: Lorem ipsum dolor sit amet. Etiqueta verde = resultado positivo; custo menor também é bom.
+# aprendizado (opcional): "O que aprendemos" abaixo dos resultados do destaque, antes da nota.
+aprendizado: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+# Resultados do projeto em destaque (até 3).
+[RESULTADO 1]
+valor: X%
+titulo: CTR
+detalhe: era X%
+variacao: +X%
+
+[RESULTADO 2]
+valor: R$ X
+titulo: CPC
+detalhe: era R$ X
+variacao: -X%
+
+[RESULTADO 3]
+valor: X
+titulo: Lorem ipsum
+detalhe: era X
+variacao: +X%
+
+# Lançamentos compactos ("Também neste mês", até 6, em linhas de 3).
+#  status: etiqueta curta. status_cor: verde (no ar / implementado)
+#  ou ambar (previsto / aguardando resultado).
+#  A miniatura é recortada em faixa horizontal (368 x 144 px). Em vídeo,
+#  a ferramenta desenha o botão ▶ sobre a miniatura.
+#  video: (opcional) arquivo .mp4 ou .webm na pasta do mês. Na página do
+#  mês (.html), o clique na miniatura toca o vídeo ali mesmo; no e-mail,
+#  a miniatura com ▶ abre o "link". Vale também no projeto principal e no
+#  destaque.
+[LANCAMENTO 1]
+status: Resultado em XX/XX
+status_cor: ambar
+nome: Lorem ipsum
+texto: Lorem ipsum dolor sit amet, consectetur.
+# aprendizado (opcional): uma frase no fim do card. Só quando já houver resultado.
+aprendizado:
+imagem: [INSERIR IMAGEM DA PEÇA]
+descricao_imagem: Lorem ipsum dolor sit amet
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+[LANCAMENTO 2]
+status: Resultado em XX/XX
+status_cor: ambar
+nome: Lorem ipsum
+texto: Lorem ipsum dolor sit amet, consectetur.
+imagem: [INSERIR CAPA DO VÍDEO]
+descricao_imagem: Lorem ipsum dolor sit amet
+enquadramento: centro
+tipo: video
+link: [INSERIR LINK DO VÍDEO NO STREAM]
+
+[LANCAMENTO 3]
+status: Resultado em XX/XX
+status_cor: ambar
+nome: Lorem ipsum
+texto: Lorem ipsum dolor sit amet, consectetur.
+imagem: [INSERIR IMAGEM DA PEÇA]
+descricao_imagem: Lorem ipsum dolor sit amet
+enquadramento: centro
+tipo: peca
+link: [INSERIR LINK]
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: INDICADORES (bloco [CREATIVE X]: o indicador do mês)
+#  anterior e atual em % (ex.: XX%). Com os dois preenchidos, a barra e a
+#  variação em p.p. são calculadas sozinhas (deixe "variacao" vazio).
+#  Sem o anterior, nada é calculado: escreva a variação ou deixe pendente.
+# ----------------------------------------------------------------------
+[CREATIVE X]
+subtitulo: Score criativo · Lorem ipsum
+anterior: X%
+atual: X%
+variacao: +X p.p.
+periodo: Lorem ipsum vs. dolor sit
+referencia: Lorem ipsum dolor: X%
+significado: Lorem ipsum dolor sit amet, consectetur adipiscing.
+# nota (opcional): linha pequena no fim da seção, para siglas (ex.: CQR, QSR) e fonte.
+nota: *Lorem ipsum: dolor sit amet. Consectetur: adipiscing elit.
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: INDICADORES DO TRIMESTRE (opcional)
+#  Só no mês que fecha o trimestre: entra na mesma seção, abaixo do
+#  resultado do mês, e o mês ganha o rótulo "MENSAL · MÊS ANO".
+#  Até 3 indicadores [CREATIVE X TRIMESTRE 1..3] (valor, titulo, detalhe,
+#  variacao). "estimativa" sai com a etiqueta "Estimativa": use para
+#  oportunidade ou impacto modelado, nunca para resultado alcançado.
+#  Nos outros meses, apague estes blocos.
+# ----------------------------------------------------------------------
+[CREATIVE X TRIMESTRE]
+rotulo: Trimestral · Lorem ipsum · dolor
+titulo: Lorem ipsum dolor sit amet X p.p.
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
+estimativa: Lorem ipsum dolor sit amet, consectetur (modelo, não é resultado).
+
+[CREATIVE X TRIMESTRE 1]
+valor: X%
+titulo: Lorem*
+detalhe: Lorem ipsum: X%
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 2]
+valor: X%
+titulo: Ipsum*
+detalhe: Lorem ipsum: X%
+variacao: +X p.p.
+
+[CREATIVE X TRIMESTRE 3]
+valor: X
+titulo: Dolor sit amet
+detalhe: Lorem ipsum: X
+variacao: +X%
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: ANÁLISES (bloco [TRANSFORMATION], até 3 análises)
+#  icones: nomes de assets/icones/ separados por vírgula
+#          (icone-prancheta, icone-lupa), OU
+#  imagem: um print da ferramenta (na pasta do mês).
+#  Sem os dois, o texto ocupa a linha inteira.
+#  citacao e resultado são opcionais.
+#  prints: até 3 prints (telas) do projeto, na pasta do mês, separados
+#          por vírgula. Aparecem abaixo do texto, na largura do cartão:
+#          1 print = 504 px; 2 = 240 px cada; 3 = 152 px cada (no celular,
+#          um embaixo do outro). Na página do mês, abrem maiores no clique.
+#  descricao_prints: o que cada print mostra, separados por "|", na
+#          mesma ordem (ex.: Tela do agente | Resultado do teste).
+#  logo:   (opcional) o PNG original do logo do projeto (ex.: logo do
+#          agente), na pasta do mês. Aparece com 56 px, no lugar dos
+#          ícones. descricao_logo: o que o logo é (texto alternativo).
+#  links:  (opcional) links extras, "Texto | endereço", vários separados
+#          por ";" (ex.: Documento do projeto | https://… ; Agente de exemplo | https://…).
+#  status: use para a previsão (ex.: Previsão de lançamento: nov/26).
+# ----------------------------------------------------------------------
+[TRANSFORMATION]
+titulo: Lorem ipsum dolor sit amet.
+
+[TRANSFORMATION 1]
+status: Implementado · XX/XX
+status_cor: verde
+nome: Lorem ipsum dolor
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+citacao:
+resultado: Lorem ipsum: X%
+icones: icone-prancheta, icone-lupa
+logo:
+descricao_logo:
+links: Lorem ipsum | [INSERIR LINK]
+imagem:
+descricao_imagem:
+prints: [INSERIR PRINT]
+descricao_prints: Lorem ipsum dolor sit amet
+tipo: demo
+link:
+
+[TRANSFORMATION 2]
+status: Em teste
+status_cor: ambar
+nome: Lorem ipsum sit amet
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+citacao:
+resultado: Lorem ipsum dolor sit amet.
+icones:
+imagem:
+descricao_imagem:
+tipo: projeto
+link:
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: APRENDIZADOS (até 3) · SEÇÃO OPCIONAL
+#  Desde a 4.13, o aprendizado de cada campanha vai no próprio bloco
+#  (campo "aprendizado" em [PROJETO PRINCIPAL], [DESTAQUE] e [LANCAMENTO n]).
+#  Esta seção junta aprendizados gerais: para não repetir, apague os blocos
+#  [APRENDIZADO] abaixo (a seção some e a numeração se ajusta).
+#  Aprendizado = o que os dados mostraram. Se a causa não está provada,
+#  escreva como hipótese ("pode indicar", "sugere").
+# ----------------------------------------------------------------------
+[APRENDIZADO 1]
+titulo: Lorem ipsum dolor
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+levamos: lorem ipsum dolor.
+
+[APRENDIZADO 2]
+titulo: Lorem ipsum dolor
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+levamos: lorem ipsum dolor.
+
+[APRENDIZADO 3]
+titulo: Lorem ipsum dolor
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+levamos: lorem ipsum dolor.
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: NOVOS TÓPICOS (opcional · ex.: TESTES)
+# ----------------------------------------------------------------------
+#  Até 4 assuntos novos que ainda não têm seção própria (ex.: os testes
+#  do mês): [TOPICO], [TOPICO B], [TOPICO C] e [TOPICO D], nessa ordem,
+#  antes do Foco do próximo mês. Cada um só aparece no report quando
+#  [TOPICO 1] (ou [TOPICO B 1]…) existe. Para usar: tire o "#" do
+#  começo das linhas abaixo.
+#  rotulo: o nome curto no topo da seção (vira MAIÚSCULAS: TESTES).
+#  layout: qual desenho seguir
+#    lista    um item embaixo do outro, na largura inteira (até 6)
+#    colunas  colunas numeradas, lado a lado (até 3)
+#    cartoes  cartões com imagem em cima, 3 por linha (até 6)
+#    numeros  números grandes com o que medem (até 4; use valor)
+#  Em cada item: status + status_cor (verde ou ambar), nome
+#  (obrigatório), texto, valor (só no layout numeros),
+#    links: "Texto | endereço", vários separados por ; (vale qualquer
+#           link; PDF da pasta do mês também: "Plano | plano.pdf")
+#    imagens: até 3, separadas por vírgula (descrições em
+#             descricao_imagens, separadas por |)
+#
+# [TOPICO]
+# rotulo: Testes
+# titulo: Lorem ipsum dolor sit amet.
+# texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+# layout: lista
+#
+# [TOPICO 1]
+# status: Lorem ipsum
+# status_cor: ambar
+# nome: Lorem ipsum dolor
+# texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+# links: Lorem ipsum | [INSERIR LINK]
+# imagens:
+# descricao_imagens:
+#
+# [TOPICO B]
+# rotulo: Mídia
+# titulo: Lorem ipsum dolor sit amet.
+# layout: numeros
+#
+# [TOPICO B 1]
+# valor: X%
+# nome: Lorem ipsum
+# texto: Lorem ipsum dolor sit amet.
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: PRÓXIMAS INICIATIVAS (bloco [FOCO])
+# ----------------------------------------------------------------------
+#  selo (opcional): o PNG original do selo da campanha, na versão feita
+#  para fundo claro (o bloco do PJ é Rio). Fica ao lado do título (computador) ou acima dele
+#  (celular). Não redesenhe o selo. Sem selo, deixe vazio.
+[FOCO]
+prioridade: Lorem ipsum dolor sit amet.
+texto: Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do.
+selo:
+descricao_selo:
+
+
+# ----------------------------------------------------------------------
+#  EDITAR AQUI: AGENDA · PRÓXIMAS DATAS (até 6, em linhas de 3)
+#  data: "12 OUT" (dia + mês) ou um texto como "A DEFINIR".
+# ----------------------------------------------------------------------
+[AGENDA 1]
+data: XX MÊS
+titulo: Lorem ipsum dolor
+detalhe: Sit amet consectetur
+
+[AGENDA 2]
+data: XX MÊS
+titulo: Lorem ipsum dolor
+detalhe: Sit amet consectetur
+
+[AGENDA 3]
+data: XX MÊS
+titulo: Lorem ipsum dolor
+detalhe: Sit amet consectetur

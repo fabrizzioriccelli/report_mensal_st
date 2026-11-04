@@ -8,6 +8,8 @@
 | `marca/` | Chama do Santander e paleta. [README](marca/README.md) | Sim | Não |
 | `formiguinha/` | A personagem (arquivo original). [README](formiguinha/README.md) | Sim | Não |
 | `icones/` | Ícones do Creative Transformation (traço vermelho) | Sim | Não |
+| `coringa/` · `coringa-pj/` | Espaços neutros do modelo em branco do PF e do PJ (o do PJ em Rio, peça da visão geral vertical) | Sim (sem dado real) | Não |
+| `exemplo/` · `exemplo-pj/` | Peças **fictícias** dos exemplos de treino do PF e do PJ (sem logotipo, sem pessoas) | Sim (fictício) | Não |
 
 ## Imagens do mês
 

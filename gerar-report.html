@@ -244,8 +244,13 @@
   /* ---------- 2. conferência ---------- */
   function conferir(caminhoDados) {
     abertas = {};
-    Promise.all([lerTexto(caminhoDados), lerTexto("config/marca.txt"), lerTexto("template/report.html")]).then(function (t) {
-      var entrada = { dados: t[0], arquivoDados: caminhoDados, marca: t[1], template: t[2], existe: function (p) { return !!ARQ[p]; }, medidas: {} };
+    /* Segmento (5.0): o arquivo de dados com "segmento: PJ" usa o template e a marca do PJ; os outros, os do PF. */
+    var perfilDados = null;
+    lerTexto(caminhoDados).then(function (dados) {
+      perfilDados = Motor.perfil(Motor.segmentoDosDados(dados));
+      return Promise.all([dados, lerTexto(perfilDados.marca), lerTexto(perfilDados.template)]);
+    }).then(function (t) {
+      var entrada = { dados: t[0], arquivoDados: caminhoDados, marca: t[1], arquivoMarca: perfilDados.marca, template: t[2], existe: function (p) { return !!ARQ[p]; }, medidas: {} };
       var r1 = Motor.montar(entrada);
       if (!r1.ok) return mostrar(r1);
       /* 2ª passada, já com o tamanho real de cada imagem */
