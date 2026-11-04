@@ -52,7 +52,7 @@ O guia pede uso **pontual**, preferencialmente em gráficos e visualizações de
 
 | Grupo | Seções | Texto / etiqueta | Contraste |
 |---|---|---|---|
-| Resultados | Números da capa, 02 · O que lançamos | Turquesa `#127277` sobre `#CDECEE` | 4,6:1 |
+| Resultados | Visão geral, O que lançamos | Turquesa `#127277` sobre `#CDECEE` | 4,6:1 |
 | Qualidade e transformação | 03 · Creative X (inclui a barra), 04 · Creative Transformation | Roxo `#803262` sobre `#F0CAE1` | 5,6:1 |
 | Aprendizado e próximos passos | 05 · O que aprendemos, 07 · Também vem aí, rótulos do rodapé | Rosa `#A6112F` sobre `#FFC3CF` | 5,1:1 |
 

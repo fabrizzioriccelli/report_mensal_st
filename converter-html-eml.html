@@ -449,11 +449,13 @@
     numeroDe: "Resultado principal ", resultadoDe: " da campanha em destaque", cx: "Indicadores", sugestao: "os principais resultados", destaqueSec: PERFIL.nomes.destaque,
     cor: { numero1: "#000000", texto: "#000000", linha: "#F5DECF", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#CC0000", apr: { abertura_linha: "#FFFFFF", linha: "#F5DECF", grupo_aprendizado: "#CC0000", texto: "#000000" } }
   } : {
-    sec: { lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" },
-    grupos: { numero: "Números da capa", resultado: "Resultados do destaque (O que lançamos)", cxt: "Creative X: indicadores do trimestre", lancamento: "Também neste mês (O que lançamos)", transformation: "Transformation Hub", aprendizado: "O que aprendemos", agenda: "Também vem aí (agenda)" },
-    principal: "Capa · campanha", destaque: "O que lançamos · destaque", foco: "Foco do próximo mês", compactos: "Também neste mês", figPrincipal: "Peça da capa", figDestaque: "Peça do destaque",
-    numeroDe: "Número ", resultadoDe: " do destaque", cx: "Creative X", sugestao: "os números da capa", destaqueSec: "Destaque",
-    cor: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#E2E2E2", transf: "#F5DECF", topico: "#127277", apr: null }
+    sec: { visao: "Visão geral", resultados: "Principais resultados", lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" },
+    grupos: { numero: "Principais resultados", resultado: "Resultados do destaque (O que lançamos)", cxt: "Creative X: indicadores do trimestre", lancamento: "Também neste mês (O que lançamos)", transformation: "Transformation Hub", aprendizado: "O que aprendemos", agenda: "Também vem aí (agenda)" },
+    principal: "Visão geral · campanha", destaque: "O que lançamos · destaque", foco: "Foco do próximo mês", compactos: "Também neste mês", figPrincipal: "Peça da visão geral", figDestaque: "Peça do destaque",
+    numeroDe: "Resultado principal ", resultadoDe: " do destaque", cx: "Creative X", sugestao: "os principais resultados", destaqueSec: "Destaque",
+    cor: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#127277", apr: { abertura_linha: "#FFFFFF", linha: "#E2E2E2", grupo_aprendizado: "#A6112F", texto: "#000000" } },
+    /* report PF salvo antes da 5.1 (layout de antes, sem a meta "report-layout"): as cores que o emulador usava nele */
+    corAntiga: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#E2E2E2", transf: "#F5DECF", topico: "#127277", apr: null }
   };
   var EDITOR_CSS =
     "[data-ed-campo]{outline:1px dashed rgba(236,0,0,.45);outline-offset:2px;border-radius:3px;cursor:text;transition:background-color .15s}" +
@@ -508,7 +510,7 @@
     $("#bDesfazer").disabled = true;
     var fr = $("#edFrame");
     fr.onload = function () {
-      ED.doc = fr.contentDocument;
+      ED.doc = fr.contentDocument; coresDoLayout(ED.doc);
       /* Tópico novo ainda do modelo em branco (rótulo [entre colchetes]) sai ao abrir: os do modelo são a fonte do
          "+ Novo tópico", que pergunta o nome e o layout. */
       var tirou = IDS_TOPICO.filter(function (id) {
@@ -1363,7 +1365,7 @@
   function criarAprendizado(chave, textoHtml, mostrar) {
     var a = alvoAprendizado(chave); if (!a) return null;
     var modelo = '<span style="background:#FFE1B9;color:#945400;border-radius:3px;">[O que a campanha ensinou, em uma ou duas frases]</span>';
-    var tmp = ED.doc.createElement("div"); tmp.innerHTML = Motor.htmlAprendizado(textoHtml || modelo, chave, a.variante, UI.cor.apr ? { fonte: fonteTextoDaPagina(), cor: UI.cor.apr } : { fonte: fonteTextoDaPagina() });
+    var tmp = ED.doc.createElement("div"); tmp.innerHTML = Motor.htmlAprendizado(textoHtml || modelo, chave, a.variante, COR.apr ? { fonte: fonteTextoDaPagina(), cor: COR.apr } : { fonte: fonteTextoDaPagina() });
     var bloco = tmp.firstElementChild; a.pai.insertBefore(bloco, a.antes);
     editavel(bloco);
     pilha(function () { bloco.remove(); });
@@ -1538,7 +1540,15 @@
 
   /* ---------- itens: adicionar e ocultar, com a grade refeita como o motor faz ---------- */
   /* Cores da grade (as mesmas de config/marca.txt): 1º número da capa em vermelho; filete e separadores. */
-  var COR = { marca: UI.cor.numero1, texto: UI.cor.texto, linha: UI.cor.linha, linhaBloco: UI.cor.linhaBloco, transf_linha: UI.cor.transf };
+  var COR = {};
+  /* Cores do que o emulador acrescenta (1º número, separadores, filetes, tópicos, "O que aprendemos"): as do layout do
+     report aberto. A partir da 5.1, PF e PJ têm o mesmo esqueleto (meta "report-layout" 2); o report PF de antes segue
+     com as cores de antes. */
+  function coresDoLayout(doc) {
+    var c = !PJ && UI.corAntiga && !(doc && doc.querySelector('meta[name="report-layout"][content="2"]')) ? UI.corAntiga : UI.cor;
+    COR.marca = c.numero1; COR.texto = c.texto; COR.linha = c.linha; COR.linhaBloco = c.linhaBloco; COR.transf_linha = c.transf; COR.topico = c.topico; COR.apr = c.apr;
+  }
+  coresDoLayout(null);
   var GRUPOS = {
     numero: { max: 4, nome: "indicador" }, resultado: { max: 3, nome: "resultado" }, lancamento: { max: 6, nome: "lançamento" },
     cxt: { max: 3, nome: "indicador trimestral", semMidia: true },
@@ -1547,7 +1557,7 @@
   };
   /* Novos tópicos (até 4): o id da seção é o grupo dos itens (topico-1, topicob-1…), e o layout vem da página
      (tabela data-layout; sem ela, página da 4.6: lista). O máximo de itens é o do layout (Motor.LAYOUTS_TOPICO). */
-  var IDS_TOPICO = Motor.TOPICOS.map(function (t) { return t[1]; }), LAYOUTS = Motor.LAYOUTS_TOPICO, COR_TOPICO = UI.cor.topico;
+  var IDS_TOPICO = Motor.TOPICOS.map(function (t) { return t[1]; }), LAYOUTS = Motor.LAYOUTS_TOPICO;
   function layoutDaSecao(doc, id) {
     var rot = doc.querySelector('[data-campo="' + id + '.rotulo"]'), td = rot && rot.closest("td.px"), t = td && td.querySelector("table[data-layout]");
     return t ? t.getAttribute("data-layout") : "lista";
@@ -1617,7 +1627,7 @@
       var lg = divide(600, Math.max(n, 1));
       it.forEach(function (x, i) {
         if (i) cont.insertBefore(lay === "colunas" ? separador() : espaco(24), x);
-        var cor = i === 0 ? COR_TOPICO : COR.texto;
+        var cor = i === 0 ? COR.topico : COR.texto;
         x.setAttribute("class", i === n - 1 ? "col" : "col gap"); x.setAttribute("width", String(lg[i]));
         x.setAttribute("style", "width:" + lg[i] + "px;" + (lay === "numeros" ? "border-top:2px solid " + cor + ";padding-top:12px;" : ""));
         var val = lay === "numeros" && x.querySelector('[data-campo$=".valor"]'); if (val) val.setAttribute("style", trocaCor(val.getAttribute("style"), cor));
@@ -2427,7 +2437,7 @@
   /* Nome do campo para gente (no lugar da chave técnica). */
   function rotuloNumero(k) {
     var m = /^(numero|resultado)-(\d+)\.(\w+)$/.exec(k), parte = { valor: "valor", detalhe: "base de comparação", variacao: "variação", anterior: "anterior", atual: "atual" };
-    if (m) return (m[1] === "numero" ? UI.numeroDe + m[2] + (PJ ? "" : " da capa") : "Resultado " + m[2] + UI.resultadoDe) + " (" + parte[m[3]] + ")";
+    if (m) return (m[1] === "numero" ? UI.numeroDe + m[2] : "Resultado " + m[2] + UI.resultadoDe) + " (" + parte[m[3]] + ")";
     m = /^cx\.(\w+)$/.exec(k); if (m) return UI.cx + " (" + (parte[m[1]] || m[1]) + ")";
     return k;
   }

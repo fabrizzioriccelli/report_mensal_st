@@ -68,6 +68,7 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 | Chamadas da apresentação (PDF) abrindo o emulador, o guia e o report no visualizador do Chromium | Passa |
 | Emulador Report PJ de ponta a ponta (`tests/pj.e2e.js`): aba e ícone Santander + PJ, modelo em branco PJ, edição, imagem vertical, itens e grade, seções, novo tópico, celular, importação, salvar (ícone e marca do PJ), reabrir, rascunho separado do PF, recusa do outro segmento nos dois sentidos, e-mail-resumo no tema Empresas, `.eml`, `.png` e e-mail completo | Passa |
 | PF sem mudança na 5.0: HTML, texto puro, e-mail-resumo, página interativa e e-mail resumido idênticos byte a byte aos da 4.13; suíte inteira do PF (repositório e kit) | Passa |
+| PF e PJ no mesmo esqueleto (5.1): mesmas seções, na mesma ordem, e a mesma marcação de campos com os mesmos dados; cores e nomes de cada segmento; marca de antes sem as cores novas; report PF salvo antes da 5.1 (`tests/dados/report-exemplo-4.12.html`) abre, é atualizado e funciona; suíte inteira do PF (repositório e kit) e do PJ | Passa |
 | Movimento na versão interativa (contagem, barra, reduzir movimento, edição) | Passa |
 | Página de geração de ponta a ponta no Chromium, sem vazar para o lado de 320 a 1440 px | Passa |
 | Fonte `.otf` de teste em `assets/fonts/` | Carrega na prévia e no `.html`; fora do `.eml` |

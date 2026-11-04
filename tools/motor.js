@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "5.0 (2026-11-04)";
+  var VERSAO = "5.1 (2026-11-04)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -109,31 +109,40 @@
   /* Ícone da aba do report PJ (5.0): Santander + PJ (assets/marca/svg/santander-pj.svg e os PNG de 16, 32 e 180 px). A mesma
      chama do PF, sem redesenho; o selo "PJ" tem o contorno em Rio, a cor de destaque do Santander Empresas. */
   var ICONE_TAG_PJ = "<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADoklEQVR4nMRXXUgUURT+ZnZnNcw12oJoISnLsijqpcIyqIf+/EFJ7CESgiChP0wKNSh9CIsoQn2oHoQezAcfMtAwRdKHyCAqMDHDHxBf+rHUVltdd6fv7k7m37gz7FAfXM6dc88995tz7jk7K+M/QzZjPASchsWQjBp+AZaS7bACbIoDemARDEcgClhFYfMBd2EhDBOYCgYhiHSm4hAsQlgCo8AKFbC7glPUCl0AKKdOgQUIS2ACOPcdOCbmdqCQYpIXJ/EbcBEWICwBHpbMt73DEb0M6KPqnqa/9hNYiQhh5A6ISnEz7xfEA1NRSjJfOY31AkWIEEYItGvyqrgPZDPOcVnTpSNCzOsDzO1OihMc+1cA23ioaxLo5TPLH5XUndfsPlBs4ejkeMqoPGI+PsEkpiNABzEM831OXyMU7q0/gHgnGyBZXtfM8hj7RG3+WJOCRDFtOkmqWDXZXWXtcIWHN1Gembno156X880pujnsPOi20FF+nuOLRYIb9FMOswS4qZQieYH1AhEFHuaXtEtIZFC3j9Kt4/Msy/YIzBDgm+forDv8Wtm5QhGqF3N2xSucH9dzyj25MEOAiF3EJvNP66VxmZCMRirF5kX2xMEMATp8vpgRW2+luCe8C29gAJIWKcME+EtXoIa6nJ7D9YzCJU5tCAP6ecZ0PYBBTPcBlpCbmx9ScVTHsYdss6UD+xqVvFOQEhMgOWNhFvQzLKmid0g3YxK2189rRLzBe3iJCrlwGKHSmoYt7eCQo/yWC1NT8Le9hNrdA9Xng1FIigJp43rYUlhwDkW8fpa0CNMYkklm/tfRaA2f10Y31h6V49fEebNOQv1ouulNQyaJqLpq5l5pt+uyBcYommfqPBsShv0NTREdLhBg5PzNLyCnHkyym9koSVJcoLd/li4qNxf2HTuCc9Xjga+1Fb6WltBidDRiyoKVi6mODkxUVf0lQT82+jPVtxeCIzUVjpxQH5Pj4+FsaMCS4uLZNtnZcGRkLLg/YgICgcFBjOXnw8No+Nra4DikfTJ6vUF9YGBAd6+pFOhBcjrhyMyELSkJyt698M4IdThYQkB2u7GkKPRxNFFTg/GSEsN7LSHg7+rCyK5ds3RLq6shu1wYzcqCvHp10GYhmLoDqqqOyAlrDdlO1tVBSUmBa3xclA9+VVTMPph+hD/Df80ExvrevsKEb7eVjcgcgf53mWyRT/5JK9Yl0fs+jckoVCVs4eZlMIm5P0a/AQAA//9bX7NXAAAABklEQVQDAGWsFPWJgRmdAAAAAElFTkSuQmCC\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABw0lEQVR4nJxSSyiEURT+7jX/hOYfGyzkGXkURcpOyiMlZquUhY2ysmJjTHltsFKWrCwYRVakrGwsRIkyRlFIeY3IKPM/fDM0M5lfM5w6/z333O989zvnvxIW9gjkI0WTVkkD6L8H6vEfAhPIZPJKAPNIwRIIKH+GCpZJVPoA9P6ZgIVFXDrpo/SRZAQi/AkAxdoX2JcGnOjAAuMKup+AS67T2cCaJcEzpbL4kLHK2y8IrGIbGyw84r6O+dZvZUM5wGxCCyxuDxd/yyl5Aoa5jnEOA0w1xGF7rBRIMq/TH+Jm4KYHSOLg1hkF/vJXojNg35MMu8JFQnWcKlPuSllRBuMxkFiUJiFqa3xSsXtE/AFvFuw/L2Nxrk+7vZsIuaegdHQAuo7Q7i7w/g67ywXt4ACmHkLG5uqZ/CHH5BBv0NRo05a83JnI9HggCwrg9HojGKWlBUpzM8ybW2hbO+WWTznSc9ZX+8LphK26Gh/b23zjBnSfLwbKz4MNScy4vsbb4GAkVldWIFQVwfHx6LklgZDmKYcE7O3jpa0tmn/t7o6B7ApEVblfWBGYd8eOt0BwAWd+l/EaTE+4QAjIksJzkZs78gkAAP//lBSIQQAAAAZJREFUAwAF+IZkHW0juAAAAABJRU5ErkJggg==\">\n<link rel=\"icon\" type=\"image/svg+xml\" sizes=\"any\" href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg transform='translate(2,2) scale(0.95)'%3E%3Cpath transform='translate(0,-0.4)' fill='%23EC0000' d='M 31.5,19.5 C 31.4,18 31,16.5 30.2,15.2 L 23.4,3.3 C 22.9,2.4 22.5,1.4 22.3,0.4 L 22,0.9 c -1.7,2.9 -1.7,6.6 0,9.5 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 l -5,-8.7 -3.2,-5.6 C 17.4,11.8 17,10.8 16.8,9.8 l -0.3,0.5 c -1.7,2.9 -1.7,6.5 0,9.5 v 0 l 5.5,9.5 c 1.7,2.9 1.7,6.6 0,9.5 l -0.3,0.5 c -0.2,-1 -0.6,-2 -1.1,-2.9 L 13.7,24.5 C 12.8,22.9 12.4,21.1 12.4,19.3 5.1,21.2 0,25.3 0,30 0,36.6 9.8,41.9 21.9,41.9 34,41.9 43.8,36.6 43.8,30 43.9,25.5 38.9,21.4 31.5,19.5 Z'/%3E%3C/g%3E%3Crect x='22' y='36' width='42' height='28' rx='8' fill='%23F5DECF'/%3E%3Crect x='25' y='39' width='36' height='22' rx='6' fill='%23EC0000'/%3E%3Ctext x='43' y='57' text-anchor='middle' font-family='Arial,Helvetica,sans-serif' font-weight='900' font-size='19' fill='%23FFFFFF'%3EPJ%3C/text%3E%3C/svg%3E\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"data:image/png;base64,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\">";
-  /* Segmentos (5.0): PF (Creative Strategy PF) e PJ (Santander Empresas). O mesmo motor, o mesmo emulador e as mesmas
-     funções; muda o que é de cada um: nome da área, ícone da aba, nomes das seções, cores do e-mail-resumo, template e
-     marca (template/report-pj.html, config/marca-pj.txt). O segmento vem dos dados ([EDICAO] segmento: PJ) e fica na página
+  /* Segmentos (5.0): PF (Creative Strategy PF) e PJ (Santander Empresas). O mesmo motor, o mesmo emulador, as mesmas
+     funções e, a partir da 5.1, o mesmo template (o mesmo esqueleto de página); muda o que é de cada um: nome da área,
+     ícone da aba, nomes das seções, cores (config/marca.txt e config/marca-pj.txt) e as do e-mail-resumo. O segmento vem dos dados ([EDICAO] segmento: PJ) e fica na página
      (meta "report-segmento"). Sem ele, é PF, como sempre foi. */
   var PERFIS = {
     pf: {
       id: "pf", sigla: "PF", area: "Creative Strategy PF", area_linha: "CUSTOMER INTERACTIONS", icone: ICONE_TAG,
-      template: "template/report.html", marca: "config/marca.txt", emulador: "Emulador Report PF", foto_capa: [220, 220],
-      secoes: { capa: "Capa (frase do mês, campanha e números)", lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub",
+      template: "template/report.html", marca: "config/marca.txt", emulador: "Emulador Report PF", foto_capa: [184, 230],
+      secoes: { capa: "Abertura", visao: "Visão geral", resultados: "Principais resultados", lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub",
         aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí", rodape: "Encerramento e assinatura" },
       nomes: { destaque: "Destaque", lancamentos: "Lançamentos", cx: "Creative X", cxt: "Creative X trimestral", transformation: "Transformation Hub",
         aprendizados: "O que aprendemos", foco: "Foco", agenda: "Também vem aí", rotulo_texto: "CREATIVE X", topo_lancamos: "O QUE LANÇAMOS",
-        topo_transformation: "TRANSFORMATION HUB", topo_aprendizados: "O QUE APRENDEMOS", topo_foco: "FOCO DE ", topo_agenda: "TAMBÉM VEM AÍ" }
+        topo_transformation: "TRANSFORMATION HUB", topo_aprendizados: "O QUE APRENDEMOS", topo_foco: "FOCO DE ", topo_agenda: "TAMBÉM VEM AÍ" },
+      /* rótulos das seções na página (template/report.html › {{rot.*}}) */
+      rotulos: { visao: "VISÃO GERAL", resultados: "PRINCIPAIS RESULTADOS", lancamos: "O QUE LANÇAMOS", outras: "TAMBÉM NESTE MÊS", cx: "CREATIVE X",
+        transformation: "TRANSFORMATION HUB", aprendizados: "O QUE APRENDEMOS", foco: "FOCO DE ", agenda: "TAMBÉM VEM AÍ" },
+      links: { principal: "Visão geral · ", destaque: "Destaque · ", lancamento: "Lançamento ", transformation: "Transformation " }
     },
     pj: {
       id: "pj", sigla: "PJ", area: "Creative Strategy PJ", area_linha: "SANTANDER EMPRESAS", icone: ICONE_TAG_PJ,
-      template: "template/report-pj.html", marca: "config/marca-pj.txt", emulador: "Emulador Report PJ", foto_capa: [184, 230],
+      template: "template/report.html", marca: "config/marca-pj.txt", emulador: "Emulador Report PJ", foto_capa: [184, 230],
       secoes: { capa: "Abertura", visao: "Visão geral", resultados: "Principais resultados", lancamos: "Campanhas", cx: "Indicadores", transformation: "Análises",
         aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda", rodape: "Encerramento" },
       nomes: { destaque: "Campanha em destaque", lancamentos: "Campanhas", cx: "Indicadores", cxt: "Indicadores do trimestre", transformation: "Análises",
         aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda", rotulo_texto: "INDICADORES", topo_lancamos: "CAMPANHAS",
-        topo_transformation: "ANÁLISES", topo_aprendizados: "APRENDIZADOS", topo_foco: "PRÓXIMAS INICIATIVAS · ", topo_agenda: "AGENDA" }
+        topo_transformation: "ANÁLISES", topo_aprendizados: "APRENDIZADOS", topo_foco: "PRÓXIMAS INICIATIVAS · ", topo_agenda: "AGENDA" },
+      rotulos: { visao: "VISÃO GERAL", resultados: "PRINCIPAIS RESULTADOS", lancamos: "CAMPANHAS", outras: "OUTRAS CAMPANHAS DO MÊS", cx: "INDICADORES",
+        transformation: "ANÁLISES", aprendizados: "APRENDIZADOS", foco: "PRÓXIMAS INICIATIVAS&nbsp;&nbsp;·&nbsp;&nbsp;", agenda: "AGENDA&nbsp;&nbsp;·&nbsp;&nbsp;PRÓXIMAS DATAS" },
+      links: { principal: "Visão geral · ", destaque: "Campanha em destaque · ", lancamento: "Campanha ", transformation: "Análise " }
     }
   };
   function perfil(seg) { return PERFIS[String(seg || "").toLowerCase()] || PERFIS.pf; }
+  /* Rótulos das seções para o template (já em HTML: o "·" do PJ leva espaços que não quebram). */
+  function rotulosDaPagina(perf) { var o = {}; Object.keys(perf.rotulos).forEach(function (k) { o[k] = seguro(perf.rotulos[k]); }); return o; }
   /* Segmento de uma página do report: a meta "report-segmento" (PJ); sem ela, PF. */
   function segmentoDoHtml(html) { var m = /<meta name="report-segmento" content="([a-z]+)"/.exec(String(html || "")); return m && PERFIS[m[1]] ? m[1] : "pf"; }
   /* Segmento de um arquivo de dados: "segmento: PJ" no bloco [EDICAO]; sem ele, PF. */
@@ -176,14 +185,16 @@
   var CORES_APOIO = ["grupo_resultados", "grupo_resultados_fundo", "grupo_evolucao", "grupo_evolucao_fundo", "grupo_aprendizado", "grupo_aprendizado_fundo",
     "capa_selo", "capa_filete", "capa_destaque", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
     "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto", "rodape_claro", "rodape_fundo",
-    "placeholder_fundo", "placeholder_borda"];
+    "placeholder_fundo", "placeholder_borda", "abertura_texto", "bloco_fundo", "foco_fundo"];
+  /* Cores do esqueleto da 5.1 (PF e PJ no mesmo layout). Numa marca de antes, valem estas (o que a abertura e o foco já usavam). */
+  var CORES_PADRAO = { abertura_texto: "texto", bloco_fundo: "abertura_fundo", foco_fundo: "abertura_fundo" };
   function obrig(lista) { var o = {}; lista.forEach(function (k) { o[k] = 1; }); return o; }
 
   var ESQUEMA_MARCA = [
     { bloco: "FONTES", obrigatorio: true, campos: { titulos: 1, texto: 1, impacto: 0, titulos_outlook_windows: 1, texto_outlook_windows: 1 } },
     { bloco: "LOGO", campos: { arquivo: 0, largura: 0, descricao: 0 } },
     { bloco: "CORES", obrigatorio: true, campos: obrig(CORES) },
-    { bloco: "CORES DE APOIO", obrigatorio: true, campos: obrig(CORES_APOIO) },
+    { bloco: "CORES DE APOIO", obrigatorio: true, campos: (function () { var o = obrig(CORES_APOIO); Object.keys(CORES_PADRAO).forEach(function (k) { o[k] = 0; }); return o; })() },
     { bloco: "IMAGENS", obrigatorio: true, campos: { modo: 1, endereco_base: 0, qualidade_jpg: 0 } },
     { bloco: "LINKS", campos: { dominios_permitidos: 0 } },
     { bloco: "FORMIGUINHA", campos: { arquivo: 0, descricao: 0 } }
@@ -435,9 +446,8 @@
   /* GRADE do e-mail (computador): 600 px de conteúdo = 3 colunas de 184 px + 2 espaços de 24 px.
      Todas as seções usam essas linhas, para tudo ficar alinhado de cima a baixo. */
   var COL = 184, ESP = 24, LARGURA = 600;
-  /* Foto da capa (projeto principal): 20% maior que a coluna (184 → 220 px), quadrada.
-     O texto ao lado fica com o resto da linha: 600 − 24 − 220 = 356 px. */
-  var FOTO_CAPA = 220;
+  /* Peça da visão geral (projeto principal, 5.1): retângulo vertical de 184 x 230 px (PERFIS.*.foto_capa), na coluna da
+     direita; o texto fica com o resto da linha: 600 − 24 − 184 = 392 px. */
   /* Imagem ampliada (só na página do navegador, clique na peça): até 1400 px de largura, sem recorte. */
   var AMPLIADA = 1400;
   /* Divide "total" em n colunas com espaços de 24 px entre elas (a soma fecha exata). */
@@ -470,6 +480,7 @@
     var todas = junta(M.simples.CORES, M.simples["CORES DE APOIO"]);
     CORES.concat(CORES_APOIO).forEach(function (k) {
       var v = todas[k];
+      if (!v && CORES_PADRAO[k]) v = todas[CORES_PADRAO[k]];
       if (!/^#[0-9a-f]{6}$/i.test(v)) problema(prob, "erro", arqM, todas._linhas[k], "Cor \"" + k + "\" inválida (" + v + "). Use # e 6 dígitos hexadecimais, ex.: #9E1218.");
       cor[k] = seguro(String(v).toUpperCase());
     });
@@ -531,7 +542,7 @@
     /* Segmento (5.0): PF (padrão) ou PJ, pelo [EDICAO] segmento. Muda a área, o ícone e os nomes; o template e a marca vêm de quem chama. */
     var segD = chaveCampo(E.segmento || entrada.segmento || "pf");
     if (!PERFIS[segD]) { problema(prob, "aviso", arqD, E._linhas.segmento, "[EDICAO] segmento deve ser PF ou PJ. Usei PF."); segD = "pf"; }
-    var PERF = PERFIS[segD], ehPJ = segD === "pj";
+    var PERF = PERFIS[segD];
     var imagens = [], porCaminho = {}, videos = [], anexos = [];
     function caminhoImagem(nome) { return nome.indexOf("/") >= 0 ? nome.replace(/^\.?\/+/, "") : pasta + "/" + nome; }
     /* Registra uma imagem do e-mail. w/h = tamanho na tela (px). recorte = encaixa exatamente em w × h.
@@ -681,15 +692,14 @@
     function proxSecao() { secoes++; return (secoes < 10 ? "0" : "") + secoes; }
 
     /* 01 · Abertura */
-    /* PJ: a peça fica em fundo branco, num retângulo vertical (o Brand Guide Empresas não usa formato quadrado). */
-    var pp = ehPJ ? peca(P, "PROJETO PRINCIPAL", PERF.foto_capa[0], PERF.foto_capa[1], 20, { dica: (PERF.foto_capa[0] * 2) + " x " + (PERF.foto_capa[1] * 2) + " px", fluida: true })
-      : peca(P, "PROJETO PRINCIPAL", FOTO_CAPA, FOTO_CAPA, 20, { dica: "440 x 440 px", fluida: true, corCta: "#FFFFFF", corCtaPendente: "#F5DECF" });
+    /* Visão geral (PF e PJ, 5.1): a peça fica em fundo branco, num retângulo vertical (nunca quadrado). */
+    var pp = peca(P, "PROJETO PRINCIPAL", PERF.foto_capa[0], PERF.foto_capa[1], 20, { dica: (PERF.foto_capa[0] * 2) + " x " + (PERF.foto_capa[1] * 2) + " px", fluida: true });
     var nums = (L.NUMERO || []);
     /* Grade: até 3 números, um por coluna de 184 px (alinhados com as seções de baixo); 4 números, 4 colunas iguais. */
     var larg = nums.length <= 3 ? nums.map(function () { return COL; }) : colunas(LARGURA, nums.length);
     var sobra = nums.length && nums.length < 3 ? LARGURA - nums.length * COL - (nums.length - 1) * ESP : 0;
     var abertura = {
-      n: proxSecao(), n2: ehPJ ? proxSecao() : "", frase: texto(A.frase), frase_final: texto(A.frase_final),
+      n: proxSecao(), n2: proxSecao(), frase: texto(A.frase), frase_final: texto(A.frase_final),
       /* rótulo acima do nome (4.13): "CAMPANHA" por padrão, editável (o do mês nem sempre é um "projeto principal") */
       rotulo: texto(maiusculas(semBr(P.rotulo || "") || "Campanha")),
       nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp, aprendizado: aprendizado(P, "PROJETO PRINCIPAL", "principal.aprendizado", "capa"),
@@ -698,7 +708,8 @@
         return {
           valor: numero(v.valor), titulo: texto(v.titulo), detalhe: texto(v.detalhe), variacao: variacao(v, "NUMERO " + (i + 1)),
           idx: i + 1, largura: larg[i], principal: i === 0, primeiro: i === 0,
-          cor_valor: i === 0 && !ehPJ ? cor.marca : cor.texto, cor_filete: i === 0 && !ehPJ ? cor.marca : cor.texto,
+          /* o 1º número na cor do título (PF: Vermelho Santander; PJ: Preto) */
+          cor_valor: i === 0 ? cor.titulo : cor.texto, cor_filete: i === 0 ? cor.titulo : cor.texto,
           classe_m: nums.length === 3 ? "third" : "half",
           estilo: "padding:0 0 20px 0;"
         };
@@ -969,7 +980,7 @@
     }
     var assunto = PERF.area + " | Report de " + mes + " " + ano;
     var modelo = {
-      assunto: assunto, icone: seguro(PERF.icone), segmento: PERF.id, area: PERF.area, area_linha: PERF.area_linha, css_celular: seguro(CSS_CELULAR), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
+      assunto: assunto, icone: seguro(PERF.icone), segmento: PERF.id, area: PERF.area, area_linha: PERF.area_linha, rot: rotulosDaPagina(PERF), css_celular: seguro(CSS_CELULAR), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topicos: topicos, foco: foco, agenda: agenda
@@ -984,12 +995,12 @@
     /* Links do report (para a lista de "testar antes de enviar") */
     var links = [];
     function regLink(onde, p) { if (p && p.link) links.push({ onde: onde, tipo: p.tipo, rotulo: CTA[p.tipo].texto, url: p.link }); }
-    regLink((ehPJ ? "Visão geral · " : "Capa · ") + semBr(P.nome), pp);
+    regLink(PERF.links.principal + semBr(P.nome), pp);
     if (lancamos) {
-      if (lancamos.destaque) regLink((ehPJ ? "Campanha em destaque · " : "Destaque · ") + semBr(DS.titulo), lancamos.destaque.peca);
-      lanc.forEach(function (v, i) { regLink((ehPJ ? "Campanha " : "Lançamento ") + (i + 1) + " · " + semBr(v.nome), lancamos.linhas_compactos[Math.floor(i / 3)].itens[i % 3].peca); });
+      if (lancamos.destaque) regLink(PERF.links.destaque + semBr(DS.titulo), lancamos.destaque.peca);
+      lanc.forEach(function (v, i) { regLink(PERF.links.lancamento + (i + 1) + " · " + semBr(v.nome), lancamos.linhas_compactos[Math.floor(i / 3)].itens[i % 3].peca); });
     }
-    if (transformation) tr.forEach(function (v, i) { regLink((ehPJ ? "Análise " : "Transformation ") + (i + 1) + " · " + semBr(v.nome), transformation.projetos[i].peca); });
+    if (transformation) tr.forEach(function (v, i) { regLink(PERF.links.transformation + (i + 1) + " · " + semBr(v.nome), transformation.projetos[i].peca); });
     links = links.concat(linksReport);
 
     /* Nome do arquivo: report-AAAA-MM (no modelo em branco, report-MODELO). */
@@ -1242,11 +1253,11 @@
     "w.addEventListener('scroll',lendo,{passive:true});w.addEventListener('resize',lendo);lendo();" +
     "if((w.matchMedia&&w.matchMedia('(prefers-reduced-motion: reduce)').matches)||!('IntersectionObserver' in w)||d.designMode==='on')return;" +
     "raiz.setAttribute('data-motion','');" +
-    /* alvos: as células de cada linha de seção (entre as marcas secao:nome) */
+    /* alvos: as células de cada linha de seção (entre as marcas secao:nome); as células vazias (espaço entre blocos) não */
     "var tw=d.createTreeWalker(d.body,128),c,alvos=[];" +
     "while((c=tw.nextNode())){var m=/^secao:([a-z]+)$/.exec(c.nodeValue.trim());if(!m||m[1]==='fim')continue;" +
     "var e=c.nextSibling;while(e&&e.nodeType===3)e=e.nextSibling;if(e&&e.nodeType===1&&e.tagName==='TBODY')e=e.firstChild;" +
-    "for(;e&&!(e.nodeType===8&&/^secao:/.test(e.nodeValue.trim()));e=e.nextSibling){if(e.nodeType===1&&e.tagName==='TR'){for(var k=0;k<e.children.length;k++)alvos.push(e.children[k]);}}}" +
+    "for(;e&&!(e.nodeType===8&&/^secao:/.test(e.nodeValue.trim()));e=e.nextSibling){if(e.nodeType===1&&e.tagName==='TR'){for(var k=0;k<e.children.length;k++){var q=e.children[k];if(q.children.length||q.textContent.replace(/[\\s\\u00a0]/g,''))alvos.push(q);}}}}" +
     /* barra do Creative X: a parte preenchida (altura 8, largura em %, menor que 100%) */
     "Array.prototype.forEach.call(d.querySelectorAll('td[height=\"8\"]'),function(t){var wd=t.getAttribute('width')||'';if(/%$/.test(wd)&&wd!=='100%'&&!t.previousElementSibling)t.setAttribute('data-barra','');});" +
     "var NUM=/^([^\\d]*?)(\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,(\\d+))?([^\\d]*)$/;" +
@@ -1428,7 +1439,7 @@
     agenda: "Também vem aí", rodape: "Encerramento e assinatura"
   };
   TOPICOS.forEach(function (t, i) { SECOES[t[1]] = "Novo tópico " + (i + 1); });
-  var SECOES_RESUMO = ["capa", "foco", "rodape"];
+  var SECOES_RESUMO = ["capa", "visao", "resultados", "foco", "rodape"];
   var MARCA_SECAO = /<!--secao:([a-z]+)-->/g;
 
   /* Nome da seção; o de um tópico novo é o rótulo que ele tem na página (ex.: "Tópico: TESTES"). */
@@ -1516,7 +1527,7 @@
     html = html.replace(/<link rel="(?:icon|apple-touch-icon)"[^>]*>\n?/g, "");
     var partes = html.split(/(<!--secao:[a-z]+-->)/);
     if (partes.length < 3) return { erro: "Este arquivo não tem as marcas de seção (foi gerado antes da versão 3.9). Gere a página de novo pelo gerar-report.html." };
-    var manter = op.manter || (segmentoDoHtml(html) === "pj" ? ["capa", "visao", "resultados", "foco", "rodape"] : SECOES_RESUMO), mantidas = [], fora = [], out = partes[0], bloco = false;
+    var manter = op.manter || SECOES_RESUMO, mantidas = [], fora = [], out = partes[0], bloco = false;
     var temVideo = /data-video="/.test(html) || /alt="Vídeo: /.test(html);
     for (var i = 1; i < partes.length; i += 2) {
       var id = /secao:([a-z]+)/.exec(partes[i])[1], corpo = partes[i + 1] || "";

@@ -15,7 +15,7 @@ Quando uma solução mais sofisticada prejudicava um item de cima, ela foi desca
 
 ## Visão geral
 
-**Segmentos (5.0):** o motor tem um perfil por segmento (`PERFIS.pf` e `PERFIS.pj` em `tools/motor.js`): nome da área, ícone da aba, nomes das seções, tema do e-mail-resumo, template e marca. O segmento vem dos dados (`[EDICAO] segmento: PJ`) e fica na página (`<meta name="report-segmento" content="pj">`); sem ele, é PF. O emulador lê o perfil de `window.SEGMENTO` (o kit PJ é montado com `node tools/montar-avulso.js pj`). O template PJ (`template/report-pj.html`) usa a mesma marcação de itens do PF; por isso todas as funções do emulador valem nos dois. Veja [REPORT_PJ.md](REPORT_PJ.md).
+**Segmentos (5.0):** o motor tem um perfil por segmento (`PERFIS.pf` e `PERFIS.pj` em `tools/motor.js`): nome da área, ícone da aba, nomes das seções, tema do e-mail-resumo, template e marca. O segmento vem dos dados (`[EDICAO] segmento: PJ`) e fica na página (`<meta name="report-segmento" content="pj">`); sem ele, é PF. O emulador lê o perfil de `window.SEGMENTO` (o kit PJ é montado com `node tools/montar-avulso.js pj`). A partir da 5.1, PF e PJ usam **o mesmo template** (`template/report.html`, o esqueleto que nasceu no PJ): o que muda vem da marca (`config/marca.txt`, `config/marca-pj.txt`: cores por bloco, logo, formiguinha) e dos rótulos das seções (`PERFIS.*.rotulos`). A página leva `<meta name="report-layout" content="2">`; o emulador usa essa marca para escolher as cores do que acrescenta (o report PF de antes, sem ela, segue com as cores de antes). Veja [REPORT_PJ.md](REPORT_PJ.md).
 
 
 ```text

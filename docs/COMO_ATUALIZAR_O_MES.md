@@ -113,6 +113,7 @@ Imagens, links e PDF não vêm pelo Copilot: troque na página.
 - **Reabrir:** "Abrir um report salvo (.html)". Textos, números e imagens voltam como ficaram.
 - **Fechou sem salvar?** Ao abrir o emulador de novo: "Há uma edição não salva…" › **Recuperar a edição**. A cópia fica só neste navegador, neste computador.
 - **Mês novo a partir do anterior:** abra o report do mês anterior e troque o período. Ao salvar, o emulador lista os números que ninguém mexeu: confira antes de "Salvar mesmo assim".
+- **Layout novo (5.1):** um report PF salvo antes da 5.1 continua no layout em que foi salvo. Para o mês ficar no esqueleto novo (o mesmo do PJ), comece em "Começar do modelo em branco" e traga o conteúdo pela importação do Copilot ou digitando.
 
 ## 3. Conferir e publicar
 

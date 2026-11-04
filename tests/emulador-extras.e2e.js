@@ -152,13 +152,13 @@ function salvarComo() {
   confere(await noQuadro(p, function (d) { return !!d.querySelector('[data-item="lancamento-1"] p[data-links] a[href="https://www.example.com/peca"]'); }), "Desfazer: o link volta");
   /* "Resumo das campanhas" saiu do report (4.11): nem a seção, nem os itens "foi bem"/"a melhorar", nem a opção em Seções do report */
   confere(await noQuadro(p, function (d) { return !d.querySelector('[data-item^="bem-"], [data-item^="melhorar-"]') && d.body.textContent.indexOf("RESUMO DAS CAMPANHAS") < 0; }) && !(await p.$('#secoesRep input[value="resumo"]')) && (await p.$eval("#secoesRep", function (e) { return e.textContent; })).indexOf("Resumo das campanhas") < 0, "modelo em branco: sem \"Resumo das campanhas\" (nem a seção, nem em Seções do report)");
-  /* destaque (bloco sem data-item) e capa (fundo vermelho: link claro) */
+  /* destaque (bloco sem data-item) e visão geral (5.1: a campanha fica sobre o branco, link em vermelho) */
   p.__respostas = ["Estudo completo", "https://www.example.com/estudo"];
   await ferramenta(p, f, '[data-campo="destaque.titulo"]', "+ Link");
   confere(await noQuadro(p, function (d) { return !!d.querySelector('[data-ed-bloco="destaque"] a[href="https://www.example.com/estudo"]'); }), "destaque: + Link também");
   p.__respostas = ["Apresentação", "https://www.example.com/apresentacao"];
   await ferramenta(p, f, '[data-campo="principal.nome"]', "+ Link");
-  confere(await noQuadro(p, function (d) { var a = d.querySelector('a[href="https://www.example.com/apresentacao"]'); return a && /#FFFFFF/i.test(a.getAttribute("style")); }), "capa (fundo vermelho): link novo em branco");
+  confere(await noQuadro(p, function (d) { var a = d.querySelector('a[href="https://www.example.com/apresentacao"]'); return a && /#EC0000/i.test(a.getAttribute("style")); }), "visão geral (fundo branco): link novo em vermelho");
 
   /* 3. + Imagem: até 3 por item, na grade da coluna. */
   fase = "3";

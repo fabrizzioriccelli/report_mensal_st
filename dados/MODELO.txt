@@ -72,14 +72,15 @@ previa: Lorem ipsum dolor sit amet: X% de lorem ipsum no mês.
 
 
 # ----------------------------------------------------------------------
-#  EDITAR AQUI: PROJETO PRINCIPAL (capa)
-#  O resultado mais importante do mês. Aparece só na capa, com a peça
-#  (recorte quadrado, 220 x 220 px; envie com 440 px ou mais) e até 4 números.
+#  EDITAR AQUI: VISÃO GERAL · A CAMPANHA DO MÊS (PROJETO PRINCIPAL)
+#  O resultado mais importante do mês. Aparece na Visão geral, com a peça
+#  (retângulo VERTICAL, 184 x 230 px; envie com 368 x 460 px ou mais), e
+#  até 4 números em PRINCIPAIS RESULTADOS.
 #  Clique na peça: com link, abre o link (e-mail e navegador); sem link,
 #  na página do navegador a peça abre maior; no e-mail, não clica.
 # ----------------------------------------------------------------------
 [PROJETO PRINCIPAL]
-# rotulo: o nome acima da campanha, na capa (padrão: CAMPANHA). Ex.: Campanha do mês, Porta de entrada.
+# rotulo: o nome acima da campanha, na Visão geral (padrão: CAMPANHA). Ex.: Campanha do mês, Porta de entrada.
 rotulo:
 nome: Lorem ipsum dolor
 resumo: Lorem ipsum dolor sit amet, consectetur adipiscing elit.

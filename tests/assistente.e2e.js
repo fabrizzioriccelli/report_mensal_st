@@ -175,10 +175,10 @@ function salvarComo() {
   fase = "seções";
   await p.click("#secEditar details summary");
   var o0 = await ordem(p), linhasPainel = await p.$$eval(".secaoRep", function (l) { return l.map(function (x) { return x.getAttribute("data-id"); }); });
-  confere(linhasPainel.indexOf("capa") < 0 && linhasPainel.indexOf("rodape") < 0 && linhasPainel[0] === "lancamos", "painel: só as seções que mudam de lugar (capa e encerramento fixos) · " + linhasPainel.join(","));
+  confere(linhasPainel.indexOf("capa") < 0 && linhasPainel.indexOf("rodape") < 0 && linhasPainel[0] === "visao", "painel: só as seções que mudam de lugar (capa e encerramento fixos) · " + linhasPainel.join(","));
   await p.click('.secaoRep[data-id="lancamos"] button[data-a="desce"]'); await p.waitForTimeout(200);
   var o1 = await ordem(p), pl = await pilulas(p);
-  confere(/capa,cx,lancamos,/.test(o1) && /^02 CREATIVE X/.test(pl[1]) && /^03 O QUE LANÇAMOS/.test(pl[2]), "↓ no painel: O que lançamos desce; os números das seções são refeitos · " + pl.slice(1, 3).join(" | "));
+  confere(/capa,visao,resultados,cx,lancamos,/.test(o1) && /^03 CREATIVE X/.test(pl[2]) && /^04 O QUE LANÇAMOS/.test(pl[3]), "↓ no painel: O que lançamos desce; os números das seções são refeitos · " + pl.slice(2, 4).join(" | "));
   confere(await p.evaluate(function () { return document.activeElement && document.activeElement.getAttribute("data-a") === "desce" && document.activeElement.closest(".secaoRep").getAttribute("data-id") === "lancamos"; }), "teclado: depois de mover, o foco segue no mesmo botão da seção");
   await p.click("#bDesfazer"); await p.waitForTimeout(150);
   confere(await ordem(p) === o0, "Desfazer: a ordem das seções volta");

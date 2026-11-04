@@ -8,68 +8,43 @@
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
 <meta name="color-scheme" content="light only">
 <meta name="supported-color-schemes" content="light only">
+<!-- Segmento do report: pf (Creative Strategy PF) ou pj (Santander Empresas). Cada emulador só abre os reports do seu segmento. -->
+<meta name="report-segmento" content="{{segmento}}">
+<!-- Layout dos reports a partir da 5.1: PF e PJ no mesmo esqueleto (o emulador usa esta marca para as cores do que acrescenta). -->
+<meta name="report-layout" content="2">
 <title>{{assunto}}</title>
-<!-- Ícone da aba (só na página; o e-mail não leva): a chama do Santander. -->
+<!-- Ícone da aba (só na página; o e-mail não leva): Santander + PF ou Santander + PJ. -->
 {{icone}}
 {{#link_report_completo}}<meta name="report-completo" content="{{link_report_completo}}">
 {{/link_report_completo}}
 <!--
   ======================================================================
-  TEMPLATE DO REPORT · CÓDIGO TÉCNICO
+  TEMPLATE DO REPORT (PF E PJ) · CÓDIGO TÉCNICO
   ======================================================================
   Você NÃO edita este arquivo no dia a dia.
-    Conteúdo do mês  → dados/AAAA-MM.txt
-    Fontes e cores   → config/marca.txt
-    Gerar e-mail     → tools/gerar-report.html
+    Conteúdo do mês  → emulador (kit/emulador-report.html ou kit/emulador-report-pj.html) ou dados/AAAA-MM.txt
+    Fontes e cores   → config/marca.txt (PF) e config/marca-pj.txt (PJ)
 
-  Este arquivo é o layout aprovado do e-mail, com {{campos}} no lugar do
-  conteúdo. A ferramenta preenche os campos e gera o HTML final.
+  O MESMO ESQUELETO PARA OS DOIS SEGMENTOS (5.1): a estrutura, a grade, os blocos arredondados, os balões
+  e a marcação de cada item são iguais no PF e no PJ. Muda só o que vem da marca e do perfil do segmento:
+    · cores (config/marca*.txt): a abertura, o foco e o encerramento em Vermelho Santander com texto
+      branco no PF; em Rio com texto Preto no PJ (Brand Guide Santander Brasil, cap. 6 · Santander
+      Empresas: nenhum fundo vermelho). Os blocos de resultados e de indicadores são Rio nos dois;
+    · nomes das seções ({{rot.*}}, em tools/motor.js › PERFIS): "O que lançamos", "Creative X",
+      "Transformation Hub"… no PF; "Campanhas", "Indicadores", "Análises"… no PJ;
+    · logo (chama branca sobre o vermelho do PF, positiva sobre o Rio do PJ) e a formiguinha (só PF).
+  Tipografia: títulos e mensagens de impacto em Santander Condensed, números e nomes em Santander
+  Headline, textos de apoio em Santander Micro Text. Peças em retângulos verticais ou horizontais
+  (a imagem da visão geral é vertical, 184 x 230 px), cantos de 34 px nos blocos e 20 px nas imagens.
 
-  ONDE ESTÁ CADA TEXTO: procure (Ctrl+F) "EDITAR AQUI". Cada comentário
-  diz o bloco e o campo de dados/AAAA-MM.txt que preenche aquele trecho.
-  O texto é trocado LÁ, não aqui: assim o layout nunca quebra e o mês
-  seguinte começa de uma cópia do arquivo de dados.
-  Os comentários "EDITAR AQUI" também vão para a página gerada (.html),
-  para quem precisar achar um texto direto nela; os e-mails não os levam.
+  ESTRUTURA: Abertura, Visão geral, Principais resultados, O que lançamos / Campanhas, Creative X /
+  Indicadores, Transformation Hub / Análises, O que aprendemos / Aprendizados, tópicos, Foco /
+  Próximas iniciativas, agenda e Encerramento. Cada item (número, campanha, análise, aprendizado,
+  agenda, tópico) tem a mesma marcação (data-campo, data-item, classes do celular): é assim que o
+  emulador edita, acrescenta, tira, reordena e monta o e-mail-resumo. NÃO ALTERAR sem testar.
 
-  CAMPOS DO RESUMO (atributos data-campo e data-tom): marcam cada texto e
-  número que o converter-html-eml.html usa para montar o e-mail-resumo
-  (período, frase, números, campanhas, aprendizados, Transformation Hub,
-  foco e agenda). Ficam só na página; os e-mails não os levam.
-  NÃO APAGUE esses atributos: sem eles, o item some do e-mail-resumo.
-  NÃO ALTERAR A ESTRUTURA (tabelas, larguras, classes) sem testar no
-  computador e no celular (docs/ARQUITETURA.md).
-
-  CANTOS (Brand Guide 3.6 e 3.10): retângulos com raio de 5% do lado menor
-  do formato (e-mail de 680 px = 34 px; celular ~390 px = 20 px, classes
-  ra/rt/rb); imagens com metade da margem (40 px / 2 = 20 px).
-
-  TIPOGRAFIA (Brand Guide Santander): títulos em Santander Headline Bold,
-  textos em Santander Micro Text, frase da capa em Santander Condensed.
-  As listas de fontes ficam em config/marca.txt; os arquivos .otf, em
-  assets/fonts/ (docs/GUIA_TIPOGRAFIA.md).
-
-  Regras de e-mail seguidas aqui (Outlook para Windows usa o motor do Word):
-    · layout em tabelas, estilos inline, largura fixa de 680 px;
-    · margem só em <p>, espaçamento em <td>, espaçadores com <div>;
-    · cada texto tem a classe ft (títulos) ou fx (texto) como 1ª classe:
-      é por ela que o Outlook para Windows recebe a fonte de
-      config/marca.txt (bloco [if mso] abaixo);
-    · toda imagem tem width, height e alt; nenhum recurso externo.
-  Link do report completo: {{link_report_completo}} vira a meta
-  "report-completo" (dados › [EDICAO] link_report_completo).
-
-  GRADE (computador): área de conteúdo de 600 px (margens de 40 px),
-  3 colunas de 184 px separadas por espaços de 24 px:
-      |  184  |24|  184  |24|  184  |
-  2/3 + 1/3 = 392 + 24 + 184. Divisórias ficam no meio do espaço
-  (12 px + filete de 1 px + 11 px). Entre seções, 40 px. No celular, os espaços somem
-  (classe hide-m) e as colunas empilham (classe col).
-
-  MARCAS DE SEÇÃO: cada seção começa com um comentário "secao:nome" (e o
-  fim do conteúdo com "secao:fim"). Elas ficam no e-mail e na página, e o
-  converter-html-eml.html usa essas marcas para montar o e-mail resumido.
-  Não apague nem mude de lugar.
+  MARCAS DE SEÇÃO: cada seção começa com um comentário "secao:nome" (e o fim com "secao:fim").
+  GRADE (computador): conteúdo de 600 px (margens de 40 px), 3 colunas de 184 px e espaços de 24 px.
 
   Sintaxe:  {{campo}}  ·  {{#lista}}…{{/lista}} repete ou mostra se existe
             {{^campo}}…{{/campo}} mostra se vazio
@@ -102,8 +77,8 @@
     .half{display:inline-block !important;width:49% !important;box-sizing:border-box !important;border-left:0 !important;padding:0 8px 18px 0 !important;vertical-align:top !important;}
     .hide-m{display:none !important;}
     .show-m{display:block !important;max-height:none !important;overflow:visible !important;}
-    .h1{font-size:30px !important;line-height:34px !important;}
-    .h2{font-size:22px !important;line-height:27px !important;}
+    .h1{font-size:34px !important;line-height:37px !important;}
+    .h2{font-size:24px !important;line-height:28px !important;}
     .fluid{width:100% !important;max-width:100% !important;height:auto !important;box-sizing:border-box !important;}
     .num{font-size:24px !important;line-height:28px !important;}
     .brand{font-size:17px !important;line-height:20px !important;}
@@ -112,8 +87,6 @@
     .wrap-m{white-space:normal !important;}
     .third{display:inline-block !important;width:32% !important;box-sizing:border-box !important;border-left:0 !important;padding:0 10px 20px 0 !important;vertical-align:top !important;}
     .fw{width:auto !important;}
-    .fant{width:64px !important;}
-    .fant img{width:56px !important;}
     .tm{font-size:14px !important;line-height:21px !important;}
     .ts{font-size:12px !important;line-height:17px !important;}
     .ra{border-radius:20px !important;}
@@ -121,9 +94,11 @@
     .rb{border-radius:0 0 20px 20px !important;}
     .al-m img{margin-left:0 !important;}
     .himg{width:216px !important;max-width:100% !important;margin:0 auto !important;}
+    .fant{width:64px !important;}
+    .fant img{width:56px !important;}
   }
 </style>
-<!-- Ajuste de largura no celular (o mesmo bloco que o emulador acrescenta em reports antigos): tools/motor.js › CSS_CELULAR. -->
+<!-- Ajuste de largura no celular (o mesmo bloco do PF): tools/motor.js › CSS_CELULAR. -->
 {{css_celular}}
 </head>
 
@@ -143,12 +118,11 @@
 
   {{#abertura}}
   <!--secao:capa-->
-  <!-- 01 · CAPA · faixa vermelha de ponta a ponta: logo, nome da área, selo do mês,
-       frase do mês e projeto principal com a peça. Logo abaixo, a faixa creme dos números. -->
+  <!-- ABERTURA · bloco na cor da abertura (PF: Vermelho Santander, texto branco; PJ: Rio, texto Preto): chama,
+       nome da área, período num balão branco com texto vermelho e a frase do mês em Santander Condensed. -->
+  <!-- EDITAR AQUI: FRASE DO MÊS E PERÍODO → [ABERTURA] frase, frase_final · [EDICAO] mes, ano -->
   <tr>
-    <td class="rt" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:34px 34px 0 0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-    <td class="px ra" bgcolor="{{cor.marca}}" style="background:{{cor.marca}};border-radius:34px;padding:24px 40px 32px 40px;">
+    <td class="px ra" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:34px;padding:26px 40px 40px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td class="col" valign="middle">
@@ -156,62 +130,72 @@
               <tr>
                 {{#logo}}
                 <td valign="middle" style="padding-right:14px;">
-                  {{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="logo" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#FFFFFF;">{{/img}}{{placeholder}}
+                  {{#img}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="logo" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:{{cor.marca}};">{{/img}}{{placeholder}}
                 </td>
                 {{/logo}}
-                <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid {{cor.capa_filete}};{{/logo}}">
-                  <p class="ft brand" style="margin:0;font-family:{{fonte.titulos}};font-size:19px;line-height:22px;font-weight:bold;color:#FFFFFF;letter-spacing:-0.2px;">Creative Strategy PF</p>
-                  <!-- Só no celular: o mês numa linha discreta abaixo do nome (no computador, é o selo à direita). -->
-                  <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p></div>
+                <td valign="middle" style="{{#logo}}padding-left:14px;border-left:1px solid {{cor.abertura_texto}};{{/logo}}">
+                  <p class="ft brand" style="margin:0;font-family:{{fonte.titulos}};font-size:19px;line-height:22px;font-weight:bold;color:{{cor.abertura_texto}};letter-spacing:-0.2px;">{{area}}</p>
+                  <!-- Só no celular: o período numa linha discreta abaixo do nome (no computador, é o balão à direita). -->
+                  <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><p class="fx" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.abertura_texto}};letter-spacing:1.5px;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p></div>
                 </td>
               </tr>
             </table>
           </td>
-          <!-- EDITAR AQUI: PERÍODO → dados/AAAA-MM.txt › [EDICAO] mes, ano (selo do mês) -->
+          <!-- Balão sobre a abertura: fundo Branco, texto Vermelho Santander, Santander Micro Text SemiBold -->
           <td class="hide-m" valign="middle" align="right">
             <table role="presentation" class="selo" align="right" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td bgcolor="{{cor.capa_selo}}" style="background:{{cor.capa_selo}};border-radius:999px;padding:6px 12px;">
-                  <p class="fx wrap-m" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:12px;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;white-space:nowrap;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
+                <td bgcolor="{{cor.capa_selo}}" style="background:{{cor.capa_selo}};border-radius:999px;padding:7px 14px;">
+                  <p class="fx wrap-m" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:12px;font-weight:600;color:{{cor.marca}};letter-spacing:1.2px;white-space:nowrap;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
                 </td>
               </tr>
             </table>
           </td>
         </tr>
-        <tr><td colspan="2" style="padding:18px 0 24px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="{{cor.capa_filete}}" style="height:1px;background:{{cor.capa_filete}};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
+        <tr><td colspan="2" style="padding:20px 0 30px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="{{cor.capa_filete}}" style="height:1px;background:{{cor.capa_filete}};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
         <tr>
           <td colspan="2">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td class="col gap" width="356" valign="middle" style="width:356px;">
-                  <!-- EDITAR AQUI: FRASE DO MÊS E CAMPANHA DA CAPA → dados/AAAA-MM.txt › [ABERTURA] frase, frase_final · [PROJETO PRINCIPAL] rotulo (padrão: CAMPANHA), nome, resumo, link -->
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O MÊS EM UMA FRASE</p>
-                  <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:36px;line-height:40px;color:#FFFFFF;letter-spacing:-1px;"><span data-campo="frase">{{frase}}</span>{{#frase_final}}<br><span data-campo="frase_final" style="font-weight:normal;color:{{cor.capa_destaque}};">{{frase_final}}</span>{{/frase_final}}</p>
-                  <p class="fx" data-campo="principal.rotulo" style="margin:18px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;">{{rotulo}}</p>
-                  <p class="fx" data-campo="principal.nome" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:15px;line-height:20px;font-weight:bold;color:#FFFFFF;">{{nome}}</p>
-                  {{#resumo_cta}}<p class="fx tm" data-campo="principal.resumo" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">{{resumo_cta}}</p>{{/resumo_cta}}
-                </td>
-<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-                <!-- EDITAR AQUI: IMAGEM DO PROJETO PRINCIPAL → dados/AAAA-MM.txt › [PROJETO PRINCIPAL] imagem, descricao_imagem (vídeo: tipo video + video)
-                     Foto da capa: 220 x 220 px (20% maior que a coluna de 184 px), quadrada, cantos de 20 px.
-                     No celular: 216 px, centralizada (classe himg). -->
-                <td class="col" width="220" valign="middle" align="center" style="width:220px;">
-                  {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-campo="principal.imagem" data-img="principal" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#FFFFFF;">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
-                </td>
-              </tr>
-            </table>
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.abertura_texto}};letter-spacing:2px;">O MÊS EM UMA FRASE</p>
+            <p class="ft h1" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:44px;line-height:46px;color:{{cor.abertura_texto}};letter-spacing:-1px;"><span data-campo="frase">{{frase}}</span>{{#frase_final}}<br><span data-campo="frase_final" style="font-weight:normal;color:{{cor.capa_destaque}};">{{frase_final}}</span>{{/frase_final}}</p>
           </td>
         </tr>
       </table>
     </td>
-    </tr></table>
+  </tr>
+
+  <!--secao:visao-->
+  <!-- VISÃO GERAL · sobre Branco: a campanha do mês, com o rótulo num balão (cores do grupo Resultados), o nome
+       em Santander Condensed, o resumo e a peça enquadrada num retângulo VERTICAL (184 x 230 px, cantos de 20 px). -->
+  <!-- EDITAR AQUI: CAMPANHA DO MÊS → [PROJETO PRINCIPAL] rotulo (padrão: CAMPANHA), nome, resumo, imagem, link -->
+  <tr>
+    <td class="px" style="padding:40px 40px 0 40px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="col gap" width="392" valign="top" style="width:392px;">
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.visao}}</p>
+            <p class="fx" style="margin:18px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;"><span class="fx" data-campo="principal.rotulo" style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:4px 12px;font-weight:600;letter-spacing:1.2px;">{{rotulo}}</span></p>
+            <p class="ft h2" data-campo="principal.nome" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-size:28px;line-height:32px;font-weight:bold;color:{{cor.titulo}};letter-spacing:-0.5px;">{{nome}}</p>
+            {{#resumo_cta}}<p class="fx tm" data-campo="principal.resumo" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{resumo_cta}}</p>{{/resumo_cta}}
+          </td>
+          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+          <!-- EDITAR AQUI: IMAGEM DA CAMPANHA → [PROJETO PRINCIPAL] imagem, descricao_imagem (vídeo: tipo video + video)
+               184 x 230 px (envie com 368 x 460 px ou mais), retângulo vertical; no celular, 216 px, centralizada. -->
+          <td class="col" width="184" valign="top" align="center" style="width:184px;">
+            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-campo="principal.imagem" data-img="principal" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
+
+  <!--secao:resultados-->
+  <!-- PRINCIPAIS RESULTADOS · bloco claro (Rio) na largura do e-mail (cantos de 34 px), na grade de 3 colunas
+       (184 + 24 + 184 + 24 + 184): cada número com filete no topo (o 1º na cor do título); o "O que aprendemos" da campanha embaixo. -->
+  <!-- EDITAR AQUI: RESULTADOS DA CAMPANHA → [NUMERO 1] a [NUMERO 3] (até 4) valor, titulo, detalhe, variacao · [PROJETO PRINCIPAL] aprendizado -->
+  <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px rb" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:0 0 34px 34px;padding:24px 40px 28px 40px;">
-      <!-- Faixa dos números do projeto principal, na grade de 3 colunas (184 + 24 + 184 + 24 + 184):
-           cada número tem o seu filete no topo, como a agenda. A foto da capa (220 px) é 36 px mais larga que a coluna 3. -->
-      <!-- EDITAR AQUI: RESULTADO PRINCIPAL (INDICADORES) → dados/AAAA-MM.txt › [NUMERO 1] a [NUMERO 3] (até 4) valor, titulo, detalhe, variacao -->
+    <td class="px ra" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:34px;padding:28px 40px 32px 40px;">
+      <p class="fx" style="margin:0 0 18px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n2}}</span>&nbsp;&nbsp;{{rot.resultados}}</p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           {{#numeros}}
@@ -220,7 +204,7 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr><td style="border-top:2px solid {{cor_filete}};padding-top:12px;">
                 <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:30px;line-height:34px;color:{{cor_valor}};white-space:nowrap;letter-spacing:-0.5px;" data-campo="numero-{{idx}}.valor">{{valor}}</p>
-                <!-- leitura em ordem (4.13): quanto (número) → o quê (título) → comparado com quê (etiqueta e a referência, juntas) -->
+                <!-- leitura em ordem: quanto (número) → o quê (título) → comparado com quê (etiqueta e a referência) -->
                 <p class="fx ts" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><b data-campo="numero-{{idx}}.titulo" style="color:{{cor.texto}};">{{titulo}}</b></p>
                 {{#variacao}}<p class="fx" data-campo="numero-{{idx}}.variacao" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{variacao}}</p>{{/variacao}}
                 {{#detalhe}}<p class="fx ts" style="margin:{{#variacao}}3px{{/variacao}}{{^variacao}}0{{/variacao}} 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_corpo}};"><span data-campo="numero-{{idx}}.detalhe">{{detalhe}}</span></p>{{/detalhe}}
@@ -231,7 +215,7 @@
           {{#sobra}}<td class="hide-m" width="{{sobra}}" style="width:{{sobra}}px;font-size:0;line-height:0;">&nbsp;</td>{{/sobra}}
         </tr>
       </table>
-      <!-- EDITAR AQUI: O QUE APRENDEMOS (PROJETO PRINCIPAL) → dados/AAAA-MM.txt › [PROJETO PRINCIPAL] aprendizado (uma ou duas frases; sem texto, não aparece) -->
+      <!-- EDITAR AQUI: O QUE APRENDEMOS (CAMPANHA DO MÊS) → [PROJETO PRINCIPAL] aprendizado (sem texto, não aparece) -->
       {{aprendizado}}
     </td>
   </tr>
@@ -239,18 +223,18 @@
 
   {{#lancamos}}
   <!--secao:lancamos-->
-  <!-- 02 · O QUE LANÇAMOS · 1 projeto em destaque + compactos -->
-  <!-- EDITAR AQUI: CAMPANHAS → dados/AAAA-MM.txt › [LANCAMOS] titulo · [DESTAQUE] · [RESULTADO 1..3] · [LANCAMENTO 1..6] (imagem da campanha: campo imagem) -->
+  <!-- CAMPANHAS · sobre Branco: 1 campanha em destaque (peça vertical de 184 x 300 px) + até 6 em cartões -->
+  <!-- EDITAR AQUI: CAMPANHAS → [LANCAMOS] titulo · [DESTAQUE] · [RESULTADO 1..3] · [LANCAMENTO 1..6] -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
-      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O QUE LANÇAMOS</p>
-      {{#titulo}}<p class="ft h2" data-campo="lancamos.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
+      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.lancamos}}</p>
+      {{#titulo}}<p class="ft h2" data-campo="lancamos.titulo" style="margin:10px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
     </td>
   </tr>
 
   {{#destaque}}
   <tr>
-    <td class="px" style="padding:20px 40px 0 40px;">
+    <td class="px" style="padding:22px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           {{#peca}}{{#img}}
@@ -268,7 +252,7 @@
               {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-img="destaque" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
               <div style="font-size:16px;line-height:16px;">&nbsp;</div>
             </div>{{/img_m}}{{#placeholder_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{placeholder_m}}<div style="font-size:16px;line-height:16px;">&nbsp;</div></div>{{/placeholder_m}}{{/peca}}
-            {{#categoria}}<p class="fx" data-campo="destaque.categoria" style="margin:0 0 6px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
+            {{#categoria}}<p class="fx" data-campo="destaque.categoria" style="margin:0 0 8px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
             <p class="ft" data-campo="destaque.titulo" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:21px;line-height:26px;color:{{cor.titulo}};">{{titulo}}</p>
             {{#texto_cta}}<p class="fx tm" data-campo="destaque.texto" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
             {{#tem_resultados}}
@@ -287,7 +271,7 @@
               </tr>
             </table>
             {{/tem_resultados}}
-            <!-- EDITAR AQUI: O QUE APRENDEMOS (DESTAQUE) → dados/AAAA-MM.txt › [DESTAQUE] aprendizado -->
+            <!-- EDITAR AQUI: O QUE APRENDEMOS (CAMPANHA EM DESTAQUE) → [DESTAQUE] aprendizado -->
             {{aprendizado}}
             {{#nota}}<p class="fx" data-campo="destaque.nota" style="margin:12px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;color:{{cor.texto_apoio}};">{{nota}}</p>{{/nota}}
           </td>
@@ -298,13 +282,13 @@
   {{/destaque}}
 
   {{#tem_compactos}}
-  <!-- Lançamentos compactos ("Também neste mês"): até 6, em linhas de 3 -->
+  <!-- Outras campanhas: até 6, em linhas de 3, com a peça num retângulo horizontal (184 x 72 px) -->
   <tr>
     <td class="px" style="padding:30px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td colspan="{{colunas_compactos}}" style="padding:12px 0 14px 0;border-top:1px solid {{cor.texto}};">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">TAMBÉM NESTE MÊS</p>
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">{{rot.outras}}</p>
           </td>
         </tr>
         {{#linhas_compactos}}
@@ -332,20 +316,22 @@
 
   {{#cx}}
   <!--secao:cx-->
-  <!-- 03 · CREATIVE X · anterior → atual, variação, barra e uma frase; no fim do trimestre, o trimestral embaixo -->
-  <!-- EDITAR AQUI: CREATIVE X → dados/AAAA-MM.txt › [CREATIVE X] anterior, atual, variacao, periodo, referencia, significado, nota · [CREATIVE X TRIMESTRE] rotulo, titulo, texto, estimativa · [CREATIVE X TRIMESTRE 1..3] valor, titulo, detalhe, variacao -->
+  <!-- CREATIVE X / INDICADORES · bloco claro (Rio): o indicador do mês (anterior → atual, variação, barra sobre trilho branco)
+       e, no fim do trimestre, os indicadores trimestrais embaixo. -->
+  <!-- EDITAR AQUI: INDICADORES → [CREATIVE X] subtitulo, anterior, atual, variacao, periodo, referencia, significado, nota · [CREATIVE X TRIMESTRE] · [CREATIVE X TRIMESTRE 1..3] -->
+  <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px" style="padding:40px 40px 0 40px;">
+    <td class="px ra" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:34px;padding:28px 40px 30px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="border-top:1px solid {{cor.texto}};border-bottom:1px solid {{cor.texto}};padding:20px 0 22px 0;">
+          <td style="padding:0;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td class="col gap" width="184" valign="middle" style="width:184px;">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_evolucao}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;CREATIVE X</p>
-                  {{#subtitulo}}<p class="fx ts" data-campo="cx.subtitulo" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{subtitulo}}</p>{{/subtitulo}}
-                  {{#rotulo}}<p class="fx" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cx.rotulo" style="display:inline-block;border:1px solid {{cor.linha}};border-radius:999px;padding:1px 8px;font-weight:bold;letter-spacing:1px;color:{{cor.texto_apoio}};">{{rotulo}}</span></p>{{/rotulo}}
-                  <p class="ft wrap-m" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:58px;color:{{cor.creative_x_anterior}};white-space:nowrap;">{{#anterior}}<span data-campo="cx.anterior">{{anterior}}</span> <span style="color:{{cor.marca}};">&#8594;</span> {{/anterior}}<span data-campo="cx.atual" style="font-size:54px;color:{{cor.marca}};letter-spacing:-2px;">{{atual}}</span></p>
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.cx}}</p>
+                  {{#subtitulo}}<p class="fx ts" data-campo="cx.subtitulo" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{subtitulo}}</p>{{/subtitulo}}
+                  {{#rotulo}}<p class="fx" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cx.rotulo" style="display:inline-block;background:{{cor.capa_selo}};border-radius:999px;padding:2px 9px;font-weight:600;letter-spacing:1px;color:{{cor.marca}};">{{rotulo}}</span></p>{{/rotulo}}
+                  <p class="ft wrap-m" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:58px;color:{{cor.creative_x_anterior}};white-space:nowrap;">{{#anterior}}<span data-campo="cx.anterior">{{anterior}}</span> <span style="color:{{cor.marca}};">&#8594;</span> {{/anterior}}<span data-campo="cx.atual" style="font-size:54px;color:{{cor.texto}};letter-spacing:-2px;">{{atual}}</span></p>
                 </td>
                 <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
                 <td class="col" width="392" valign="middle" style="width:392px;">
@@ -355,9 +341,9 @@
                     <tr>
                       {{#tem_barra}}
                       <td width="{{barra}}" height="8" bgcolor="{{cor.creative_x}}" style="height:8px;background:{{cor.creative_x}};font-size:0;line-height:0;border-radius:4px 0 0 4px;">&nbsp;</td>
-                      <td width="{{resto}}" height="8" bgcolor="{{cor.linha}}" style="height:8px;background:{{cor.linha}};font-size:0;line-height:0;border-radius:0 4px 4px 0;">&nbsp;</td>
+                      <td width="{{resto}}" height="8" bgcolor="{{cor.abertura_linha}}" style="height:8px;background:{{cor.abertura_linha}};font-size:0;line-height:0;border-radius:0 4px 4px 0;">&nbsp;</td>
                       {{/tem_barra}}
-                      {{^tem_barra}}<td width="100%" height="8" bgcolor="{{cor.linha}}" style="height:8px;background:{{cor.linha}};font-size:0;line-height:0;border-radius:4px;">&nbsp;</td>{{/tem_barra}}
+                      {{^tem_barra}}<td width="100%" height="8" bgcolor="{{cor.abertura_linha}}" style="height:8px;background:{{cor.abertura_linha}};font-size:0;line-height:0;border-radius:4px;">&nbsp;</td>{{/tem_barra}}
                     </tr>
                   </table>
                   {{#referencia}}<p class="fx ts" data-campo="cx.referencia" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_apoio}};">{{referencia}}</p>{{/referencia}}
@@ -366,13 +352,13 @@
               </tr>
             </table>
             {{#trimestre}}
-            <!-- Creative X trimestral: rótulo, título, até 3 indicadores (como os resultados do destaque), leitura curta e estimativa (sempre com a etiqueta) -->
+            <!-- Indicadores do trimestre: rótulo, título, até 3 indicadores, leitura curta e estimativa (sempre com a etiqueta) -->
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-item="cx-trimestre">
-              <tr><td height="20" style="height:20px;font-size:0;line-height:0;border-bottom:1px solid {{cor.linha}};">&nbsp;</td></tr>
+              <tr><td height="20" style="height:20px;font-size:0;line-height:0;border-bottom:1px solid {{cor.abertura_linha}};">&nbsp;</td></tr>
               <tr>
                 <td style="padding:18px 0 0 0;">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cxt.rotulo" style="display:inline-block;border:1px solid {{cor.linha}};border-radius:999px;padding:1px 8px;font-weight:bold;letter-spacing:1px;color:{{cor.texto_apoio}};">{{rotulo}}</span></p>
-                  {{#titulo}}<p class="ft" data-campo="cxt.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:19px;line-height:24px;color:{{cor.titulo}};">{{titulo}}</p>{{/titulo}}
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cxt.rotulo" style="display:inline-block;background:{{cor.capa_selo}};border-radius:999px;padding:2px 9px;font-weight:600;letter-spacing:1px;color:{{cor.marca}};">{{rotulo}}</span></p>
+                  {{#titulo}}<p class="ft" data-campo="cxt.titulo" style="margin:8px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:22px;line-height:26px;color:{{cor.titulo}};">{{titulo}}</p>{{/titulo}}
                 </td>
               </tr>
               {{#tem_indicadores}}
@@ -381,7 +367,7 @@
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                       {{#indicadores}}
-                      {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
+                      {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.abertura_linha}};">&nbsp;</td>{{/primeiro}}
                       <td class="{{classe_m}}" data-item="cxt-{{idx}}" width="{{largura}}" valign="top" style="width:{{largura}}px;padding:14px 0 0 0;">
                         <p class="ft num" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.texto}};" data-campo="cxt-{{idx}}.valor">{{valor}}</p>
                         <p class="fx ts" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto_corpo}};"><b data-campo="cxt-{{idx}}.titulo" style="color:{{cor.texto}};">{{titulo}}</b></p>
@@ -408,29 +394,20 @@
 
   {{#transformation}}
   <!--secao:transformation-->
-  <!-- 04 · TRANSFORMATION HUB · superfície Lisboa com cartão branco -->
-  <!-- EDITAR AQUI: TRANSFORMATION HUB → dados/AAAA-MM.txt › [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] nome, texto, status, logo, links (prints: até 3 por projeto) -->
+  <!-- TRANSFORMATION HUB / ANÁLISES · título sobre Branco e os projetos num cartão branco com borda Rio -->
+  <!-- EDITAR AQUI: ANÁLISES → [TRANSFORMATION] titulo · [TRANSFORMATION 1..3] nome, texto, status, resultado, logo, links (prints: até 3 por análise) -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.transformation_fundo}}" class="ra" style="background:{{cor.transformation_fundo}};border-radius:34px;">
+      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.transformation}}</p>
+      {{#titulo}}<p class="ft h2" data-campo="transformation.titulo" style="margin:10px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.transformation_titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
+      <div style="font-size:18px;line-height:18px;mso-line-height-rule:exactly;">&nbsp;</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" class="ra" style="background:{{cor.fundo_email}};border:2px solid {{cor.transformation_fundo}};border-radius:34px;">
         <tr>
-          <td class="px" style="padding:24px 28px 0 28px;">
+          <td class="px" style="padding:6px 26px 6px 26px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td valign="bottom" style="padding-bottom:18px;">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_evolucao}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;TRANSFORMATION HUB</p>
-                  {{#titulo}}<p class="ft h2" data-campo="transformation.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:29px;color:{{cor.transformation_titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td class="px" style="padding:0 28px 26px 28px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" style="background:{{cor.fundo_email}};border-radius:20px;">
               {{#projetos}}
               <tr data-item="transformation-{{numero}}">
-                <td data-bloco="transformation-{{numero}}" style="padding:18px 20px;{{borda}}">
+                <td data-bloco="transformation-{{numero}}" style="padding:18px 0;{{borda}}">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                       {{#tem_visual}}
@@ -450,7 +427,7 @@
                       </td>
                     </tr>
                     {{#tem_prints}}
-                    <!-- PRINTS do projeto (dados › prints, descricao_prints): 1 × 504, 2 × 240 ou 3 × 152 px; no celular, empilhados. -->
+                    <!-- PRINTS da análise (dados › prints, descricao_prints): 1 × 504, 2 × 240 ou 3 × 152 px; no celular, empilhados. -->
                     <tr>
                       <td colspan="2" style="padding-top:14px;">
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
@@ -476,18 +453,18 @@
 
   {{#aprendizados}}
   <!--secao:aprendizados-->
-  <!-- 05 · O QUE APRENDEMOS · até 3 colunas, sem caixas -->
-  <!-- EDITAR AQUI: APRENDIZADO → dados/AAAA-MM.txt › [APRENDIZADO 1..3] titulo, texto, levamos -->
+  <!-- O QUE APRENDEMOS / APRENDIZADOS · até 3 colunas numeradas (número em Santander Condensed), sem caixas -->
+  <!-- EDITAR AQUI: APRENDIZADO → [APRENDIZADO 1..3] titulo, texto, levamos -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
-      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_aprendizado_fundo}};color:{{cor.grupo_aprendizado}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;O QUE APRENDEMOS</p>
+      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_aprendizado_fundo}};color:{{cor.grupo_aprendizado}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.aprendizados}}</p>
       <div style="font-size:14px;line-height:14px;mso-line-height-rule:exactly;">&nbsp;</div>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           {{#itens}}
           {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
           <td class="{{classe}}" data-item="aprendizado-{{numero}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
-            <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:36px;line-height:38px;color:{{cor.grupo_aprendizado}};">{{numero}}</p>
+            <p class="ft" style="margin:0;font-family:{{fonte.impacto}};font-weight:bold;font-size:40px;line-height:40px;color:{{cor.grupo_aprendizado}};">{{numero}}</p>
             <p class="ft" data-campo="aprendizado-{{numero}}.titulo" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{titulo}}</p>
             {{#texto}}<p class="fx tm" data-campo="aprendizado-{{numero}}.texto" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
             {{#levamos}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:16px;color:{{cor.texto}};"><b style="color:{{cor.grupo_aprendizado}};">&#8594; Levamos:</b> <span data-campo="aprendizado-{{numero}}.levamos">{{levamos}}</span></p>{{/levamos}}
@@ -501,15 +478,12 @@
 
   {{#topicos}}
   <!--secao:{{sid}}-->
-  <!-- NOVO TÓPICO (ex.: TESTES) · até 4 assuntos novos, cada um no layout escolhido. Só aparece quando o mês tem
-       [TOPICO 1] (ou [TOPICO B 1], [TOPICO C 1], [TOPICO D 1]) preenchido, ou quando o tópico é acrescentado no emulador
-       (Seções do report › + Novo tópico). Layouts: lista (linhas na largura inteira), colunas (até 3, numeradas),
-       cartoes (imagem em cima, 3 por linha) e numeros (até 4 números grandes). -->
-  <!-- EDITAR AQUI: NOVO TÓPICO → dados/AAAA-MM.txt › [TOPICO] rotulo, titulo, texto, layout · [TOPICO 1..6] status, status_cor, nome, texto, valor, links, imagens, descricao_imagens ([TOPICO B], [TOPICO C] e [TOPICO D]: iguais) -->
+  <!-- NOVO TÓPICO · até 4 assuntos novos, cada um no layout escolhido (lista, colunas, cartões ou números). -->
+  <!-- EDITAR AQUI: NOVO TÓPICO → [TOPICO] rotulo, titulo, texto, layout · [TOPICO 1..6] ([TOPICO B], [TOPICO C] e [TOPICO D]: iguais) -->
   <tr>
     <td class="px" style="padding:40px 40px 0 40px;">
-      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;<span data-campo="{{sid}}.rotulo">{{rotulo}}</span></p>
-      {{#titulo}}<p class="ft h2" data-campo="{{sid}}.titulo" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
+      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;<span data-campo="{{sid}}.rotulo">{{rotulo}}</span></p>
+      {{#titulo}}<p class="ft h2" data-campo="{{sid}}.titulo" style="margin:10px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
       {{#texto}}<p class="fx tm" data-campo="{{sid}}.texto" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
       <div style="font-size:14px;line-height:14px;mso-line-height-rule:exactly;">&nbsp;</div>
       {{#lista}}
@@ -523,7 +497,6 @@
             {{#texto}}<p class="fx tm" data-campo="{{sid}}-{{numero}}.texto" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
             {{#links}}<p class="fx ts" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:22px;">{{links}}</p>{{/links}}
             {{#tem_prints}}
-            <!-- IMAGENS do item (dados › imagens, descricao_imagens): 1 × 600, 2 × 288 ou 3 × 184 px; no celular, empilhadas. -->
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr>
               {{#prints}}
               {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
@@ -537,13 +510,13 @@
       </table>
       {{/lista}}
       {{#colunas}}
-      <!-- Layout COLUNAS: até 3, numeradas, com separador fino (como O que aprendemos); no celular, uma embaixo da outra. -->
+      <!-- Layout COLUNAS: até 3, numeradas, com separador fino; no celular, uma embaixo da outra. -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-layout="colunas">
         <tr>
           {{#itens}}
           {{^primeiro}}<td class="hide-m" width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td><td class="hide-m" width="11" style="width:11px;font-size:0;line-height:0;border-left:1px solid {{cor.linha}};">&nbsp;</td>{{/primeiro}}
           <td class="{{classe}}" data-item="{{sid}}-{{numero}}" width="{{largura}}" valign="top" style="width:{{largura}}px;">
-            <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:36px;line-height:38px;color:{{cor.grupo_resultados}};">{{numero}}</p>
+            <p class="ft" style="margin:0;font-family:{{fonte.impacto}};font-weight:bold;font-size:40px;line-height:40px;color:{{cor.grupo_resultados}};">{{numero}}</p>
             {{#status}}<p class="fx" data-campo="{{sid}}-{{numero}}.status" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:16px;">{{status}}</p>{{/status}}
             <p class="ft" data-campo="{{sid}}-{{numero}}.nome" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:16px;line-height:20px;color:{{cor.titulo}};">{{nome}}</p>
             {{#texto}}<p class="fx tm" data-campo="{{sid}}-{{numero}}.texto" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:18px;color:{{cor.texto_corpo}};">{{texto}}</p>{{/texto}}
@@ -557,7 +530,7 @@
       </table>
       {{/colunas}}
       {{#cartoes}}
-      <!-- Layout CARTÕES: imagem em cima, 3 por linha (como Também neste mês); no celular, um embaixo do outro. -->
+      <!-- Layout CARTÕES: imagem em cima, 3 por linha; no celular, um embaixo do outro. -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-layout="cartoes">
         {{#linhas}}
         <tr>
@@ -581,7 +554,7 @@
       </table>
       {{/cartoes}}
       {{#numeros}}
-      <!-- Layout NÚMEROS: até 4 números grandes, com filete em cima (como os números da capa). -->
+      <!-- Layout NÚMEROS: até 4 números grandes, com filete em cima. -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-layout="numeros">
         <tr>
           {{#itens}}
@@ -602,41 +575,35 @@
 
   {{#foco}}
   <!--secao:foco-->
-  <!-- 06 · FOCO DO PRÓXIMO MÊS · bloco vermelho -->
-  <!-- EDITAR AQUI: FOCO DO PRÓXIMO MÊS → dados/AAAA-MM.txt › [FOCO] prioridade, texto, selo (opcional), descricao_selo
-       Selo da campanha: o PNG original (versão para fundo vermelho). No computador, à direita do título,
-       na coluna 3 (184 px). No celular, acima do título, com 160 px. Sem sobreposição: funciona no Outlook. -->
+  <!-- FOCO / PRÓXIMAS INICIATIVAS · bloco na cor do foco (PF: Vermelho Santander; PJ: Rio): a prioridade do próximo mês
+       em Santander Condensed e o selo (opcional). -->
+  <!-- EDITAR AQUI: PRÓXIMAS INICIATIVAS → [FOCO] prioridade, texto, selo (opcional, PNG original), descricao_selo -->
+  <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px" style="padding:40px 40px 0 40px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.marca}}" class="ra" style="background:{{cor.marca}};border-radius:34px;">
-        <tr>
-          <td class="px" valign="middle" style="padding:26px 28px 28px 28px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-          <td class="col" width="{{largura_texto}}" valign="middle" style="width:{{largura_texto}}px;">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:#FFFFFF;color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;FOCO DE <span data-campo="foco.mes">{{mes}}</span></p>
-            {{#selo}}{{#img_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="selo" style="display:block;border:0;width:{{w}}px;height:auto;margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></div>{{/img_m}}{{/selo}}
-            <p class="ft h2" data-campo="foco.prioridade" style="margin:10px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">{{prioridade}}</p>
-            {{#texto}}<p class="fx tm" data-campo="foco.texto" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
-          </td>
-          {{#selo}}{{#img}}
-          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-          <td class="hide-m" width="184" valign="middle" align="right" style="width:184px;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="selo" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:#FFFFFF;"></td>
-          {{/img}}{{/selo}}
-          </tr></table>
-          </td>
-        </tr>
-      </table>
+    <td class="px ra" bgcolor="{{cor.foco_fundo}}" valign="middle" style="background:{{cor.foco_fundo}};border-radius:34px;padding:28px 40px 30px 40px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td class="col" width="{{largura_texto}}" valign="middle" style="width:{{largura_texto}}px;">
+        <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.foco}}<span data-campo="foco.mes">{{mes}}</span></p>
+        {{#selo}}{{#img_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="selo" style="display:block;border:0;width:{{w}}px;height:auto;margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:{{cor.texto}};"></div>{{/img_m}}{{/selo}}
+        <p class="ft h2" data-campo="foco.prioridade" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.foco_texto}};letter-spacing:-0.5px;">{{prioridade}}</p>
+        {{#texto}}<p class="fx tm" data-campo="foco.texto" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
+      </td>
+      {{#selo}}{{#img}}
+      <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+      <td class="hide-m" width="184" valign="middle" align="right" style="width:184px;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="selo" style="display:block;border:0;width:{{w}}px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:{{cor.texto}};"></td>
+      {{/img}}{{/selo}}
+      </tr></table>
     </td>
   </tr>
   {{/foco}}
 
   {{#agenda}}
   <!--secao:agenda-->
-  <!-- 07 · TAMBÉM VEM AÍ · agenda em linhas de 3 -->
-  <!-- EDITAR AQUI: PRÓXIMAS INICIATIVAS (AGENDA) → dados/AAAA-MM.txt › [AGENDA 1..6] data, titulo, detalhe -->
+  <!-- AGENDA · as próximas datas, em linhas de 3, sobre Branco (continua as Próximas iniciativas) -->
+  <!-- EDITAR AQUI: AGENDA → [AGENDA 1..6] data, titulo, detalhe -->
   <tr>
-    <td class="px" style="padding:40px 40px 0 40px;">
-      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_aprendizado_fundo}};color:{{cor.grupo_aprendizado}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;TAMBÉM VEM AÍ</p>
+    <td class="px" style="padding:32px 40px 0 40px;">
+      <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:2px;">{{rot.agenda}}</p>
       <div style="font-size:12px;line-height:12px;mso-line-height-rule:exactly;">&nbsp;</div>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         {{#linhas}}
@@ -645,8 +612,8 @@
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;border-top:1px solid {{filete}};">&nbsp;</td>{{/primeiro}}
           <td class="{{#vazio}}hide-m{{/vazio}}{{^vazio}}col{{/vazio}}"{{^vazio}} data-item="agenda-{{idx}}"{{/vazio}} width="184" valign="top" style="width:184px;padding:12px 0;border-top:1px solid {{filete}};">
             {{^vazio}}
-            {{#dia}}<p class="ft" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:22px;line-height:24px;color:{{cor.grupo_aprendizado}};">{{dia}} <span class="fx" style="font-family:{{fonte.texto}};font-size:10px;font-weight:bold;letter-spacing:1.5px;">{{mes}}</span></p>{{/dia}}
-            {{^dia}}<p class="fx" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:28px;font-weight:bold;color:{{cor.texto_apoio}};letter-spacing:1.5px;">{{rotulo}}</p>{{/dia}}
+            {{#dia}}<p class="ft" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.impacto}};font-weight:bold;font-size:26px;line-height:26px;color:{{cor.grupo_aprendizado}};">{{dia}} <span class="fx" style="font-family:{{fonte.texto}};font-size:10px;font-weight:bold;letter-spacing:1.5px;">{{mes}}</span></p>{{/dia}}
+            {{^dia}}<p class="fx" data-campo="agenda-{{idx}}.data" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:28px;font-weight:bold;color:{{cor.grupo_aprendizado}};letter-spacing:1.5px;">{{rotulo}}</p>{{/dia}}
             <p class="fx tm" data-campo="agenda-{{idx}}.titulo" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:17px;font-weight:bold;color:{{cor.texto}};">{{titulo}}</p>
             {{#detalhe}}<p class="fx ts" data-campo="agenda-{{idx}}.detalhe" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{detalhe}}</p>{{/detalhe}}
             {{/vazio}}
@@ -661,45 +628,46 @@
   {{/agenda}}
 
   <!--secao:rodape-->
-  <!-- RODAPÉ · encerramento em Vermelho Santander (Brand Guide 3.2: vermelho como fundo; textos, chama
-       e filetes em branco). Fecha como a capa abre. Despedida e contato (colunas 1 e 2), formiguinha
-       à direita (coluna 3); abaixo de um filete branco, a assinatura da área com a chama no canto
-       inferior direito (Brand Guide 3.10). -->
-  <!-- EDITAR AQUI: ENCERRAMENTO → dados/AAAA-MM.txt › [EDICAO] proximo_mes, contato. A assinatura é fixa (NÃO ALTERAR). -->
+  <!-- ENCERRAMENTO · bloco na cor do encerramento (PF: Vermelho Santander; PJ: Rio): despedida em Santander
+       Condensed, contato num balão branco, a formiguinha à direita (só PF) e, abaixo de um filete, a assinatura
+       da área com a chama no canto inferior direito (logotipo alinhado à margem inferior direita). -->
+  <!-- EDITAR AQUI: ENCERRAMENTO → [EDICAO] proximo_mes, contato. A assinatura é fixa (NÃO ALTERAR). -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
     <td class="px ra" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:34px;padding:32px 40px 26px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td class="fw" width="392" valign="top" style="width:392px;padding-bottom:4px;">
+          <td class="fw" valign="top" style="padding-bottom:4px;">
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;">ENCERRAMENTO</p>
-            <p class="ft h2" data-campo="ate" style="margin:8px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:26px;line-height:31px;color:#FFFFFF;letter-spacing:-0.5px;">Até {{proximo_mes_minusculo}}.</p>
-            <p class="fx tm" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">Obrigado por acompanhar o report da Creative Strategy PF.</p>
+            <p class="ft h2" data-campo="ate" style="margin:10px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:30px;line-height:34px;color:{{cor.foco_texto}};letter-spacing:-0.5px;">Até {{proximo_mes_minusculo}}.</p>
+            <p class="fx tm" style="margin:6px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:19px;color:{{cor.foco_texto}};">Obrigado por acompanhar o report da {{area}}.</p>
             {{#contato}}
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr>
-              <td class="col" valign="top" style="padding-top:12px;border-top:1px solid {{cor.foco_rotulo}};">
-                <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;">DÚVIDAS E SUGESTÕES</p>
-                <p class="fx tm" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:#FFFFFF;word-break:break-word;" data-campo="contato">{{contato}}</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr>
+              <td bgcolor="{{cor.capa_selo}}" style="background:{{cor.capa_selo}};border-radius:20px;padding:10px 16px 11px 16px;">
+                <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;">DÚVIDAS E SUGESTÕES</p>
+                <p class="fx tm" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};word-break:break-word;" data-campo="contato">{{contato}}</p>
               </td>
             </tr></table>
             {{/contato}}
           </td>
+          {{#rodape_formiga}}
           <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
-          <td class="fant" width="184" valign="bottom" align="right" style="width:184px;">
-            {{#rodape_formiga}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="formiguinha" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#FFFFFF;">{{/rodape_formiga}}
+          <td class="fant" width="{{w}}" valign="bottom" align="right" style="width:{{w}}px;">
+            <img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-campo="formiguinha" style="display:block;border:0;width:{{w}}px;height:auto;margin:0 0 0 auto;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:{{cor.foco_texto}};">
           </td>
+          {{/rodape_formiga}}
         </tr>
-        <tr><td colspan="3" style="padding:20px 0 18px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="{{cor.foco_rotulo}}" style="height:1px;background:{{cor.foco_rotulo}};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
+        <tr><td colspan="3" style="padding:22px 0 18px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="{{cor.rodape_claro}}" style="height:1px;background:{{cor.rodape_claro}};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
         <tr>
           <td colspan="3">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td valign="bottom" style="padding-right:16px;">
-                  <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:15px;line-height:19px;color:#FFFFFF;">Creative Strategy PF</p>
-                  <p class="fx wrap-m" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:1.5px;white-space:nowrap;">CUSTOMER INTERACTIONS&nbsp;&nbsp;·&nbsp;&nbsp;REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
+                  <p class="ft" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:15px;line-height:19px;color:{{cor.foco_texto}};">{{area}}</p>
+                  <p class="fx wrap-m" style="margin:3px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.foco_texto}};letter-spacing:1.5px;white-space:nowrap;">{{area_linha}}&nbsp;&nbsp;·&nbsp;&nbsp;REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
                 </td>
                 <td valign="bottom" align="right" width="{{#rodape_logo}}{{w}}{{/rodape_logo}}{{^rodape_logo}}1{{/rodape_logo}}">
-                  {{#rodape_logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#FFFFFF;">{{/rodape_logo}}
+                  {{#rodape_logo}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" style="display:block;border:0;width:{{w}}px;height:auto;margin-left:auto;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:{{cor.marca}};">{{/rodape_logo}}
                 </td>
               </tr>
             </table>

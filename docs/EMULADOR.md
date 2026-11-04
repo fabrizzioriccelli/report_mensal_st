@@ -14,6 +14,8 @@ O emulador é o centro da operação mensal. Um arquivo só (`kit/emulador-repor
 
 **PF e PJ (5.0):** são dois arquivos, `kit/emulador-report.html` (Emulador Report PF) e `kit/emulador-report-pj.html` (Emulador Report PJ, Santander Empresas), com o mesmo código e as mesmas funções. Cada um abre só os reports do seu segmento (o outro é recusado com um aviso, sem mexer no que está aberto) e guarda o seu rascunho à parte. Identidade e seções do PJ: [REPORT_PJ.md](REPORT_PJ.md).
 
+**O mesmo esqueleto (5.1):** os reports PF e PJ novos têm a mesma estrutura de página; mudam as cores, os nomes das seções e a formiguinha (só PF). No PF, a campanha do mês fica na **Visão geral** (peça vertical, 184 x 230 px) e os números em **Principais resultados**; as duas seções podem ser movidas ou tiradas como as outras. Um report PF salvo antes da 5.1 abre e funciona como sempre, no layout em que foi salvo.
+
 Nada é enviado para a internet: a página só lê e grava os arquivos que você escolhe. Passo a passo para o time: [COMO_ATUALIZAR_O_MES.md](COMO_ATUALIZAR_O_MES.md) e o guia ilustrado, [kit/guia-operacional.pdf](../kit/guia-operacional.pdf).
 
 ## Edição

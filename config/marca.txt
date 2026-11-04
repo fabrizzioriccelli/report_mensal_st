@@ -111,18 +111,22 @@ capa_filete: #FFFFFF
 # Grupos da história, com cores de APOIO do guia (uso pontual: etiqueta
 # do número da seção, rótulo e barra do Creative X). Títulos continuam
 # em vermelho. Contraste de cada par: 4,5:1 ou mais.
-#   resultados  (02 · O que lançamos e números da capa) -> turquesa
-#   evolucao    (03 · Creative X e 04 · Transformation)  -> roxo
-#   aprendizado (05 · O que aprendemos e 07 · Vem aí)     -> rosa
+#   resultados  (Visão geral e O que lançamos)          -> turquesa
+#   evolucao    (Creative X e Transformation Hub)       -> roxo
+#   aprendizado (O que aprendemos e Também vem aí)      -> rosa
 grupo_resultados: #127277
 grupo_resultados_fundo: #CDECEE
 grupo_evolucao: #803262
 grupo_evolucao_fundo: #F0CAE1
 grupo_aprendizado: #A6112F
 grupo_aprendizado_fundo: #FFC3CF
-# Faixa dos números (Rio) e divisórias entre eles (Cidade do México).
-abertura_fundo: #F5DECF
-abertura_linha: #F0B998
+# Abertura (frase do mês): bloco em Vermelho Santander, com texto branco.
+abertura_fundo: #EC0000
+abertura_texto: #FFFFFF
+# Blocos claros (Principais resultados e Creative X): Rio, com filetes e
+# trilho da barra em branco.
+bloco_fundo: #F5DECF
+abertura_linha: #FFFFFF
 # Final da frase do mês, sobre o vermelho (branco).
 capa_destaque: #FFFFFF
 # Divisórias finas e trilho da barra do Creative X.
@@ -134,11 +138,14 @@ creative_x_anterior: #767676
 # e divisórias.
 transformation: #EC0000
 transformation_titulo: #EC0000
-transformation_fundo: #FBF1EA
+# Contorno do cartão do Transformation Hub (Rio).
+transformation_fundo: #F5DECF
 transformation_linha: #F5DECF
 transformation_placeholder_fundo: #FBF1EA
 transformation_placeholder_borda: #F0B998
-# Textos sobre o vermelho (capa, Foco e rodapé): branco.
+# Foco do próximo mês: bloco em Vermelho Santander.
+foco_fundo: #EC0000
+# Textos sobre o vermelho (abertura, Foco e encerramento): branco.
 foco_rotulo: #FFFFFF
 foco_texto: #FFFFFF
 # Rodapé: faixa clara em Rio (a mesma da faixa dos números: o report fecha

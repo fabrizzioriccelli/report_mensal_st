@@ -228,7 +228,7 @@ function salvarComo() {
   await p.click("#bSalvar");
   await p.waitForSelector("#modal:not([hidden])");
   var aviso = await p.$eval("#modalCorpo", function (e) { return e.textContent; });
-  confere(/JANEIRO 2099/.test(aviso) && /Número 1 da capa \(valor\): 12,5%/.test(aviso) && !/numero-1\.valor/.test(aviso), "aviso: período mudou e os números ainda são do mês anterior (com o nome de cada campo)");
+  confere(/JANEIRO 2099/.test(aviso) && /Resultado principal 1 \(valor\): 12,5%/.test(aviso) && !/numero-1\.valor/.test(aviso), "aviso: período mudou e os números ainda são do mês anterior (com o nome de cada campo)");
   await p.click("#modalCancela");
   confere(await p.evaluate(function () { return window.__salvos.length; }) === 0, "\"Voltar e conferir\" não salva");
 

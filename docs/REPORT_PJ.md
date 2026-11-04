@@ -1,6 +1,6 @@
 # Report PJ (Santander Empresas)
 
-O report PJ usa o **mesmo sistema** do report PF: o mesmo motor (`tools/motor.js`), o mesmo emulador (`converter-html-eml.html`) e as mesmas funções. São dois emuladores independentes, cada um com o seu arquivo:
+O report PJ usa o **mesmo sistema** do report PF: o mesmo motor (`tools/motor.js`), o mesmo emulador (`converter-html-eml.html`), as mesmas funções e, a partir da 5.1, **o mesmo template** (`template/report.html`): PF e PJ têm o mesmo esqueleto de página. São dois emuladores independentes, cada um com o seu arquivo:
 
 | | PF | PJ |
 |---|---|---|
@@ -8,15 +8,32 @@ O report PJ usa o **mesmo sistema** do report PF: o mesmo motor (`tools/motor.js
 | Ícone da aba | Santander + PF | Santander + PJ (a mesma chama; selo "PJ" com contorno Rio) |
 | Modelo em branco | `kit/report-coringa.html` (`dados/CORINGA.txt`) | `kit/report-coringa-pj.html` (`dados/CORINGA-PJ.txt`) |
 | Exemplo de treino (fictício) | `kit/report-exemplo.html` | `kit/report-exemplo-pj.html` (`dados/EXEMPLO-PJ-treinamento.txt`) |
-| Template e marca | `template/report.html` · `config/marca.txt` | `template/report-pj.html` · `config/marca-pj.txt` |
+| Template | `template/report.html` (o mesmo nos dois) | `template/report.html` (o mesmo nos dois) |
+| Marca (cores, logo, formiguinha) | `config/marca.txt` | `config/marca-pj.txt` |
 | Rascunho no navegador | `emulador-report` | `emulador-report-pj` (não se misturam) |
 
 ## PF e PJ não se misturam
 
-- Cada página salva leva o segmento: o report PJ tem `<meta name="report-segmento" content="pj">`; o PF, nenhum (como sempre).
+- Cada página leva o segmento: `<meta name="report-segmento" content="pj">` no PJ e, a partir da 5.1, `content="pf"` no PF. Report sem a marca (PF salvo antes da 5.1) é PF.
 - O **Emulador Report PJ só abre reports PJ** e o **PF só abre reports PF**. Ao escolher o arquivo do outro segmento, aparece "Este é um report PF/PJ", com o nome do emulador certo; o report que estava aberto continua como estava.
 - O rascunho guardado no navegador (edição não salva) é separado: um emulador nunca oferece a edição do outro.
 - As imagens do PJ são próprias (`assets/coringa-pj/`, `assets/exemplo-pj/`). Nenhuma peça, campanha ou resultado do PF entra no PJ. A formiguinha (personagem do Creative Strategy PF) não aparece no PJ.
+
+## O mesmo esqueleto no PF e no PJ (5.1)
+
+A estrutura da página é uma só: abertura, visão geral com a peça vertical, principais resultados num bloco claro, campanhas, indicadores num bloco claro, análises num cartão com borda, aprendizados, tópicos, foco ou próximas iniciativas, agenda e encerramento. A grade, os cantos, os balões, as pílulas numeradas e a marcação de cada item são os mesmos. O que muda vem da marca e do perfil do segmento:
+
+| | PF | PJ |
+|---|---|---|
+| Abertura, foco e encerramento | Vermelho Santander, texto branco, chama branca | Rio, texto Preto, chama vermelha |
+| Principais resultados e indicadores | Rio | Rio |
+| 1º número e títulos | Vermelho Santander | Preto |
+| Pílulas e rótulos das seções | Cores de apoio do PF (turquesa, roxo, rosa) | Rio com Boston |
+| Nomes das seções | O que lançamos, Creative X, Transformation Hub, O que aprendemos, Foco de…, Também vem aí | Campanhas, Indicadores, Análises, Aprendizados, Próximas iniciativas, Agenda |
+| Fundo em volta do e-mail | Lisboa | Branco |
+| Formiguinha | No encerramento | Não usa |
+
+As cores ficam em `config/marca.txt` e `config/marca-pj.txt` (`abertura_fundo`, `abertura_texto`, `bloco_fundo`, `foco_fundo`, `rodape_fundo`…); os nomes, em `PERFIS.*.rotulos` (`tools/motor.js`). Um report PF salvo antes da 5.1 continua abrindo e funcionando no Emulador Report PF, no layout em que foi salvo; para o mês ficar no esqueleto novo, comece do modelo em branco (veja [COMO_ATUALIZAR_O_MES.md](COMO_ATUALIZAR_O_MES.md)).
 
 ## Seções do report PJ
 

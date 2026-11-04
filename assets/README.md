@@ -20,7 +20,7 @@
 
 | Espaço no e-mail | Formato (o recorte é automático) |
 |---|---|
-| Peça do projeto principal | Quadrado (184 × 184 na tela; 180 px no celular) |
+| Peça do projeto principal (Visão geral) | Retângulo vertical (184 × 230 na tela; envie com 368 × 460 px ou mais; 216 px no celular), no PF e no PJ |
 | Peça do projeto em destaque | Vertical 184 × 300 no computador; horizontal na largura da tela no celular |
 | Miniatura de lançamento | Faixa horizontal (~2,5 : 1) |
 | Print de Creative Transformation | Horizontal (~4 : 3) |

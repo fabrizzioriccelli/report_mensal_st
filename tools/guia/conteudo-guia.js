@@ -95,7 +95,7 @@ module.exports = function (G) {
   G.divisor("escolhendo", "PF e PJ são dois emuladores independentes, com o mesmo funcionamento. Cada um tem o seu nome na aba, o seu ícone, o seu modelo em branco e a sua identidade visual.", "Use o emulador do segmento do report. Um não abre o report do outro.", "A regra central", "pj-recusa");
   G.conteudo("escolhendo", function (sl) {
     G.titulo(sl, "PF ou PJ: qual emulador abrir", "Pelo segmento do report do mês", ["PF", "PJ"]);
-    [["pf", "Emulador Report PF", "Creative Strategy PF. Capa vermelha, títulos em vermelho, a formiguinha no encerramento.", KIT.pf, KIT.coringaPF, "PF"],
+    [["pf", "Emulador Report PF", "Creative Strategy PF. Abertura, foco e encerramento em vermelho, títulos em vermelho e a formiguinha no encerramento.", KIT.pf, KIT.coringaPF, "PF"],
       ["pj", "Emulador Report PJ", "Santander Empresas. Blocos em Rio, títulos em Preto com Santander Condensed, balões e o ícone Santander + PJ.", KIT.pj, KIT.coringaPJ, "PJ"]].forEach(function (e, i) {
       var x = 65 + i * 666;
       G.captura(sl, e[0] + "-inicio", x, 205, 646, 360, [{ i: 0, n: 1 }, { i: 1, n: 2 }], { rot: "TELA INICIAL", seg: e[5] });
@@ -107,10 +107,10 @@ module.exports = function (G) {
     });
   });
   G.conteudo("escolhendo", function (sl) {
-    G.titulo(sl, "O que é igual e o que muda", "As funções são as mesmas; mudam a identidade e os nomes das seções", ["PF", "PJ"]);
+    G.titulo(sl, "O que é igual e o que muda", "As funções e o esqueleto da página são os mesmos; mudam as cores e os nomes das seções", ["PF", "PJ"]);
     G.tabela(sl, 65, 200, 790, ["", "PF", "PJ"], [
       ["Aba e ícone", "Emulador Report PF · Santander + PF", "Emulador Report PJ · Santander + PJ"],
-      ["Abertura", "Capa vermelha: frase, campanha e números", "Abertura (frase), Visão geral (campanha) e Principais resultados"],
+      ["Abertura, foco e encerramento", "Em vermelho, texto branco", "Em Rio, texto Preto"],
       ["Campanhas", "O que lançamos", "Campanhas"],
       ["Indicador do mês", "Creative X", "Indicadores"],
       ["Projetos", "Transformation Hub", "Análises"],
@@ -143,7 +143,7 @@ module.exports = function (G) {
       ["Campanha + o que é a imagem", "one_brief_icone.png", "imagem1.png · Captura de tela.png"],
       ["Formato .png (logos, selos, prints) ou .jpg (fotos e peças)", "agente_x_print.png", ".heic · .webp · .pdf como imagem"]
     ], [520, 396, 396], { rowH: 46, s: 14 });
-    G.cartaoTexto(sl, 65, 460, 645, 275, "Tamanho recomendado · PF", "Peça da capa: 440 × 440 px ou mais (quadrada) · Destaque: 368 × 600 px · Lançamentos: 736 × 288 px · Logo do Transformation Hub: 112 × 112 px · Print: 1008 px de largura · Selo: o PNG original, sem redesenhar.", { eyebrow: "PF", eyeFill: C.br, eyeCor: C.vm });
+    G.cartaoTexto(sl, 65, 460, 645, 275, "Tamanho recomendado · PF", "Peça da visão geral: 368 × 460 px ou mais (retângulo vertical, como no PJ) · Destaque: 368 × 600 px · Lançamentos: 736 × 288 px · Logo do Transformation Hub: 112 × 112 px · Print: 1008 px de largura · Selo: o PNG original, sem redesenhar.", { eyebrow: "PF", eyeFill: C.br, eyeCor: C.vm });
     G.cartaoTexto(sl, 732, 460, 645, 275, "Tamanho recomendado · PJ", "Peça da visão geral: 368 × 460 px ou mais (retângulo VERTICAL: o Brand Guide Empresas não usa formato quadrado) · Campanha em destaque: 368 × 600 px · Outras campanhas: 736 × 288 px · Print da análise: 1008 px de largura.", { eyebrow: "PJ" });
   });
   G.conteudo("primeiros", function (sl) {
@@ -408,7 +408,6 @@ module.exports = function (G) {
     return { tit: "Prompt " + tit.replace(/\s*\(.*$/, ""), titCompleto: "Prompt " + tit, campo: campo, cod: cod.trim() };
   });
   var NO_PJ = {
-    5: "No PJ, os mesmos blocos preenchem a Abertura (frase), a Visão geral (campanha do mês) e os Principais resultados (números).",
     6: "No PJ, os mesmos blocos preenchem a seção Campanhas (campanha em destaque e outras campanhas do mês).",
     7: "No PJ, o bloco [CREATIVE X] preenche a seção Indicadores (o indicador do mês e os do trimestre).",
     8: "No PJ, o bloco [TRANSFORMATION] preenche a seção Análises (status, texto, resultado e prints).",

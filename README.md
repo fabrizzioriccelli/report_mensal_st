@@ -7,9 +7,9 @@ Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas
 
 O time atualiza tudo no **emulador**: um arquivo só, que abre no Chrome ou no Edge, sem instalar nada.
 
-**Versão 5.0 (2026-11-04).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 5.1 (2026-11-04).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
-**Dois emuladores, o mesmo sistema:** o **Emulador Report PF** (Creative Strategy PF) e o **Emulador Report PJ** (Santander Empresas, pelo capítulo 6 do Brand Guide). As funções são as mesmas; muda a identidade, o ícone da aba e os nomes das seções. Um não abre o report do outro. Detalhes do PJ: [docs/REPORT_PJ.md](docs/REPORT_PJ.md).
+**Dois emuladores, o mesmo sistema:** o **Emulador Report PF** (Creative Strategy PF) e o **Emulador Report PJ** (Santander Empresas, pelo capítulo 6 do Brand Guide). As funções são as mesmas e, a partir da 5.1, **o esqueleto da página também** (o do PJ): muda a identidade (cores e formiguinha), o ícone da aba e os nomes das seções. Um não abre o report do outro. Detalhes do PJ: [docs/REPORT_PJ.md](docs/REPORT_PJ.md).
 
 <p>
 <img src="docs/preview-modelo.jpg" width="420" alt="Prévia do modelo em branco no computador">

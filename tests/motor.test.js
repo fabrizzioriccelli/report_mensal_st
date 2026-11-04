@@ -215,8 +215,8 @@ teste("links: placeholder é pendência; https interno passa; domínio fora da l
 
 teste("link pendente: botão aparece em cinza, sem ser clicável (só rascunho)", function () {
   var r = montar(MINIMO.replace(/link: .*/, "link: [INSERIR LINK]"));
-  /* na capa vermelha, em Rio (contraste); nas outras seções, em cinza */
-  assert.ok(/<span title="Link ainda não definido" style="color:#F5DECF;[^"]*">Ver peça&nbsp;&#8594;<\/span>/.test(r.html));
+  /* 5.1: a campanha fica na visão geral, sobre o branco: o link pendente sai em cinza, como nas outras seções */
+  assert.ok(/<span title="Link ainda não definido" style="color:#767676;[^"]*">Ver peça&nbsp;&#8594;<\/span>/.test(r.html));
   var m = montar(MODELO);
   assert.ok(/<span title="Link ainda não definido" style="color:#767676;[^"]*">Ver peça&nbsp;&#8594;<\/span>/.test(m.html));
   assert.ok(!/<a [^>]*>\s*<img/.test(r.html) && !/href="#/.test(r.html));
@@ -303,10 +303,10 @@ teste("conferência de HTML detecta recursos que o Outlook não aceita", functio
   assert.deepStrictEqual(M.conferirHtml('<img src="cid:a" width="10" alt="">'), []);
 });
 
-teste("capa: foto do projeto principal com 220 px (20% maior que a coluna), quadrada", function () {
+teste("visão geral: peça da campanha num retângulo vertical de 184 x 230 px (o mesmo esqueleto do PJ)", function () {
   var r = montar(MINIMO);
-  assert.ok(r.imagens.some(function (i) { return i.papel === "PROJETO PRINCIPAL" && i.w === 220 && i.h === 220 && i.recorte; }));
-  assert.ok(r.html.indexOf('width="356"') > 0 && r.html.indexOf('width="220"') > 0, "texto 356 + 24 + foto 220 = 600");
+  assert.ok(r.imagens.some(function (i) { return i.papel === "PROJETO PRINCIPAL" && i.w === 184 && i.h === 230 && i.recorte; }));
+  assert.ok(r.html.indexOf('width="392"') > 0 && r.html.indexOf('width="184" valign="top" align="center"') > 0, "texto 392 + 24 + peça 184 = 600");
 });
 
 teste("ampliar: peça sem link abre maior no navegador; no e-mail não há script nem versão ampliada", function () {
@@ -446,12 +446,38 @@ function modeloHtml() {
   return r.html;
 }
 
+teste("PF e PJ (5.1): o mesmo esqueleto; mudam as cores da marca, os nomes das seções e a formiguinha", function () {
+  /* os mesmos dados (fictícios) nos dois segmentos: só muda "segmento: PJ" e a marca */
+  var dados = ler("dados/EXEMPLO-treinamento.txt");
+  var pf = montar(dados), pj = montar(dados.replace(/^\[EDICAO\]\s*$/m, "[EDICAO]\nsegmento: PJ"), { marca: ler("config/marca-pj.txt"), arquivoMarca: "config/marca-pj.txt" });
+  assert.ok(pf.ok && pj.ok);
+  var ids = function (r) { return M.secoesDoHtml(r.html).map(function (x) { return x.id; }); };
+  assert.deepStrictEqual(ids(pf), ids(pj), "mesmas seções, na mesma ordem");
+  /* a mesma marcação: os mesmos campos editáveis na abertura, na visão geral e nos resultados */
+  var campos = function (r) { return (r.html.match(/data-campo="(frase|frase_final|periodo|principal\.[a-z]+|numero-\d\.[a-z]+)"/g) || []).join(","); };
+  assert.strictEqual(campos(pf), campos(pj));
+  assert.ok(/<meta name="report-segmento" content="pf">/.test(pf.html) && /<meta name="report-segmento" content="pj">/.test(pj.html));
+  assert.ok(/<meta name="report-layout" content="2">/.test(pf.html) && /<meta name="report-layout" content="2">/.test(pj.html));
+  var abertura = function (r) { return /<!--secao:capa-->[\s\S]*?bgcolor="(#[0-9A-F]{6})"/.exec(r.html)[1]; };
+  assert.strictEqual(abertura(pf), "#EC0000", "PF: abertura em Vermelho Santander");
+  assert.strictEqual(abertura(pj), "#F5DECF", "PJ: abertura em Rio");
+  assert.ok(/&nbsp;&nbsp;O QUE LANÇAMOS<\/p>/.test(pf.html) && /&nbsp;&nbsp;CAMPANHAS<\/p>/.test(pj.html));
+  assert.ok(/data-campo="formiguinha"/.test(pf.html) && !/data-campo="formiguinha"/.test(pj.html), "formiguinha só no PF");
+});
+
+teste("marca de antes da 5.1 (sem as cores novas): vale o que a abertura já usava", function () {
+  var antiga = MARCA.replace(/^abertura_texto:.*\n/m, "").replace(/^bloco_fundo:.*\n/m, "").replace(/^foco_fundo:.*\n/m, "");
+  var r = montar(MINIMO, { marca: antiga });
+  assert.ok(r.ok, JSON.stringify(r.problemas));
+  assert.deepStrictEqual(niveis(r, "erro"), []);
+});
+
 teste("o report sai com as marcas de seção, na ordem do template", function () {
   assert.deepStrictEqual(M.secoesDoHtml(modeloHtml()).map(function (x) { return x.id; }),
-    ["capa", "lancamos", "cx", "transformation", "aprendizados", "foco", "agenda", "rodape"]);
+    ["capa", "visao", "resultados", "lancamos", "cx", "transformation", "aprendizados", "foco", "agenda", "rodape"]);
   assert.ok(/<!--secao:fim-->/.test(modeloHtml()));
   /* Os "EDITAR AQUI" ficam na página (guia para quem abre no editor), mas não vão para o e-mail. */
-  assert.ok(/<!-- EDITAR AQUI: PERÍODO/.test(modeloHtml()) && /<!-- EDITAR AQUI: APRENDIZADO/.test(modeloHtml()), "EDITAR AQUI na página");
+  assert.ok(/<!-- EDITAR AQUI: FRASE DO MÊS E PERÍODO/.test(modeloHtml()) && /<!-- EDITAR AQUI: APRENDIZADO/.test(modeloHtml()), "EDITAR AQUI na página");
   assert.ok(!/<!-- EDITAR AQUI|data-campo=|data-tom=/.test(M.paraEmail(modeloHtml())), "o e-mail não leva EDITAR AQUI nem as marcas do resumo");
   assert.ok(!/<!--(?!\[if|<!\[endif\]|secao:| EDITAR AQUI)/.test(modeloHtml()), "os outros comentários continuam saindo");
 });
@@ -459,13 +485,13 @@ teste("o report sai com as marcas de seção, na ordem do template", function ()
 teste("emailResumido: só as seções escolhidas, botão com o link antes do encerramento, seções renumeradas", function () {
   var link = "https://empresa.sharepoint.com/sites/x/report.html?a=1&b=2";
   var r = M.emailResumido(modeloHtml(), { link: link });
-  assert.deepStrictEqual(r.mantidas, ["capa", "foco", "rodape"]);
+  assert.deepStrictEqual(r.mantidas, ["capa", "visao", "resultados", "foco", "rodape"]);
   assert.deepStrictEqual(r.fora, ["lancamos", "cx", "transformation", "aprendizados", "agenda"]);
   assert.ok(r.html.indexOf('href="https://empresa.sharepoint.com/sites/x/report.html?a=1&amp;b=2"') > 0, "link escapado no href");
   assert.ok(r.html.indexOf("<!--secao:interativo-->") < r.html.indexOf("<!--secao:rodape-->"), "botão antes do encerramento");
   assert.ok(!/<!--secao:(lancamos|cx|agenda)-->/.test(r.html) && /Na versão completa estão também: O que lançamos, Creative X/.test(r.html));
   var nums = (r.html.match(/border-radius:999px;padding:0 7px;letter-spacing:1px;">(\d\d)</g) || []).map(function (x) { return x.slice(-3, -1); });
-  assert.deepStrictEqual(nums, ["01", "02"]);
+  assert.deepStrictEqual(nums, ["01", "02", "03"]);
   assert.ok(r.html.length < modeloHtml().length * 0.7);
   assert.ok(M.emailResumido("<html><body>sem marcas</body></html>", { link: link }).erro);
   var c = M.conferirHtml(r.html).filter(function (x) { return x.nivel === "erro"; });

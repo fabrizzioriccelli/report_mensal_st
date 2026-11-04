@@ -166,12 +166,12 @@ Se não houver critério, diga qual usou. Não explique causas.
 
 | | |
 |---|---|
-| **Objetivo** | Escolher o projeto principal, os 3 números da capa e o que fica de fora |
+| **Objetivo** | Escolher o projeto principal, os 3 principais resultados e o que fica de fora |
 | **Quando usar** | Depois das variações calculadas |
 | **Entradas** | Tabelas dos prompts 1 e 3 |
 | **Formato de saída** | Projeto principal + número 1 a 3; destaque de "O que lançamos"; lista do que foi descartado e por quê |
 | **Validação** | A área aprova a escolha antes de escrever os textos |
-| **Onde entra no report** | Capa (projeto principal e números), "O que lançamos" e a sugestão do e-mail-resumo (os números do projeto principal; os destaques do e-mail são escolhidos no emulador, até 4) |
+| **Onde entra no report** | Visão geral e Principais resultados (projeto principal e números), "O que lançamos" e a sugestão do e-mail-resumo (os números do projeto principal; os destaques do e-mail são escolhidos no emulador, até 4) |
 
 ```text
 Com base nas tabelas anteriores, proponha:
@@ -188,12 +188,12 @@ Liste também o que você DESCARTOU (pequeno, sem base, base pequena) e o motivo
 
 | | |
 |---|---|
-| **Objetivo** | Escrever a capa: frase do mês, projeto principal e os 3 números |
+| **Objetivo** | Escrever a abertura: frase do mês, projeto principal e os 3 números |
 | **Quando usar** | Depois que a área aprovar os destaques (Prompt 4) |
 | **Entradas** | Destaques aprovados; mês e próximo mês |
 | **Formato de saída** | Blocos `[EDICAO]`, `[ABERTURA]`, `[PROJETO PRINCIPAL]`, `[NUMERO 1]` a `[NUMERO 3]` |
 | **Validação** | Cada `valor` igual ao da tabela; frase sem número; nenhum campo inventado |
-| **Onde entra no report** | Capa vermelha e e-mail-resumo (frase e indicadores) |
+| **Onde entra no report** | Abertura (frase do mês), Visão geral, Principais resultados e e-mail-resumo (frase e indicadores) |
 
 ```text
 Escreva a capa do report de [MÊS/ANO] usando só os destaques aprovados.

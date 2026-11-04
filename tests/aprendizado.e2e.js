@@ -61,7 +61,8 @@ function salvarComo() {
     });
   }
 
-  var p = await abrir(path.join(RAIZ, "kit/report-exemplo.html"));
+  /* report de antes (o exemplo do kit na 4.12, guardado em tests/dados): o emulador o atualiza ao abrir */
+  var p = await abrir(path.join(RAIZ, "tests/dados/report-exemplo-4.12.html"));
   confere((await q(p, blocos)).length === 0, "report de antes: sem bloco \"O que aprendemos\" nas campanhas");
 
   /* 0. formato novo ao abrir (4.13): "PROJETO PRINCIPAL" vira "CAMPANHA" (editável); números em ordem de leitura (número → título → etiqueta → referência) */

@@ -3,8 +3,8 @@
 # ======================================================================
 #  O mesmo formato de config/marca.txt (o do PF), com as escolhas do
 #  Brand Guide Santander Brasil (maio/2026), capítulo 6 · Santander
-#  Empresas. Vale para o template/report-pj.html. O PF continua usando
-#  config/marca.txt, sem nenhuma mudança.
+#  Empresas. O template é o mesmo do PF (template/report.html, o mesmo
+#  esqueleto nos dois segmentos): o que muda no PJ vem daqui.
 #
 #  Como editar: cada linha é "campo: valor". Troque só o que vem depois
 #  dos ":". Linhas que começam com # são explicações.
@@ -97,9 +97,12 @@ capa_selo: #FFFFFF
 capa_filete: #FFFFFF
 # Segunda parte da frase do mês: Preto, mais leve (peso normal).
 capa_destaque: #000000
-# Blocos Rio (abertura, resultados, indicadores, análises, próximas
-# iniciativas e encerramento) e filetes sobre eles.
+# Blocos Rio (abertura, resultados, indicadores, próximas iniciativas e
+# encerramento), texto da abertura em Preto e filetes brancos sobre o Rio.
 abertura_fundo: #F5DECF
+abertura_texto: #000000
+bloco_fundo: #F5DECF
+foco_fundo: #F5DECF
 abertura_linha: #FFFFFF
 # Divisórias finas sobre Branco (Rio).
 linha: #F5DECF

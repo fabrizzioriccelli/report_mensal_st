@@ -5,6 +5,7 @@
  * Uso técnico (quem mantém a ferramenta). Requer Node.js + Playwright:
  *   node tools/atualizar-coringa.js            PF: kit/report-coringa.html e tools/coringa.js
  *   node tools/atualizar-coringa.js pj         PJ: kit/report-coringa-pj.html e tools/coringa-pj.js
+ *   node tools/atualizar-coringa.js exemplo    PF: kit/report-exemplo.html (treino, conteúdo fictício)
  *   node tools/atualizar-coringa.js exemplo-pj PJ: kit/report-exemplo-pj.html (treino, conteúdo fictício)
  *   (depois: node tools/montar-avulso.js [pj] e os testes)
  */
@@ -15,10 +16,11 @@ var RAIZ = path.join(__dirname, "..");
 var VARIANTES = {
   pf: { dados: "dados/CORINGA.txt", html: "kit/report-coringa.html", js: "tools/coringa.js" },
   pj: { dados: "dados/CORINGA-PJ.txt", html: "kit/report-coringa-pj.html", js: "tools/coringa-pj.js" },
+  exemplo: { dados: "dados/EXEMPLO-treinamento.txt", html: "kit/report-exemplo.html" },
   "exemplo-pj": { dados: "dados/EXEMPLO-PJ-treinamento.txt", html: "kit/report-exemplo-pj.html" }
 };
 var V = VARIANTES[process.argv[2] || "pf"];
-if (!V) { console.error("Use: pf, pj ou exemplo-pj"); process.exit(1); }
+if (!V) { console.error("Use: pf, pj, exemplo ou exemplo-pj"); process.exit(1); }
 (async function () {
   var browser = await chromium.launch(), page = await browser.newPage({ acceptDownloads: true }), erros = [];
   page.on("pageerror", function (e) { erros.push(e.message); });

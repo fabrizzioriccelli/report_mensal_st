@@ -2,6 +2,35 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 5.1 · 2026-11-04 · PF e PJ no mesmo esqueleto de página
+
+- **Um template só para os dois segmentos** (`template/report.html`, o esqueleto que nasceu no PJ; `template/report-pj.html` saiu). A estrutura, a grade, os blocos arredondados, os balões, as pílulas numeradas e a marcação de cada item são os mesmos no PF e no PJ. Muda só o que vem da marca e do perfil de cada um:
+  - cores: no PF, abertura, foco e encerramento em Vermelho Santander com texto branco; no PJ, em Rio com texto Preto. Principais resultados e Creative X/Indicadores em Rio nos dois;
+  - nomes das seções: os do PF continuam (O que lançamos, Creative X, Transformation Hub, O que aprendemos, Foco de…, Também vem aí);
+  - formiguinha: só no PF, no encerramento.
+- **Report PF no esqueleto novo:**
+  - a abertura traz só a frase do mês;
+  - a campanha do mês vai para **01 · Visão geral**, com a peça num retângulo vertical (184 x 230 px; envie com 368 x 460 px ou mais). Antes, era quadrada (220 px);
+  - os números vão para **02 · Principais resultados**, num bloco Rio, com o 1º número em vermelho e o "O que aprendemos" da campanha embaixo;
+  - Visão geral e Principais resultados se movem e se tiram como as outras seções;
+  - o e-mail-resumido leva também essas duas seções.
+- **Cores novas na marca** (`config/marca.txt` e `config/marca-pj.txt`): `abertura_texto`, `bloco_fundo` e `foco_fundo`. Numa marca de antes, sem elas, valem as que a abertura já usava.
+- **Rótulos das seções** em `PERFIS.*.rotulos` (`tools/motor.js`): o template usa `{{rot.*}}`.
+- **Marcas na página:** a página traz `<meta name="report-segmento" content="pf">` (ou `pj`) e `<meta name="report-layout" content="2">`.
+- **No emulador:**
+  - as cores do que ele acrescenta seguem o layout do report aberto: separadores, filetes, 1º número, tópicos e "O que aprendemos";
+  - nomes novos no PF: "Visão geral · campanha", "Peça da visão geral", "Resultado principal N" e "Principais resultados".
+- **Report salvo antes:** um report PF salvo antes da 5.1 abre e funciona no Emulador Report PF como sempre, no layout em que foi salvo. Para o mês ficar no esqueleto novo, comece do modelo em branco.
+- **Movimento:** as células vazias que só separam os blocos não entram mais na animação de entrada. Antes, rolando direto até o fim, uma delas podia ficar esperando a vez de aparecer.
+- **Kit gerado de novo:**
+  - modelo em branco PF, com o espaço da imagem vertical (`assets/coringa/coringa-principal.png`);
+  - exemplo PF (`kit/report-exemplo.html`, agora por `node tools/atualizar-coringa.js exemplo`);
+  - modelo e exemplo PJ e os dois emuladores avulsos.
+- **Testes:**
+  - motor: o mesmo esqueleto nos dois segmentos e a marca de antes sem as cores novas (81);
+  - o exemplo do kit da 4.12 virou peça de teste do "report de antes" (`tests/dados/report-exemplo-4.12.html`);
+  - testes do emulador atualizados para os nomes e a ordem das seções do PF.
+
 ## 5.0 · 2026-11-04 · Emulador Report PJ (Santander Empresas) e guia operacional unificado PF + PJ
 
 - **Emulador Report PJ** (`kit/emulador-report-pj.html`): o mesmo emulador do PF, com todas as funções (edição no Chrome/Edge, textos e indicadores, imagens e vídeos, + Adicionar item, + Novo tópico, mover e tirar seções, grade do computador e do celular, movimento, HTML completo, e-mail-resumo com até 4 destaques, imagens no resumo, link, `.eml`, e-mail completo, importação do Copilot, rascunho recuperado, conferências e as otimizações de desempenho). Muda o que é do PJ: aba **Emulador Report PJ**, ícone **Santander + PJ**, cabeçalho em Rio, modelo em branco PJ e os nomes das seções.
