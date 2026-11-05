@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "5.1 (2026-11-04)";
+  var VERSAO = "5.2 (2026-11-05)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -116,7 +116,7 @@
   var PERFIS = {
     pf: {
       id: "pf", sigla: "PF", area: "Creative Strategy PF", area_linha: "CUSTOMER INTERACTIONS", icone: ICONE_TAG,
-      template: "template/report.html", marca: "config/marca.txt", emulador: "Emulador Report PF", foto_capa: [184, 230],
+      template: "template/report.html", marca: "config/marca.txt", emulador: "Emulador Report PF", foto_capa: [184, 230], layout: "2",
       secoes: { capa: "Abertura", visao: "Visão geral", resultados: "Principais resultados", lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub",
         aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí", rodape: "Encerramento e assinatura" },
       nomes: { destaque: "Destaque", lancamentos: "Lançamentos", cx: "Creative X", cxt: "Creative X trimestral", transformation: "Transformation Hub",
@@ -129,7 +129,7 @@
     },
     pj: {
       id: "pj", sigla: "PJ", area: "Creative Strategy PJ", area_linha: "SANTANDER EMPRESAS", icone: ICONE_TAG_PJ,
-      template: "template/report.html", marca: "config/marca-pj.txt", emulador: "Emulador Report PJ", foto_capa: [184, 230],
+      template: "template/report.html", marca: "config/marca-pj.txt", emulador: "Emulador Report PJ", foto_capa: [184, 230], layout: "3",
       secoes: { capa: "Abertura", visao: "Visão geral", resultados: "Principais resultados", lancamos: "Campanhas", cx: "Indicadores", transformation: "Análises",
         aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda", rodape: "Encerramento" },
       nomes: { destaque: "Campanha em destaque", lancamentos: "Campanhas", cx: "Indicadores", cxt: "Indicadores do trimestre", transformation: "Análises",
@@ -185,9 +185,11 @@
   var CORES_APOIO = ["grupo_resultados", "grupo_resultados_fundo", "grupo_evolucao", "grupo_evolucao_fundo", "grupo_aprendizado", "grupo_aprendizado_fundo",
     "capa_selo", "capa_filete", "capa_destaque", "abertura_fundo", "abertura_linha", "linha", "creative_x", "creative_x_anterior", "transformation", "transformation_titulo",
     "transformation_fundo", "transformation_linha", "transformation_placeholder_fundo", "transformation_placeholder_borda", "foco_rotulo", "foco_texto", "rodape_claro", "rodape_fundo",
-    "placeholder_fundo", "placeholder_borda", "abertura_texto", "bloco_fundo", "foco_fundo"];
-  /* Cores do esqueleto da 5.1 (PF e PJ no mesmo layout). Numa marca de antes, valem estas (o que a abertura e o foco já usavam). */
-  var CORES_PADRAO = { abertura_texto: "texto", bloco_fundo: "abertura_fundo", foco_fundo: "abertura_fundo" };
+    "placeholder_fundo", "placeholder_borda", "abertura_texto", "bloco_fundo", "foco_fundo", "selo_texto", "cartao_fundo", "rotulo_texto"];
+  /* Cores do esqueleto da 5.1 (PF e PJ no mesmo layout) e do fundo Rio do PJ (5.2). Numa marca de antes, valem estas
+     (o que a página já usava): texto dos balões dos painéis = marca, cartão das análises = fundo do e-mail, rótulos
+     pequenos = cor do grupo Resultados. */
+  var CORES_PADRAO = { abertura_texto: "texto", bloco_fundo: "abertura_fundo", foco_fundo: "abertura_fundo", selo_texto: "marca", cartao_fundo: "fundo_email", rotulo_texto: "grupo_resultados" };
   function obrig(lista) { var o = {}; lista.forEach(function (k) { o[k] = 1; }); return o; }
 
   var ESQUEMA_MARCA = [
@@ -980,7 +982,7 @@
     }
     var assunto = PERF.area + " | Report de " + mes + " " + ano;
     var modelo = {
-      assunto: assunto, icone: seguro(PERF.icone), segmento: PERF.id, area: PERF.area, area_linha: PERF.area_linha, rot: rotulosDaPagina(PERF), css_celular: seguro(CSS_CELULAR), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
+      assunto: assunto, icone: seguro(PERF.icone), segmento: PERF.id, area: PERF.area, area_linha: PERF.area_linha, layout: PERF.layout, rot: rotulosDaPagina(PERF), css_celular: seguro(CSS_CELULAR), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topicos: topicos, foco: foco, agenda: agenda

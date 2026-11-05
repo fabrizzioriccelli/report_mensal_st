@@ -57,13 +57,16 @@ descricao: Santander
 #  Boston #CC0000 (texto do balão sobre Rio) e Preto #000000 (títulos e
 #  textos de apoio). "Destaque para o tom Rio, garantindo maior
 #  distintividade."
-#  Regras aplicadas no report PJ:
-#   - FUNDO só Rio ou Branco (nenhum fundo vermelho). A página é Branca
-#     e os blocos (abertura, resultados, indicadores, próximas
-#     iniciativas, encerramento) são retângulos Rio arredondados.
-#   - Títulos e textos em Preto; vermelho só na chama, nos links e no
-#     botão; balões: Branco com texto Vermelho (sobre Rio) ou Rio com
-#     texto Boston (sobre Branco). Nenhuma outra combinação.
+#  Regras aplicadas no report PJ (5.2):
+#   - FUNDO só Rio ou Branco (nenhum fundo vermelho), com destaque para o
+#     Rio: a página e o fundo do e-mail são Rio; os painéis (abertura,
+#     principais resultados, indicadores, próximas iniciativas e
+#     encerramento) e o cartão das análises são retângulos Brancos
+#     arredondados sobre o Rio.
+#   - Títulos e textos em Preto; vermelho só na chama, nos links, nos
+#     números de destaque e no botão. Balões: Branco com texto Vermelho
+#     Santander (sobre Rio) ou Rio com texto Boston (sobre Branco). Textos
+#     pequenos sobre o Rio em Boston (contraste de 4,5:1 ou mais).
 #   - Etiquetas de variação (verde/âmbar): só nos dados, como no PF
 #     (paleta de apoio institucional, uso pontual em indicadores).
 [CORES]
@@ -76,54 +79,62 @@ positivo: #21634F
 positivo_fundo: #A3E0CE
 atencao: #945400
 atencao_fundo: #FFE1B9
-fundo_pagina: #FFFFFF
-fundo_email: #FFFFFF
+fundo_pagina: #F5DECF
+fundo_email: #F5DECF
 
 
 # ======================================================================
 #  CORES DE APOIO (elementos do report PJ)
 # ======================================================================
 [CORES DE APOIO]
-# Número da seção (balão sobre Branco): fundo Rio, texto Boston.
-grupo_resultados: #CC0000
-grupo_resultados_fundo: #F5DECF
-grupo_evolucao: #CC0000
-grupo_evolucao_fundo: #F5DECF
+# Balão sobre o Rio (número da seção, rótulo da campanha): fundo Branco,
+# texto Vermelho Santander.
+grupo_resultados: #EC0000
+grupo_resultados_fundo: #FFFFFF
+grupo_evolucao: #EC0000
+grupo_evolucao_fundo: #FFFFFF
+# Aprendizados e agenda (números, datas e rótulos pequenos sobre o Rio):
+# Boston, com o balão Branco.
 grupo_aprendizado: #CC0000
-grupo_aprendizado_fundo: #F5DECF
-# Balão sobre Rio (período na abertura, número da seção nos blocos Rio):
-# fundo Branco, texto Vermelho Santander. Filetes sobre Rio: branco.
-capa_selo: #FFFFFF
-capa_filete: #FFFFFF
+grupo_aprendizado_fundo: #FFFFFF
+# Rótulos pequenos sobre o Rio (categoria do destaque, "Outras
+# campanhas do mês"): Boston.
+rotulo_texto: #CC0000
+# Balão sobre os painéis Brancos (período na abertura, número da seção,
+# contato): fundo Rio, texto Boston. Filete da abertura: Rio.
+capa_selo: #F5DECF
+selo_texto: #CC0000
+capa_filete: #F5DECF
 # Segunda parte da frase do mês: Preto, mais leve (peso normal).
 capa_destaque: #000000
-# Blocos Rio (abertura, resultados, indicadores, próximas iniciativas e
-# encerramento), texto da abertura em Preto e filetes brancos sobre o Rio.
-abertura_fundo: #F5DECF
+# Painéis Brancos (abertura, resultados, indicadores, próximas
+# iniciativas e encerramento), com texto Preto e filetes e trilho em Rio.
+abertura_fundo: #FFFFFF
 abertura_texto: #000000
-bloco_fundo: #F5DECF
-foco_fundo: #F5DECF
-abertura_linha: #FFFFFF
-# Divisórias finas sobre Branco (Rio).
-linha: #F5DECF
+bloco_fundo: #FFFFFF
+foco_fundo: #FFFFFF
+abertura_linha: #F5DECF
+# Divisórias finas e contorno das imagens sobre o Rio: Branco.
+linha: #FFFFFF
 # Indicadores: barra (Boston) e valor anterior (Preto).
 creative_x: #CC0000
 creative_x_anterior: #000000
-# Análises: textos, títulos, bloco Rio com cartão branco e divisórias.
+# Análises: cartão Branco sobre o Rio, com divisórias Rio.
 transformation: #000000
 transformation_titulo: #000000
-transformation_fundo: #F5DECF
+cartao_fundo: #FFFFFF
+transformation_fundo: #FFFFFF
 transformation_linha: #F5DECF
-transformation_placeholder_fundo: #FFFFFF
+transformation_placeholder_fundo: #F5DECF
 transformation_placeholder_borda: #CC0000
-# Textos sobre Rio: Preto.
+# Textos dos painéis Brancos: Preto.
 foco_rotulo: #000000
 foco_texto: #000000
-# Encerramento: bloco Rio, assinatura com a chama vermelha.
-rodape_claro: #FFFFFF
-rodape_fundo: #F5DECF
-# Espaço de imagem ainda não escolhida (só no rascunho).
-placeholder_fundo: #F5DECF
+# Encerramento: painel Branco, filete Rio, assinatura com a chama vermelha.
+rodape_claro: #F5DECF
+rodape_fundo: #FFFFFF
+# Espaço de imagem ainda não escolhida (só no rascunho): Branco sobre o Rio.
+placeholder_fundo: #FFFFFF
 placeholder_borda: #CC0000
 
 

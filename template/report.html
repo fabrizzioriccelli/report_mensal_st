@@ -10,8 +10,8 @@
 <meta name="supported-color-schemes" content="light only">
 <!-- Segmento do report: pf (Creative Strategy PF) ou pj (Santander Empresas). Cada emulador só abre os reports do seu segmento. -->
 <meta name="report-segmento" content="{{segmento}}">
-<!-- Layout dos reports a partir da 5.1: PF e PJ no mesmo esqueleto (o emulador usa esta marca para as cores do que acrescenta). -->
-<meta name="report-layout" content="2">
+<!-- Layout da página: 2 = PF no esqueleto da 5.1; 3 = PJ com fundo Rio (5.2). O emulador usa esta marca para as cores do que acrescenta. -->
+<meta name="report-layout" content="{{layout}}">
 <title>{{assunto}}</title>
 <!-- Ícone da aba (só na página; o e-mail não leva): Santander + PF ou Santander + PJ. -->
 {{icone}}
@@ -27,9 +27,10 @@
 
   O MESMO ESQUELETO PARA OS DOIS SEGMENTOS (5.1): a estrutura, a grade, os blocos arredondados, os balões
   e a marcação de cada item são iguais no PF e no PJ. Muda só o que vem da marca e do perfil do segmento:
-    · cores (config/marca*.txt): a abertura, o foco e o encerramento em Vermelho Santander com texto
-      branco no PF; em Rio com texto Preto no PJ (Brand Guide Santander Brasil, cap. 6 · Santander
-      Empresas: nenhum fundo vermelho). Os blocos de resultados e de indicadores são Rio nos dois;
+    · cores (config/marca*.txt): no PF, página Lisboa e cartão Branco, com a abertura, o foco e o
+      encerramento em Vermelho Santander (texto branco) e os blocos de resultados e indicadores em Rio;
+      no PJ (5.2), página e e-mail em Rio, com todos esses blocos em painéis Brancos e os balões nas duas
+      variações do Brand Guide Santander Brasil, cap. 6 · Santander Empresas (nenhum fundo vermelho);
     · nomes das seções ({{rot.*}}, em tools/motor.js › PERFIS): "O que lançamos", "Creative X",
       "Transformation Hub"… no PF; "Campanhas", "Indicadores", "Análises"… no PJ;
     · logo (chama branca sobre o vermelho do PF, positiva sobre o Rio do PJ) e a formiguinha (só PF).
@@ -146,7 +147,7 @@
             <table role="presentation" class="selo" align="right" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td bgcolor="{{cor.capa_selo}}" style="background:{{cor.capa_selo}};border-radius:999px;padding:7px 14px;">
-                  <p class="fx wrap-m" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:12px;font-weight:600;color:{{cor.marca}};letter-spacing:1.2px;white-space:nowrap;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
+                  <p class="fx wrap-m" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:12px;font-weight:600;color:{{cor.selo_texto}};letter-spacing:1.2px;white-space:nowrap;">REPORT MENSAL&nbsp;&nbsp;·&nbsp;&nbsp;<span data-campo="periodo">{{edicao}}</span></p>
                 </td>
               </tr>
             </table>
@@ -195,7 +196,7 @@
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
     <td class="px ra" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:34px;padding:28px 40px 32px 40px;">
-      <p class="fx" style="margin:0 0 18px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n2}}</span>&nbsp;&nbsp;{{rot.resultados}}</p>
+      <p class="fx" style="margin:0 0 18px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.selo_texto}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n2}}</span>&nbsp;&nbsp;{{rot.resultados}}</p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           {{#numeros}}
@@ -252,7 +253,7 @@
               {{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}" height="{{h}}" alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-img="destaque" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}
               <div style="font-size:16px;line-height:16px;">&nbsp;</div>
             </div>{{/img_m}}{{#placeholder_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{placeholder_m}}<div style="font-size:16px;line-height:16px;">&nbsp;</div></div>{{/placeholder_m}}{{/peca}}
-            {{#categoria}}<p class="fx" data-campo="destaque.categoria" style="margin:0 0 8px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
+            {{#categoria}}<p class="fx" data-campo="destaque.categoria" style="margin:0 0 8px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.rotulo_texto}};letter-spacing:1.5px;">{{categoria}}</p>{{/categoria}}
             <p class="ft" data-campo="destaque.titulo" style="margin:0;font-family:{{fonte.titulos}};font-weight:bold;font-size:21px;line-height:26px;color:{{cor.titulo}};">{{titulo}}</p>
             {{#texto_cta}}<p class="fx tm" data-campo="destaque.texto" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{texto_cta}}</p>{{/texto_cta}}
             {{#tem_resultados}}
@@ -288,7 +289,7 @@
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td colspan="{{colunas_compactos}}" style="padding:12px 0 14px 0;border-top:1px solid {{cor.texto}};">
-            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.grupo_resultados}};letter-spacing:1.5px;">{{rot.outras}}</p>
+            <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.rotulo_texto}};letter-spacing:1.5px;">{{rot.outras}}</p>
           </td>
         </tr>
         {{#linhas_compactos}}
@@ -328,9 +329,9 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td class="col gap" width="184" valign="middle" style="width:184px;">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.cx}}</p>
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.selo_texto}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.cx}}</p>
                   {{#subtitulo}}<p class="fx ts" data-campo="cx.subtitulo" style="margin:4px 0 0 0;font-family:{{fonte.texto}};font-size:11px;line-height:15px;color:{{cor.texto_apoio}};">{{subtitulo}}</p>{{/subtitulo}}
-                  {{#rotulo}}<p class="fx" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cx.rotulo" style="display:inline-block;background:{{cor.capa_selo}};border-radius:999px;padding:2px 9px;font-weight:600;letter-spacing:1px;color:{{cor.marca}};">{{rotulo}}</span></p>{{/rotulo}}
+                  {{#rotulo}}<p class="fx" style="margin:8px 0 0 0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cx.rotulo" style="display:inline-block;background:{{cor.capa_selo}};border-radius:999px;padding:2px 9px;font-weight:600;letter-spacing:1px;color:{{cor.selo_texto}};">{{rotulo}}</span></p>{{/rotulo}}
                   <p class="ft wrap-m" style="margin:6px 0 0 0;font-family:{{fonte.titulos}};font-weight:bold;font-size:24px;line-height:58px;color:{{cor.creative_x_anterior}};white-space:nowrap;">{{#anterior}}<span data-campo="cx.anterior">{{anterior}}</span> <span style="color:{{cor.marca}};">&#8594;</span> {{/anterior}}<span data-campo="cx.atual" style="font-size:54px;color:{{cor.texto}};letter-spacing:-2px;">{{atual}}</span></p>
                 </td>
                 <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
@@ -357,7 +358,7 @@
               <tr><td height="20" style="height:20px;font-size:0;line-height:0;border-bottom:1px solid {{cor.abertura_linha}};">&nbsp;</td></tr>
               <tr>
                 <td style="padding:18px 0 0 0;">
-                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cxt.rotulo" style="display:inline-block;background:{{cor.capa_selo}};border-radius:999px;padding:2px 9px;font-weight:600;letter-spacing:1px;color:{{cor.marca}};">{{rotulo}}</span></p>
+                  <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:14px;"><span data-campo="cxt.rotulo" style="display:inline-block;background:{{cor.capa_selo}};border-radius:999px;padding:2px 9px;font-weight:600;letter-spacing:1px;color:{{cor.selo_texto}};">{{rotulo}}</span></p>
                   {{#titulo}}<p class="ft" data-campo="cxt.titulo" style="margin:8px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:22px;line-height:26px;color:{{cor.titulo}};">{{titulo}}</p>{{/titulo}}
                 </td>
               </tr>
@@ -401,7 +402,7 @@
       <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_evolucao_fundo}};color:{{cor.grupo_evolucao}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.transformation}}</p>
       {{#titulo}}<p class="ft h2" data-campo="transformation.titulo" style="margin:10px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.transformation_titulo}};letter-spacing:-0.5px;">{{titulo}}</p>{{/titulo}}
       <div style="font-size:18px;line-height:18px;mso-line-height-rule:exactly;">&nbsp;</div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.fundo_email}}" class="ra" style="background:{{cor.fundo_email}};border:2px solid {{cor.transformation_fundo}};border-radius:34px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.cartao_fundo}}" class="ra" style="background:{{cor.cartao_fundo}};border:2px solid {{cor.transformation_fundo}};border-radius:34px;">
         <tr>
           <td class="px" style="padding:6px 26px 6px 26px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -583,7 +584,7 @@
     <td class="px ra" bgcolor="{{cor.foco_fundo}}" valign="middle" style="background:{{cor.foco_fundo}};border-radius:34px;padding:28px 40px 30px 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td class="col" width="{{largura_texto}}" valign="middle" style="width:{{largura_texto}}px;">
-        <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.marca}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.foco}}<span data-campo="foco.mes">{{mes}}</span></p>
+        <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.selo_texto}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.foco}}<span data-campo="foco.mes">{{mes}}</span></p>
         {{#selo}}{{#img_m}}<div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}" data-img="selo" style="display:block;border:0;width:{{w}}px;height:auto;margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;color:{{cor.texto}};"></div>{{/img_m}}{{/selo}}
         <p class="ft h2" data-campo="foco.prioridade" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-weight:bold;font-size:28px;line-height:32px;color:{{cor.foco_texto}};letter-spacing:-0.5px;">{{prioridade}}</p>
         {{#texto}}<p class="fx tm" data-campo="foco.texto" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.foco_texto}};">{{texto}}</p>{{/texto}}
@@ -644,7 +645,7 @@
             {{#contato}}
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr>
               <td bgcolor="{{cor.capa_selo}}" style="background:{{cor.capa_selo}};border-radius:20px;padding:10px 16px 11px 16px;">
-                <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.marca}};letter-spacing:1.5px;">DÚVIDAS E SUGESTÕES</p>
+                <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:9px;line-height:13px;font-weight:bold;color:{{cor.selo_texto}};letter-spacing:1.5px;">DÚVIDAS E SUGESTÕES</p>
                 <p class="fx tm" style="margin:2px 0 0 0;font-family:{{fonte.texto}};font-size:12px;line-height:17px;font-weight:bold;color:{{cor.texto}};word-break:break-word;" data-campo="contato">{{contato}}</p>
               </td>
             </tr></table>

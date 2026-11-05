@@ -446,7 +446,7 @@ function modeloHtml() {
   return r.html;
 }
 
-teste("PF e PJ (5.1): o mesmo esqueleto; mudam as cores da marca, os nomes das seções e a formiguinha", function () {
+teste("PF e PJ (5.1 e 5.2): o mesmo esqueleto; mudam as cores da marca, os nomes das seções e a formiguinha", function () {
   /* os mesmos dados (fictícios) nos dois segmentos: só muda "segmento: PJ" e a marca */
   var dados = ler("dados/EXEMPLO-treinamento.txt");
   var pf = montar(dados), pj = montar(dados.replace(/^\[EDICAO\]\s*$/m, "[EDICAO]\nsegmento: PJ"), { marca: ler("config/marca-pj.txt"), arquivoMarca: "config/marca-pj.txt" });
@@ -457,10 +457,14 @@ teste("PF e PJ (5.1): o mesmo esqueleto; mudam as cores da marca, os nomes das s
   var campos = function (r) { return (r.html.match(/data-campo="(frase|frase_final|periodo|principal\.[a-z]+|numero-\d\.[a-z]+)"/g) || []).join(","); };
   assert.strictEqual(campos(pf), campos(pj));
   assert.ok(/<meta name="report-segmento" content="pf">/.test(pf.html) && /<meta name="report-segmento" content="pj">/.test(pj.html));
-  assert.ok(/<meta name="report-layout" content="2">/.test(pf.html) && /<meta name="report-layout" content="2">/.test(pj.html));
+  assert.ok(/<meta name="report-layout" content="2">/.test(pf.html) && /<meta name="report-layout" content="3">/.test(pj.html), "layout 2 no PF; 3 no PJ (fundo Rio, 5.2)");
   var abertura = function (r) { return /<!--secao:capa-->[\s\S]*?bgcolor="(#[0-9A-F]{6})"/.exec(r.html)[1]; };
   assert.strictEqual(abertura(pf), "#EC0000", "PF: abertura em Vermelho Santander");
-  assert.strictEqual(abertura(pj), "#F5DECF", "PJ: abertura em Rio");
+  assert.strictEqual(abertura(pj), "#FFFFFF", "PJ: abertura num painel Branco");
+  assert.ok(/<body style="margin:0;padding:0;background:#F5DECF;" bgcolor="#F5DECF">/.test(pj.html), "PJ: página Rio (5.2)");
+  /* balões: Branco com Vermelho sobre o Rio; Rio com Boston sobre os painéis Brancos */
+  assert.ok(/data-campo="principal.rotulo" style="display:inline-block;background:#FFFFFF;color:#EC0000;/.test(pj.html), "PJ: rótulo da campanha num balão Branco com texto Vermelho (sobre o Rio)");
+  assert.ok(/background:#F5DECF;color:#CC0000;border-radius:999px;padding:0 7px;letter-spacing:1px;">02</.test(pj.html), "PJ: número da seção no painel Branco num balão Rio com texto Boston");
   assert.ok(/&nbsp;&nbsp;O QUE LANÇAMOS<\/p>/.test(pf.html) && /&nbsp;&nbsp;CAMPANHAS<\/p>/.test(pj.html));
   assert.ok(/data-campo="formiguinha"/.test(pf.html) && !/data-campo="formiguinha"/.test(pj.html), "formiguinha só no PF");
 });

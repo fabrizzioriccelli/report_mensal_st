@@ -2,6 +2,22 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 5.2 · 2026-11-05 · Report PJ com fundo Rio
+
+- **Fundo do report PJ em Rio:** antes, a página do PJ era toda branca. Agora a página e o fundo do e-mail são **Rio**, o tom de destaque do Brand Guide Santander Empresas. Os blocos viraram painéis **Brancos** arredondados sobre o Rio: abertura, principais resultados, indicadores, próximas iniciativas, encerramento e o cartão das análises. As outras seções ficam direto sobre o Rio.
+- **Balões nas duas variações do guia:**
+  - sobre o Rio (número da seção, rótulo da campanha), balão Branco com texto Vermelho Santander;
+  - nos painéis Brancos (período da abertura, número da seção, contato), balão Rio com texto Boston;
+  - textos pequenos sobre o Rio (datas da agenda, rótulos) em Boston, para o contraste de 4,5:1;
+  - filetes e divisórias: Brancos sobre o Rio e Rio nos painéis.
+- **Cores novas na marca, com valor padrão:** `selo_texto` (texto dos balões dos painéis), `cartao_fundo` (cartão das análises) e `rotulo_texto` (rótulos pequenos). Sem elas, valem as que a página já usava. Por isso o **PF não muda**: o HTML, o texto puro, a página interativa e o e-mail saem idênticos aos da 5.1, comparados byte a byte.
+- **Layout na página:** o report PJ novo leva `<meta name="report-layout" content="3">`. O emulador usa as cores do layout do report aberto para o que acrescenta: separadores, filetes, 1º número e "O que aprendemos". O report PJ salvo na 5.0 ou na 5.1 continua com as cores dele.
+- **Imagens do PJ:**
+  - os espaços de imagem do modelo em branco e as peças fictícias de treino que ficam sobre o Rio passaram a ter fundo Branco (`assets/coringa-pj/`, `assets/exemplo-pj/`, com o vídeo de exemplo);
+  - o espaço do selo, que fica num painel Branco, passou a ter fundo Rio.
+- Modelo em branco e exemplo PJ, os dois emuladores avulsos e o guia gerados de novo.
+- Testes: motor (layout 3 no PJ, página Rio, balões nas duas variações; 81) e `tests/pj.e2e.js` (página Rio e painel Branco, separadores Rio no painel). A suíte inteira do PF e do PJ, no repositório e no kit.
+
 ## 5.1 · 2026-11-04 · PF e PJ no mesmo esqueleto de página
 
 - **Um template só para os dois segmentos** (`template/report.html`, o esqueleto que nasceu no PJ; `template/report-pj.html` saiu). A estrutura, a grade, os blocos arredondados, os balões, as pílulas numeradas e a marcação de cada item são os mesmos no PF e no PJ. Muda só o que vem da marca e do perfil de cada um:

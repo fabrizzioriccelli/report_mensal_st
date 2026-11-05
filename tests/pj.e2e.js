@@ -118,11 +118,12 @@ function salvarComo() {
   var mod = await noQuadro(p, function (d) {
     return { seg: (d.querySelector('meta[name="report-segmento"]') || {}).content || "", campos: d.querySelectorAll("[data-ed-campo]").length, imgs: d.querySelectorAll("img[data-img]").length,
       principal: (function () { var i = d.querySelector('img[data-img="principal"]'); return i.getAttribute("width") + "x" + i.getAttribute("height"); })(),
-      area: d.querySelector("p.brand").textContent.trim(), fundoAbertura: d.querySelector("td.px.ra").getAttribute("bgcolor") };
+      area: d.querySelector("p.brand").textContent.trim(), fundoAbertura: d.querySelector("td.px.ra").getAttribute("bgcolor"), fundoPagina: d.body.getAttribute("bgcolor"),
+      layout: (d.querySelector('meta[name="report-layout"]') || {}).content || "" };
   });
   console.log("MODELO PJ: " + mod.campos + " campos editáveis, " + mod.imgs + " imagens trocáveis.");
   confere(mod.seg === "pj" && mod.campos > 80 && mod.imgs >= 15, "modelo em branco PJ aberto, todas as seções editáveis");
-  confere(mod.principal === "184x230" && mod.area === "Creative Strategy PJ" && mod.fundoAbertura === "#F5DECF", "identidade Empresas: abertura em Rio, peça da visão geral em retângulo vertical (184 x 230)");
+  confere(mod.principal === "184x230" && mod.area === "Creative Strategy PJ" && mod.fundoPagina === "#F5DECF" && mod.fundoAbertura === "#FFFFFF" && mod.layout === "3", "identidade Empresas (5.2): página Rio, abertura num painel Branco, peça da visão geral em retângulo vertical (184 x 230)");
   var o1 = await ordem(p);
   confere(o1.indexOf("capa,visao,resultados,lancamos,cx,transformation,aprendizados") === 0 && /foco,agenda,rodape,fim$/.test(o1), "seções do PJ na ordem: abertura, visão geral, principais resultados, campanhas, indicadores, análises, aprendizados, próximas iniciativas, encerramento · " + o1);
   var secs = await p.$$eval("#secoesRep input", function (l) { return l.map(function (i) { return i.value + ":" + i.closest("label").textContent.trim(); }); });
@@ -260,7 +261,7 @@ function salvarComo() {
   var s1 = await sepsCxt(pe);
   await clicarMais(pe, "cxt");
   var s2 = await sepsCxt(pe);
-  confere(/^#FFFFFF$/i.test(s1) && /^#FFFFFF,#FFFFFF$/i.test(s2), "indicadores do trimestre: separadores brancos sobre o Rio, também no indicador novo · " + s1 + " → " + s2);
+  confere(/^#F5DECF$/i.test(s1) && /^#F5DECF,#F5DECF$/i.test(s2), "indicadores do trimestre: separadores Rio no painel Branco, também no indicador novo · " + s1 + " → " + s2);
   await pe.close({ runBeforeUnload: false });
 
   /* 13. E-mail-resumo no tema Empresas: até 4 destaques, link, .eml */

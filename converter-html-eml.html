@@ -447,7 +447,11 @@
     grupos: { numero: "Principais resultados", resultado: "Resultados da campanha em destaque (Campanhas)", cxt: "Indicadores do trimestre", lancamento: "Outras campanhas do mês (Campanhas)", transformation: "Análises", aprendizado: "Aprendizados", agenda: "Agenda (próximas datas)" },
     principal: "Visão geral · campanha", destaque: "Campanhas · destaque", foco: "Próximas iniciativas", compactos: "Outras campanhas", figPrincipal: "Peça da visão geral", figDestaque: "Peça da campanha em destaque",
     numeroDe: "Resultado principal ", resultadoDe: " da campanha em destaque", cx: "Indicadores", sugestao: "os principais resultados", destaqueSec: PERFIL.nomes.destaque,
-    cor: { numero1: "#000000", texto: "#000000", linha: "#F5DECF", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#CC0000", apr: { abertura_linha: "#FFFFFF", linha: "#F5DECF", grupo_aprendizado: "#CC0000", texto: "#000000" } }
+    /* 5.2: fundo Rio, painéis Brancos (meta "report-layout" 3) */
+    cor: { numero1: "#000000", texto: "#000000", linha: "#FFFFFF", linhaBloco: "#F5DECF", transf: "#F5DECF", topico: "#EC0000", apr: { abertura_linha: "#F5DECF", linha: "#FFFFFF", grupo_aprendizado: "#CC0000", texto: "#000000" } },
+    /* report PJ salvo na 5.0 ou na 5.1 (página Branca, blocos Rio; meta "report-layout" 2): as cores daquele layout */
+    corAntiga: { numero1: "#000000", texto: "#000000", linha: "#F5DECF", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#CC0000", apr: { abertura_linha: "#FFFFFF", linha: "#F5DECF", grupo_aprendizado: "#CC0000", texto: "#000000" } },
+    layoutAtual: "3"
   } : {
     sec: { visao: "Visão geral", resultados: "Principais resultados", lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub", aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí" },
     grupos: { numero: "Principais resultados", resultado: "Resultados do destaque (O que lançamos)", cxt: "Creative X: indicadores do trimestre", lancamento: "Também neste mês (O que lançamos)", transformation: "Transformation Hub", aprendizado: "O que aprendemos", agenda: "Também vem aí (agenda)" },
@@ -455,7 +459,8 @@
     numeroDe: "Resultado principal ", resultadoDe: " do destaque", cx: "Creative X", sugestao: "os principais resultados", destaqueSec: "Destaque",
     cor: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#127277", apr: { abertura_linha: "#FFFFFF", linha: "#E2E2E2", grupo_aprendizado: "#A6112F", texto: "#000000" } },
     /* report PF salvo antes da 5.1 (layout de antes, sem a meta "report-layout"): as cores que o emulador usava nele */
-    corAntiga: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#E2E2E2", transf: "#F5DECF", topico: "#127277", apr: null }
+    corAntiga: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#E2E2E2", transf: "#F5DECF", topico: "#127277", apr: null },
+    layoutAtual: "2"
   };
   var EDITOR_CSS =
     "[data-ed-campo]{outline:1px dashed rgba(236,0,0,.45);outline-offset:2px;border-radius:3px;cursor:text;transition:background-color .15s}" +
@@ -1542,10 +1547,12 @@
   /* Cores da grade (as mesmas de config/marca.txt): 1º número da capa em vermelho; filete e separadores. */
   var COR = {};
   /* Cores do que o emulador acrescenta (1º número, separadores, filetes, tópicos, "O que aprendemos"): as do layout do
-     report aberto. A partir da 5.1, PF e PJ têm o mesmo esqueleto (meta "report-layout" 2); o report PF de antes segue
-     com as cores de antes. */
+     report aberto. A partir da 5.1, PF e PJ têm o mesmo esqueleto (meta "report-layout": 2 no PF; 3 no PJ com fundo Rio,
+     a partir da 5.2); o report salvo num layout de antes segue com as cores daquele layout. */
   function coresDoLayout(doc) {
-    var c = !PJ && UI.corAntiga && !(doc && doc.querySelector('meta[name="report-layout"][content="2"]')) ? UI.corAntiga : UI.cor;
+    /* sem documento (ao carregar): as cores do layout atual; com documento: as do layout em que ele foi salvo */
+    var m = doc && doc.querySelector('meta[name="report-layout"]'), lay = m ? m.getAttribute("content") : "";
+    var c = !doc || lay === UI.layoutAtual ? UI.cor : UI.corAntiga;
     COR.marca = c.numero1; COR.texto = c.texto; COR.linha = c.linha; COR.linhaBloco = c.linhaBloco; COR.transf_linha = c.transf; COR.topico = c.topico; COR.apr = c.apr;
   }
   coresDoLayout(null);

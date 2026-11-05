@@ -25,12 +25,12 @@ A estrutura da página é uma só: abertura, visão geral com a peça vertical, 
 
 | | PF | PJ |
 |---|---|---|
-| Abertura, foco e encerramento | Vermelho Santander, texto branco, chama branca | Rio, texto Preto, chama vermelha |
-| Principais resultados e indicadores | Rio | Rio |
+| Fundo da página e do e-mail | Lisboa em volta de um cartão Branco | **Rio** (5.2), o tom de destaque do Empresas |
+| Abertura, foco e encerramento | Vermelho Santander, texto branco, chama branca | Painéis **Brancos** sobre o Rio, texto Preto, chama vermelha |
+| Principais resultados e indicadores | Rio | Painéis Brancos sobre o Rio |
 | 1º número e títulos | Vermelho Santander | Preto |
-| Pílulas e rótulos das seções | Cores de apoio do PF (turquesa, roxo, rosa) | Rio com Boston |
+| Pílulas e rótulos das seções | Cores de apoio do PF (turquesa, roxo, rosa) | Sobre o Rio: balão Branco com texto Vermelho Santander. Nos painéis Brancos: balão Rio com texto Boston |
 | Nomes das seções | O que lançamos, Creative X, Transformation Hub, O que aprendemos, Foco de…, Também vem aí | Campanhas, Indicadores, Análises, Aprendizados, Próximas iniciativas, Agenda |
-| Fundo em volta do e-mail | Lisboa | Branco |
 | Formiguinha | No encerramento | Não usa |
 
 As cores ficam em `config/marca.txt` e `config/marca-pj.txt` (`abertura_fundo`, `abertura_texto`, `bloco_fundo`, `foco_fundo`, `rodape_fundo`…); os nomes, em `PERFIS.*.rotulos` (`tools/motor.js`). Um report PF salvo antes da 5.1 continua abrindo e funcionando no Emulador Report PF, no layout em que foi salvo; para o mês ficar no esqueleto novo, comece do modelo em branco (veja [COMO_ATUALIZAR_O_MES.md](COMO_ATUALIZAR_O_MES.md)).
@@ -56,10 +56,10 @@ Os nomes dos blocos são os mesmos do PF (a biblioteca de prompts e a importaç�
 
 | Regra do guia | No report PJ |
 |---|---|
-| Paleta: Rio, Branco, Vermelho Santander, Boston e Preto, "com destaque para o tom Rio" (6.2 Cores) | Fundos só **Rio** e **Branco**: página branca e blocos Rio (abertura, principais resultados, indicadores, próximas iniciativas, encerramento). Nenhum fundo vermelho |
+| Paleta: Rio, Branco, Vermelho Santander, Boston e Preto, "com destaque para o tom Rio" (6.2 Cores) | Fundos só **Rio** e **Branco**, com destaque para o Rio (5.2): a página e o fundo do e-mail são Rio; abertura, principais resultados, indicadores, próximas iniciativas, encerramento e o cartão das análises são painéis Brancos arredondados. Nenhum fundo vermelho na página (o vermelho aparece só como peça, como o selo de uma campanha feito para fundo vermelho) |
 | Títulos e textos de apoio em Preto (6.2 Cores) | Todos os títulos, números e textos em Preto (o 1º número também; no PF ele é vermelho) |
-| Vermelho: Botão de Início, texto do balão, logotipo | Vermelho só na chama, nos links, nos balões sobre Rio e no botão do e-mail-resumo |
-| Balões de fala: só duas variações, Branco com texto Vermelho Santander (sobre Rio) e Rio com texto Boston (sobre Branco); Santander Micro Text SemiBold (6.2 Balões) | Período da abertura e números das seções nos blocos Rio: balão Branco/Vermelho. Rótulo da campanha e números das seções sobre Branco: balão Rio/Boston |
+| Vermelho: Botão de Início, texto do balão, logotipo | Vermelho só na chama, nos links, no texto dos balões sobre o Rio, no 1º número de um tópico de números e no botão do e-mail-resumo |
+| Balões de fala: só duas variações, Branco com texto Vermelho Santander (sobre Rio) e Rio com texto Boston (sobre Branco); Santander Micro Text SemiBold (6.2 Balões) | Sobre o Rio da página (número da seção, rótulo da campanha): balão Branco com texto Vermelho Santander. Nos painéis Brancos (período da abertura, número da seção, contato): balão Rio com texto Boston. Textos pequenos sobre o Rio (datas da agenda, rótulos) em Boston, para o contraste de 4,5:1 |
 | Santander Condensed: títulos e mensagens de impacto, voz do banco; Headline: títulos de peso médio, ambientes digitais; Micro Text: apoio (6.2 Tipografia) | Frase do mês e títulos das seções em Condensed; números e nomes em Headline; textos em Micro Text (`config/marca-pj.txt`) |
 | Retângulos verticais ou horizontais, nunca quadrados; raio de 5% do menor lado (6.2 Retângulos) | Peça da visão geral em retângulo vertical (184 x 230 px); destaque vertical (184 x 300); cards horizontais (184 x 72). Cantos: 34 px nos blocos (5% de 680), 20 px nas imagens |
 | Logotipo na versão positiva, sobre Rio ou Branco; cor não muda (6.2 Logotipo) | A chama oficial em Vermelho Santander (`assets/marca/chama-santander.png`, o mesmo arquivo do PF), no topo e no canto inferior direito do encerramento |

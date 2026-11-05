@@ -96,7 +96,7 @@ module.exports = function (G) {
   G.conteudo("escolhendo", function (sl) {
     G.titulo(sl, "PF ou PJ: qual emulador abrir", "Pelo segmento do report do mês", ["PF", "PJ"]);
     [["pf", "Emulador Report PF", "Creative Strategy PF. Abertura, foco e encerramento em vermelho, títulos em vermelho e a formiguinha no encerramento.", KIT.pf, KIT.coringaPF, "PF"],
-      ["pj", "Emulador Report PJ", "Santander Empresas. Blocos em Rio, títulos em Preto com Santander Condensed, balões e o ícone Santander + PJ.", KIT.pj, KIT.coringaPJ, "PJ"]].forEach(function (e, i) {
+      ["pj", "Emulador Report PJ", "Santander Empresas. Página em Rio com painéis brancos, títulos em Preto com Santander Condensed, balões e o ícone Santander + PJ.", KIT.pj, KIT.coringaPJ, "PJ"]].forEach(function (e, i) {
       var x = 65 + i * 666;
       G.captura(sl, e[0] + "-inicio", x, 205, 646, 360, [{ i: 0, n: 1 }, { i: 1, n: 2 }], { rot: "TELA INICIAL", seg: e[5] });
       cx(sl, x, 590, 646, 145, { fill: C.br, r: 20 });
@@ -110,7 +110,7 @@ module.exports = function (G) {
     G.titulo(sl, "O que é igual e o que muda", "As funções e o esqueleto da página são os mesmos; mudam as cores e os nomes das seções", ["PF", "PJ"]);
     G.tabela(sl, 65, 200, 790, ["", "PF", "PJ"], [
       ["Aba e ícone", "Emulador Report PF · Santander + PF", "Emulador Report PJ · Santander + PJ"],
-      ["Abertura, foco e encerramento", "Em vermelho, texto branco", "Em Rio, texto Preto"],
+      ["Fundo e destaques", "Lisboa e cartão branco; abertura, foco e encerramento em vermelho", "Página em Rio; painéis brancos, texto Preto"],
       ["Campanhas", "O que lançamos", "Campanhas"],
       ["Indicador do mês", "Creative X", "Indicadores"],
       ["Projetos", "Transformation Hub", "Análises"],
