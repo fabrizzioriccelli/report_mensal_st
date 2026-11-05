@@ -2,6 +2,19 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 5.3 · 2026-11-05 · Hierarquia de cores do Santander Empresas no PJ
+
+- **O fundo do conteúdo não se confunde mais com o fundo do HTML.** Na 5.2, a página e o report do PJ eram os dois Rio, e o report se misturava com a página. Agora o PJ segue a hierarquia da paleta do Brand Guide (6.2 · Paleta e proporção):
+  - **Rio** é a cor principal e é o fundo do conteúdo (o report);
+  - **Branco** é a base: o fundo do HTML em volta do report e os painéis e cartões;
+  - **Vermelho Santander** é o acento (chama, links, botão e texto do balão Branco);
+  - **Boston** e **Preto** ficam com os textos.
+- **Painéis recuados:** a abertura, os principais resultados, os indicadores, as próximas iniciativas e o encerramento ficam recuados dentro do report. Há uma borda de Rio de 20 px em volta (8 px no celular), então o branco do painel nunca encosta no branco do HTML. O canto do painel fica com 24 px e a grade de 600 px não muda.
+- **E-mail-resumo PJ na mesma hierarquia:** fundo do e-mail Branco; cabeçalho, corpo e assinatura em Rio; cartões dos destaques e chamada final Brancos, recuados no Rio.
+- **O PF não muda:** recuo, raio e margem dos painéis vêm do perfil (`PERFIS.*.painel_recuo`: 0 no PF, 20 no PJ), e a cor do corpo do resumo vem do tema (`corpo`). O report e o e-mail-resumo do PF saem idênticos aos da 5.2, comparados byte a byte.
+- Modelo em branco e exemplo PJ, emuladores avulsos e guia gerados de novo.
+- Testes: motor (fundo do HTML, conteúdo e os 5 painéis recuados no PJ; painéis do PF sem recuo; 81) e `tests/pj.e2e.js` (hierarquia do report e do resumo). A suíte inteira do PF e do PJ.
+
 ## 5.2 · 2026-11-05 · Report PJ com fundo Rio
 
 - **Fundo do report PJ em Rio:** antes, a página do PJ era toda branca. Agora a página e o fundo do e-mail são **Rio**, o tom de destaque do Brand Guide Santander Empresas. Os blocos viraram painéis **Brancos** arredondados sobre o Rio: abertura, principais resultados, indicadores, próximas iniciativas, encerramento e o cartão das análises. As outras seções ficam direto sobre o Rio.

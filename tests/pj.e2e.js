@@ -119,11 +119,12 @@ function salvarComo() {
     return { seg: (d.querySelector('meta[name="report-segmento"]') || {}).content || "", campos: d.querySelectorAll("[data-ed-campo]").length, imgs: d.querySelectorAll("img[data-img]").length,
       principal: (function () { var i = d.querySelector('img[data-img="principal"]'); return i.getAttribute("width") + "x" + i.getAttribute("height"); })(),
       area: d.querySelector("p.brand").textContent.trim(), fundoAbertura: d.querySelector("td.px.ra").getAttribute("bgcolor"), fundoPagina: d.body.getAttribute("bgcolor"),
-      layout: (d.querySelector('meta[name="report-layout"]') || {}).content || "" };
+      layout: (d.querySelector('meta[name="report-layout"]') || {}).content || "", fundoConteudo: d.querySelector("table.container").getAttribute("bgcolor"),
+      recuo: getComputedStyle(d.querySelector("td.px.ra")).borderTopWidth };
   });
   console.log("MODELO PJ: " + mod.campos + " campos editáveis, " + mod.imgs + " imagens trocáveis.");
   confere(mod.seg === "pj" && mod.campos > 80 && mod.imgs >= 15, "modelo em branco PJ aberto, todas as seções editáveis");
-  confere(mod.principal === "184x230" && mod.area === "Creative Strategy PJ" && mod.fundoPagina === "#F5DECF" && mod.fundoAbertura === "#FFFFFF" && mod.layout === "3", "identidade Empresas (5.2): página Rio, abertura num painel Branco, peça da visão geral em retângulo vertical (184 x 230)");
+  confere(mod.principal === "184x230" && mod.area === "Creative Strategy PJ" && mod.fundoPagina === "#FFFFFF" && mod.fundoConteudo === "#F5DECF" && mod.fundoAbertura === "#FFFFFF" && mod.recuo === "20px" && mod.layout === "3", "identidade Empresas (5.3): fundo do HTML Branco, conteúdo Rio, abertura num painel Branco recuado, peça da visão geral em retângulo vertical (184 x 230) · " + [mod.fundoPagina, mod.fundoConteudo, mod.fundoAbertura, mod.recuo].join(" "));
   var o1 = await ordem(p);
   confere(o1.indexOf("capa,visao,resultados,lancamos,cx,transformation,aprendizados") === 0 && /foco,agenda,rodape,fim$/.test(o1), "seções do PJ na ordem: abertura, visão geral, principais resultados, campanhas, indicadores, análises, aprendizados, próximas iniciativas, encerramento · " + o1);
   var secs = await p.$$eval("#secoesRep input", function (l) { return l.map(function (i) { return i.value + ":" + i.closest("label").textContent.trim(); }); });
@@ -283,6 +284,7 @@ function salvarComo() {
   confere(hrefs.length === 1 && hrefs[0] === 'href="' + LINK + '"', "um único link: o botão do report completo");
   confere(/<td class="px dm-rio" bgcolor="#F5DECF"/.test(html) && /dm-txt-texto" style="margin:0;font-family:[^"]*color:#000000;">Creative Strategy PJ</.test(html) && /bgcolor="#EC0000"[^>]*><a class="cta fx dm-txt-branco"/.test(html), "tema Empresas: cabeçalho Rio com texto Preto, botão em Vermelho Santander");
   confere(!/#127277|#A6112F|#FBF1EA|#803262/i.test(html) && /SANTANDER EMPRESAS/.test(html), "resumo PJ sem as cores do PF (turquesa, rosa, Lisboa, roxo)");
+  confere(/<body class="dm-branco-bg"[^>]*bgcolor="#FFFFFF">/.test(html) && /class="container dm-rio" width="680"[^>]*bgcolor="#F5DECF"/.test(html) && /class="col kpi dtq dm-branco-bg[^"]*"[^>]*bgcolor="#FFFFFF"/.test(html), "resumo PJ (5.3): fundo do e-mail Branco, conteúdo Rio, cartões Brancos");
   var cids = (html.match(/src="cid:([^"]+)"/g) || []).map(function (s) { return s.slice(9, -1); }), anexos = (eml.match(/Content-ID: <([^>]+)>/g) || []).map(function (s) { return s.slice(13, -1); });
   confere(cids.length > 0 && cids.every(function (x) { return anexos.indexOf(x) >= 0; }), cids.length + " imagem(ns) no resumo, todas dentro do .eml");
   confere(Motor.conferirHtml(html).filter(function (x) { return x.nivel === "erro"; }).length === 0, "conferência do Outlook sem erros");

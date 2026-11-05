@@ -44,6 +44,10 @@
   agenda, tópico) tem a mesma marcação (data-campo, data-item, classes do celular): é assim que o
   emulador edita, acrescenta, tira, reordena e monta o e-mail-resumo. NÃO ALTERAR sem testar.
 
+  PAINÉIS (abertura, principais resultados, indicadores, foco e encerramento): no PJ (5.3) ficam recuados dentro
+  do report, com uma borda na cor do conteúdo ({{painel.*}}, tools/motor.js › PERFIS.pj.painel_recuo). Assim o
+  painel nunca encosta no fundo do HTML. No PF, os valores de sempre (sem recuo).
+
   MARCAS DE SEÇÃO: cada seção começa com um comentário "secao:nome" (e o fim com "secao:fim").
   GRADE (computador): conteúdo de 600 px (margens de 40 px), 3 colunas de 184 px e espaços de 24 px.
 
@@ -100,7 +104,7 @@
   }
 </style>
 <!-- Ajuste de largura no celular (o mesmo bloco do PF): tools/motor.js › CSS_CELULAR. -->
-{{css_celular}}
+{{css_celular}}{{painel.css}}
 </head>
 
 <body style="margin:0;padding:0;background:{{cor.fundo_pagina}};" bgcolor="{{cor.fundo_pagina}}">
@@ -123,7 +127,7 @@
        nome da área, período num balão branco com texto vermelho e a frase do mês em Santander Condensed. -->
   <!-- EDITAR AQUI: FRASE DO MÊS E PERÍODO → [ABERTURA] frase, frase_final · [EDICAO] mes, ano -->
   <tr>
-    <td class="px ra" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:34px;padding:26px 40px 40px 40px;">
+    <td class="px ra{{painel.classe}}" bgcolor="{{cor.abertura_fundo}}" style="background:{{cor.abertura_fundo}};border-radius:{{painel.raio}}px;padding:26px {{painel.lado}}px 40px {{painel.lado}}px;{{painel.borda}}">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td class="col" valign="middle">
@@ -195,7 +199,7 @@
   <!-- EDITAR AQUI: RESULTADOS DA CAMPANHA → [NUMERO 1] a [NUMERO 3] (até 4) valor, titulo, detalhe, variacao · [PROJETO PRINCIPAL] aprendizado -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px ra" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:34px;padding:28px 40px 32px 40px;">
+    <td class="px ra{{painel.classe}}" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:{{painel.raio}}px;padding:28px {{painel.lado}}px 32px {{painel.lado}}px;{{painel.borda}}">
       <p class="fx" style="margin:0 0 18px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.selo_texto}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n2}}</span>&nbsp;&nbsp;{{rot.resultados}}</p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -322,7 +326,7 @@
   <!-- EDITAR AQUI: INDICADORES → [CREATIVE X] subtitulo, anterior, atual, variacao, periodo, referencia, significado, nota · [CREATIVE X TRIMESTRE] · [CREATIVE X TRIMESTRE 1..3] -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px ra" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:34px;padding:28px 40px 30px 40px;">
+    <td class="px ra{{painel.classe}}" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:{{painel.raio}}px;padding:28px {{painel.lado}}px 30px {{painel.lado}}px;{{painel.borda}}">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td style="padding:0;">
@@ -581,7 +585,7 @@
   <!-- EDITAR AQUI: PRÓXIMAS INICIATIVAS → [FOCO] prioridade, texto, selo (opcional, PNG original), descricao_selo -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px ra" bgcolor="{{cor.foco_fundo}}" valign="middle" style="background:{{cor.foco_fundo}};border-radius:34px;padding:28px 40px 30px 40px;">
+    <td class="px ra{{painel.classe}}" bgcolor="{{cor.foco_fundo}}" valign="middle" style="background:{{cor.foco_fundo}};border-radius:{{painel.raio}}px;padding:28px {{painel.lado}}px 30px {{painel.lado}}px;{{painel.borda}}">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td class="col" width="{{largura_texto}}" valign="middle" style="width:{{largura_texto}}px;">
         <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.foco_rotulo}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.selo_texto}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.foco}}<span data-campo="foco.mes">{{mes}}</span></p>
@@ -635,7 +639,7 @@
   <!-- EDITAR AQUI: ENCERRAMENTO → [EDICAO] proximo_mes, contato. A assinatura é fixa (NÃO ALTERAR). -->
   <tr><td height="40" style="height:40px;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td class="px ra" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:34px;padding:32px 40px 26px 40px;">
+    <td class="px ra{{painel.classe}}" bgcolor="{{cor.rodape_fundo}}" style="background:{{cor.rodape_fundo}};border-radius:{{painel.raio}}px;padding:32px {{painel.lado}}px 26px {{painel.lado}}px;{{painel.borda}}">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td class="fw" valign="top" style="padding-bottom:4px;">

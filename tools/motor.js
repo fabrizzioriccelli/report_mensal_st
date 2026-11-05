@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "5.2 (2026-11-05)";
+  var VERSAO = "5.3 (2026-11-05)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -116,7 +116,7 @@
   var PERFIS = {
     pf: {
       id: "pf", sigla: "PF", area: "Creative Strategy PF", area_linha: "CUSTOMER INTERACTIONS", icone: ICONE_TAG,
-      template: "template/report.html", marca: "config/marca.txt", emulador: "Emulador Report PF", foto_capa: [184, 230], layout: "2",
+      template: "template/report.html", marca: "config/marca.txt", emulador: "Emulador Report PF", foto_capa: [184, 230], layout: "2", painel_recuo: 0,
       secoes: { capa: "Abertura", visao: "Visão geral", resultados: "Principais resultados", lancamos: "O que lançamos", cx: "Creative X", transformation: "Transformation Hub",
         aprendizados: "O que aprendemos", foco: "Foco do próximo mês", agenda: "Também vem aí", rodape: "Encerramento e assinatura" },
       nomes: { destaque: "Destaque", lancamentos: "Lançamentos", cx: "Creative X", cxt: "Creative X trimestral", transformation: "Transformation Hub",
@@ -129,7 +129,7 @@
     },
     pj: {
       id: "pj", sigla: "PJ", area: "Creative Strategy PJ", area_linha: "SANTANDER EMPRESAS", icone: ICONE_TAG_PJ,
-      template: "template/report.html", marca: "config/marca-pj.txt", emulador: "Emulador Report PJ", foto_capa: [184, 230], layout: "3",
+      template: "template/report.html", marca: "config/marca-pj.txt", emulador: "Emulador Report PJ", foto_capa: [184, 230], layout: "3", painel_recuo: 20,
       secoes: { capa: "Abertura", visao: "Visão geral", resultados: "Principais resultados", lancamos: "Campanhas", cx: "Indicadores", transformation: "Análises",
         aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda", rodape: "Encerramento" },
       nomes: { destaque: "Campanha em destaque", lancamentos: "Campanhas", cx: "Indicadores", cxt: "Indicadores do trimestre", transformation: "Análises",
@@ -141,6 +141,16 @@
     }
   };
   function perfil(seg) { return PERFIS[String(seg || "").toLowerCase()] || PERFIS.pf; }
+  /* Painéis (abertura, resultados, indicadores, foco, encerramento). No PJ (5.3), recuados dentro do report: uma borda na
+     cor do conteúdo (fundo_email) afasta o painel da borda do report, para ele nunca encostar no fundo do HTML; o raio
+     externo cresce o mesmo tanto (o canto do painel fica com 24 px) e a margem interna diminui o mesmo tanto (a grade de
+     600 px não muda). No celular, recuo de 8 px. No PF (recuo 0), os valores de sempre: a página sai igual. */
+  function painelDaPagina(perf, cor) {
+    var r = perf.painel_recuo || 0;
+    if (!r) return { classe: "", raio: 34, lado: 40, borda: "", css: "" };
+    return { classe: " painel", raio: 24 + r, lado: 40 - r, borda: seguro("border:" + r + "px solid " + cor.fundo_email.s + ";"),
+      css: seguro('\n<style id="painel-celular">\n  @media screen and (max-width:700px){\n    .painel{border-width:8px !important;border-radius:28px !important;padding-left:12px !important;padding-right:12px !important;}\n  }\n</style>') };
+  }
   /* Rótulos das seções para o template (já em HTML: o "·" do PJ leva espaços que não quebram). */
   function rotulosDaPagina(perf) { var o = {}; Object.keys(perf.rotulos).forEach(function (k) { o[k] = seguro(perf.rotulos[k]); }); return o; }
   /* Segmento de uma página do report: a meta "report-segmento" (PJ); sem ela, PF. */
@@ -982,7 +992,7 @@
     }
     var assunto = PERF.area + " | Report de " + mes + " " + ano;
     var modelo = {
-      assunto: assunto, icone: seguro(PERF.icone), segmento: PERF.id, area: PERF.area, area_linha: PERF.area_linha, layout: PERF.layout, rot: rotulosDaPagina(PERF), css_celular: seguro(CSS_CELULAR), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
+      assunto: assunto, icone: seguro(PERF.icone), segmento: PERF.id, area: PERF.area, area_linha: PERF.area_linha, layout: PERF.layout, painel: painelDaPagina(PERF, cor), rot: rotulosDaPagina(PERF), css_celular: seguro(CSS_CELULAR), link_report_completo: linkRC, previa: texto(A.previa || semBr(A.frase + " " + A.frase_final)),
       logo: logo, rodape_logo: rodapeLogo, rodape_formiga: formiga(64, "formiguinha"), edicao: texto(maiusculas(mes + " " + ano)), proximo_mes: prox, proximo_mes_minusculo: texto(ehPendencia(prox) ? prox : prox.toLocaleLowerCase("pt-BR")), contato: texto(E.contato),
       cor: cor, fonte: fonte,
       abertura: abertura, lancamos: lancamos, cx: cx, transformation: transformation, aprendizados: aprendizados, topicos: topicos, foco: foco, agenda: agenda
@@ -1826,7 +1836,7 @@
     '    .hide-m{display:none !important;}',
     '    .kpi{display:block !important;width:100% !important;box-sizing:border-box !important;}',
     '    .kpiv{font-size:26px !important;line-height:30px !important;}',
-    '    .dtq2{border-top:14px solid #FFFFFF !important;}',
+    '    .dtq2{border-top:14px solid {{t.corpo}} !important;}',
     '    .dimg{width:100% !important;max-width:100% !important;height:auto !important;}',
     '    .ctat{display:block !important;width:100% !important;box-sizing:border-box !important;padding:18px 20px 0 20px !important;}',
     '    .ctab{display:block !important;width:100% !important;box-sizing:border-box !important;padding:14px 20px 20px 20px !important;text-align:left !important;}',
@@ -1843,7 +1853,7 @@
     '<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;mso-line-height-rule:exactly;color:{{t.pagina}};">{{previa}}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>',
     '<table role="presentation" class="{{t.dm_pagina}}" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{{t.pagina}}" style="background:{{t.pagina}};"><tr><td align="center" style="padding:24px 0;">',
     '<!--[if mso]><table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->',
-    '<table role="presentation" class="container dm-branco-bg" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{cor.branco}}" style="width:680px;max-width:680px;background:{{cor.branco}};">',
+    '<table role="presentation" class="container {{t.dm_corpo}}" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="{{t.corpo}}" style="width:680px;max-width:680px;background:{{t.corpo}};">',
     '',
     '  <!-- CABEÇALHO: identidade, período e a frase do mês (contexto) -->',
     '  <tr><td class="px {{t.dm_cab}}" bgcolor="{{t.cab}}" style="background:{{t.cab}};padding:22px 40px 26px 40px;">',
@@ -1950,14 +1960,16 @@
      Santander Empresas, 6.2 Cores): Rio e Branco como fundos, títulos e textos em Preto, etiquetas em Boston, e o vermelho só
      na chama, nos links e no botão (o Botão de Início). Cantos retos nos dois, pelo mesmo motivo do Outlook (acima). */
   var TEMAS_RESUMO = {
-    pf: { area: PERFIS.pf.area, area_linha: PERFIS.pf.area_linha, pagina: CR.lisboa, dm_pagina: "dm-lisboa", cab: CR.marca, dm_cab: "dm-marca-bg", cab_txt: "#FFFFFF", dm_cab_txt: "dm-txt-branco", cab_filete: "#FFFFFF",
+    pf: { area: PERFIS.pf.area, area_linha: PERFIS.pf.area_linha, pagina: CR.lisboa, dm_pagina: "dm-lisboa", corpo: CR.branco, dm_corpo: "dm-branco-bg", cab: CR.marca, dm_cab: "dm-marca-bg", cab_txt: "#FFFFFF", dm_cab_txt: "dm-txt-branco", cab_filete: "#FFFFFF",
       rot: CR.turquesa, dm_rot: "dm-txt-turquesa", card: CR.lisboa, dm_card: "dm-lisboa", grupo: CR.turquesa, dm_grupo: "turquesa", grupo_apr: CR.rosa, dm_grupo_apr: "rosa",
       valor1: CR.marca, dm_valor1: "marca", titulo_txt: CR.marca, dm_titulo_txt: "marca", cta: CR.rio, dm_cta: "dm-rio", cta_borda: "", cta_tit: CR.marca, dm_cta_tit: "dm-txt-marca",
       ass: CR.marca, dm_ass: "dm-marca-bg", ass_txt: "#FFFFFF", dm_ass_txt: "dm-txt-branco", ass_borda: "", apoio: CR.apoio, dm_apoio: "apoio" },
-    pj: { area: PERFIS.pj.area, area_linha: PERFIS.pj.area_linha, pagina: CR.rio, dm_pagina: "dm-rio", cab: CR.rio, dm_cab: "dm-rio", cab_txt: CR.texto, dm_cab_txt: "dm-txt-texto", cab_filete: CR.texto,
-      rot: CR.boston, dm_rot: "dm-txt-boston", card: CR.rio, dm_card: "dm-rio", grupo: CR.boston, dm_grupo: "boston", grupo_apr: CR.boston, dm_grupo_apr: "boston",
-      valor1: CR.texto, dm_valor1: "texto", titulo_txt: CR.texto, dm_titulo_txt: "texto", cta: CR.branco, dm_cta: "dm-branco-bg", cta_borda: "border:1px solid " + CR.rio + ";", cta_tit: CR.texto, dm_cta_tit: "dm-txt-texto",
-      ass: CR.branco, dm_ass: "dm-branco-bg", ass_txt: CR.texto, dm_ass_txt: "dm-txt-texto", ass_borda: "border-top:1px solid " + CR.rio + ";", apoio: CR.texto, dm_apoio: "texto" }
+    /* PJ (5.3): a hierarquia do Brand Guide Empresas, como no report: o fundo do e-mail é Branco; o conteúdo (cabeçalho,
+       corpo e assinatura) é Rio, a cor principal; os cartões dos destaques e a chamada são Brancos, recuados no Rio. */
+    pj: { area: PERFIS.pj.area, area_linha: PERFIS.pj.area_linha, pagina: CR.branco, dm_pagina: "dm-branco-bg", corpo: CR.rio, dm_corpo: "dm-rio", cab: CR.rio, dm_cab: "dm-rio", cab_txt: CR.texto, dm_cab_txt: "dm-txt-texto", cab_filete: CR.texto,
+      rot: CR.boston, dm_rot: "dm-txt-boston", card: CR.branco, dm_card: "dm-branco-bg", grupo: CR.boston, dm_grupo: "boston", grupo_apr: CR.boston, dm_grupo_apr: "boston",
+      valor1: CR.texto, dm_valor1: "texto", titulo_txt: CR.texto, dm_titulo_txt: "texto", cta: CR.branco, dm_cta: "dm-branco-bg", cta_borda: "", cta_tit: CR.texto, dm_cta_tit: "dm-txt-texto",
+      ass: CR.rio, dm_ass: "dm-rio", ass_txt: CR.texto, dm_ass_txt: "dm-txt-texto", ass_borda: "border-top:1px solid " + CR.branco + ";", apoio: CR.texto, dm_apoio: "texto" }
   };
   var CSS_ESCURO_PJ = (function () {
     /* só as classes que o tema PJ usa (sem Lisboa, turquesa, rosa: não são do Empresas) */

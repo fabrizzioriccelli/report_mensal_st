@@ -70,6 +70,7 @@ Antes do **primeiro** envio real, faça o **teste piloto com outro usuário** (c
 | PF sem mudança na 5.0: HTML, texto puro, e-mail-resumo, página interativa e e-mail resumido idênticos byte a byte aos da 4.13; suíte inteira do PF (repositório e kit) | Passa |
 | PF e PJ no mesmo esqueleto (5.1): mesmas seções, na mesma ordem, e a mesma marcação de campos com os mesmos dados; cores e nomes de cada segmento; marca de antes sem as cores novas; report PF salvo antes da 5.1 (`tests/dados/report-exemplo-4.12.html`) abre, é atualizado e funciona; suíte inteira do PF (repositório e kit) e do PJ | Passa |
 | PJ com fundo Rio (5.2): página Rio, painéis Brancos, balões nas duas variações do Brand Guide Empresas; PF idêntico byte a byte ao da 5.1 (HTML, texto puro, página interativa e e-mail); report PJ salvo na 5.1 segue com as cores dele no emulador; suíte inteira do PF (repositório e kit) e do PJ | Passa |
+| Hierarquia de cores do PJ (5.3): fundo do HTML Branco, conteúdo Rio, 5 painéis Brancos recuados (borda Rio de 20 px; 8 px no celular); e-mail-resumo PJ na mesma hierarquia; PF (report e e-mail-resumo) idêntico byte a byte ao da 5.2; suíte inteira do PF (repositório e kit) e do PJ | Passa |
 | Movimento na versão interativa (contagem, barra, reduzir movimento, edição) | Passa |
 | Página de geração de ponta a ponta no Chromium, sem vazar para o lado de 320 a 1440 px | Passa |
 | Fonte `.otf` de teste em `assets/fonts/` | Carrega na prévia e no `.html`; fora do `.eml` |

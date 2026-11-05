@@ -96,7 +96,7 @@ module.exports = function (G) {
   G.conteudo("escolhendo", function (sl) {
     G.titulo(sl, "PF ou PJ: qual emulador abrir", "Pelo segmento do report do mês", ["PF", "PJ"]);
     [["pf", "Emulador Report PF", "Creative Strategy PF. Abertura, foco e encerramento em vermelho, títulos em vermelho e a formiguinha no encerramento.", KIT.pf, KIT.coringaPF, "PF"],
-      ["pj", "Emulador Report PJ", "Santander Empresas. Página em Rio com painéis brancos, títulos em Preto com Santander Condensed, balões e o ícone Santander + PJ.", KIT.pj, KIT.coringaPJ, "PJ"]].forEach(function (e, i) {
+      ["pj", "Emulador Report PJ", "Santander Empresas. Report em Rio sobre fundo branco, painéis brancos, títulos em Preto com Santander Condensed, balões e o ícone Santander + PJ.", KIT.pj, KIT.coringaPJ, "PJ"]].forEach(function (e, i) {
       var x = 65 + i * 666;
       G.captura(sl, e[0] + "-inicio", x, 205, 646, 360, [{ i: 0, n: 1 }, { i: 1, n: 2 }], { rot: "TELA INICIAL", seg: e[5] });
       cx(sl, x, 590, 646, 145, { fill: C.br, r: 20 });
@@ -110,13 +110,13 @@ module.exports = function (G) {
     G.titulo(sl, "O que é igual e o que muda", "As funções e o esqueleto da página são os mesmos; mudam as cores e os nomes das seções", ["PF", "PJ"]);
     G.tabela(sl, 65, 200, 790, ["", "PF", "PJ"], [
       ["Aba e ícone", "Emulador Report PF · Santander + PF", "Emulador Report PJ · Santander + PJ"],
-      ["Fundo e destaques", "Lisboa e cartão branco; abertura, foco e encerramento em vermelho", "Página em Rio; painéis brancos, texto Preto"],
+      ["Fundo e destaques", "Lisboa e cartão branco; abertura, foco e encerramento em vermelho", "Fundo branco; report em Rio; painéis brancos recuados"],
       ["Campanhas", "O que lançamos", "Campanhas"],
       ["Indicador do mês", "Creative X", "Indicadores"],
       ["Projetos", "Transformation Hub", "Análises"],
       ["Aprendizados", "O que aprendemos", "Aprendizados"],
       ["Próximo mês", "Foco do próximo mês · Também vem aí", "Próximas iniciativas · Agenda"],
-      ["E-mail-resumo", "Faixa vermelha, cartões Lisboa", "Cabeçalho Rio, cartões Rio, texto Preto"]
+      ["E-mail-resumo", "Faixa vermelha, cartões Lisboa", "Fundo branco; conteúdo Rio; cartões brancos"]
     ], [190, 300, 300], { rowH: 54, s: 13.5 });
     G.captura(sl, "pj-recusa", 875, 200, 502, 300, [{ i: 0 }], { rot: "REPORT DO OUTRO SEGMENTO", seg: "PJ" });
     G.confirmar(sl, 875, 520, 502, 215, "Abriu o report do outro segmento? O emulador avisa (\"Este é um report PF\" ou \"PJ\"), diz qual emulador abrir e não mexe no report que estava aberto. Os rascunhos guardados também são separados.", "PF e PJ não se misturam");
@@ -356,7 +356,7 @@ module.exports = function (G) {
       ["Cantos retos", "Ao enviar, o Outlook para Windows tira os cantos arredondados para todos. A prévia já mostra como chega."],
       ["Modo escuro", "As cores aprovadas são protegidas onde o programa de e-mail deixa. No Outlook clássico, vale o botão do próprio Outlook."],
       ["Imagem do resumo", "Baixar imagem do resumo (.png): uma foto do e-mail, para prévia. O e-mail continua sendo o .eml."],
-      ["Tema do segmento", "PF: faixa vermelha e cartões Lisboa. PJ: cabeçalho Rio, cartões Rio, texto Preto e o botão em Vermelho Santander."]].forEach(function (c, i) {
+      ["Tema do segmento", "PF: faixa vermelha e cartões Lisboa. PJ: fundo branco, conteúdo em Rio, cartões brancos e o botão em Vermelho Santander."]].forEach(function (c, i) {
       var x = 65 + (i % 3) * 444, y = 205 + Math.floor(i / 3) * 268;
       G.cartaoTexto(sl, x, y, 424, 248, c[0], c[1], { eyebrow: String(i + 1) });
     });

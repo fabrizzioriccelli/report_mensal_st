@@ -57,12 +57,17 @@ descricao: Santander
 #  Boston #CC0000 (texto do balão sobre Rio) e Preto #000000 (títulos e
 #  textos de apoio). "Destaque para o tom Rio, garantindo maior
 #  distintividade."
-#  Regras aplicadas no report PJ (5.2):
-#   - FUNDO só Rio ou Branco (nenhum fundo vermelho), com destaque para o
-#     Rio: a página e o fundo do e-mail são Rio; os painéis (abertura,
-#     principais resultados, indicadores, próximas iniciativas e
-#     encerramento) e o cartão das análises são retângulos Brancos
-#     arredondados sobre o Rio.
+#  Hierarquia de cores (Brand Guide 6.2 · Paleta e proporção):
+#    principal (destaque) Rio · base Branco · acento Vermelho Santander
+#    (logotipo, Botão de Início, texto do balão Branco) · Boston (texto do
+#    balão Rio) · Preto (títulos e textos de apoio).
+#  Regras aplicadas no report PJ (5.3):
+#   - FUNDO só Rio ou Branco (nenhum fundo vermelho), em três níveis que
+#     nunca se encostam: o fundo do HTML (em volta do report) é Branco; o
+#     fundo do conteúdo (o report) é Rio, a cor principal; os painéis
+#     (abertura, principais resultados, indicadores, próximas iniciativas
+#     e encerramento) e o cartão das análises são Brancos, recuados dentro
+#     do report (sempre há Rio entre o painel e o fundo do HTML).
 #   - Títulos e textos em Preto; vermelho só na chama, nos links, nos
 #     números de destaque e no botão. Balões: Branco com texto Vermelho
 #     Santander (sobre Rio) ou Rio com texto Boston (sobre Branco). Textos
@@ -79,7 +84,7 @@ positivo: #21634F
 positivo_fundo: #A3E0CE
 atencao: #945400
 atencao_fundo: #FFE1B9
-fundo_pagina: #F5DECF
+fundo_pagina: #FFFFFF
 fundo_email: #F5DECF
 
 

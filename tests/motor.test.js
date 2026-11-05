@@ -446,7 +446,7 @@ function modeloHtml() {
   return r.html;
 }
 
-teste("PF e PJ (5.1 e 5.2): o mesmo esqueleto; mudam as cores da marca, os nomes das seções e a formiguinha", function () {
+teste("PF e PJ (5.1 a 5.3): o mesmo esqueleto; mudam as cores da marca, os nomes das seções e a formiguinha", function () {
   /* os mesmos dados (fictícios) nos dois segmentos: só muda "segmento: PJ" e a marca */
   var dados = ler("dados/EXEMPLO-treinamento.txt");
   var pf = montar(dados), pj = montar(dados.replace(/^\[EDICAO\]\s*$/m, "[EDICAO]\nsegmento: PJ"), { marca: ler("config/marca-pj.txt"), arquivoMarca: "config/marca-pj.txt" });
@@ -461,7 +461,11 @@ teste("PF e PJ (5.1 e 5.2): o mesmo esqueleto; mudam as cores da marca, os nomes
   var abertura = function (r) { return /<!--secao:capa-->[\s\S]*?bgcolor="(#[0-9A-F]{6})"/.exec(r.html)[1]; };
   assert.strictEqual(abertura(pf), "#EC0000", "PF: abertura em Vermelho Santander");
   assert.strictEqual(abertura(pj), "#FFFFFF", "PJ: abertura num painel Branco");
-  assert.ok(/<body style="margin:0;padding:0;background:#F5DECF;" bgcolor="#F5DECF">/.test(pj.html), "PJ: página Rio (5.2)");
+  /* hierarquia (5.3): fundo do HTML Branco, conteúdo Rio, painéis Brancos recuados (borda Rio de 20 px) */
+  assert.ok(/<body style="margin:0;padding:0;background:#FFFFFF;" bgcolor="#FFFFFF">/.test(pj.html), "PJ: fundo do HTML Branco");
+  assert.ok(/class="container ra" width="680"[^>]*bgcolor="#F5DECF"/.test(pj.html), "PJ: conteúdo (o report) em Rio");
+  assert.strictEqual((pj.html.match(/<td class="px ra painel" bgcolor="#FFFFFF"[^>]*border-radius:44px;padding:\d+px 20px \d+px 20px;border:20px solid #F5DECF;/g) || []).length, 5, "PJ: 5 painéis Brancos recuados no Rio");
+  assert.ok(!/class="px ra painel"|border:20px solid/.test(pf.html) && /<td class="px ra" bgcolor="#EC0000" style="background:#EC0000;border-radius:34px;padding:26px 40px 40px 40px;">/.test(pf.html), "PF: painéis como sempre (sem recuo)");
   /* balões: Branco com Vermelho sobre o Rio; Rio com Boston sobre os painéis Brancos */
   assert.ok(/data-campo="principal.rotulo" style="display:inline-block;background:#FFFFFF;color:#EC0000;/.test(pj.html), "PJ: rótulo da campanha num balão Branco com texto Vermelho (sobre o Rio)");
   assert.ok(/background:#F5DECF;color:#CC0000;border-radius:999px;padding:0 7px;letter-spacing:1px;">02</.test(pj.html), "PJ: número da seção no painel Branco num balão Rio com texto Boston");

@@ -25,9 +25,10 @@ A estrutura da página é uma só: abertura, visão geral com a peça vertical, 
 
 | | PF | PJ |
 |---|---|---|
-| Fundo da página e do e-mail | Lisboa em volta de um cartão Branco | **Rio** (5.2), o tom de destaque do Empresas |
-| Abertura, foco e encerramento | Vermelho Santander, texto branco, chama branca | Painéis **Brancos** sobre o Rio, texto Preto, chama vermelha |
-| Principais resultados e indicadores | Rio | Painéis Brancos sobre o Rio |
+| Fundo do HTML (em volta do report) | Lisboa | **Branco** (a base) |
+| Fundo do conteúdo (o report) | Branco | **Rio** (a cor principal do Empresas) |
+| Abertura, foco e encerramento | Vermelho Santander, texto branco, chama branca, encostados na borda do report | Painéis **Brancos** recuados dentro do report (20 px de Rio em volta; 8 px no celular), texto Preto, chama vermelha |
+| Principais resultados e indicadores | Rio | Painéis Brancos recuados, como a abertura |
 | 1º número e títulos | Vermelho Santander | Preto |
 | Pílulas e rótulos das seções | Cores de apoio do PF (turquesa, roxo, rosa) | Sobre o Rio: balão Branco com texto Vermelho Santander. Nos painéis Brancos: balão Rio com texto Boston |
 | Nomes das seções | O que lançamos, Creative X, Transformation Hub, O que aprendemos, Foco de…, Também vem aí | Campanhas, Indicadores, Análises, Aprendizados, Próximas iniciativas, Agenda |
@@ -56,7 +57,7 @@ Os nomes dos blocos são os mesmos do PF (a biblioteca de prompts e a importaç�
 
 | Regra do guia | No report PJ |
 |---|---|
-| Paleta: Rio, Branco, Vermelho Santander, Boston e Preto, "com destaque para o tom Rio" (6.2 Cores) | Fundos só **Rio** e **Branco**, com destaque para o Rio (5.2): a página e o fundo do e-mail são Rio; abertura, principais resultados, indicadores, próximas iniciativas, encerramento e o cartão das análises são painéis Brancos arredondados. Nenhum fundo vermelho na página (o vermelho aparece só como peça, como o selo de uma campanha feito para fundo vermelho) |
+| Paleta e proporção: Rio, Branco, Vermelho Santander, Boston e Preto, "com destaque para o tom Rio" (6.2 Cores). Rio e Branco são as cores de fundo e de balão; Vermelho Santander, de logotipo, Botão de Início e texto do balão Branco; Boston, de texto do balão Rio; Preto, de títulos e textos de apoio | Hierarquia (5.3): **Rio** é a cor principal e é o fundo do conteúdo (o report e o e-mail-resumo); **Branco** é a base: o fundo do HTML em volta e os painéis e cartões, sempre recuados dentro do Rio, para o fundo do conteúdo nunca se confundir com o fundo do HTML; **Vermelho Santander** é o acento (chama, links, botão, texto do balão Branco); **Boston** e **Preto**, os textos. Nenhum fundo vermelho na página (o vermelho aparece só como peça, como o selo de uma campanha feito para fundo vermelho) |
 | Títulos e textos de apoio em Preto (6.2 Cores) | Todos os títulos, números e textos em Preto (o 1º número também; no PF ele é vermelho) |
 | Vermelho: Botão de Início, texto do balão, logotipo | Vermelho só na chama, nos links, no texto dos balões sobre o Rio, no 1º número de um tópico de números e no botão do e-mail-resumo |
 | Balões de fala: só duas variações, Branco com texto Vermelho Santander (sobre Rio) e Rio com texto Boston (sobre Branco); Santander Micro Text SemiBold (6.2 Balões) | Sobre o Rio da página (número da seção, rótulo da campanha): balão Branco com texto Vermelho Santander. Nos painéis Brancos (período da abertura, número da seção, contato): balão Rio com texto Boston. Textos pequenos sobre o Rio (datas da agenda, rótulos) em Boston, para o contraste de 4,5:1 |
@@ -67,7 +68,7 @@ Os nomes dos blocos são os mesmos do PF (a biblioteca de prompts e a importaç�
 
 ### E-mail-resumo PJ
 
-Mesmo funcionamento do PF (até 4 destaques, imagem, link, um único botão, modo escuro protegido), no tema Empresas: cabeçalho Rio com texto Preto, cartões Rio, etiquetas em Boston, chamada final em Branco e o botão em Vermelho Santander com texto branco. Cantos retos, pelo mesmo motivo do PF (o Outlook para Windows tira os cantos ao enviar).
+Mesmo funcionamento do PF (até 4 destaques, imagem, link, um único botão, modo escuro protegido), na mesma hierarquia do report (5.3): o fundo do e-mail é Branco; o conteúdo (cabeçalho, corpo e assinatura) é Rio; os cartões dos destaques e a chamada final são Brancos, recuados no Rio; o botão é Vermelho Santander com texto branco. Cantos retos, pelo mesmo motivo do PF (o Outlook para Windows tira os cantos ao enviar).
 
 ### Ícone Santander + PJ
 
