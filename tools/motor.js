@@ -23,7 +23,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
   /* Versão do projeto (veja CHANGELOG.md). Aparece na página de geração e nos arquivos gerados. */
-  var VERSAO = "5.3 (2026-11-05)";
+  var VERSAO = "5.4 (2026-11-05)";
 
   /* =================================================================== */
   /* 1. LEITURA DOS ARQUIVOS "campo: valor"                               */
@@ -83,8 +83,11 @@
   var ESQUEMA_DADOS = [
     { bloco: "EDICAO", obrigatorio: true, campos: { mes: 1, ano: 1, proximo_mes: 1, pasta_imagens: 1, contato: 0, link_report_completo: 0, segmento: 0 } },
     { bloco: "ABERTURA", obrigatorio: true, campos: { frase: 1, frase_final: 0, previa: 0 } },
-    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ rotulo: 0, nome: 1, resumo: 0, aprendizado: 0 }, PECA) },
+    { bloco: "PROJETO PRINCIPAL", obrigatorio: true, campos: junta({ rotulo: 0, nome: 1, resumo: 0, aprendizado: 0, posicao_imagem: 0 }, PECA) },
     { bloco: "NUMERO", max: 4, campos: NUM },
+    /* Funil (5.4): com este bloco, os números de [NUMERO 1..4] viram os degraus de um funil (o 1º é o mais largo), num
+       bloco Vermelho, com o nome em cima (rotulo) e um total ao lado (total, total_titulo). Sem ele, colunas, como sempre. */
+    { bloco: "FUNIL", campos: { rotulo: 0, total: 0, total_titulo: 0 } },
     { bloco: "LANCAMOS", campos: { titulo: 0 } },
     { bloco: "DESTAQUE", campos: junta({ categoria: 0, titulo: 1, texto: 0, nota: 0, aprendizado: 0 }, PECA) },
     { bloco: "RESULTADO", max: 3, campos: NUM },
@@ -131,12 +134,12 @@
       id: "pj", sigla: "PJ", area: "Creative Strategy PJ", area_linha: "SANTANDER EMPRESAS", icone: ICONE_TAG_PJ,
       template: "template/report.html", marca: "config/marca-pj.txt", emulador: "Emulador Report PJ", foto_capa: [184, 230], layout: "3", painel_recuo: 20,
       secoes: { capa: "Abertura", visao: "Visão geral", resultados: "Principais resultados", lancamos: "Campanhas", cx: "Indicadores", transformation: "Análises",
-        aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda", rodape: "Encerramento" },
+        aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Vem aí", rodape: "Encerramento" },
       nomes: { destaque: "Campanha em destaque", lancamentos: "Campanhas", cx: "Indicadores", cxt: "Indicadores do trimestre", transformation: "Análises",
-        aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda", rotulo_texto: "INDICADORES", topo_lancamos: "CAMPANHAS",
-        topo_transformation: "ANÁLISES", topo_aprendizados: "APRENDIZADOS", topo_foco: "PRÓXIMAS INICIATIVAS · ", topo_agenda: "AGENDA" },
+        aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Vem aí", rotulo_texto: "INDICADORES", topo_lancamos: "CAMPANHAS",
+        topo_transformation: "ANÁLISES", topo_aprendizados: "APRENDIZADOS", topo_foco: "PRÓXIMAS INICIATIVAS · ", topo_agenda: "VEM AÍ" },
       rotulos: { visao: "VISÃO GERAL", resultados: "PRINCIPAIS RESULTADOS", lancamos: "CAMPANHAS", outras: "OUTRAS CAMPANHAS DO MÊS", cx: "INDICADORES",
-        transformation: "ANÁLISES", aprendizados: "APRENDIZADOS", foco: "PRÓXIMAS INICIATIVAS&nbsp;&nbsp;·&nbsp;&nbsp;", agenda: "AGENDA&nbsp;&nbsp;·&nbsp;&nbsp;PRÓXIMAS DATAS" },
+        transformation: "ANÁLISES", aprendizados: "APRENDIZADOS", foco: "PRÓXIMAS INICIATIVAS&nbsp;&nbsp;·&nbsp;&nbsp;", agenda: "VEM AÍ" },
       links: { principal: "Visão geral · ", destaque: "Campanha em destaque · ", lancamento: "Campanha ", transformation: "Análise " }
     }
   };
@@ -469,6 +472,43 @@
     return r;
   }
 
+  /* FUNIL (5.4) · Principais resultados como funil: um bloco Vermelho (cantos de 20 px) com o nome da campanha em
+     cima, os degraus (os números de [NUMERO 1..4], cada um num retângulo Branco, centrado e mais estreito que o de cima)
+     e, ao lado, o total (ex.: a produção financeira). Grade de 600 px: margem de 24 px, degraus em 344 px, espaço de
+     24 px e o total em 184 px (sem total, os degraus usam os 552 px). No celular, o total desce para baixo do funil.
+     Os campos são os mesmos dos números (numero-N.valor, .titulo, .detalhe, .variacao): o e-mail-resumo e a importação
+     seguem iguais. O emulador monta o mesmo bloco (Motor.blocoFunil) ao virar as colunas em funil. */
+  var FUNIL = { margem: 24, degraus: 344, total: 184 };
+  /* largura de cada degrau, em % da coluna do funil: 100, 88 (2 degraus); 100, 88, 76 (3); 100, 90, 80, 70 (4) */
+  function larguraDegrau(i, n) { var passo = n > 1 ? Math.min(12, Math.floor(30 / (n - 1))) : 0; return 100 - i * passo; }
+  /* o: { itens: [{ idx, valor, titulo, detalhe, variacao }] (HTML pronto), rotulo, total, total_titulo, cor: { fundo, valor, texto },
+     fonte: { titulos, texto } }. Devolve o HTML do bloco. */
+  function blocoFunil(o) {
+    var c = o.cor, f = o.fonte, itens = o.itens || [], temTotal = !!(o.total || o.total_titulo);
+    var wf = temTotal ? FUNIL.degraus : LARGURA - 2 * FUNIL.margem;
+    var degraus = itens.map(function (x, i) {
+      var k = "numero-" + x.idx, pct = larguraDegrau(i, itens.length);
+      return '<tr data-item="' + k + '"><td align="center" style="padding:' + (i ? "6px" : "0") + ' 0 0 0;">' +
+        '<table role="presentation" width="' + pct + '%" cellpadding="0" cellspacing="0" border="0" align="center" bgcolor="#FFFFFF" data-degrau="" style="width:' + pct + '%;background:#FFFFFF;border-radius:12px;">' +
+        '<tr><td align="center" style="padding:9px 12px 10px 12px;text-align:center;">' +
+        '<p class="fx" style="margin:0;font-family:' + f.texto + ';font-size:13px;line-height:26px;color:' + c.texto + ';"><span class="ft num" data-campo="' + k + '.valor" style="font-family:' + f.titulos + ';font-weight:bold;font-size:22px;line-height:26px;color:' + c.valor + ';white-space:nowrap;">' + x.valor + '</span>&nbsp;&nbsp; <b data-campo="' + k + '.titulo" style="display:inline-block;color:' + c.texto + ';line-height:18px;">' + (x.titulo || "") + "</b></p>" +
+        (x.variacao ? '<p class="fx" data-campo="' + k + '.variacao" style="margin:2px 0 0 0;font-family:' + f.texto + ';font-size:10px;line-height:16px;">' + x.variacao + "</p>" : "") +
+        (x.detalhe ? '<p class="fx ts" style="margin:0;font-family:' + f.texto + ';font-size:11px;line-height:15px;color:' + c.texto + ';"><span data-campo="' + k + '.detalhe">' + x.detalhe + "</span></p>" : "") +
+        "</td></tr></table></td></tr>";
+    }).join("");
+    var total = !temTotal ? "" : '<td class="hide-m" width="' + ESP + '" style="width:' + ESP + 'px;font-size:0;line-height:0;">&nbsp;</td>' +
+      '<td class="col" data-item="funil-total" width="' + FUNIL.total + '" valign="middle" align="center" style="width:' + FUNIL.total + 'px;text-align:center;">' +
+      '<p class="ft num" data-campo="funil.total" style="margin:0;font-family:' + f.titulos + ';font-weight:bold;font-size:30px;line-height:34px;color:#FFFFFF;white-space:nowrap;">' + (o.total || "") + "</p>" +
+      '<p class="fx" data-campo="funil.total_titulo" style="margin:4px 0 0 0;font-family:' + f.texto + ';font-size:13px;line-height:18px;color:#FFFFFF;">' + (o.total_titulo || "") + "</p></td>";
+    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-funil="" bgcolor="' + c.fundo + '" class="ra" style="background:' + c.fundo + ';border-radius:20px;">' +
+      '<tr><td style="padding:22px ' + FUNIL.margem + "px " + FUNIL.margem + "px " + FUNIL.margem + 'px;">' +
+      (o.rotulo ? '<p class="fx" data-campo="funil.rotulo" style="margin:0 0 16px 0;font-family:' + f.texto + ';font-size:11px;line-height:15px;font-weight:bold;color:#FFFFFF;letter-spacing:1.5px;">' + o.rotulo + "</p>" : "") +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>' +
+      '<td class="col' + (temTotal ? " gap" : "") + '" width="' + wf + '" valign="middle" style="width:' + wf + 'px;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" data-degraus="">' + degraus + "</table></td>" + total +
+      "</tr></table></td></tr></table>";
+  }
+
   function lerNumero(s) { var m = String(s || "").replace(/\s/g, "").match(/^(-?\d+(?:[.,]\d+)?)%?$/); return m ? parseFloat(m[1].replace(",", ".")) : null; }
   function fmtPP(n) { var r = Math.round(n * 10) / 10; return (r > 0 ? "+" : r < 0 ? "-" : "") + String(Math.abs(r)).replace(".", ",") + " p.p."; }
 
@@ -705,7 +745,13 @@
 
     /* 01 · Abertura */
     /* Visão geral (PF e PJ, 5.1): a peça fica em fundo branco, num retângulo vertical (nunca quadrado). */
-    var pp = peca(P, "PROJETO PRINCIPAL", PERF.foto_capa[0], PERF.foto_capa[1], 20, { dica: (PERF.foto_capa[0] * 2) + " x " + (PERF.foto_capa[1] * 2) + " px", fluida: true });
+    /* posicao_imagem: embaixo (5.4): a peça desce para baixo do texto, na largura do report (600 px), inteira, sem
+       recorte (para a peça horizontal, o KV com o selo da campanha à mostra). Sem o campo: ao lado, como sempre. */
+    var posImg = chaveCampo(P.posicao_imagem || "ao lado"), embaixo = posImg === "embaixo" || posImg === "abaixo";
+    if (!embaixo && ["ao_lado", "lado", "direita"].indexOf(posImg) < 0) problema(prob, "aviso", arqD, P._linhas.posicao_imagem, "[PROJETO PRINCIPAL] posicao_imagem deve ser \"ao lado\" ou \"embaixo\". Usei ao lado.");
+    var pp = embaixo ? peca(P, "PROJETO PRINCIPAL", LARGURA, 0, 20, { dica: "1200 px de largura (horizontal)", fluida: true })
+      : peca(P, "PROJETO PRINCIPAL", PERF.foto_capa[0], PERF.foto_capa[1], 20, { dica: (PERF.foto_capa[0] * 2) + " x " + (PERF.foto_capa[1] * 2) + " px", fluida: true });
+    if (embaixo && pp.placeholder) pp.placeholder = placeholder(LARGURA, 300, "1200 x 600 px (horizontal)", 20, pp.tipo === "video");
     var nums = (L.NUMERO || []);
     /* Grade: até 3 números, um por coluna de 184 px (alinhados com as seções de baixo); 4 números, 4 colunas iguais. */
     var larg = nums.length <= 3 ? nums.map(function () { return COL; }) : colunas(LARGURA, nums.length);
@@ -715,6 +761,7 @@
       /* rótulo acima do nome (4.13): "CAMPANHA" por padrão, editável (o do mês nem sempre é um "projeto principal") */
       rotulo: texto(maiusculas(semBr(P.rotulo || "") || "Campanha")),
       nome: texto(P.nome), resumo_cta: comCta(P.resumo, pp), peca: pp, aprendizado: aprendizado(P, "PROJETO PRINCIPAL", "principal.aprendizado", "capa"),
+      imagem_embaixo: embaixo, imagem_ao_lado: !embaixo, funil: false,
       numeros: nums.map(function (v, i) {
         curto(v, "valor", 11, "NUMERO " + (i + 1));
         return {
@@ -728,6 +775,13 @@
       }),
       sobra: sobra
     };
+    /* Funil (5.4): os mesmos números, em degraus (bloco [FUNIL]) */
+    var FN = D.simples.FUNIL;
+    if (FN) abertura.funil = { html: seguro(blocoFunil({
+      itens: abertura.numeros.map(function (x) { return { idx: x.idx, valor: x.valor.s, titulo: x.titulo.s, detalhe: x.detalhe.s, variacao: x.variacao ? x.variacao.s : "" }; }),
+      rotulo: texto(maiusculas(semBr(FN.rotulo || ""))).s, total: numero(FN.total || "").s, total_titulo: texto(FN.total_titulo).s,
+      cor: { fundo: cor.marca.s, valor: cor.marca.s, texto: cor.texto.s }, fonte: { titulos: fonte.titulos.s || fonte.titulos, texto: fonte.texto.s || fonte.texto }
+    })) };
 
     /* 02 · O que lançamos */
     var DS = D.simples.DESTAQUE, lanc = L.LANCAMENTO || [], res = L.RESULTADO || [];
@@ -2095,7 +2149,8 @@
     "CREATIVE X": { subtitulo: "cx.subtitulo", rotulo: "cx.rotulo", anterior: "cx.anterior", atual: "cx.atual", variacao: "cx.variacao", periodo: "cx.periodo", referencia: "cx.referencia", significado: "cx.significado", nota: "cx.nota" },
     "CREATIVE X TRIMESTRE": { rotulo: "cxt.rotulo", titulo: "cxt.titulo", texto: "cxt.texto", estimativa: "cxt.estimativa" },
     "TRANSFORMATION": { titulo: "transformation.titulo" },
-    "FOCO": { prioridade: "foco.prioridade", texto: "foco.texto" }
+    "FOCO": { prioridade: "foco.prioridade", texto: "foco.texto" },
+    "FUNIL": { rotulo: "funil.rotulo", total: "funil.total", total_titulo: "funil.total_titulo" }
   };
   var IMPORTA_LISTA = {
     "NUMERO": ["numero", ["valor", "titulo", "detalhe", "variacao"]], "RESULTADO": ["resultado", ["valor", "titulo", "detalhe", "variacao"]],
@@ -2161,6 +2216,7 @@
     imagemDeDataUri: imagemDeDataUri, trocarSrc: trocarSrc, assuntoDoHtml: assuntoDoHtml, textoDoHtml: textoDoHtml, origemDoHtml: origemDoHtml,
     SECOES: SECOES, SECOES_RESUMO: SECOES_RESUMO, secoesDoHtml: secoesDoHtml, emailResumido: emailResumido, ligarVideos: ligarVideos, paginaInterativa: paginaInterativa, miniaturasSemPlay: miniaturasSemPlay,
     RESUMO_REGRAS: RESUMO_REGRAS, ICONE_TAG: ICONE_TAG, ICONE_TAG_PJ: ICONE_TAG_PJ, PERFIS: PERFIS, perfil: perfil, segmentoDoHtml: segmentoDoHtml, segmentoDosDados: segmentoDosDados, CSS_CELULAR: CSS_CELULAR, xDeExemplo: xDeExemplo, TOPICOS: TOPICOS, LAYOUTS_TOPICO: LAYOUTS_TOPICO, importarDados: importarDados, normalizarLink: normalizarLink, linkDoReport: linkDoReport, nomeDoReport: nomeDoReport, renumerarSecoes: renumerarSecoes, conferirLinkSimples: function (u) { return conferirLink(u, "projeto", []); }, dadosDoResumo: dadosDoResumo, emailResumo: emailResumo, htmlAprendizado: htmlAprendizado, candidatosResumo: candidatosResumo, sugerirDestaques: sugerirDestaques, resolverDestaques: resolverDestaques, layoutDestaques: layoutDestaques, tamanhoImagemDestaque: tamanhoImagemDestaque, DESTAQUE_IMG: DESTAQUE_IMG, elementosComCampo: elementosComCampo,
+    blocoFunil: blocoFunil, larguraDegrau: larguraDegrau, FUNIL: FUNIL,
     CTA: CTA, ESQUEMA_DADOS: ESQUEMA_DADOS, ESQUEMA_MARCA: ESQUEMA_MARCA, seguro: seguro, texto: textoSeguro
   };
 });

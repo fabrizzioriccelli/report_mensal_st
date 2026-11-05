@@ -7,7 +7,7 @@ Modelo do report mensal da Creative Strategy PF (Customer Interactions), em duas
 
 O time atualiza tudo no **emulador**: um arquivo só, que abre no Chrome ou no Edge, sem instalar nada.
 
-**Versão 5.3 (2026-11-05).** Histórico em [CHANGELOG.md](CHANGELOG.md).
+**Versão 5.4 (2026-11-05).** Histórico em [CHANGELOG.md](CHANGELOG.md).
 
 **Dois emuladores, o mesmo sistema:** o **Emulador Report PF** (Creative Strategy PF) e o **Emulador Report PJ** (Santander Empresas, pelo capítulo 6 do Brand Guide). As funções são as mesmas e, a partir da 5.1, **o esqueleto da página também** (o do PJ): muda a identidade (cores e formiguinha), o ícone da aba e os nomes das seções. Um não abre o report do outro. Detalhes do PJ: [docs/REPORT_PJ.md](docs/REPORT_PJ.md).
 
@@ -117,6 +117,7 @@ Testes (Node.js; os `e2e` também precisam do Playwright):
 
 - `node tests/motor.test.js`: motor (79 testes).
 - `node tests/pj.e2e.js`: o Emulador Report PJ de ponta a ponta (aba e ícone Santander + PJ, modelo em branco PJ, editar, imagem vertical, itens com a grade em Preto, seções, + Novo tópico, celular sem rolagem para o lado, importar, salvar com o ícone e a marca do PJ, reabrir, rascunho separado do PF, recusa do report do outro segmento nos dois sentidos, e-mail-resumo no tema Empresas com 4 destaques, `.eml`, `.png` e e-mail completo).
+- `node tests/funil.e2e.js`: o funil dos Principais resultados e a peça da visão geral embaixo, no Emulador Report PJ (Ver como funil, degraus, total, Ver em colunas, Desfazer, Imagem embaixo / ao lado, salvar e reabrir, e-mail-resumo, e-mail completo, celular, "Vem aí" num report da 5.3, PF sem o botão).
 - `node tests/resumo.e2e.js`: e-mail-resumo com destaques escolhidos (sugestão, ordem, título ajustado, informação nova com revisão, imagem do computador, capa de vídeo, link, número vindo do report, `.eml`, `.png`, salvar e reabrir, celular).
 - `node tests/aprendizado.e2e.js`: "O que aprendemos" dentro de cada campanha (criar pela barra, importar do Copilot, tirar e desfazer, salvar e reabrir, celular).
 - `node tests/assistente.e2e.js`: + Adicionar item (os 7 tipos, posição, prévia, Voltar e ajustar, Cancelar, campos obrigatórios, Creative X trimestral), mover itens e a ordem das seções (↑ ↓ Posição…, arrastar no painel e na página, Esc, rolagem automática), leveza do arrasto com a CPU 4× mais lenta, salvar, reabrir, e-mail-resumo e celular.

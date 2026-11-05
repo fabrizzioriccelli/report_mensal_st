@@ -443,12 +443,14 @@
      O código é o mesmo; mudam os nomes, as cores da grade, o ícone e o modelo em branco. Um report do outro segmento não abre. */
   var SEG = window.SEGMENTO === "pj" ? "pj" : "pf", PERFIL = Motor.perfil(SEG), PJ = SEG === "pj";
   var UI = PJ ? {
-    sec: { visao: "Visão geral", resultados: "Principais resultados", lancamos: "Campanhas", cx: "Indicadores", transformation: "Análises", aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Agenda (próximas datas)" },
-    grupos: { numero: "Principais resultados", resultado: "Resultados da campanha em destaque (Campanhas)", cxt: "Indicadores do trimestre", lancamento: "Outras campanhas do mês (Campanhas)", transformation: "Análises", aprendizado: "Aprendizados", agenda: "Agenda (próximas datas)" },
+    sec: { visao: "Visão geral", resultados: "Principais resultados", lancamos: "Campanhas", cx: "Indicadores", transformation: "Análises", aprendizados: "Aprendizados", foco: "Próximas iniciativas", agenda: "Vem aí" },
+    grupos: { numero: "Principais resultados", resultado: "Resultados da campanha em destaque (Campanhas)", cxt: "Indicadores do trimestre", lancamento: "Outras campanhas do mês (Campanhas)", transformation: "Análises", aprendizado: "Aprendizados", agenda: "Vem aí (agenda)" },
     principal: "Visão geral · campanha", destaque: "Campanhas · destaque", foco: "Próximas iniciativas", compactos: "Outras campanhas", figPrincipal: "Peça da visão geral", figDestaque: "Peça da campanha em destaque",
     numeroDe: "Resultado principal ", resultadoDe: " da campanha em destaque", cx: "Indicadores", sugestao: "os principais resultados", destaqueSec: PERFIL.nomes.destaque,
     /* 5.2: fundo Rio, painéis Brancos (meta "report-layout" 3) */
     cor: { numero1: "#000000", texto: "#000000", linha: "#FFFFFF", linhaBloco: "#F5DECF", transf: "#F5DECF", topico: "#EC0000", apr: { abertura_linha: "#F5DECF", linha: "#FFFFFF", grupo_aprendizado: "#CC0000", texto: "#000000" } },
+    /* Funil dos Principais resultados (5.4): as mesmas cores do motor (config/marca-pj.txt › marca e texto) */
+    funil: { fundo: "#EC0000", valor: "#EC0000", texto: "#000000" },
     /* report PJ salvo na 5.0 ou na 5.1 (página Branca, blocos Rio; meta "report-layout" 2): as cores daquele layout */
     corAntiga: { numero1: "#000000", texto: "#000000", linha: "#F5DECF", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#CC0000", apr: { abertura_linha: "#FFFFFF", linha: "#F5DECF", grupo_aprendizado: "#CC0000", texto: "#000000" } },
     layoutAtual: "3"
@@ -460,6 +462,7 @@
     cor: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#FFFFFF", transf: "#F5DECF", topico: "#127277", apr: { abertura_linha: "#FFFFFF", linha: "#E2E2E2", grupo_aprendizado: "#A6112F", texto: "#000000" } },
     /* report PF salvo antes da 5.1 (layout de antes, sem a meta "report-layout"): as cores que o emulador usava nele */
     corAntiga: { numero1: "#EC0000", texto: "#000000", linha: "#E2E2E2", linhaBloco: "#E2E2E2", transf: "#F5DECF", topico: "#127277", apr: null },
+    funil: { fundo: "#EC0000", valor: "#EC0000", texto: "#000000" },
     layoutAtual: "2"
   };
   var EDITOR_CSS =
@@ -477,6 +480,7 @@
     ".ed-mais{margin:12px 0 0 0;text-align:left;line-height:1}" +
     ".ed-mais button{all:unset;cursor:pointer;display:inline-block;font:700 12px/1 Arial,sans-serif;color:#EC0000;background:#FFFFFF;border:1.5px dashed #EC0000;border-radius:999px;padding:8px 13px}" +
     ".ed-mais button:hover{background:#FFF1F1}.ed-mais button[disabled]{color:#767676;border-color:#BBBBBB;cursor:default;background:#FFFFFF}" +
+    ".ed-mais button[hidden]{display:none}" +
     "#ed-secao{position:absolute;z-index:98;display:flex;gap:4px;font:700 12px/1 Arial,sans-serif}#ed-secao[hidden]{display:none !important}" +
     "#ed-secao button{all:unset;background:#222;color:#fff;border-radius:999px;padding:6px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);font:700 12px/1 Arial,sans-serif}" +
     "#ed-secao button.pega{cursor:grab;touch-action:none;background:#EC0000}#ed-secao button.tira{background:#5F5F5F}#ed-secao button[disabled]{opacity:.35;cursor:default}#ed-secao button:focus-visible{outline:2px solid #EC0000;outline-offset:2px}" +
@@ -493,7 +497,9 @@
     $("#estado").className = "estado sujo"; $("#estado").textContent = (msg ? msg + " · " : "") + "Alterações não salvas (a edição fica guardada neste navegador até salvar).";
     /* o status e as prévias acompanham logo (reconverter espera 0,6 s sem mudança); o rascunho é guardado a cada 1,2 s */
     reconverter();
-    clearTimeout(ED.timer); ED.timer = setTimeout(function () { guardarRascunho({ nome: ED.nome, origem: ED.origem, periodoInicial: ED.periodoInicial, html: htmlEdicao(), quando: Date.now() }); }, 1200);
+    /* rascunho 1,2 s depois da última mudança (5.4: não roda com outro report abrindo no quadro: o documento de antes já saiu) */
+    var docDaVez = ED.doc;
+    clearTimeout(ED.timer); ED.timer = setTimeout(function () { if (ED.doc !== docDaVez || !ED.doc || !ED.doc.documentElement || !ED.doc.defaultView) return; guardarRascunho({ nome: ED.nome, origem: ED.origem, periodoInicial: ED.periodoInicial, html: htmlEdicao(), quando: Date.now() }); }, 1200);
   }
   function camposDe(chave) { return Array.prototype.slice.call(ED.doc.querySelectorAll('[data-campo="' + chave + '"]')); }
 
@@ -548,6 +554,7 @@
         if (o.n) marcarSujo("Otimizei " + o.n + " imagem(ns) pesada(s) deste report (−" + kb(o.economia) + "): ele fica mais leve para abrir e enviar. Salve para gravar"); });
       document.querySelector(".ferramentas").scrollIntoView({ behavior: "smooth", block: "start" });
     };
+    clearTimeout(ED.timer);
     fr.srcdoc = paraEditar(html);
   }
   /* Report de antes (4.13): o rótulo "PROJETO PRINCIPAL" da capa vira "CAMPANHA" (editável) e os números ficam na
@@ -562,6 +569,15 @@
       }
     }
     if (ordenarNumeros(d)) feito.push("os números agora se leem em ordem: o número, o que ele é e a comparação (etiqueta com a referência)");
+    /* PJ (5.4): a seção "Agenda · Próximas datas" passa a se chamar "Vem aí" (o nome do report do time) */
+    if (PJ) {
+      var ag = marcaSecao(d, "agenda"), w = ag && d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT), t, trocou = false;
+      if (ag) {
+        var nosAg = []; for (var x = ag.nextSibling; x && !(x.nodeType === 8 && /^secao:/.test(x.nodeValue.trim())); x = x.nextSibling) nosAg.push(x);
+        nosAg.forEach(function (n) { if (n.nodeType !== 1 || trocou) return; var tw = d.createTreeWalker(n, NodeFilter.SHOW_TEXT); while ((t = tw.nextNode())) { if (/^AGENDA\s*·\s*PRÓXIMAS DATAS$/.test(t.nodeValue.replace(/\u00a0/g, " ").trim())) { t.nodeValue = "VEM AÍ"; trocou = true; break; } } });
+      }
+      if (trocou) feito.push("a seção Agenda agora se chama VEM AÍ");
+    }
     /* o layout de celular entra até 700 px (antes 620): de 621 a 700 px a página rolava para o lado (ex.: celular deitado) */
     var bp = 0; Array.prototype.forEach.call(d.querySelectorAll("style"), function (st) { var t = st.textContent; if (/\(max-width:620px\)/.test(t)) { st.textContent = t.replace(/\(max-width:620px\)/g, "(max-width:700px)"); bp++; } });
     if (bp) feito.push("o layout de celular vale também para telas de até 700 px");
@@ -665,7 +681,14 @@
     /* links não navegam durante a edição */
     d.addEventListener("click", function (e) {
       if (!e.target.closest) return;
-      var mais = e.target.closest(".ed-mais button"); if (mais) { e.preventDefault(); if (!mais.disabled) adicionarItem(mais.getAttribute("data-grupo")); return; }
+      var mais = e.target.closest(".ed-mais button"); if (mais) {
+        e.preventDefault(); if (mais.disabled) return;
+        var acao = mais.getAttribute("data-acao");
+        if (acao === "funil") { if (emFunil("numero")) virarColunas(); else virarFunil(); }
+        else if (acao === "total") porTotalFunil();
+        else adicionarItem(mais.getAttribute("data-grupo"));
+        return;
+      }
       if (e.target.closest("a")) e.preventDefault();
     }, true);
     /* barra flutuante: imagem, link ou item */
@@ -686,7 +709,8 @@
       if (alvo.tagName === "IMG") return mostrarBarra(alvo, ferramentasImagem(alvo), alvo.getBoundingClientRect().width < 200 ? "abaixo" : "");
       if (alvo.matches(LINKS)) return mostrarBarra(alvo, ferramentasLink(alvo));
       if (alvo.hasAttribute("data-apr")) return mostrarBarra(alvo, [["Tirar aprendizado", function () { tirarAprendizado(alvo); }, "cinza"]], "direita");
-      var item = alvo, gi = grupoDe(item), numeros = gi ? GRUPOS[gi].layout === "numeros" || GRUPOS[gi].semMidia : item.getAttribute("data-item") === "cx-trimestre";
+      if (alvo.getAttribute("data-item") === "funil-total") return mostrarBarra(alvo, [["Tirar o total", function () { tirarTotalFunil(alvo); }, "cinza"]], "acima");
+      var item = alvo, gi = grupoDe(item), numeros = gi ? GRUPOS[gi].layout === "numeros" || GRUPOS[gi].semMidia || emFunil(gi) : item.getAttribute("data-item") === "cx-trimestre";
       var bi = numeros ? [] : [["+ Link", function () { adicionarLink(item); }]];
       if (!numeros) bi.push(["+ Imagem", function () { escolher("#fImagem", function (f) { adicionarImagem(item, f); }); }]);
       if (item.hasAttribute("data-item")) {
@@ -698,7 +722,8 @@
       /* "O que aprendemos" da campanha: lançamento (no card), projeto principal (números) e destaque (resultados) */
       var ca = chaveAprendizadoDe(item);
       if (ca && !campoExiste(ca)) bi.splice(bi.length && /^Tirar/.test(bi[bi.length - 1][0]) ? bi.length - 1 : bi.length, 0, ["+ O que aprendemos", function () { criarAprendizado(ca, null, true); }]);
-      mostrarBarra(item, bi, item.getBoundingClientRect().width < 320 ? "acima" : "direita");
+      /* degrau do funil: a barra fica em cima (não cobre o número nem o título do degrau) */
+      mostrarBarra(item, bi, emFunil(gi) || item.getBoundingClientRect().width < 320 ? "acima" : "direita");
     }
     /* Caminho até a barra: indo do dono até ela, o mouse passa por cima de outras coisas (o cartão em volta da imagem,
        a imagem dentro do cartão, outro item). Se ele saiu do dono (ou da própria barra, escorregando ao ir de um botão
@@ -851,12 +876,53 @@
     var chave = img.getAttribute("data-img"), video = img.hasAttribute("data-video");
     if (video) b.push(["Trocar vídeo", function () { escolher("#fVideo", function (f) { trocarVideo(chave, f, false); }); }], ["Tirar o vídeo", function () { tirarVideo(chave); }, "cinza"]);
     else if (/^(principal|destaque|lancamento-\d+)$/.test(chave)) b.push(["Colocar vídeo", function () { escolher("#fVideo", function (f) { trocarVideo(chave, f, true); }); }, "cinza"]);
+    if (chave === "principal" && PJ) b.splice(1, 0, [imagemEmbaixo() ? "Imagem ao lado" : "Imagem embaixo", function () { moverImagemPrincipal(); }]);
     if (/^(selo|transformation-\d+-logo)$|-print-\d+$/.test(chave)) b.push(["Tirar imagem", function () { tirarImagem(chave); }, "cinza"]);
     b.push(["Descrição", function () { var n = prompt("Descrição da imagem (o que ela mostra):", img.alt.replace(/^Vídeo: /, "")); if (n !== null) mesmasImagens(chave).forEach(function (i) { var antes = i.alt; i.alt = (i.hasAttribute("data-video") ? "Vídeo: " : "") + n; i.setAttribute("data-legenda", n); pilha(function () { i.alt = antes; }); }); marcarSujo(); }, "cinza"]);
     return b;
   }
   function escolher(sel, fn) { var i = $(sel); i.value = ""; i.onchange = function () { if (i.files[0]) fn(i.files[0]); }; i.click(); }
   function mesmasImagens(chave) { return Array.prototype.slice.call(ED.doc.querySelectorAll('img[data-img="' + chave + '"]')); }
+  /* Peça da visão geral embaixo do texto (5.4, PJ): na largura do report (600 px), inteira, sem recorte (a peça
+     horizontal, o KV com o selo da campanha à mostra). "Imagem ao lado" volta para o retângulo vertical (184 x 230 px).
+     A imagem é refeita a partir da versão inteira (a ampliada); depois é só Trocar imagem pela peça horizontal. */
+  function imagemEmbaixo() { var img = ED.doc.querySelector('img[data-img="principal"]'); return !!(img && img.closest("td[data-imagem-embaixo]")); }
+  async function moverImagemPrincipal() {
+    var img = ED.doc.querySelector('img[data-img="principal"]'), nome = ED.doc.querySelector('[data-campo="principal.nome"]'); if (!img || !nome) return;
+    var el = img.parentNode.tagName === "A" ? img.parentNode : img, tdImg = el.closest("td"), tdTexto = nome.closest("td"), trTexto = tdTexto.parentNode;
+    var antes = { src: img.getAttribute("src"), thumb: img.getAttribute("data-thumb"), w: img.getAttribute("width"), h: img.getAttribute("height"), cls: img.className, w2: img.style.width, tw: tdTexto.getAttribute("width"), tc: tdTexto.className, ts: tdTexto.style.width };
+    var origem = img.getAttribute("data-ampliar") || img.getAttribute("data-thumb") || img.getAttribute("src"), tipo = MIDIA[origem] ? MIDIA[origem].blob.type : (/^data:([^;,]+)/.exec(origem) || [])[1] || "";
+    var im; try { im = await carregar(origem); } catch (e) { $("#estado").textContent = e.message; return; }
+    var png = /png|webp|gif/.test(tipo), video = img.hasAttribute("data-video"), embaixo = !imagemEmbaixo(), w = embaixo ? 600 : PERFIL.foto_capa[0], h = embaixo ? 0 : PERFIL.foto_capa[1];
+    var desfaz;
+    if (embaixo) {
+      var esp = tdImg.previousElementSibling, tr = ED.doc.createElement("tr"), td = ED.doc.createElement("td");
+      td.className = "col"; td.setAttribute("width", "600"); td.setAttribute("valign", "top"); td.setAttribute("style", "width:600px;padding-top:24px;"); td.setAttribute("data-imagem-embaixo", "");
+      td.appendChild(el); tr.appendChild(td); trTexto.parentNode.insertBefore(tr, trTexto.nextSibling);
+      var espOk = esp && esp.classList.contains("hide-m"), prox = tdImg.nextSibling;
+      if (espOk) esp.remove(); tdImg.remove();
+      tdTexto.className = "col"; tdTexto.setAttribute("width", "600"); tdTexto.style.width = "600px";
+      desfaz = function () { if (espOk) trTexto.appendChild(esp); trTexto.appendChild(tdImg); tdImg.appendChild(el); tr.remove(); };
+    } else {
+      var trB = tdImg.parentNode, esp2 = ED.doc.createElement("td"), td2 = ED.doc.createElement("td");
+      esp2.className = "hide-m"; esp2.setAttribute("width", "24"); esp2.setAttribute("style", "width:24px;font-size:0;line-height:0;"); esp2.innerHTML = "&nbsp;";
+      td2.className = "col"; td2.setAttribute("width", "184"); td2.setAttribute("valign", "top"); td2.setAttribute("align", "center"); td2.setAttribute("style", "width:184px;");
+      td2.appendChild(el); trTexto.appendChild(esp2); trTexto.appendChild(td2); trB.remove();
+      tdTexto.className = "col gap"; tdTexto.setAttribute("width", "392"); tdTexto.style.width = "392px";
+      desfaz = function () { trTexto.parentNode.insertBefore(trB, trTexto.nextSibling); tdImg.appendChild(el); esp2.remove(); td2.remove(); };
+    }
+    img.setAttribute("width", String(w)); if (h) img.setAttribute("height", String(h)); else img.removeAttribute("height");
+    img.className = embaixo ? "fluid" : "fluid himg"; img.style.width = w + "px";
+    img.setAttribute("src", midiaDe(desenhar(im, w, h, png, video)));
+    if (video) img.setAttribute("data-thumb", midiaDe(desenhar(im, w, h, png, false)));
+    pilha(function () {
+      desfaz(); img.setAttribute("src", antes.src); if (antes.thumb !== null) img.setAttribute("data-thumb", antes.thumb);
+      img.setAttribute("width", antes.w); if (antes.h) img.setAttribute("height", antes.h); else img.removeAttribute("height"); img.className = antes.cls; img.style.width = antes.w2;
+      tdTexto.setAttribute("width", antes.tw); tdTexto.className = antes.tc; tdTexto.style.width = antes.ts;
+    });
+    ED.doc.getElementById("ed-barra").hidden = true;
+    marcarSujo(embaixo ? "Peça da visão geral embaixo do texto, na largura do report e sem recorte. Use Trocar imagem para pôr a peça horizontal (ex.: o KV com o selo da campanha)" : "Peça da visão geral ao lado do texto de novo (retângulo vertical)");
+  }
   /* =================================================================== */
   /* MÍDIA FORA DO TEXTO (desempenho)                                     */
   /* Fotos, vídeos e PDFs ficam como arquivos na memória do navegador (Blob) e a página em edição guarda
@@ -1597,14 +1663,19 @@
     if (g === "resultado") total = it.reduce(function (s2, x) { return s2 + (+x.getAttribute("width") || 0); }, 0) + 24 * (it.length - 1);
     ED.grupos[g] = { cont: cont, total: total };
     var div = ED.doc.createElement("div"); div.className = "ed-mais"; div.setAttribute("data-editor", ""); div.setAttribute("contenteditable", "false");
-    div.innerHTML = '<button type="button" data-grupo="' + g + '"></button>';
+    div.innerHTML = '<button type="button" data-grupo="' + g + '"></button>' +
+      /* PJ (5.4): os Principais resultados viram funil (e voltam para colunas); no funil, o total pode sair e voltar */
+      (g === "numero" && PJ ? ' <button type="button" data-acao="funil"></button> <button type="button" data-acao="total" hidden></button>' : "");
     var tab = cont.closest("table"); tab.parentNode.insertBefore(div, tab.nextSibling);
   }
   function atualizarMais() {
-    Array.prototype.forEach.call(ED.doc.querySelectorAll(".ed-mais button"), function (b) {
+    Array.prototype.forEach.call(ED.doc.querySelectorAll(".ed-mais button[data-grupo]"), function (b) {
       var g = b.getAttribute("data-grupo"), n = itensDo(g).length, max = GRUPOS[g].max;
       b.disabled = n >= max; b.textContent = n >= max ? "Máximo de " + max + " (" + GRUPOS[g].nome + ")" : "+ Adicionar " + GRUPOS[g].nome;
     });
+    var f = ED.doc.querySelector('.ed-mais button[data-acao="funil"]'), t = ED.doc.querySelector('.ed-mais button[data-acao="total"]'), em = emFunil("numero");
+    if (f) { f.textContent = em ? "Ver em colunas" : "Ver como funil"; f.title = em ? "Os números voltam para as colunas (o nome e o total do funil saem)" : "Os números viram os degraus de um funil, com o nome da campanha e um total ao lado"; }
+    if (t) t.hidden = !em || !!ED.doc.querySelector('table[data-funil] [data-item="funil-total"]'), t.textContent = "+ Total ao lado";
   }
   function celula(attrs) { var x = ED.doc.createElement("td"); Object.keys(attrs).forEach(function (k) { x.setAttribute(k, attrs[k]); }); x.innerHTML = "&nbsp;"; return x; }
   function espaco(w, extra) { return celula({ "class": "hide-m", width: String(w), style: "width:" + w + "px;font-size:0;line-height:0;" + (extra || "") }); }
@@ -1639,6 +1710,16 @@
         x.setAttribute("style", "width:" + lg[i] + "px;" + (lay === "numeros" ? "border-top:2px solid " + cor + ";padding-top:12px;" : ""));
         var val = lay === "numeros" && x.querySelector('[data-campo$=".valor"]'); if (val) val.setAttribute("style", trocaCor(val.getAttribute("style"), cor));
         var cx = x.querySelector("table[data-imagens]"); if (cx && cx.querySelector("img[data-img]")) arrumarImagens(cx, lg[i], x.getAttribute("data-item"));
+      });
+      return;
+    }
+    if (emFunil(g)) {
+      /* funil: os degraus um embaixo do outro, cada um mais estreito (as larguras do motor: Motor.larguraDegrau) */
+      Array.prototype.slice.call(cont.children).forEach(function (c) { if (it.indexOf(c) < 0) c.remove(); });
+      it.forEach(function (x, i) {
+        var td = x.firstElementChild, t = x.querySelector("table[data-degrau]"), pct = Motor.larguraDegrau(i, n);
+        if (td) td.style.padding = i ? "6px 0px 0px" : "0px";
+        if (t) { t.setAttribute("width", pct + "%"); t.style.width = pct + "%"; }
       });
       return;
     }
@@ -1698,6 +1779,81 @@
     }
   }
   /* Item novo: o do modelo em branco (textos [entre colchetes], imagem neutra), no fim do grupo ou depois do item escolhido. */
+  /* ---------- funil dos Principais resultados (5.4, PJ) ----------
+     "Ver como funil" (embaixo dos números): os números viram os degraus de um funil (Motor.blocoFunil, o mesmo bloco do
+     [FUNIL] nos dados), com o nome da campanha em cima e um total ao lado; tudo continua editável no clique. Os degraus
+     usam os mesmos campos (numero-N): o e-mail-resumo segue igual. "Ver em colunas" volta (o nome e o total saem).
+     + Adicionar, Tirar item e ↑/↓ funcionam nos degraus. Cada passo é um passo no Desfazer. */
+  function emFunil(g) { var G = g === "numero" && ED.grupos && ED.grupos.numero; return !!(G && G.cont && G.cont.closest && G.cont.closest("table[data-funil]")); }
+  var PEND_ED = "background:#FFE1B9;color:#945400;border-radius:3px;";
+  function pend(t) { return '<span style="' + PEND_ED + '">' + t + "</span>"; }
+  function fonteDe(el) { var m = el && /font-family:\s*([^;]+)/.exec(el.getAttribute("style") || ""); return m ? m[1].trim().replace(/"/g, "'") : ""; }
+  function fontesDaPagina() {
+    var v = ED.doc.querySelector('[data-campo="numero-1.valor"]'), t = ED.doc.querySelector('[data-campo="numero-1.titulo"]'), r = ED.doc.querySelector('[data-campo="principal.resumo"]');
+    return { titulos: fonteDe(v) || "Arial, Helvetica, sans-serif", texto: fonteDe(t && t.closest("p")) || fonteDe(r) || "Arial, Helvetica, sans-serif" };
+  }
+  function htmlDoCampo(it, c) { var e = it.querySelector('[data-campo="' + it.getAttribute("data-item") + "." + c + '"]'); return e ? e.innerHTML.trim() : ""; }
+  function deHtml(h) { var box = ED.doc.createElement("div"); box.innerHTML = h; return box; }
+  function virarFunil() {
+    var G = ED.grupos.numero; if (!G || emFunil("numero")) return;
+    var it = itensDo("numero"), tab = G.cont.closest("table"), mais = tab.nextElementSibling && tab.nextElementSibling.classList.contains("ed-mais") ? tab.nextElementSibling : null;
+    var nome = ED.doc.querySelector('[data-campo="principal.nome"]'), rot = nome ? nome.textContent.replace(/\s+/g, " ").trim().toLocaleUpperCase("pt-BR") : "";
+    var novo = deHtml(Motor.blocoFunil({
+      itens: it.map(function (x, i) { return { idx: i + 1, valor: htmlDoCampo(x, "valor"), titulo: htmlDoCampo(x, "titulo"), detalhe: htmlDoCampo(x, "detalhe"), variacao: htmlDoCampo(x, "variacao") }; }),
+      rotulo: rot && !/^\[.*\]$/.test(rot) ? esc(rot) : pend("[NOME DA CAMPANHA]"), total: pend("[Total]"), total_titulo: pend("[o que o total mede]"),
+      cor: UI.funil, fonte: fontesDaPagina()
+    })).firstElementChild;
+    tab.parentNode.replaceChild(novo, tab); if (mais) mais.remove();
+    delete ED.grupos.numero; editavel(novo); prepararGrupo("numero"); atualizarMais();
+    pilha(function () { novo.parentNode.replaceChild(tab, novo); if (mais) tab.parentNode.insertBefore(mais, tab.nextSibling); ED.grupos.numero = G; atualizarMais(); });
+    ED.doc.getElementById("ed-barra").hidden = true;
+    marcarSujo("Principais resultados em funil: clique nos textos para editar (o nome em cima, cada degrau e o total ao lado). Para voltar: Ver em colunas ou Desfazer");
+  }
+  function virarColunas() {
+    var G = ED.grupos.numero; if (!emFunil("numero")) return;
+    var it = itensDo("numero"), funil = G.cont.closest("table[data-funil]");
+    var tab = deHtml('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr></tr></tbody></table>').firstElementChild, tr = tab.querySelector("tr");
+    for (var i = 0; i < it.length; i++) {
+      var m = modeloDoItem("numero"); if (!m) { perguntar("Modelo não encontrado", "<p>O modelo em branco não está junto deste emulador. Use a versão avulsa (kit/emulador-report-pj.html).</p>", "Entendi"); return; }
+      m.setAttribute("data-item", "numero-" + (i + 1));
+      Array.prototype.forEach.call(m.querySelectorAll("[data-campo]"), function (x) { x.setAttribute("data-campo", x.getAttribute("data-campo").replace(/^numero-\d+/, "numero-" + (i + 1))); });
+      var vals = { valor: htmlDoCampo(it[i], "valor"), titulo: htmlDoCampo(it[i], "titulo"), detalhe: htmlDoCampo(it[i], "detalhe"), variacao: htmlDoCampo(it[i], "variacao") };
+      ["valor", "titulo", "detalhe", "variacao"].forEach(function (c) {
+        var e = m.querySelector('[data-campo$=".' + c + '"]'); if (!e) return;
+        if (vals[c] || c === "valor" || c === "titulo") e.innerHTML = vals[c]; else (e.tagName === "P" ? e : e.closest("p")).remove();
+      });
+      var det = m.querySelector('[data-campo$=".detalhe"]'); if (det) det.closest("p").style.margin = vals.variacao ? "3px 0px 0px" : "0px";
+      tr.appendChild(m);
+    }
+    var mais = funil.querySelector(".ed-mais");
+    funil.parentNode.replaceChild(tab, funil);
+    delete ED.grupos.numero; editavel(tab); prepararGrupo("numero"); renumerar("numero"); refazer("numero"); atualizarMais();
+    pilha(function () { var m2 = tab.nextElementSibling; if (m2 && m2.classList.contains("ed-mais")) m2.remove(); tab.parentNode.replaceChild(funil, tab); ED.grupos.numero = G; atualizarMais(); });
+    ED.doc.getElementById("ed-barra").hidden = true;
+    marcarSujo("Principais resultados em colunas de novo (o nome e o total do funil saíram). Para voltar: Desfazer");
+  }
+  function degrauNovo() {
+    return deHtml(Motor.blocoFunil({ itens: [{ idx: 1, valor: pend("[Número]"), titulo: pend("[O que ele mede]"), detalhe: pend("[Referência]") }], cor: UI.funil, fonte: fontesDaPagina() })).querySelector("tr[data-item]");
+  }
+  function colunaDoFunil(f) { var t = f.querySelector("table[data-degraus]"); return t && t.closest("td"); }
+  function tirarTotalFunil(td) {
+    var f = td.closest("table[data-funil]"), esp = td.previousElementSibling, col = colunaDoFunil(f), linha = td.parentNode;
+    var w0 = col.getAttribute("width"), c0 = col.className, w = 600 - 2 * Motor.FUNIL.margem;
+    if (esp && esp.classList.contains("hide-m")) esp.remove(); else esp = null;
+    td.remove(); col.setAttribute("width", String(w)); col.style.width = w + "px"; col.className = "col";
+    pilha(function () { if (esp) linha.appendChild(esp); linha.appendChild(td); col.setAttribute("width", w0); col.style.width = w0 + "px"; col.className = c0; atualizarMais(); });
+    ED.doc.getElementById("ed-barra").hidden = true; atualizarMais();
+    marcarSujo("Total tirado do funil: os degraus usam a largura toda. Para voltar: + Total ao lado ou Desfazer");
+  }
+  function porTotalFunil() {
+    var f = ED.doc.querySelector("table[data-funil]"); if (!f || f.querySelector('[data-item="funil-total"]')) return;
+    var td = deHtml(Motor.blocoFunil({ itens: [], total: pend("[Total]"), total_titulo: pend("[o que o total mede]"), cor: UI.funil, fonte: fontesDaPagina() })).querySelector('[data-item="funil-total"]');
+    var esp = td.previousElementSibling, col = colunaDoFunil(f), linha = col.parentNode, w0 = col.getAttribute("width"), c0 = col.className;
+    linha.appendChild(esp); linha.appendChild(td); col.setAttribute("width", String(Motor.FUNIL.degraus)); col.style.width = Motor.FUNIL.degraus + "px"; col.className = "col gap";
+    editavel(td);
+    pilha(function () { esp.remove(); td.remove(); col.setAttribute("width", w0); col.style.width = w0 + "px"; col.className = c0; atualizarMais(); });
+    atualizarMais(); marcarSujo("Total ao lado do funil: troque os textos [entre colchetes]");
+  }
   /* Modelo em branco com a mídia separada (uma vez por sessão), fonte do + Adicionar e do + Novo tópico. */
   var CORINGA_LEVE = null;
   function coringaLeve() { if (!CORINGA_LEVE && window.CORINGA_HTML) CORINGA_LEVE = separarMidia(window.CORINGA_HTML, true); return CORINGA_LEVE; }
@@ -1719,7 +1875,7 @@
   async function adicionarItem(g, depois) {
     var G = ED.grupos[g], it = itensDo(g); if (!G) return;
     if (it.length >= GRUPOS[g].max) { $("#estado").textContent = "Este grupo já tem o máximo de " + GRUPOS[g].max + " (" + GRUPOS[g].nome + ")."; return; }
-    var novo = modeloDoItem(g);
+    var novo = emFunil(g) ? degrauNovo() : modeloDoItem(g);
     if (!novo) { await perguntar("Modelo não encontrado", "<p>O modelo em branco não está junto deste emulador. Use a versão avulsa (kit/emulador-report.html).</p>", "Entendi"); return; }
     var volta = desfazGrupo(G), ref = depois || it[it.length - 1];
     if (ref) ref.parentNode.insertBefore(novo, ref.nextSibling);
@@ -1751,7 +1907,7 @@
   }
   /* ---------- mover itens: ← Antes / Depois → (ou ↑ / ↓) na barra do item ---------- */
   /* Grupos em coluna (um embaixo do outro) usam ↑/↓; os outros, ←/→. A grade é refeita como no + Adicionar. */
-  function grupoVertical(g) { return g === "transformation" || GRUPOS[g].layout === "lista"; }
+  function grupoVertical(g) { return g === "transformation" || GRUPOS[g].layout === "lista" || emFunil(g); }
   /* Leva o item para a posição destino (0 = primeiro) do grupo. Um passo no Desfazer. */
   function moverItem(item, destino) {
     var g = grupoDe(item), G = g && ED.grupos[g]; if (!G) return false;

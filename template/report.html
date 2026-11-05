@@ -176,19 +176,25 @@
     <td class="px" style="padding:40px 40px 0 40px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td class="col gap" width="392" valign="top" style="width:392px;">
+          {{#imagem_ao_lado}}<td class="col gap" width="392" valign="top" style="width:392px;">{{/imagem_ao_lado}}{{#imagem_embaixo}}<td class="col" width="600" valign="top" style="width:600px;">{{/imagem_embaixo}}
             <p class="fx" style="margin:0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n}}</span>&nbsp;&nbsp;{{rot.visao}}</p>
             <p class="fx" style="margin:18px 0 0 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;"><span class="fx" data-campo="principal.rotulo" style="display:inline-block;background:{{cor.grupo_resultados_fundo}};color:{{cor.grupo_resultados}};border-radius:999px;padding:4px 12px;font-weight:600;letter-spacing:1.2px;">{{rotulo}}</span></p>
             <p class="ft h2" data-campo="principal.nome" style="margin:12px 0 0 0;font-family:{{fonte.impacto}};font-size:28px;line-height:32px;font-weight:bold;color:{{cor.titulo}};letter-spacing:-0.5px;">{{nome}}</p>
             {{#resumo_cta}}<p class="fx tm" data-campo="principal.resumo" style="margin:10px 0 0 0;font-family:{{fonte.texto}};font-size:13px;line-height:20px;color:{{cor.texto_corpo}};">{{resumo_cta}}</p>{{/resumo_cta}}
           </td>
-          <td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
+          <!-- posicao_imagem: embaixo (5.4): a peça desce para baixo do texto, na largura do report (600 px), sem recorte -->{{#imagem_ao_lado}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>
           <!-- EDITAR AQUI: IMAGEM DA CAMPANHA → [PROJETO PRINCIPAL] imagem, descricao_imagem (vídeo: tipo video + video)
                184 x 230 px (envie com 368 x 460 px ou mais), retângulo vertical; no celular, 216 px, centralizada. -->
           <td class="col" width="184" valign="top" align="center" style="width:184px;">
             {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-campo="principal.imagem" data-img="principal" class="fluid himg" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
+          </td>{{/imagem_ao_lado}}
+        </tr>{{#imagem_embaixo}}
+        <!-- Peça embaixo do texto (posicao_imagem: embaixo): 600 px, inteira (envie com 1200 px de largura). -->
+        <tr>
+          <td class="col" width="600" valign="top" style="width:600px;padding-top:24px;" data-imagem-embaixo="">
+            {{#peca}}{{#img}}{{#link}}<a href="{{link}}" target="_blank" style="text-decoration:none;">{{/link}}<img src="{{src}}" width="{{w}}"{{#h}} height="{{h}}"{{/h}} alt="{{alt}}"{{#zoom}} data-ampliar="{{zoom}}" data-legenda="{{legenda}}"{{/zoom}}{{#video}} data-video="{{video}}" data-legenda="{{legenda}}"{{/video}}{{#thumb}} data-thumb="{{thumb}}"{{/thumb}} data-campo="principal.imagem" data-img="principal" class="fluid" style="display:block;border:0;width:{{w}}px;height:auto;border-radius:20px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:{{cor.texto_apoio}};">{{#link}}</a>{{/link}}{{/img}}{{placeholder}}{{/peca}}
           </td>
-        </tr>
+        </tr>{{/imagem_embaixo}}
       </table>
     </td>
   </tr>
@@ -201,7 +207,7 @@
   <tr>
     <td class="px ra{{painel.classe}}" bgcolor="{{cor.bloco_fundo}}" style="background:{{cor.bloco_fundo}};border-radius:{{painel.raio}}px;padding:28px {{painel.lado}}px 32px {{painel.lado}}px;{{painel.borda}}">
       <p class="fx" style="margin:0 0 18px 0;font-family:{{fonte.texto}};font-size:10px;line-height:14px;font-weight:bold;color:{{cor.texto}};letter-spacing:2px;"><span style="display:inline-block;background:{{cor.capa_selo}};color:{{cor.selo_texto}};border-radius:999px;padding:0 7px;letter-spacing:1px;">{{n2}}</span>&nbsp;&nbsp;{{rot.resultados}}</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <!-- Funil (5.4): [FUNIL] rotulo, total, total_titulo; os degraus são os [NUMERO 1..4] (tools/motor.js › blocoFunil). Sem [FUNIL]: colunas. -->{{#funil}}{{html}}{{/funil}}{{^funil}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           {{#numeros}}
           {{^primeiro}}<td class="hide-m" width="24" style="width:24px;font-size:0;line-height:0;">&nbsp;</td>{{/primeiro}}
@@ -219,7 +225,7 @@
           {{/numeros}}
           {{#sobra}}<td class="hide-m" width="{{sobra}}" style="width:{{sobra}}px;font-size:0;line-height:0;">&nbsp;</td>{{/sobra}}
         </tr>
-      </table>
+      </table>{{/funil}}
       <!-- EDITAR AQUI: O QUE APRENDEMOS (CAMPANHA DO MÊS) → [PROJETO PRINCIPAL] aprendizado (sem texto, não aparece) -->
       {{aprendizado}}
     </td>

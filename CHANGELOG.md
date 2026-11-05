@@ -2,6 +2,22 @@
 
 A versão atual aparece na página `gerar-report.html`, no topo de `report_backup.html` e em `tools/motor.js` (`VERSAO`).
 
+## 5.4 · 2026-11-05 · Funil nos Principais resultados, peça embaixo e "Vem aí" (PJ)
+
+- **Funil editável no Emulador Report PJ.** Embaixo dos números dos Principais resultados, o botão **Ver como funil** transforma os números em degraus de um funil, num bloco Vermelho Santander:
+  - em cima, o nome da campanha (vem da visão geral, em maiúsculas);
+  - cada número vira um degrau Branco, centrado e mais estreito que o de cima (100, 88 e 76% com 3 degraus; 100, 90, 80 e 70% com 4), com o número, o que ele mede e a referência;
+  - ao lado, um total (ex.: a produção financeira), com o texto [entre colchetes] para trocar; no celular, o total desce para baixo do funil.
+  - Tudo se edita no clique. **+ Adicionar indicador**, **Tirar item** e **↑ / ↓** funcionam nos degraus (as larguras se refazem). No total: **Tirar o total** (os degraus usam a largura toda) e **+ Total ao lado** (volta). **Ver em colunas** volta para as colunas (o nome e o total saem). Cada passo é um passo no **Desfazer**.
+  - Os degraus usam os mesmos campos dos números (`numero-1` a `numero-4`): o e-mail-resumo, a importação do Copilot e o e-mail completo seguem iguais.
+- **Funil também pelos dados:** o bloco `[FUNIL]` (`rotulo`, `total`, `total_titulo`) faz o mesmo no `gerar-report.html`. O emulador e o motor montam o mesmo bloco (`Motor.blocoFunil`).
+- **Peça da visão geral embaixo do texto (PJ):** na barra da imagem, **Imagem embaixo** leva a peça para baixo do texto, na largura do report (600 px), inteira, sem recorte. Serve para a peça horizontal, como o KV com o selo da campanha à mostra. Depois, **Trocar imagem** coloca a peça horizontal, que entra sem recorte. **Imagem ao lado** volta ao retângulo vertical. Pelos dados: `[PROJETO PRINCIPAL] posicao_imagem: embaixo`.
+- **"Agenda · Próximas datas" agora se chama "Vem aí" no PJ** (o nome do report do time). Um report PJ salvo antes muda ao abrir no emulador, com aviso (salve para gravar).
+- **O PF não muda:** o report, o modelo e o exemplo do PF saem idênticos aos da 5.3, comparados byte a byte. No PJ, sem `[FUNIL]` e sem `posicao_imagem`, só o rótulo "Vem aí" muda. O Emulador Report PF não tem o botão do funil.
+- **Correção no emulador (PF e PJ):** o rascunho automático (1,2 s depois da última mudança) não roda mais quando outro report está sendo aberto no quadro. Antes, salvar e abrir outro arquivo logo em seguida podia dar um erro no console (o documento de antes já tinha saído).
+- Modelos em branco, exemplos e emuladores avulsos gerados de novo.
+- Testes: `tests/funil.e2e.js` (novo: funil, degraus, total, colunas, Desfazer, peça embaixo, salvar e reabrir, e-mail-resumo, e-mail completo, celular a 390, 640 e 690 px, "Vem aí" num report da 5.3, PF sem o botão) e a suíte inteira do PF e do PJ.
+
 ## 5.3 · 2026-11-05 · Hierarquia de cores do Santander Empresas no PJ
 
 - **O fundo do conteúdo não se confunde mais com o fundo do HTML.** Na 5.2, a página e o report do PJ eram os dois Rio, e o report se misturava com a página. Agora o PJ segue a hierarquia da paleta do Brand Guide (6.2 · Paleta e proporção):

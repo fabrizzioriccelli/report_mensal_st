@@ -96,6 +96,15 @@ descricao_imagem: Lorem ipsum dolor sit amet
 enquadramento: centro
 tipo: peca
 link: [INSERIR LINK]
+# posicao_imagem (opcional, 5.4): "embaixo" leva a peça para baixo do texto, na largura do report
+#   (600 px, inteira, sem recorte; envie a peça horizontal com 1200 px de largura). Sem o campo: ao lado.
+
+# [FUNIL] (opcional, 5.4): os números abaixo viram os degraus de um funil, com o nome em cima
+#   e um total ao lado. Para usar, tire o # das 4 linhas (no emulador: "Ver como funil").
+# [FUNIL]
+# rotulo: Nome da campanha
+# total: R$ X MM
+# total_titulo: produção financeira
 
 # EDITAR AQUI: PRINCIPAIS RESULTADOS (números da campanha do mês)
 # Recomendado: 3 números, um em cada coluna da grade (alinhados com as

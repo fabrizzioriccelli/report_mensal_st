@@ -41,17 +41,23 @@ As cores ficam em `config/marca.txt` e `config/marca-pj.txt` (`abertura_fundo`, 
 | Seção | De onde vem (mesmos blocos do PF) |
 |---|---|
 | Abertura | `[ABERTURA]` frase e segunda parte, período (`[EDICAO]`) |
-| 01 · Visão geral | `[PROJETO PRINCIPAL]` rótulo (balão), nome, resumo, peça vertical |
-| 02 · Principais resultados | `[NUMERO 1..4]` e o "O que aprendemos" da campanha |
+| 01 · Visão geral | `[PROJETO PRINCIPAL]` rótulo (balão), nome, resumo, peça vertical ao lado ou, com `posicao_imagem: embaixo` (5.4), a peça horizontal embaixo do texto, em 600 px e sem recorte |
+| 02 · Principais resultados | `[NUMERO 1..4]` em colunas ou, com `[FUNIL]` (5.4), em funil: `rotulo` em cima, um degrau por número e o `total` / `total_titulo` ao lado; o "O que aprendemos" da campanha |
 | 03 · Campanhas | `[LANCAMOS]`, `[DESTAQUE]` + `[RESULTADO 1..3]`, `[LANCAMENTO 1..6]` (outras campanhas) |
 | 04 · Indicadores | `[CREATIVE X]` (indicador do mês) e `[CREATIVE X TRIMESTRE]` |
 | 05 · Análises | `[TRANSFORMATION]` e `[TRANSFORMATION 1..3]` (status, texto, resultado, prints, links) |
 | 06 · Aprendizados | `[APRENDIZADO 1..3]` |
 | Novos tópicos | `[TOPICO]`… (iguais ao PF) |
-| 07 · Próximas iniciativas | `[FOCO]` e a agenda (`[AGENDA 1..6]`, "próximas datas") |
+| 07 · Próximas iniciativas | `[FOCO]` |
+| Vem aí | a agenda (`[AGENDA 1..6]`; até a 5.3 se chamava "Agenda · Próximas datas") |
 | Encerramento | `[EDICAO]` próximo mês e contato; assinatura com a chama |
 
 Os nomes dos blocos são os mesmos do PF (a biblioteca de prompts e a importação do Copilot funcionam igual); só o nome que aparece na página muda.
+
+### Funil e peça embaixo, direto no emulador (5.4)
+
+- **Funil:** embaixo dos números dos Principais resultados, **Ver como funil**. Os números viram degraus num bloco Vermelho Santander, com o nome da campanha em cima e um total ao lado. Clique em qualquer texto para editar. Nos degraus: **+ Adicionar indicador**, **Tirar item**, **↑ / ↓**. No total: **Tirar o total** e **+ Total ao lado**. **Ver em colunas** volta (o nome e o total saem). Os degraus são os mesmos números (`numero-1` a `numero-4`): o e-mail-resumo continua oferecendo esses números como destaques.
+- **Peça embaixo:** passe o mouse na peça da visão geral e use **Imagem embaixo**. Depois, **Trocar imagem** com a peça horizontal (ex.: o KV com o selo da campanha), que entra inteira, sem recorte, na largura do report. **Imagem ao lado** volta ao retângulo vertical.
 
 ## Identidade: Brand Guide Santander Brasil (maio/2026), capítulo 6 · Santander Empresas
 
@@ -88,6 +94,7 @@ node tools/atualizar-coringa.js pj           # kit/report-coringa-pj.html e tool
 node tools/atualizar-coringa.js exemplo-pj   # kit/report-exemplo-pj.html
 node tools/montar-avulso.js pj               # kit/emulador-report-pj.html
 node tests/pj.e2e.js                         # teste de ponta a ponta do PJ
+node tests/funil.e2e.js                      # funil, peça embaixo e "Vem aí" (5.4)
 ```
 
 O PF continua com os mesmos comandos, sem argumento. `gerar-report.html` escolhe o template e a marca pelo `segmento:` do arquivo de dados.
